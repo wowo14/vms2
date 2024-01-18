@@ -1,0 +1,7 @@
+{
+    "disabled": [
+        'ms-azuretools.vscode-docker',
+    ],
+    "autoReload": true,
+    "openInNewWindow": true
+}

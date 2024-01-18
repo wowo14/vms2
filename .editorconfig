@@ -1,0 +1,5 @@
+# .editorconfig
+root = true
+
+[*]
+trim_trailing_whitespace = true

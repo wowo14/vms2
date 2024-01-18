@@ -1,0 +1,19 @@
+{
+    "recommendations": [
+        "bmewburn.vscode-intelephense-client", // Example extension for Yii2 (Intelephense)
+        // Add more extension IDs here as needed
+        "imanilchaudhari.yii2-snippets",
+    ],
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true
+    },
+    "php.validate.executable": "php",
+    "workbench.settings.editor": "json",
+    "emmet.showSuggestionsAsSnippets": true,
+    "emmet.useInlineCompletions": true,
+    "editorconfig.generateAuto": false,
+}
