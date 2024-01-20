@@ -1,4 +1,5 @@
 <?php
+
 use yii\helpers\Html;
 ?>
 <table style="width: 100%; font-size: 14px; text-align: center; font-weight: bold;">
@@ -30,11 +31,14 @@ use yii\helpers\Html;
 </table>
 <table width="100%" class="border1solid table">
     <tr>
-        <td class="center border1solid">No</td>
-        <td class="center border1solid">URAIAN REVIEW</td>
-        <td class="center border1solid">YA</td>
+        <td rowspan="2" class="center border1solid">No</td>
+        <td rowspan="2" class="center border1solid">URAIAN REVIEW</td>
+        <td colspan="2" class="center border1solid">Sesuai?</td>
+        <td rowspan="2" class="center border1solid">Keterangan</td>
+    </tr>
+    <tr>
+        <td class="center border1solid">Ya</td>
         <td class="center border1solid">Tidak</td>
-        <td class="center border1solid">Keterangan</td>
     </tr>
     <?php $i = 1;
     $uraian = json_decode($template->uraian, true);
@@ -52,7 +56,7 @@ use yii\helpers\Html;
 </table>
 Review Oleh Pejabat Pengadaan:<br>
 <ol>
-    <li><?= $template->keterangan??'' ?></li>
+    <li><?= $template->keterangan ?? '' ?></li>
 </ol>
 Kesimpulan:<br>
 <ol>

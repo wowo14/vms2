@@ -6,6 +6,8 @@ $config = [
     'id' => 'vms2',
     'name' => 'VMS',
     'timeZone' => 'Asia/Jakarta',
+    'language' => 'id-ID',
+    'sourceLanguage' => 'id-ID',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'aliases' => [
@@ -67,7 +69,7 @@ $config = [
             ],
         ],
         'session' => [
-            'class'=>'yii\web\Session',
+            'class' => 'yii\web\Session',
             'name' => 'vms2',
             'cookieParams' => ['httponly' => true, 'lifetime' => 3600 * 4],
             'timeout' => 3600 * 4, //session expire 4jam
@@ -123,7 +125,7 @@ $config = [
                 'yii2-ajaxcrud' => [
                     'class' => 'yii\i18n\PhpMessageSource',
                     'basePath' => '@yii2ajaxcrud/ajaxcrud/messages',
-                    'sourceLanguage' => 'id',
+                    'sourceLanguage' => 'id-ID',
                 ],
             ]
         ],

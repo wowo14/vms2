@@ -68,4 +68,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     public function getAttachments() {
         return $this->hasMany(Attachment::class, ['user_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_attachment'));
     }
+    public function getRequiredlampiran(){//array id
+        return collect(self::settingType('jenis_dokumen'))->where('param', 'lampiran')->pluck('id')->toArray();
+    }
 }

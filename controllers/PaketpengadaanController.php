@@ -4,8 +4,11 @@ use app\models\{Attachment,Dpp, PaketPengadaanDetails, PaketPengadaanSearch, Pak
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\web\ServerErrorHttpException;
 use yii\web\{Controller, Response, NotFoundHttpException};
+
 class PaketpengadaanController extends Controller {
     public function behaviors() {
         return [
@@ -76,6 +79,15 @@ class PaketpengadaanController extends Controller {
         $pks = explode(',', $request->post('pks'));
         foreach ($pks as $pk) {
             $model = $this->findModel($pk);
+            $jenisdokumen= Attachment::collectAll(['user_id'=>$model->id])->pluck('jenis_dokumen')->toArray();
+            sort($jenisdokumen);
+            if($jenisdokumen!==$model->requiredlampiran){
+                throw new ServerErrorHttpException('Paket Pengadaan: Lampiran belum diupload semua');
+            }
+            $dp=Dpp::where(['paket_id'=>$model->id])->one();
+            if($dp){
+                throw new ServerErrorHttpException('Paket Pengadaan: DPP sudah diinput');
+            }
             $dpp = new Dpp;
             $dpp->paket_id = $model->id;
             if ($dpp->save()) {

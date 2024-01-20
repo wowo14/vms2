@@ -84,9 +84,7 @@ class DppController extends Controller {
                 ];
             }
         }
-        // return $this->renderPartial('_reviewdpp', [
-        //     'model' => $model,
-        // ]);
+
     }
     public function actionCetak($id) {
         $model = $this->findModel($id);

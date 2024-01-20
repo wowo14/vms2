@@ -37,7 +37,8 @@ class ReviewDpp extends \yii\db\ActiveRecord {
             $this->updated_by = Yii::$app->user->identity->id;
             $this->updated_at = date('Y-m-d H:i:s', time());
         }
+        $this->tanggal_review=date('Y-m-d H:i:s');
         return parent::beforeSave($insert);
     }
-    
+
 }
