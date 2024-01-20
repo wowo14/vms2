@@ -25,8 +25,5 @@ class AuthAssignment extends \yii\db\ActiveRecord
             'created_at' => 'Created At',
         ];
     }
-    public function afterSave($insert, $changedAttributes){
-        parent::afterSave($insert, $changedAttributes);
-        self::invalidatecache('tag_' . self::getModelname());
-    }
+    
 }

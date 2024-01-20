@@ -1,11 +1,12 @@
 <?php
 namespace app\controllers;
+use app\models\ReviewDpp;
+use app\models\{Dpp, DppSearch, PaketPengadaanDetails};
 use Yii;
-use app\models\{Dpp,DppSearch,PaketPengadaanDetails};
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
-use yii\web\{Controller,Response, NotFoundHttpException};
+use yii\web\{Controller, Response, NotFoundHttpException};
 class DppController extends Controller {
     private $_pageSize = 10;
     public function behaviors() {
@@ -36,7 +37,6 @@ class DppController extends Controller {
     public function actionIndex() {
         $searchModel = new DppSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $this->_pageSize);
-
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -98,11 +98,50 @@ class DppController extends Controller {
     }
     public function actionReviewdpp($id) {
         $model = $this->findModel($id);
-        $pdf = Yii::$app->pdf;
-        $pdf->content = $this->renderPartial('_reviewdpp', [
-            'model' => $model,
-        ]);
-        return $pdf->render();
+        if($model->reviews){
+            $pdf = Yii::$app->pdf;
+            $pdf->content = $this->renderPartial('_reviewdpp', [
+                'model' => $model, 'template' => $model->reviews??[]
+            ]);
+            $pdf->cssInline = ".center{text-align:center}.border1solid {border: #eee 1px solid;}";
+            return $pdf->render();
+        }else{
+            Yii::$app->session->setFlash('warning', 'Belum ada review dpp');
+            return $this->redirect(['index']);
+        }
+    }
+    public function actionFormreview($id) {
+        $request = Yii::$app->request;
+        $model = $this->findModel($id);
+        $r = file_get_contents(Yii::getAlias('@app/uraianreviewdpp.json'));
+        $template = (json_decode($r));
+        if ($request->isGet) {
+            return $this->render('_frmreviewdpp', [
+                'model' => $model,
+                'reviews' => $model->reviews??new ReviewDpp, 'template' => $template->data??[],
+            ]);
+        }
+        if ($request->isPost) {
+            $rr=ReviewDpp::where(['dpp_id'=>$model->id])->orderBy('id desc')->one();
+            if($rr){
+                $rr->uraian=json_encode($_POST['ReviewDpp']['uraian'],JSON_UNESCAPED_SLASHES);
+                $rr->keterangan=$_POST['ReviewDpp']['keterangan'];
+                $rr->dpp_id = $model->id;
+                $rr->pejabat=Yii::$app->user->id;
+                $rr->save();
+            }else{
+                $rr=new ReviewDpp;
+                $rr->uraian=json_encode($_POST['ReviewDpp']['uraian'],JSON_UNESCAPED_SLASHES);
+                $rr->keterangan=$_POST['ReviewDpp']['keterangan'];
+                $rr->dpp_id=$model->id;
+                $rr->pejabat=Yii::$app->user->id;
+                $rr->save();
+            }
+            $model->status_review=1;
+            $model->save();
+            Yii::$app->session->setFlash('success', 'Review DPP Berhasil');
+            return $this->redirect(['index']);
+        }
     }
     public function actionCreate() {
         $request = Yii::$app->request;

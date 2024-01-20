@@ -33,9 +33,5 @@ class Setting extends \yii\db\ActiveRecord
     public function getValueparam(){
         return $this->value . ' | ' . $this->param;
     }
-    public function afterSave($insert, $changedAttributes)
-    {
-        parent::afterSave($insert, $changedAttributes);
-        self::invalidatecache('tag_' . self::getModelname());
-    }
+
 }

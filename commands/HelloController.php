@@ -32,8 +32,9 @@ class HelloController extends Controller
         // $tables = $schema->getTableNames();
         $tables=[
             // 'setting',
-            'attachment',
-            // 'trx_ppat',
+            // 'attachment',
+            'review_dpp',
+            'dpp',
         ];
         // $db->createCommand('SET FOREIGN_KEY_CHECKS = 0;')->execute();
         foreach ($tables as $table) {

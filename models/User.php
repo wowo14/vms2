@@ -12,9 +12,5 @@ class User extends U
     {
         return $this->hasMany(AuthAssignment::class, ['user_id' => 'id'])->cache(24 * 60 * 60, self::settagdep('tag_authassignment'));
     }
-    public function afterSave($insert, $changedAttributes)
-    {
-        parent::afterSave($insert, $changedAttributes);
-        self::invalidatecache('tag_' . self::getModelname());
-    }
+  
 }

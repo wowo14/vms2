@@ -46,7 +46,7 @@ return [
         'class' => 'kartik\grid\ActionColumn',
         'dropdown' => false,
         'noWrap' => 'true',
-        'template' => '{approve} {cetak} {reviewdpp} {view} {update} {delete}',
+        'template' => '{approve} {cetak} {reviewdpp} {formreview} {view} {update} {delete}',
         'vAlign' => 'middle',
         'urlCreator' => function($action, $model, $key, $index) {
                 return Url::to([$action,'id'=>$key]);
@@ -59,6 +59,10 @@ return [
             'cetak' => function ($url, $model, $key) {
                 return Html::a('<span class="fa fa-print"></span>', $url,
                 ['class' => 'btn btn-sm btn-outline-success', 'data-pjax' => 0, 'title' => 'Cetak', 'data-toggle' => 'tooltip']);
+            },
+            'formreview' => function ($url, $model, $key) {
+                return Html::a('<span class="fa fa-print"></span>', $url,
+                ['class' => 'btn btn-sm btn-outline-primary', 'data-pjax' => 0, 'title' => 'reviewdpp', 'data-toggle' => 'tooltip']);
             },
             'reviewdpp' => function ($url, $model, $key) {
                 return Html::a('<span class="fa fa-print"></span>', $url,

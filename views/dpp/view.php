@@ -3,7 +3,7 @@ use app\models\PaketPengadaan;
 use yii\widgets\DetailView;
 ?>
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="dpp-view">DPP
             <?= DetailView::widget([
                 'model' => $model,
@@ -22,7 +22,7 @@ use yii\widgets\DetailView;
             ]) ?>
         </div>
     </div>
-    <div class="col-md-6">Paket Pengadaan
+    <div class="col-md-8">Paket Pengadaan
         <?php echo $this->render('/paketpengadaan/view', ['model' => PaketPengadaan::findOne($model->paket_id)]);
         ?>
     </div>
