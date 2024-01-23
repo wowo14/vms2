@@ -6,13 +6,13 @@ use yii\bootstrap4\Modal;
 use kartik\grid\GridView;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
+/* @var $searchModel app\models\TemplateChecklistEvaluasiDetailSearch */
 
-$this->title = 'Draft Usulans';
+$this->title = 'Template Checklist Evaluasi Detail';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
-$this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\BootstrapPluginAsset']);
 ?>
-<div class="draft-usulan-index">
+<div class="template-checklist-evaluasi-detail-index">
     <div id="ajaxCrudDatatable">
         <?= GridView::widget([
             'id' => 'crud-datatable',
@@ -26,7 +26,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
                     Html::a(
                         '<i class="fa fa-plus"></i>',
                         ['create'],
-                        ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Draft Usulans', 'class' => 'btn btn-outline-primary']
+                        ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Template Checklist Evaluasi Details', 'class' => 'btn btn-outline-primary']
                     ) .
                         Html::a(
                             '<i class="fa fa-redo"></i>',
@@ -36,14 +36,6 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
                         '{toggleData}' .
                         '{export}'
                 ],
-            ],
-            'exportConfig' => [
-                'html' => ['filename' => str_replace(' ', '', $this->title)],
-                'csv' => ['filename' => str_replace(' ', '', $this->title)],
-                'txt' => ['filename' => str_replace(' ', '', $this->title)],
-                'xls' => ['filename' => str_replace(' ', '', $this->title)],
-                'pdf' => ['filename' => str_replace(' ', '', $this->title)],
-                'json' => ['filename' => str_replace(' ', '', $this->title)],
             ],
             'striped' => true,
             'condensed' => true,

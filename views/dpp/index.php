@@ -1,4 +1,5 @@
 <?php
+
 use kartik\grid\GridView;
 use sdelfi\datatables\DataTables;
 use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
@@ -6,6 +7,7 @@ use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii\bootstrap4\Modal;
 use yii\helpers\Html;
 use yii\helpers\Url;
+
 $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\BootstrapPluginAsset']);
 $this->title = 'Dpp';
 $this->params['breadcrumbs'][] = $this->title;
@@ -91,12 +93,12 @@ CrudAsset::register($this);
     </div>
 </div>
 <?php Modal::begin([
-    "id" => "ajaxCrudModal","size"=>"modal-xl",
+    "id" => "ajaxCrudModal", "size" => "modal-xl",
     "footer" => "",
     "clientOptions" => [
         "tabindex" => false,
         "backdrop" => "static",
-        "keyboard" => false,
+        "keyboard" => true,
     ],
     "options" => [
         "tabindex" => false

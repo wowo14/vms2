@@ -1,7 +1,7 @@
 <?php
 namespace app\controllers;
-use app\models\{Attachment,Dpp, PaketPengadaanDetails, PaketPengadaanSearch, PaketPengadaan};
 use Yii;
+use app\models\{Attachment,Dpp, PaketPengadaanDetails, PaketPengadaanSearch, PaketPengadaan};
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
@@ -177,13 +177,6 @@ class PaketpengadaanController extends Controller {
                 }
             }
             return $this->redirect(['index']);
-            // $searchModel = new PaketPengadaanSearch();
-            // $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-            // // $dataProvider->pagination->pageSize=10;
-            // return $this->render('index', [
-            //     'searchModel' => $searchModel,
-            //     'dataProvider' => $dataProvider
-            // ]);
         }
     }
     public function actionIndex() {

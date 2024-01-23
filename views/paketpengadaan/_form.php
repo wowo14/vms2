@@ -1,4 +1,5 @@
 <?php
+
 use kartik\date\DatePicker;
 use kartik\select2\Select2;
 use nemmo\attachments\components\AttachmentsInput;
@@ -12,7 +13,7 @@ use yii\helpers\Html;
         'options' => ['enctype' => 'multipart/form-data'],
         'fieldConfig' => [
             'template' => "<div class='row'>{label}\n<div class='col-sm-9'>{input}\n{error}</div></div>",
-            'labelOptions' => ['class' => 'col-sm-3 control-label right'],
+            'labelOptions' => ['class' => 'col-sm-3 col-md-3 control-label text-sm-left text-md-right'],
         ],
     ]); ?>
     <?= $form->field($model, 'nomor')->textInput() ?>

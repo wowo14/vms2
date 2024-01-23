@@ -1,5 +1,4 @@
 <?php
-
 use kartik\switchinput\SwitchInput;
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
@@ -12,7 +11,7 @@ use unclead\multipleinput\MultipleInputColumn;
         // 'enableAjaxValidation' => true,
         'fieldConfig' => [
             'template' => "<div class='row'>{label}\n<div class='col-sm-9'>{input}\n{error}</div></div>",
-            'labelOptions' => ['class' => 'col-sm-3 control-label right'],
+            'labelOptions' => ['class' => 'col-sm-3 col-md-3 control-label text-sm-left text-md-right'],
         ],
     ]); ?>
     <table style="width: 100%; font-size: 14px; text-align: center; font-weight: bold;">
@@ -52,7 +51,6 @@ use unclead\multipleinput\MultipleInputColumn;
                 'keterangan' => $e['keterangan']
             ];
         }
-        // print_r($rr);
     } else {
         $rr = collect($template)->map(function ($e, $index) {
             $r = ['id' => $index, 'uraian' => $e, 'sesuai' => '1', 'keterangan' => ''];

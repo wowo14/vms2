@@ -1,4 +1,5 @@
 <?php
+
 use kartik\switchinput\SwitchInput;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\Html;
@@ -9,7 +10,7 @@ use yii\helpers\Html;
         'enableAjaxValidation' => false,
         'fieldConfig' => [
             'template' => "<div class='row'>{label}\n<div class='col-sm-9'>{input}\n{error}</div></div>",
-            'labelOptions' => ['class' => 'col-sm-3 control-label right'],
+            'labelOptions' => ['class' => 'col-sm-3 col-md-3 control-label text-sm-left text-md-right'],
         ],
     ]); ?>
     <?= $form->field($model, 'type')->textInput(['maxlength' => true]) ?>

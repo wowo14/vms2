@@ -6,7 +6,6 @@ use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii\bootstrap4\Modal;
 use yii\helpers\Html;
 use yii\helpers\Url;
-
 $this->title = 'Paket Pengadaan';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
@@ -113,7 +112,8 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
     "clientOptions" => [
         "tabindex" => false,
         "backdrop" => "static",
-        "keyboard" => false,
+        "keyboard" => true,
+        "focus"=>true,
     ],
     "options" => [
         "tabindex" => false
