@@ -49,7 +49,10 @@ class Dpp extends \yii\db\ActiveRecord
         }
         return parent::beforeSave($insert);
     }
-    
+
+    public function getPaketpengadaans(){
+        return $this->hasMany(PaketPengadaan::class, ['id' => 'paket_id'])->cache(self::cachetime(), self::settagdep('tag_paketpengadaan'));
+    }
     public function getPaketpengadaan(){
         return $this->hasOne(PaketPengadaan::class, ['id' => 'paket_id'])->cache(self::cachetime(), self::settagdep('tag_paketpengadaan'));
     }

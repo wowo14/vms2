@@ -5,15 +5,16 @@ use yii\widgets\DetailView;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
-            'penyedia_id',
-            'paket_pengadaan_id:ntext',
+            [
+                'attribute'=>'penyedia_id',
+                'value'=>fn($d)=>$d->penyedia->nama_perusahaan,
+            ],
+            [
+                'attribute'=> 'paket_pengadaan_id',
+                'value'=>fn($d)=>$d->paketpengadaan->nomornamapaket,
+            ],
             'keperluan:ntext',
             'is_active',
-            'created_at:ntext',
-            'updated_at:ntext',
-            'created_by',
-            'updated_by',
         ],
     ]) ?>
 </div>

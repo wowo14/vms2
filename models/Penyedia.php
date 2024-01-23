@@ -1,15 +1,15 @@
 <?php
+
 namespace app\models;
+
 use Yii;
-class Penyedia extends \yii\db\ActiveRecord
-{
+
+class Penyedia extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'penyedia';
     }
-    public function rules()
-    {
+    public function rules() {
         return [
             [['npwp', 'nama_perusahaan', 'alamat_perusahaan', 'nomor_telepon'], 'required'],
             [['tanggal_pendirian', 'created_at', 'updated_at'], 'string'],
@@ -17,8 +17,7 @@ class Penyedia extends \yii\db\ActiveRecord
             [['npwp', 'nama_perusahaan', 'alamat_perusahaan', 'nomor_telepon', 'email_perusahaan', 'kategori_usaha', 'akreditasi', 'propinsi', 'kota', 'kode_pos', 'mobile_phone', 'website', 'alamat_kantorpusat', 'telepon_kantorpusat', 'fax_kantorpusat', 'email_kantorpusat'], 'string', 'max' => 255],
         ];
     }
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'id' => 'ID',
             'npwp' => 'Npwp',
@@ -45,5 +44,15 @@ class Penyedia extends \yii\db\ActiveRecord
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
+    }
+    public function beforeSave($insert) {
+        if ($insert) {
+            $this->created_by = Yii::$app->user->identity->id;
+            $this->created_at = date('Y-m-d H:i:s', time());
+        } else {
+            $this->updated_by = Yii::$app->user->identity->id;
+            $this->updated_at = date('Y-m-d H:i:s', time());
+        }
+        return parent::beforeSave($insert);
     }
 }
