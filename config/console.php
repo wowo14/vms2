@@ -12,12 +12,12 @@ return [
         '@console'   => '@runtime',
     ],
     'controllerMap' => [
-        'migrate' => [
-            'class' => 'yii\console\controllers\MigrateController',
-            'migrationNamespaces' => [
-                'nemmo\attachments\migrations',
-            ],
-        ],
+        // 'migrate' => [
+        //     'class' => 'yii\console\controllers\MigrateController',
+        //     'migrationNamespaces' => [
+        //         'nemmo\attachments\migrations',
+        //     ],
+        // ],
         'dump' => [
             'class' => 'hzhihua\dump\DumpController',
             // 'db' => 'db', // Connection
@@ -31,17 +31,7 @@ return [
         ],
     ],
     'modules'=>[
-        'attachments' => [
-            'class' => nemmo\attachments\Module::class,
-            'tempPath' => '@app/uploads/temp',
-            'storePath' => '@app/uploads/store',
-            'rules' => [ // Rules according to the FileValidator
-                'maxFiles' => 10, // Allow to upload maximum 3 files, default to 3
-                'mimeTypes' => 'image/png', // Only png images
-                'maxSize' => 1024 * 1024 // 1 MB
-            ],
-            'tableName' => '{{%attachments}}' // Optional, default to 'attach_file'
-        ],
+
     ],
     'components' => [
         'tools' => [

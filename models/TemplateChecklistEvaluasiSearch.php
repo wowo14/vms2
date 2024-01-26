@@ -9,7 +9,7 @@ class TemplateChecklistEvaluasiSearch extends TemplateChecklistEvaluasi{
     {
         return [
             [['id', 'created_by', 'updated_by'], 'integer'],
-            [['template', 'jenis_evaluasi', 'created_at', 'updated_at'], 'safe'],
+            [['template', 'jenis_evaluasi', 'element','created_at', 'updated_at'], 'safe'],
         ];
     }
     public function scenarios()
@@ -20,7 +20,8 @@ class TemplateChecklistEvaluasiSearch extends TemplateChecklistEvaluasi{
     {
         $query = TemplateChecklistEvaluasi::find()->cache(self::cachetime(), self::settagdep('tag_templatechecklistevaluasi'));
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,
+            'query' => $query,'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
+
         ]);
         $this->load($params);
         if (!$this->validate()) {

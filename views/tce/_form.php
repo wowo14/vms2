@@ -13,6 +13,7 @@ use yii\bootstrap4\ActiveForm;
     ]); ?>
     <?= $form->field($model, 'template')->textInput() ?>
     <?= $form->field($model, 'jenis_evaluasi')->textInput() ?>
+    <?= $form->field($model, 'element')->textInput() ?>
     <?php if (!Yii::$app->request->isAjax) { ?>
         <div class="form-group">
             <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

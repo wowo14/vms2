@@ -30,6 +30,6 @@ class TemplateChecklistEvaluasiDetail extends \yii\db\ActiveRecord
         ];
     }
     public function getHeaders(){
-        return $this->hasMany(TemplateChecklistEvaluasi::class, ['id' => 'header_id'])->cache(self::cachetime(),self::settagdep('tag_template_checklist_evaluasi'));
+        return $this->hasMany(TemplateChecklistEvaluasi::class, ['id' => 'header_id'])->cache(self::cachetime(),self::settagdep('tag_templatechecklistevaluasi'));
     }
 }

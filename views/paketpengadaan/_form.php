@@ -1,8 +1,6 @@
 <?php
-
 use kartik\date\DatePicker;
 use kartik\select2\Select2;
-use nemmo\attachments\components\AttachmentsInput;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\Html;
 ?>

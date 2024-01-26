@@ -19,9 +19,10 @@ class SettingSearch extends Setting
     }
     public function search($params)
     {
-        $query = Setting::find()->cache(24 * 60 * 60, self::settagdep('tag_setting'));
+        $query = Setting::find()->cache(self::cachetime(), self::settagdep('tag_setting'));
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,
+            'query' => $query,'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
+
         ]);
         $this->load($params);
         if (!$this->validate()) {

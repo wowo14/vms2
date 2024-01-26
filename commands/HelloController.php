@@ -1,16 +1,34 @@
 <?php
 namespace app\commands;
+use app\models\PaketPengadaan;
+use app\models\PaketPengadaanDetails;
 use app\models\Sertipikat;
+use app\models\TemplateChecklistEvaluasi;
+use app\models\TemplateChecklistEvaluasiDetail;
+use app\models\ValidasiKualifikasiPenyedia;
+use app\models\ValidasiKualifikasiPenyediaDetail;
 use Yii;
 use yii\console\Controller;
 class HelloController extends Controller
 {
     public function actionIndex()
     {
-        echo "Hello world\n";
+        echo "\n";
+        $hasil = [];
+        $collect = TemplateChecklistEvaluasi::findOne(1);
+        $ar_element = explode(',', $collect->element);
+        foreach (json_decode($collect->detail->uraian, true) as $v) {
+            $c = ['uraian' => $v['uraian']];
+            foreach ($ar_element as $element) {
+                if($element){
+                    $c[$element] = '';
+                }
+            }
+            $hasil[]=$c;
+        }
+        print_r($hasil);
     }
     public function actionSeed(){
-
     }
     public function actionDropAllTables()
     {
@@ -32,9 +50,11 @@ class HelloController extends Controller
         // $tables = $schema->getTableNames();
         $tables=[
             // 'setting',
+            'validasi_kualifikasi_penyedia',
+            'validasi_kualifikasi_penyedia_detail',
             // 'attachment',
-            'review_dpp',
-            'dpp',
+            // 'review_dpp',
+            // 'dpp',
         ];
         // $db->createCommand('SET FOREIGN_KEY_CHECKS = 0;')->execute();
         foreach ($tables as $table) {

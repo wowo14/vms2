@@ -9,7 +9,7 @@ class ValidasiKualifikasiPenyediaSearch extends ValidasiKualifikasiPenyedia{
     {
         return [
             [['id', 'penyedia_id', 'is_active', 'created_by', 'updated_by'], 'integer'],
-            [['paket_pengadaan_id', 'keperluan', 'created_at', 'updated_at'], 'safe'],
+            [['paket_pengadaan_id', 'template','keperluan', 'created_at', 'updated_at'], 'safe'],
         ];
     }
     public function scenarios()
@@ -21,6 +21,7 @@ class ValidasiKualifikasiPenyediaSearch extends ValidasiKualifikasiPenyedia{
         $query = ValidasiKualifikasiPenyedia::find()->cache(self::cachetime(), self::settagdep('tag_validasikualifikasipenyedia'));
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
         ]);
         $this->load($params);
         if (!$this->validate()) {

@@ -21,6 +21,7 @@ class AktaPenyediaSearch extends AktaPenyedia{
         $query = AktaPenyedia::find()->cache(self::cachetime(), self::settagdep('tag_aktapenyedia'));
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
         ]);
         $this->load($params);
         if (!$this->validate()) {

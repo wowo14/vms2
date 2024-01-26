@@ -21,6 +21,7 @@ class DppSearch extends Dpp{
         $query = Dpp::find()->cache(self::cachetime(), self::settagdep('tag_dpp'));
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
         ]);
         $this->load($params);
         if (!$this->validate()) {

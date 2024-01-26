@@ -14,7 +14,7 @@ class TemplateChecklistEvaluasi extends \yii\db\ActiveRecord
             [['template', 'jenis_evaluasi'], 'required'],
             [['created_at', 'updated_at'], 'string'],
             [['created_by', 'updated_by'], 'integer'],
-            [['template', 'jenis_evaluasi'], 'string', 'max' => 255],
+            [['template', 'element', 'jenis_evaluasi'], 'string', 'max' => 255],
         ];
     }
     public function attributeLabels()
@@ -23,6 +23,7 @@ class TemplateChecklistEvaluasi extends \yii\db\ActiveRecord
             'id' => 'ID',
             'template' => 'Template',
             'jenis_evaluasi' => 'Jenis Evaluasi',
+            'element'=>'Element',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'created_by' => 'Created By',
@@ -38,5 +39,11 @@ class TemplateChecklistEvaluasi extends \yii\db\ActiveRecord
             $this->updated_at = date('Y-m-d H:i:s', time());
         }
         return parent::beforeSave($insert);
+    }
+    public function getJenisevaluasi(){
+        return $this->template.' - '.$this->jenis_evaluasi;
+    }
+    public function getDetail(){
+        return $this->hasOne(TemplateChecklistEvaluasiDetail::class, ['header_id' => 'id']);
     }
 }

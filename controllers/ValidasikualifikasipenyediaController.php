@@ -1,5 +1,6 @@
 <?php
 namespace app\controllers;
+use app\models\TemplateChecklistEvaluasi;
 use app\models\ValidasiKualifikasiPenyedia;
 use app\models\ValidasiKualifikasiPenyediaDetail;
 use app\models\ValidasiKualifikasiPenyediaSearch;
@@ -28,13 +29,21 @@ class ValidasikualifikasipenyediaController extends Controller {
             'dataProvider' => $dataProvider,
         ]);
     }
-    public function actionAdddetail($id) {
-        $model = new ValidasiKualifikasiPenyediaDetail();
-        $model->header_id = $id;
-        // $model->save();
-        return $this->render('adddetail', [
-            'model' => $model
-        ]);
+    public function actionAssestment($id) {
+        $request = Yii::$app->request;
+        $model=ValidasiKualifikasiPenyedia::find()->cache(false)->where(['id' => $id])->one();
+        if ($request->isGet) {
+            return $this->render('assestment', [
+                'model' => $model
+            ]);
+        }
+        if($request->isPost){
+            $assestment=$request->post('ValidasiKualifikasiPenyedia')['assestment'];
+            ValidasiKualifikasiPenyediaDetail::updateAll([
+                'hasil' => json_encode($assestment),
+            ], ['header_id' => $id]);
+            return $this->redirect('index');
+        }
     }
     public function actionView($id) {
         $request = Yii::$app->request;
@@ -68,7 +77,23 @@ class ValidasikualifikasipenyediaController extends Controller {
                     'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
                         Html::button(Yii::t('yii2-ajaxcrud', 'Create'), ['class' => 'btn btn-primary', 'type' => 'submit'])
                 ];
-            } else if ($model->load($request->post()) && $model->save()) {
+            } else if ($model->load($request->post()) && $model->save(false)) {
+                if ($model->template) {
+                    $hasil = [];
+                    $collect = TemplateChecklistEvaluasi::findOne($model->template);
+                    $ar_element = explode(',', $collect->element);
+                    foreach (json_decode($collect->detail->uraian, true) as $v) {
+                        $c = ['uraian' => $v['uraian']];
+                        foreach ($ar_element as $element) {
+                            if ($element) { $c[$element] = '';}
+                        }
+                        $hasil[] = $c;
+                    }
+                    $detail = new ValidasiKualifikasiPenyediaDetail();
+                    $detail->header_id = $model->id;
+                    $detail->hasil =json_encode($hasil);
+                    $detail->save(false);
+                }
                 return [
                     'forceReload' => '#crud-datatable-pjax',
                     'title' => Yii::t('yii2-ajaxcrud', 'Create New') . " ValidasiKualifikasiPenyedia",
@@ -88,6 +113,24 @@ class ValidasikualifikasipenyediaController extends Controller {
             }
         } else {
             if ($model->load($request->post()) && $model->save()) {
+                if ($model->template) {
+                    $hasil = [];
+                    $collect = TemplateChecklistEvaluasi::findOne($model->template);
+                    $ar_element = explode(',', $collect->element);
+                    foreach (json_decode($collect->detail->uraian, true) as $v) {
+                        $c = ['uraian' => $v['uraian']];
+                        foreach ($ar_element as $element) {
+                            if ($element) {
+                                $c[$element] = '';
+                            }
+                        }
+                        $hasil[] = $c;
+                    }
+                    $detail = new ValidasiKualifikasiPenyediaDetail();
+                    $detail->header_id = $model->id;
+                    $detail->hasil = json_encode($hasil);
+                    $detail->save(false);
+                }
                 return $this->redirect(['view', 'id' => $model->id]);
             } else {
                 return $this->render('create', [
@@ -111,6 +154,23 @@ class ValidasikualifikasipenyediaController extends Controller {
                         Html::button(Yii::t('yii2-ajaxcrud', 'Save'), ['class' => 'btn btn-primary', 'type' => 'submit'])
                 ];
             } else if ($model->load($request->post()) && $model->save()) {
+                if ($model->template) {
+                    ValidasiKualifikasiPenyediaDetail::deleteAll(['header_id' => $model->id]);
+                    $hasil = [];
+                    $collect = TemplateChecklistEvaluasi::findOne($model->template);
+                    $ar_element = explode(',', $collect->element);
+                    foreach (json_decode($collect->detail->uraian, true) as $v) {
+                        $c = ['uraian' => $v['uraian']];
+                        foreach ($ar_element as $element) {
+                            if ($element) { $c[$element] = '';}
+                        }
+                        $hasil[] = $c;
+                    }
+                    $detail = new ValidasiKualifikasiPenyediaDetail();
+                    $detail->header_id = $model->id;
+                    $detail->hasil =json_encode($hasil);
+                    $detail->save(false);
+                }
                 return [
                     'forceReload' => '#crud-datatable-pjax',
                     'title' => "ValidasiKualifikasiPenyedia #" . $id,
@@ -132,6 +192,25 @@ class ValidasikualifikasipenyediaController extends Controller {
             }
         } else {
             if ($model->load($request->post()) && $model->save()) {
+                if ($model->template) {
+                    ValidasiKualifikasiPenyediaDetail::deleteAll(['header_id' => $model->id]);
+                    $hasil = [];
+                    $collect = TemplateChecklistEvaluasi::findOne($model->template);
+                    $ar_element = explode(',', $collect->element);
+                    foreach (json_decode($collect->detail->uraian, true) as $v) {
+                        $c = ['uraian' => $v['uraian']];
+                        foreach ($ar_element as $element) {
+                            if ($element) {
+                                $c[$element] = '';
+                            }
+                        }
+                        $hasil[] = $c;
+                    }
+                    $detail = new ValidasiKualifikasiPenyediaDetail();
+                    $detail->header_id = $model->id;
+                    $detail->hasil = json_encode($hasil);
+                    $detail->save(false);
+                }
                 return $this->redirect(['view', 'id' => $model->id]);
             } else {
                 return $this->render('update', [

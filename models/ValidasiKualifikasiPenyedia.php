@@ -9,7 +9,7 @@ class ValidasiKualifikasiPenyedia extends \yii\db\ActiveRecord {
     }
     public function rules() {
         return [
-            [['penyedia_id', 'keperluan', 'is_active'], 'required'],
+            [['penyedia_id', 'keperluan','template', 'is_active'], 'required'],
             [['penyedia_id', 'is_active', 'created_by', 'updated_by'], 'integer'],
             [['created_at', 'updated_at'], 'string'],
             [['paket_pengadaan_id', 'keperluan'], 'string', 'max' => 255],
@@ -21,6 +21,7 @@ class ValidasiKualifikasiPenyedia extends \yii\db\ActiveRecord {
             'penyedia_id' => 'Penyedia ID',
             'paket_pengadaan_id' => 'Paket Pengadaan ID',
             'keperluan' => 'Keperluan',
+            'template' => 'Template',
             'is_active' => 'Is Active',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
@@ -38,8 +39,14 @@ class ValidasiKualifikasiPenyedia extends \yii\db\ActiveRecord {
         }
         return parent::beforeSave($insert);
     }
+    public function getJenisevaluasi(){
+        return $this->hasOne(TemplateChecklistEvaluasi::class, ['id' => 'template'])->cache(self::cachetime(), self::settagdep('tag_templatechecklistevaluasi'));
+    }
     public function getDetails(){
-        return $this->hasMany(ValidasiKualifikasiPenyediaDetail::class, ['header_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_validasi_kualifikasi_penyedia_detail'));
+        return $this->hasMany(ValidasiKualifikasiPenyediaDetail::class, ['header_id' => 'id']);
+    }
+    public function getDetail(){
+        return $this->hasOne(ValidasiKualifikasiPenyediaDetail::class, ['header_id' => 'id']);
     }
     public function getPenyedia() {
         return $this->hasOne(Penyedia::class, ['id' => 'penyedia_id'])->cache(self::cachetime(), self::settagdep('tag_penyedia'));

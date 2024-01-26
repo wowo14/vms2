@@ -9,6 +9,23 @@ use yii\helpers\Html;
 use yii\web\ServerErrorHttpException;
 use yii\web\{Controller, Response, NotFoundHttpException};
 
+/**
+ A Evaluasi Administrasi
+T Evaluasi Teknis
+ST Skor Teknis
+P Penawaran
+PT Penawaran Terkoreksi
+HN Hasil Negosiasi
+SH Skor Harga
+SA Skor Akhir
+B Pembuktian Kualifikasi
+K Evaluasi Kualifikasi
+SK Skor Kualifikasi
+SB Skor Pembuktian
+H Evaluasi Harga/Biaya
+P Pemenang
+PK Pemenang Berkontrak
+ */
 class PaketpengadaanController extends Controller {
     public function behaviors() {
         return [
@@ -180,7 +197,6 @@ class PaketpengadaanController extends Controller {
         }
     }
     public function actionIndex() {
-        // Yii::$app->session->destroy();
         $searchModel = new PaketPengadaanSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [

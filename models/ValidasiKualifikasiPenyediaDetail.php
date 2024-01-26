@@ -11,10 +11,10 @@ class ValidasiKualifikasiPenyediaDetail extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['header_id', 'uraian', 'hasil_evaluasi', 'hasil_pembuktian'], 'required'],
+            [['header_id'], 'required'],
             [['header_id', 'created_by', 'updated_by'], 'integer'],
             [['hasil_pembuktian', 'created_at', 'updated_at'], 'string'],
-            [['uraian', 'hasil_evaluasi'], 'string', 'max' => 255],
+            [['uraian', 'hasil_evaluasi','hasil'], 'string'],
         ];
     }
     public function attributeLabels()
@@ -25,6 +25,7 @@ class ValidasiKualifikasiPenyediaDetail extends \yii\db\ActiveRecord
             'uraian' => 'Uraian',
             'hasil_evaluasi' => 'Hasil Evaluasi',
             'hasil_pembuktian' => 'Hasil Pembuktian',
+            'hasil'=>'Hasil',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'created_by' => 'Created By',

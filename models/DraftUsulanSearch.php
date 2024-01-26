@@ -21,6 +21,7 @@ class DraftUsulanSearch extends DraftUsulan{
         $query = DraftUsulan::find()->cache(self::cachetime(), self::settagdep('tag_draftusulan'));
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
         ]);
         $query->joinWith(['unit u']);
         $this->load($params);

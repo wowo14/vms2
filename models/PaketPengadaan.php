@@ -7,11 +7,6 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     public static function tableName() {
         return 'paket_pengadaan';
     }
-    public function behaviors() {
-        return ['fileBehavior' => [
-            'class' => \nemmo\attachments\behaviors\FileBehavior::class
-        ]];
-    }
     public function rules() {
         return [
             [['nomor', 'tanggal_paket', 'nama_paket'], 'required'],

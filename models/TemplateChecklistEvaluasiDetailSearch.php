@@ -20,7 +20,8 @@ class TemplateChecklistEvaluasiDetailSearch extends TemplateChecklistEvaluasiDet
     {
         $query = TemplateChecklistEvaluasiDetail::find()->cache(self::cachetime(), self::settagdep('tag_templatechecklistevaluasidetail'));
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,
+            'query' => $query,'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
+
         ]);
         $this->load($params);
         if (!$this->validate()) {

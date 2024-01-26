@@ -32,13 +32,13 @@ return [
         'class' => 'kartik\grid\ActionColumn',
         'dropdown' => false,
         'noWrap' => 'true',
-        'template' => '{adddetail} {view} {update} {delete}',
+        'template' => '{assestment} {view} {update} {delete}',
         'vAlign' => 'middle',
         'urlCreator' => function($action, $model, $key, $index) {
                 return Url::to([$action,'id'=>$key]);
         },
         'buttons'=>[
-            'adddetail' => function ($url, $model) {
+            'assestment' => function ($url, $model) {
                 return Html::a('<span class="fa fa-plus"></span>', $url, [
                     'title' => Yii::t('yii2-ajaxcrud', 'Add Detail'),
                     'data-toggle' => 'tooltip',

@@ -1,10 +1,12 @@
 <?php
 use app\models\Dpp;
 use app\models\Penyedia;
+use app\models\TemplateChecklistEvaluasi;
 use kartik\select2\Select2;
 use kartik\switchinput\SwitchInput;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\Html;
+
 $dpp=Dpp::find()->
 with('paketpengadaans')->
 where(['status_review' => 1])->all();
@@ -34,6 +36,13 @@ $dpp=collect($dpp)->pluck('paketpengadaans')->flatten()->pluck('nomornamapaket',
         ],
       ]) ?>
       <?= $form->field($model, 'keperluan')->textInput() ?>
+      <?= $form->field($model, 'template')->widget(Select2::class,[
+        'data'=>TemplateChecklistEvaluasi::collectAll()->pluck('template','id')->toArray(),
+        'options' => ['placeholder' => 'Pilih Template...'],
+        'pluginOptions' => [
+            'allowClear' => true
+        ],
+      ]) ?>
       <?= $form->field($model, 'is_active')->widget(SwitchInput::class,[
         'pluginOptions' => [
             'onText' => 'Aktif',
