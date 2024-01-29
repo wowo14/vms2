@@ -21,8 +21,8 @@ class ProdukSearch extends Produk{
     {
         $query = Produk::find()->cache(self::cachetime(), self::settagdep('tag_produk'));
         $dataProvider = new ActiveDataProvider([
-            'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
             'query' => $query,
+            'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
         ]);
         $this->load($params);
         if (!$this->validate()) {
