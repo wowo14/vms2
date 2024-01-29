@@ -9,7 +9,7 @@ class ValidasiKualifikasiPenyedia extends \yii\db\ActiveRecord {
     }
     public function rules() {
         return [
-            [['penyedia_id', 'keperluan','template', 'is_active'], 'required'],
+            [['penyedia_id', 'paket_pengadaan_id', 'keperluan','template', 'is_active'], 'required'],
             [['penyedia_id', 'is_active', 'created_by', 'updated_by'], 'integer'],
             [['created_at', 'updated_at'], 'string'],
             [['paket_pengadaan_id', 'keperluan'], 'string', 'max' => 255],
@@ -18,8 +18,8 @@ class ValidasiKualifikasiPenyedia extends \yii\db\ActiveRecord {
     public function attributeLabels() {
         return [
             'id' => 'ID',
-            'penyedia_id' => 'Penyedia ID',
-            'paket_pengadaan_id' => 'Paket Pengadaan ID',
+            'penyedia_id' => 'Penyedia',
+            'paket_pengadaan_id' => 'Paket Pengadaan',
             'keperluan' => 'Keperluan',
             'template' => 'Template',
             'is_active' => 'Is Active',
@@ -38,6 +38,13 @@ class ValidasiKualifikasiPenyedia extends \yii\db\ActiveRecord {
             $this->updated_at = date('Y-m-d H:i:s', time());
         }
         return parent::beforeSave($insert);
+    }
+    public function beforeDelete() {
+        if (!parent::beforeDelete()) {
+            return false;
+        }
+        ValidasiKualifikasiPenyediaDetail::deleteAll(['header_id' => $this->id]);
+        return true;
     }
     public function getJenisevaluasi(){
         return $this->hasOne(TemplateChecklistEvaluasi::class, ['id' => 'template'])->cache(self::cachetime(), self::settagdep('tag_templatechecklistevaluasi'));

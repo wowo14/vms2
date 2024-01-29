@@ -77,7 +77,7 @@ class ValidasikualifikasipenyediaController extends Controller {
                     'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
                         Html::button(Yii::t('yii2-ajaxcrud', 'Create'), ['class' => 'btn btn-primary', 'type' => 'submit'])
                 ];
-            } else if ($model->load($request->post()) && $model->save(false)) {
+            } else if ($model->load($request->post()) && $model->save()) {
                 if ($model->template) {
                     $hasil = [];
                     $collect = TemplateChecklistEvaluasi::findOne($model->template);

@@ -40,6 +40,13 @@ class TemplateChecklistEvaluasi extends \yii\db\ActiveRecord
         }
         return parent::beforeSave($insert);
     }
+    public function beforeDelete() {
+        if (!parent::beforeDelete()) {
+            return false;
+        }
+        TemplateChecklistEvaluasiDetail::deleteAll(['header_id' => $this->id]);
+        return true;
+    }
     public function getJenisevaluasi(){
         return $this->template.' - '.$this->jenis_evaluasi;
     }

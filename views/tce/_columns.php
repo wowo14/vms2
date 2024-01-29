@@ -19,6 +19,10 @@ return [
         'attribute'=>'jenis_evaluasi',
     ],
     [
+        'class'=>'\kartik\grid\DataColumn',
+        'attribute'=>'element',
+    ],
+    [
         'class' => 'kartik\grid\ActionColumn',
         'dropdown' => false,
         'noWrap' => 'true',

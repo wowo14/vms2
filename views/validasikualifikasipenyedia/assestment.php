@@ -3,6 +3,17 @@ use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
 use unclead\multipleinput\MultipleInput;
 use unclead\multipleinput\MultipleInputColumn;
+$rr = json_decode($model->details[0]->hasil, true);
+//generate columns
+$aa = json_decode($model->details[0]->hasil, true)[0];
+$col = [];
+foreach (array_keys($aa) as $item) {
+    $col[] = [
+        'name' => $item,
+        'title' => ucfirst(trim($item)),
+        'type' => 'textArea'
+    ];
+}
 $js=<<<JS
 $('.list-cell__button').hide();
 JS;
@@ -44,18 +55,6 @@ $this->registerJs($js, \yii\web\View::POS_END);
             <td><?= $model->jenisevaluasi->jenisevaluasi ?? '' ?></td>
         </tr>
     </table>
-    <?php
-    $rr =json_decode($model->details[0]->hasil,true);
-    $aa=json_decode($model->details[0]->hasil,true)[0];
-    $col = [];
-    foreach (array_keys($aa) as $item) {
-        $col[] = [
-            'name' => $item,
-            'title' => ucfirst($item),
-            'type' => 'textArea'
-        ];
-    }
-    ?>
     <?= $form->field($model, 'assestment')->widget(MultipleInput::class, [
         'id' => 'dokassestment',
         'enableGuessTitle'  => true,
