@@ -1,14 +1,10 @@
 <?php
-use app\models\Dpp;
-use app\models\Penyedia;
-use app\models\TemplateChecklistEvaluasi;
+use app\models\{Dpp,Penyedia,TemplateChecklistEvaluasi};
 use kartik\select2\Select2;
 use kartik\switchinput\SwitchInput;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\Html;
-$dpp=Dpp::find()->
-with('paketpengadaans')->
-where(['status_review' => 1])->all();
+$dpp=Dpp::find()->with('paketpengadaans')->where(['status_review' => 1])->all();
 $dpp=collect($dpp)->pluck('paketpengadaans')->flatten()->pluck('nomornamapaket','id')->toArray();
 ?>
 <div class="validasi-kualifikasi-penyedia-form">
@@ -20,7 +16,7 @@ $dpp=collect($dpp)->pluck('paketpengadaans')->flatten()->pluck('nomornamapaket',
             'labelOptions' => ['class' => 'col-sm-3 control-label right'],
         ],
     ]); ?>
-          <?= $form->field($model, 'penyedia_id')->widget(Select2::class,[
+      <?= $form->field($model, 'penyedia_id')->widget(Select2::class,[
             'data'=>Penyedia::collectAll()->pluck('nama_perusahaan','id')->toArray(),
             'options' => ['placeholder' => 'Pilih Penyedia...'],
             'pluginOptions' => [
@@ -36,7 +32,7 @@ $dpp=collect($dpp)->pluck('paketpengadaans')->flatten()->pluck('nomornamapaket',
       ]) ?>
       <?= $form->field($model, 'keperluan')->textInput() ?>
       <?= $form->field($model, 'template')->widget(Select2::class,[
-        'data'=>TemplateChecklistEvaluasi::collectAll()->pluck('template','id')->toArray(),
+        'data'=>TemplateChecklistEvaluasi::collectAll()->pluck('template','id')->sortByDesc(fn($key)=>$key)->toArray(),
         'options' => ['placeholder' => 'Pilih Template...'],
         'pluginOptions' => [
             'allowClear' => true

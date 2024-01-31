@@ -1,5 +1,4 @@
 <?php
-use yii\helpers\Html;
 use yii\helpers\Url;
 return [
     [
@@ -12,41 +11,37 @@ return [
     ],
         [
         'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'penyedia_id',
-        'value'=>'penyedia.nama_perusahaan',
+        'attribute'=>'nik',
     ],
     [
         'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'paket_pengadaan_id',
-        'value'=>'paketpengadaan.nomornamapaket',
+        'attribute'=>'nama',
     ],
     [
         'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'keperluan',
+        'attribute'=>'alamat',
     ],
     [
         'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'is_active',
+        'attribute'=>'telp',
+    ],
+    [
+        'class'=>'\kartik\grid\DataColumn',
+        'attribute'=>'status',
+        'value' => fn ($d) => $d->status == 1 ? 'AKTIF' : 'TIDAK AKTIF',
+    ],
+    [
+        'attribute' => 'hak_akses',
     ],
     [
         'class' => 'kartik\grid\ActionColumn',
         'dropdown' => false,
         'noWrap' => 'true',
-        'template' => '{assestment} {view} {update} {delete}',
+        'template' => '{view} {update} {delete}',
         'vAlign' => 'middle',
         'urlCreator' => function($action, $model, $key, $index) {
                 return Url::to([$action,'id'=>$key]);
         },
-        'buttons'=>[
-            'assestment' => function ($url, $model) {
-                return Html::a('<span class="fa fa-plus"></span>', $url, [
-                    'class' => 'btn btn-sm btn-outline-primary',
-                    'title' => Yii::t('yii2-ajaxcrud', 'Add Detail'),
-                    'data-toggle' => 'tooltip',
-                    'data-pjax' => '0',
-                ]);
-            },
-        ],
         'viewOptions' => ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success'],
         'updateOptions' => ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Update'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-primary'],
         'deleteOptions' => ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Delete'), 'class' => 'btn btn-sm btn-outline-danger',

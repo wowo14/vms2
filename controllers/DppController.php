@@ -41,6 +41,12 @@ class DppController extends Controller {
             'dataProvider' => $dataProvider,
         ]);
     }
+    public function actionTab($id){
+        $model=$this->findModel($id);
+        return $this->render('tab',[
+            'model'=>$model
+        ]);
+    }
     public function actionView($id) {
         $request = Yii::$app->request;
         if ($request->isAjax) {

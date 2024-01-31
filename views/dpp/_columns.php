@@ -21,7 +21,10 @@ return [
     ],
         [
         'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'nomor_dpp',
+        'attribute'=>'nomor_dpp','format'=>'raw',
+        'value'=>fn($d)=>
+            Html::a($d->nomor_dpp,['/dpp/tab','id'=>$d->id])
+            ??''
     ],
     [
         'class'=>'\kartik\grid\DataColumn',
@@ -62,11 +65,11 @@ return [
             'formreview' => function ($url, $model, $key) {
                 return Html::a(
                     '<span class="fa fa-file"></span>', $url,
-                ['class' => 'btn btn-sm btn-outline-primary', 'data-pjax' => 0, 'title' => 'reviewdpp', 'data-toggle' => 'tooltip']);
+                ['class' => 'btn btn-sm btn-outline-primary', 'data-pjax' => 0, 'title' => 'Form reviewdpp', 'data-toggle' => 'tooltip']);
             },
             'reviewdpp' => function ($url, $model, $key) {
                 return Html::a('<span class="fa fa-print"></span>', $url,
-                ['class' => 'btn btn-sm btn-outline-primary', 'data-pjax' => 0, 'title' => 'reviewdpp', 'data-toggle' => 'tooltip']);
+                ['class' => 'btn btn-sm btn-outline-primary', 'data-pjax' => 0, 'title' => 'Cetak reviewdpp', 'data-toggle' => 'tooltip']);
             },
         ],
         'viewOptions' => ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success'],

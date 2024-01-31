@@ -31,9 +31,9 @@ trait GeneralModelsTrait {
     }
     public static function collectAll($condition = null, $params = []) { //Collection
         if (isset($params) || isset($condition)) {
-            return collect(self::where($condition, $params = [])->all());
+            return collect(self::where($condition, $params = [])->all())->sortByDesc('id');
         } else {
-            return collect(self::find()->cache(self::cachetime(), self::settagdep('tag_' . self::getModelname()))->all());
+            return collect(self::find()->cache(self::cachetime(), self::settagdep('tag_' . self::getModelname()))->all())->sortByDesc('id');
         }
     }
     protected function findReplace($string, $find, $replace) {
@@ -104,7 +104,6 @@ trait GeneralModelsTrait {
         parent::afterDelete();
         self::invalidatecache('tag_' . self::getModelname());
     }
-  
     public static function profile($param) {
         $profile = collect(self::settingType('global'))->where('param', $param)->first();
         return $profile ? $profile->value : null;

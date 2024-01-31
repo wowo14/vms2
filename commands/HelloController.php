@@ -53,7 +53,7 @@ class HelloController extends Controller
             'validasi_kualifikasi_penyedia',
             'validasi_kualifikasi_penyedia_detail',
             // 'attachment',
-            // 'review_dpp',
+            'review_dpp',
             // 'dpp',
         ];
         // $db->createCommand('SET FOREIGN_KEY_CHECKS = 0;')->execute();
