@@ -1,4 +1,5 @@
 <?php
+
 use kartik\switchinput\SwitchInput;
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
@@ -97,6 +98,10 @@ use unclead\multipleinput\MultipleInputColumn;
     ])->label(false); ?>
     Review Oleh Pejabat Pengadaan:<br>
     <?= $form->field($reviews, 'keterangan') ?>
+    Kesimpulan :<br>
+    <?= $form->field($reviews, 'kesimpulan') ?>
+    Tanggapan PPK:<br>
+    <?= $form->field($reviews, 'tanggapan_ppk') ?>
     <?php if (!Yii::$app->request->isAjax) { ?>
         <div class="form-group">
             <?= Html::submitButton('Submit', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

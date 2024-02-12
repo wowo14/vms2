@@ -89,7 +89,6 @@ class DppController extends Controller {
                 ];
             }
         }
-
     }
     public function actionCetak($id) {
         $model = $this->findModel($id);
@@ -129,6 +128,8 @@ class DppController extends Controller {
             if($rr){
                 $rr->uraian=json_encode($_POST['ReviewDpp']['uraian'],JSON_UNESCAPED_SLASHES);
                 $rr->keterangan=$_POST['ReviewDpp']['keterangan'];
+                $rr->kesimpulan=$_POST['ReviewDpp']['kesimpulan'];
+                $rr->tanggapan_ppk=$_POST['ReviewDpp']['tanggapan_ppk'];
                 $rr->dpp_id = $model->id;
                 $rr->pejabat=Yii::$app->user->id;
                 $rr->save();
@@ -136,6 +137,8 @@ class DppController extends Controller {
                 $rr=new ReviewDpp;
                 $rr->uraian=json_encode($_POST['ReviewDpp']['uraian'],JSON_UNESCAPED_SLASHES);
                 $rr->keterangan=$_POST['ReviewDpp']['keterangan'];
+                $rr->kesimpulan = $_POST['ReviewDpp']['kesimpulan'];
+                $rr->tanggapan_ppk = $_POST['ReviewDpp']['tanggapan_ppk'];
                 $rr->dpp_id=$model->id;
                 $rr->pejabat=Yii::$app->user->id;
                 $rr->save();

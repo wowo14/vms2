@@ -59,7 +59,7 @@ CrudAsset::register($this);
     "clientOptions" => [
         "tabindex" => false,
         "backdrop" => "static",
-        "keyboard" => false,
+        "keyboard" => true,
     ],
     "options" => [
         "tabindex" => false

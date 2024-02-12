@@ -10,6 +10,15 @@ return [
         'class' => 'kartik\grid\SerialColumn',
         'width' => '30px',
     ],
+    'ExpandRowColumn' =>
+    [
+        'class' => '\kartik\grid\ExpandRowColumn',
+        'value' => function ($model, $key, $index, $column) {
+            return GridView::ROW_COLLAPSED;
+        },
+        'detailUrl' => Url::to(['/draftusulan/expand']),
+        'hiddenFromExport' => true
+    ],
     [
         'class' => '\kartik\grid\DataColumn',
         'attribute' => 'tahun_anggaran',
