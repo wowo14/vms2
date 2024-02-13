@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
         'attributes' => [
             [
                 'attribute'=>'penyedia_id',
-                'value'=>fn($d)=>$d->penyedia->nama_perusahaan,
+                'value'=>fn($d)=>$d->vendor->nama_perusahaan,
             ],
             [
                 'attribute'=> 'paket_pengadaan_id',

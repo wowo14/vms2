@@ -6,13 +6,13 @@ use yii\bootstrap4\Modal;
 use kartik\grid\GridView;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
-/* @var $searchModel app\models\DraftRabSearch */
+/* @var $searchModel app\models\ProgramKegiatanSearch */
 
-$this->title = 'Draft Rab';
+$this->title = 'Program Kegiatan';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
 ?>
-<div class="draft-rab-index">
+<div class="program-kegiatan-index">
     <div id="ajaxCrudDatatable">
         <?= GridView::widget([
             'id' => 'crud-datatable',
@@ -24,14 +24,14 @@ CrudAsset::register($this);
                 [
                     'content' =>
                     Html::a(
-                        '<i class="fa fa-plane"></i>',
-                        ['draftrab/rekap'],
-                        ['role' => 'modal-remote', 'data-target' => '#modaltahun', 'title' => 'Rekap Draft', 'class' => 'btn btn-default']
+                        '<i class="fa fa-check"></i>',
+                        ['programkegiatan/copyto'],
+                        ['role' => 'modal-remote', 'data-target' => '#' . $searchModel->hash, 'title' => 'Copy To', 'class' => 'btn btn-default']
                     ) .
                         Html::a(
                             '<i class="fa fa-plus"></i>',
                             ['create'],
-                            ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Draft Rabs', 'class' => 'btn btn-outline-primary']
+                            ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Program Kegiatans', 'class' => 'btn btn-outline-primary']
                         ) .
                         Html::a(
                             '<i class="fa fa-redo"></i>',
@@ -71,20 +71,14 @@ CrudAsset::register($this);
 </div>
 <?php Modal::begin([
     "id" => "ajaxCrudModal",
-    "footer" => "", "size" => "modal-xl",
+    "footer" => "",
     "clientOptions" => [
         "tabindex" => false,
         "backdrop" => "static",
-        "keyboard" => true,
+        "keyboard" => false,
     ],
     "options" => [
         "tabindex" => false
     ]
-]) ?>
-<?php Modal::end(); ?>
-<?php Modal::begin([
-    "id" => 'modaltahun',
-    // "size"=>"modal-lg",
-    "footer" => "", // always need it for jquery plugin
 ]) ?>
 <?php Modal::end(); ?>

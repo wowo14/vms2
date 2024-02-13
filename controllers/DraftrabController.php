@@ -21,6 +21,25 @@ class DraftrabController extends Controller
             ],
         ];
     }
+    public function actionRekap() {
+        $request = Yii::$app->request;
+        if ($request->isAjax) {
+            if ($request->isGet) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return [
+                    'title' => "Rekap Tahun",
+                    'content' => $this->renderAjax('_frm_tahun'),
+                    'footer' => ''
+                ];
+            }
+        } elseif ($request->isPost) {
+            $model = DraftRab::where(['tahun_anggaran' => $request->post('tahun')])->all();
+            if (!$model) {
+                throw new NotFoundHttpException('Data ' . $request->post('tahun') . ' Tidak Ditemukan');
+            }
+            return $this->render('rekap', ['model' => $model]);
+        }
+    }
     public function actionIndex()
     {
         $searchModel = new DraftRabSearch();

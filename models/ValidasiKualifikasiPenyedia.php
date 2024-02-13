@@ -55,9 +55,6 @@ class ValidasiKualifikasiPenyedia extends \yii\db\ActiveRecord {
     public function getDetail(){
         return $this->hasOne(ValidasiKualifikasiPenyediaDetail::class, ['header_id' => 'id']);
     }
-    public function getPenyedia() {
-        return $this->hasOne(Penyedia::class, ['id' => 'penyedia_id'])->cache(self::cachetime(), self::settagdep('tag_penyedia'));
-    }
     public function getPaketpengadaan() {
         return $this->hasOne(PaketPengadaan::class, ['id' => 'paket_pengadaan_id'])->cache(self::cachetime(), self::settagdep('tag_paketpengadaan'));
     }

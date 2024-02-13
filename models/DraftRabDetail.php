@@ -35,4 +35,14 @@ class DraftRabDetail extends \yii\db\ActiveRecord
             'reff_usulan' => 'Reff Usulan',
         ];
     }
+    public function getParent() {
+        return $this->hasOne(DraftRab::class, ['id' => 'rab_id'])->cache(self::cachetime(), self::settagdep('tag_draftrab'));
+    }
+    public function getProduk() {
+        return $this->hasOne(Produk::class, ['id' => 'produk_id'])->cache(self::cachetime(), self::settagdep('tag_produk'));
+    }
+    public function getSubtotal() {
+        if ($this->harga_satuan !== 0 || $this->volume !== 0)
+            return $this->volume * $this->harga_satuan;
+    }
 }

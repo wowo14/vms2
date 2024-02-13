@@ -1,47 +1,45 @@
 <?php
 namespace app\models;
 use Yii;
-class KodeRekening extends \yii\db\ActiveRecord
+class ProgramKegiatan extends \yii\db\ActiveRecord
 {
     use GeneralModelsTrait;
     public static function tableName()
     {
-        return 'kode_rekening';
+        return 'program_kegiatan';
     }
     public function rules()
     {
         return [
-            [['kode', 'rekening', 'tahun_anggaran'], 'required'],
-            [['parent', 'is_active', 'tahun_anggaran', 'created_by', 'updated_by'], 'integer'],
+            [['code', 'desc', 'type', 'tahun_anggaran', 'is_active'], 'required'],
+            [['tahun_anggaran', 'is_active', 'created_by', 'updated_by'], 'integer'],
             [['created_at', 'updated_at'], 'string'],
-            [['kode', 'rekening'], 'string', 'max' => 255],
+            [['code', 'desc', 'parent', 'type'], 'string', 'max' => 255],
         ];
     }
     public function attributeLabels()
     {
         return [
             'id' => 'ID',
-            'kode' => 'Kode',
-            'rekening' => 'Rekening',
+            'code' => 'Code',
+            'desc' => 'Desc',
             'parent' => 'Parent',
-            'is_active' => 'Is Active',
+            'type' => 'Type',
             'tahun_anggaran' => 'Tahun Anggaran',
+            'is_active' => 'Is Active',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'created_by' => 'Created By',
             'updated_by' => 'Updated By',
         ];
     }
-    public function getCoacode() { //distinct
-        return self::where(['is_active' => 1])->select('id,kode,rekening,tahun_anggaran')->orderBy('kode')->distinct()->all();
-    }
     public static function getTree($cnd = NULL) {
         $data2 = [];
-        $menu = self::where(['parent' => $cnd])->orderby('kode')->asArray()->all();
-        foreach ($menu as $haha) {
+        $program = self::where(['parent' => $cnd])->orderby('code')->asArray()->all();
+        foreach ($program as $haha) {
             $row = [];
             $row['id']    = $haha['id'];
-            $row['text']  = $haha['kode'] . '|' . $haha['rekening'];
+            $row['text']  = $haha['code'] . '|' . $haha['desc'];
             if (count(self::getTree($haha['id'])) > 0)
                 $row['children'] = self::getTree($haha['id']);
             $data2[] = $row;
@@ -55,7 +53,7 @@ class KodeRekening extends \yii\db\ActiveRecord
             $old = self::where(['tahun_anggaran' => $from])->all();
             if ($old) {
                 foreach ($old as $o) {
-                    $to = new KodeRekening();
+                    $to = new ProgramKegiatan();
                     $to->attributes = $o->attributes;
                     $to->tahun_anggaran = $target;
                     $to->save();
