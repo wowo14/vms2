@@ -9,9 +9,8 @@ class ReviewDpp extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['dpp_id', 'pejabat', 'kesesuaian', 'created_by', 'updated_by'], 'integer'],
-            [['tanggal_review', 'created_at', 'updated_at'], 'safe'],
-            [['uraian'], 'string'],
-            [['keterangan'], 'string', 'max' => 255],
+            [['tanggal_review', 'created_at', 'updated_at', 'tgl_dikembalikan'], 'safe'],
+            [['uraian', 'keterangan', 'kesimpulan', 'tanggapan_ppk'], 'string'],
         ];
     }
     public function attributeLabels() {
@@ -23,6 +22,9 @@ class ReviewDpp extends \yii\db\ActiveRecord {
             'uraian' => 'Uraian', //json_array uraian,kesuesuaian,ket
             'kesesuaian' => 'Kesesuaian', //not use
             'keterangan' => 'Keterangan', //review tulisan
+            'kesimpulan' => 'Kesimpulan',
+            'tanggapan_ppk' => 'Tanggapan PPK',
+            'tgl_dikembalikan' => 'Tanggal Dikembalikan',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'created_by' => 'Created By',

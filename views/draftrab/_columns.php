@@ -1,4 +1,5 @@
 <?php
+use kartik\grid\GridView;
 use yii\helpers\Url;
 return [
     [
@@ -8,6 +9,15 @@ return [
     [
         'class' => 'kartik\grid\SerialColumn',
         'width' => '30px',
+    ],
+    'ExpandRowColumn' =>
+    [
+        'class' => '\kartik\grid\ExpandRowColumn',
+        'value' => function ($model, $key, $index, $column) {
+            return GridView::ROW_COLLAPSED;
+        },
+        'detailUrl' => Url::to(['/draftrab/details']),
+        'hiddenFromExport' => true
     ],
         [
         'class'=>'\kartik\grid\DataColumn',

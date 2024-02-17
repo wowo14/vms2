@@ -1,10 +1,10 @@
 <?php
-
 use kartik\switchinput\SwitchInput;
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
 use unclead\multipleinput\MultipleInput;
 use unclead\multipleinput\MultipleInputColumn;
+use kartik\date\DatePicker;
 ?>
 <div id="form-reviewdpp">
     <?php $form = ActiveForm::begin([
@@ -100,6 +100,13 @@ use unclead\multipleinput\MultipleInputColumn;
     <?= $form->field($reviews, 'keterangan') ?>
     Kesimpulan :<br>
     <?= $form->field($reviews, 'kesimpulan') ?>
+    <?= $form->field($reviews, 'tgl_dikembalikan')->widget(DatePicker::class, [
+        'pluginOptions' => [
+            'format' => 'yyyy-mm-dd',
+            'todayHighlight' => true,
+            'autoclose' => true
+        ],
+    ]) ?>
     Tanggapan PPK:<br>
     <?= $form->field($reviews, 'tanggapan_ppk') ?>
     <?php if (!Yii::$app->request->isAjax) { ?>

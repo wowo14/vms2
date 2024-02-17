@@ -6,8 +6,7 @@ use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-use yii\web\ServerErrorHttpException;
-use yii\web\{Controller, Response, NotFoundHttpException};
+use yii\web\{ServerErrorHttpException,Controller, Response, NotFoundHttpException};
 
 /**
  A Evaluasi Administrasi
@@ -103,6 +102,9 @@ class PaketpengadaanController extends Controller {
             }
             $dp=Dpp::where(['paket_id'=>$model->id])->one();
             if($dp){
+                if($model->tanggal_reject && $model->alasan_reject){
+                    throw new ServerErrorHttpException('Paket Pengadaan: DPP Ditolak, mohon koreksi/revisi terlebih dahulu');
+                }
                 throw new ServerErrorHttpException('Paket Pengadaan: DPP sudah diinput');
             }
             $dpp = new Dpp;

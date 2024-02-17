@@ -14,6 +14,7 @@ class AppAsset extends AssetBundle
         // 'js/pdf.min.js',
         // 'https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js',
         'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js',
     ];
     public $depends = [
         'yii\web\YiiAsset',

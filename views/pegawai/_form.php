@@ -30,6 +30,7 @@ $this->registerJs($js);
         ],
     ]); ?>
     <?= $form->field($model, 'nik')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'nip')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'nama')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'alamat')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'telp')->textInput(['maxlength' => true]) ?>

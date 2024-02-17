@@ -45,10 +45,20 @@ return [
         'attribute'=>'status_review',
     ],
     [
+        'class'=>'\kartik\grid\DataColumn',
+        'attribute'=>'pejabat_pengadaan',
+        'value'=>fn($d)=>$d->pejabat->nama??''
+    ],
+    [
+        'class'=>'\kartik\grid\DataColumn',
+        'attribute'=>'admin_pengadaan',
+        'value'=>fn($d)=>$d->staffadmin->nama??''
+    ],
+    [
         'class' => 'kartik\grid\ActionColumn',
         'dropdown' => false,
         'noWrap' => 'true',
-        'template' => '{cetak} {reviewdpp} {formreview} {view} {update} {delete}',
+        'template' => '{reject} {reviewdpp} {formreview} {view} {update} {delete}',
         'vAlign' => 'middle',
         'urlCreator' => function($action, $model, $key, $index) {
                 return Url::to([$action,'id'=>$key]);
@@ -58,10 +68,10 @@ return [
             //     return Html::a('<span class="fa fa-check-double"></span>', $url,
             //     ['class' => 'btn btn-sm btn-outline-danger','role' => 'modal-remote', 'title' => 'Approve', 'data-toggle' => 'tooltip']);
             // },
-            // 'cetak' => function ($url, $model, $key) {
-            //     return Html::a('<span class="fa fa-print"></span>', $url,
-            //     ['class' => 'btn btn-sm btn-outline-success', 'data-pjax' => 0, 'title' => 'Cetak', 'data-toggle' => 'tooltip']);
-            // },
+            'reject' => function ($url, $model, $key) {
+                return Html::a('<span class="fa fa-ban"></span>', $url,
+                ['class' => 'btn btn-sm btn-outline-danger', 'data-pjax' => 0, 'title' => 'Reject', 'data-toggle' => 'tooltip']);
+            },
             'formreview' => function ($url, $model, $key) {
                 return Html::a(
                     '<span class="fa fa-file"></span>', $url,
@@ -69,7 +79,7 @@ return [
             },
             'reviewdpp' => function ($url, $model, $key) {
                 return Html::a('<span class="fa fa-print"></span>', $url,
-                ['class' => 'btn btn-sm btn-outline-primary', 'data-pjax' => 0, 'title' => 'Cetak reviewdpp', 'data-toggle' => 'tooltip']);
+                ['class' => 'btn btn-sm btn-outline-info', 'data-pjax' => 0, 'title' => 'Cetak reviewdpp', 'data-toggle' => 'tooltip']);
             },
         ],
         'viewOptions' => ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success'],

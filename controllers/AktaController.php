@@ -1,18 +1,11 @@
 <?php
-
 namespace app\controllers;
-
 use Yii;
-use app\models\AktaPenyedia;
-use app\models\AktaPenyediaSearch;
-use yii\web\Controller;
-use yii\web\NotFoundHttpException;
+use app\models\{AktaPenyedia,AktaPenyediaSearch};
+use yii\web\{Response,Controller,NotFoundHttpException};
 use yii\filters\VerbFilter;
-use \yii\web\Response;
 use yii\helpers\Html;
-
-class AktaController extends Controller
-{
+class AktaController extends Controller{
     public function behaviors()
     {
         return [

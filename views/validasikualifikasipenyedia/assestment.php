@@ -47,7 +47,7 @@ $this->registerJs($js, \yii\web\View::POS_END);
         <tr>
             <td width="20%">Nama Perusahaan</td>
             <td width="1%;">:</td>
-            <td width="79%"><?= $model->penyedia->nama_perusahaan ?? '' ?></td>
+            <td width="79%"><?= $model->vendor->nama_perusahaan ?? '' ?></td>
         </tr>
         <tr>
             <td>Jenis Evaluasi</td>

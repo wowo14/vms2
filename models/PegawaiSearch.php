@@ -13,7 +13,7 @@ class PegawaiSearch extends Pegawai
     {
         return [
             [['id', 'id_user'], 'integer'],
-            [['nik', 'nama', 'alamat', 'telp', 'status', 'hak_akses', 'username', 'password'], 'safe'],
+            [['nik','nip', 'nama', 'alamat', 'telp', 'status', 'hak_akses', 'username', 'password'], 'safe'],
         ];
     }
     public function scenarios()
@@ -38,6 +38,7 @@ class PegawaiSearch extends Pegawai
             'id_user' => $this->id_user,
         ]);
         $query->andFilterWhere(['like', 'nik', $this->nik])
+            ->andFilterWhere(['like', 'nip', $this->nip])
             ->andFilterWhere(['like', 'nama', $this->nama])
             ->andFilterWhere(['like', 'alamat', $this->alamat])
             ->andFilterWhere(['like', 'telp', $this->telp])

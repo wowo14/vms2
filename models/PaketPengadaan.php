@@ -10,7 +10,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['nomor', 'tanggal_paket', 'nama_paket'], 'required'],
-            [['tanggal_paket'], 'string'],
+            [['tanggal_paket','tanggal_reject', 'alasan_reject'], 'string'],
             [['pagu'], 'number'],
             [['nama_paket'], 'unique'],
             [['created_by', 'tahun_anggaran', 'approval_by'], 'integer'],
@@ -31,7 +31,9 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             'metode_pengadaan' => 'Metode Pengadaan',
             'created_by' => 'Created By',
             'tahun_anggaran' => 'Tahun Anggaran',
-            'approval_by' => 'Approval By',
+            'approval_by' => 'Approval By',//null->belom,ditolak oleh ,<>0->diterima oleh
+            'alasan_reject'=>'Alasan Reject',//not null ditolak
+            'tanggal_reject'=>'Tanggal Reject',//not null ditolak
         ];
     }
     public function getListpaketoutstanding() {

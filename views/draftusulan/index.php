@@ -1,12 +1,10 @@
 <?php
-
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\bootstrap4\Modal;
 use kartik\grid\GridView;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
-
 $this->title = 'Draft Usulans';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
@@ -14,6 +12,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
 ?>
 <div class="draft-usulan-index">
     <div id="ajaxCrudDatatable">
+        <?= Html::beginForm(['draftusulan/collectible'], 'post', ['id' => 'merge-form']) ?>
         <?= GridView::widget([
             'id' => 'crud-datatable',
             'dataProvider' => $dataProvider,
@@ -21,6 +20,16 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
             'pjax' => true,
             'columns' => require(__DIR__ . '/_columns.php'),
             'toolbar' => [
+                ['content' => Html::submitButton(
+                    '<i class="fa fa-check"></i>',
+                    [
+                        'data-toggle' => "tooltip",
+                        'data-placement' => "top",
+                        'title' => 'Merger',
+                        'class' => 'btn btn-info btn-flat pull-left',
+                        'id' => 'merger'
+                    ]
+                )],
                 [
                     'content' =>
                     Html::a(
@@ -70,6 +79,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
                     '<div class="clearfix"></div>',
             ]
         ]) ?>
+        <?= Html::endForm() ?>
     </div>
 </div>
 <?php Modal::begin([

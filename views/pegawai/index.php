@@ -5,10 +5,10 @@ use yii\bootstrap4\Modal;
 use kartik\grid\GridView;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
+CrudAsset::register($this);
 $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\BootstrapPluginAsset']);
 $this->title = 'Pegawai';
 $this->params['breadcrumbs'][] = $this->title;
-CrudAsset::register($this);
 ?>
 <div class="pegawai-index">
     <div id="ajaxCrudDatatable">

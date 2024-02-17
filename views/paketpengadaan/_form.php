@@ -35,6 +35,10 @@ use yii\helpers\Html;
             'placeholder' => 'Pilih tahun anggaran',
         ]
     ]) ?>
+    <?php if(!$model->isNewRecord &&($model->tanggal_reject && $model->alasan_reject)):?>
+    <?= $form->field($model, 'tanggal_reject')->textInput() ?>
+    <?= $form->field($model, 'alasan_reject')->textInput() ?>
+    <?php endif;?>
     <?php if (!Yii::$app->request->isAjax) { ?>
         <div class="form-group">
             <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

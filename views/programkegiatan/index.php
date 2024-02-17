@@ -1,16 +1,14 @@
 <?php
-
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\bootstrap4\Modal;
 use kartik\grid\GridView;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
-/* @var $searchModel app\models\ProgramKegiatanSearch */
-
 $this->title = 'Program Kegiatan';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
+$this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\BootstrapPluginAsset']);
 ?>
 <div class="program-kegiatan-index">
     <div id="ajaxCrudDatatable">

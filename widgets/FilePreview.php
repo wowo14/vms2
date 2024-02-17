@@ -14,8 +14,9 @@ class FilePreview extends Widget {
         $file = Yii::getAlias('@web/uploads/') . $this->model->{$this->attribute};
         $extension = pathinfo($file, PATHINFO_EXTENSION);
         if ($extension === 'pdf') {
-            echo '<div id="pdf-viewer-container" width="100%" height="600"></div>';
-            $jsScript = $this->generatePdfViewerScript($file);
+            $containerId = md5($this->model->{$this->attribute}); // Generate unique container ID
+            echo "<div id=\"$containerId\" width=\"100%\" height=\"600\"></div>";
+            $jsScript = $this->generatePdfViewerScript($file, $containerId); // Pass container ID
             $view->registerJs($jsScript, \yii\web\View::POS_END);
         } elseif (in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
             echo Html::a(
@@ -27,24 +28,24 @@ class FilePreview extends Widget {
             echo 'File not found / Unsupported file type';
         }
     }
-    private function generatePdfViewerScript($file) {
+    private function generatePdfViewerScript($file, $containerId) {
         $pdfFile = Url::to([$file], true);
         return <<<JS
-        var pdfViewer = document.getElementById("pdf-viewer-container");
-        var pdfFile = "{$pdfFile}";
-        var initialPage = 1;
-        var loadingTask = pdfjsLib.getDocument(pdfFile);
-        loadingTask.promise.then(function(pdf) {
-            pdf.getPage(initialPage).then(function(page) {
-                var scale = 0.55;
-                var viewport = page.getViewport({ scale: scale });
-                var canvas = document.createElement("canvas");
-                var context = canvas.getContext("2d");
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-                pdfViewer.appendChild(canvas);
-                page.render({ canvasContext: context, viewport: viewport });
-            });
+        const pdfFile{$containerId} = "{$pdfFile}";
+        const pdfViewer{$containerId} = document.getElementById("$containerId");
+        const initialPage{$containerId} = 1;
+        const loadingTask{$containerId}= pdfjsLib.getDocument(pdfFile{$containerId});
+        loadingTask{$containerId}.promise.then(function(pdf) {
+                pdf.getPage(initialPage{$containerId}).then(function(page) {
+                    var scale = 0.55;
+                    var viewport = page.getViewport({ scale: scale });
+                    var canvas = document.createElement("canvas");
+                    var context = canvas.getContext("2d");
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    pdfViewer{$containerId}.appendChild(canvas);
+                    page.render({ canvasContext: context, viewport: viewport });
+                });
         });
     JS;
     }

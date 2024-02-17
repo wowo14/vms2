@@ -8,8 +8,8 @@ class DppSearch extends Dpp{
     public function rules()
     {
         return [
-            [['id', 'paket_id', 'created_by', 'updated_by'], 'integer'],
-            [['nomor_dpp', 'tanggal_dpp', 'bidang_bagian', 'status_review', 'is_approved', 'nomor_persetujuan', 'created_at', 'updated_at'], 'safe'],
+            [['id', 'created_by', 'updated_by'], 'integer'],
+            [['nomor_dpp', 'paket_id', 'pejabat_pengadaan', 'admin_pengadaan', 'tanggal_dpp', 'bidang_bagian', 'status_review', 'is_approved', 'nomor_persetujuan', 'created_at', 'updated_at'], 'safe'],
         ];
     }
     public function scenarios()
@@ -27,18 +27,25 @@ class DppSearch extends Dpp{
         if (!$this->validate()) {
             return $dataProvider;
         }
+        $query->joinWith(['paketpengadaan p']);
+        $query->where(['p.tanggal_reject' => NULL, 'p.alasan_reject' => NULL])->orWhere(['p.tanggal_reject' => '', 'p.alasan_reject' => '']);
+        $query->joinWith(['unit u']);
+        $query->joinWith(['reviews r']);
+        $query->joinWith(['pejabat p2']);
+        $query->joinWith(['staffadmin s']);
         $query->andFilterWhere([
             'id' => $this->id,
             'tanggal_dpp' => $this->tanggal_dpp,
-            'paket_id' => $this->paket_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'created_by' => $this->created_by,
             'updated_by' => $this->updated_by,
         ]);
-
         $query->andFilterWhere(['like', 'nomor_dpp', $this->nomor_dpp])
             ->andFilterWhere(['like', 'bidang_bagian', $this->bidang_bagian])
+            ->andFilterWhere(['like', 'p.nama_paket', $this->paket_id])
+            ->andFilterWhere(['like', 'p2.nama', $this->pejabat_pengadaan])
+            ->andFilterWhere(['like', 's.nama', $this->admin_pengadaan])
             ->andFilterWhere(['like', 'status_review', $this->status_review])
             ->andFilterWhere(['like', 'is_approved', $this->is_approved])
             ->andFilterWhere(['like', 'nomor_persetujuan', $this->nomor_persetujuan]);

@@ -1,4 +1,5 @@
 <?php
+
 use yii\helpers\Html;
 ?>
 <table style="width: 100%; font-size: 14px; text-align: center; font-weight: bold;">
@@ -59,27 +60,26 @@ Review Oleh Pejabat Pengadaan:<br>
 </ol>
 Kesimpulan:<br>
 <ol>
-    <li>...</li>
-    <li>...</li>
+    <li><?= $template->kesimpulan ?? '' ?></li>
 </ol>
 <table width="100%">
     <tr>
         <td width="33%"></td>
         <td width="33%"></td>
-        <td width="33%">Gresik, <?= date('d F Y') ?><br>
+        <td style="text-align: center;" width="33%">Gresik, <?= date('d F Y', strtotime($model->created_at)) ?><br>
             (Pejabat Pengadaan Barang/Jasa)
             <br>
             <br>
             <br>
             <br>
-            (........................................)<br>
-            NIP. <?= '' ?>
+            <span style="text-align:center"><?= $model->pejabat->nama ?></span><br>
+            NIP. <?= $model->pejabat->nip ?>
         </td>
     </tr>
 </table>
 Tanggapan PPK atas dikembalikan DPP :<br>
 <ol>
-    <li>...</li>
+    <li><?= $template->tanggapan_ppk ?? '' ?></li>
 </ol>
 <table width="100%">
     <tr>
@@ -89,15 +89,16 @@ Tanggapan PPK atas dikembalikan DPP :<br>
             <br>
             <br>
             <br>
-            (........................................)
+            <span style="text-align:center"><?= $model->pejabat->nama ?></span><br>
+            NIP. <?= $model->pejabat->nip ?>
         </td>
-        <td width="50%" style="text-align:center">Gresik, .....<br>
+        <td width="50%" style="text-align:center">Gresik, <?= $template->tgl_dikembalikan ? date('d F Y', strtotime($template->tgl_dikembalikan)) : ' ...... ' ?><br>
             (Pejabat Pembuat Komitmen)<br>
             <br>
             <br>
             <br>
             <br>
-            (........................................)
+            ( <?= $model->paketpengadaan->ppkom ?> )
         </td>
     </tr>
 </table>

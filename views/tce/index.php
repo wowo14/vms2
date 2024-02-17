@@ -8,6 +8,7 @@ use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
 $this->title = 'Template Checklist Evaluasi';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
+$this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\BootstrapPluginAsset']);
 ?>
 <div class="template-checklist-evaluasi-index">
     <div id="ajaxCrudDatatable">

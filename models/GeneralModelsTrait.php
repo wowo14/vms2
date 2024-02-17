@@ -54,8 +54,14 @@ trait GeneralModelsTrait {
     public static function isAdmin() {
         return (ArrayHelper::keyExists('admin', Yii::$app->session->get('roles'))) ? true : false;
     }
+    public static function isPPK() {
+        return (ArrayHelper::keyExists('PPK', Yii::$app->session->get('roles'))) ? true : false;
+    }
+    public static function isPP() {
+        return (ArrayHelper::keyExists('PP', Yii::$app->session->get('roles'))) ? true : false;
+    }
     public static function isStaff() {
-        return (ArrayHelper::keyExists('staff', Yii::$app->session->get('roles'))) ? true : false;
+        return (ArrayHelper::keyExists('staffAdmin', Yii::$app->session->get('roles'))) ? true : false;
     }
     public static function optionsSettingtype($type, $callback) { //example $model::optionsSettingtype(string 'type', string|array|function);
         $settings = Setting::type($type);
@@ -139,6 +145,42 @@ trait GeneralModelsTrait {
         if ($this->hasAttribute('penyedia_id')) {
             return $this->hasOne(Penyedia::class, ['id' => 'penyedia_id'])->cache(self::cachetime(), self::settagdep('tag_penyedia'));
         }
+    }
+    public static function getAllpetugas() {
+        return collect(Pegawai::where('id_user<>""')->all())->where('hak_akses', 'PP')->pluck('nama', 'id')->toArray();
+    }
+    public static function getAlladmin() {
+        return collect(Pegawai::where('id_user<>""')->all())->where('hak_akses', 'staffAdmin')->pluck('nama', 'id')->toArray();
+    }
+    public static function formassignpetugas($pks = null) {
+        $optpetugas = self::getAllpetugas();
+        $msg = '<form action="/dpp/assign" method="post">';
+        if ($pks) {
+            $msg .= '<div><input type="hidden" name="pks" value="' . $pks . '"/>';
+        }
+        $msg .= '<div><label for="selectOptions">Pilih Petugas:</label>
+                <select id="selectOptions" name="pejabat_pengadaan">
+                <option value="">...</option>';
+        foreach ($optpetugas as $i => $d) {
+            $msg .= '<option value="' . $i . '">' . $d . '</option>';
+        }
+        $msg .= '</select></div></form>';
+        return $msg;
+    }
+    public static function formassignadmin($pks = null) {
+        $optpetugas = self::getAlladmin();
+        $msg = '<form action="/dpp/assign" method="post">';
+        if ($pks) {
+            $msg .= '<div><input type="hidden" name="pks" value="' . $pks . '"/>';
+        }
+        $msg .= '<div><label for="selectOptions">Pilih Petugas:</label>
+                <select id="selectOptions" name="admin_pengadaan">
+                <option value="">...</option>';
+        foreach ($optpetugas as $i => $d) {
+            $msg .= '<option value="' . $i . '">' . $d . '</option>';
+        }
+        $msg .= '</select></div></form>';
+        return $msg;
     }
     public static function optthanggaran($id = null) {
         $years = [date('Y', strtotime('-1 year')), date('Y'), date('Y', strtotime('+1 year'))];

@@ -1,4 +1,5 @@
 <?php
+use app\assets\AppAsset;
 use kartik\grid\GridView;
 use mdm\admin\components\Helper;
 use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
@@ -9,6 +10,7 @@ use yii\helpers\Url;
 $this->title = 'Paket Pengadaan';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
+AppAsset::register($this);
 $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\BootstrapPluginAsset']);
 ?>
 <div class="paket-pengadaan-index">

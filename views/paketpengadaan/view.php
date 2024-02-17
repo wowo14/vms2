@@ -21,6 +21,8 @@ use yii\widgets\DetailView;
                     'created_by',
                     'tahun_anggaran',
                     'approval_by',
+                    'alasan_reject:ntext',
+                    'tanggal_reject:ntext',
                 ],
             ]) ?>
         </div>
@@ -40,16 +42,16 @@ use yii\widgets\DetailView;
                         ],
                         [
                             'attribute' => 'jenis_dokumen',
-                            'value' => function ($model) {
-                                return $model->jenisdokumen->value;
+                            'value' => function ($d) {
+                                return $d->jenisdokumen->value;
                             }
                         ],
                         [
                             'attribute' => 'uri',
                             'format' => 'raw',
-                            'value' => function ($model) {
+                            'value' => function ($d) {
                                 return FilePreview::widget([
-                                    'model' => $model,
+                                    'model' => $d,
                                     'attribute' => 'uri',
                                 ]);
                             }

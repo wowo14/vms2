@@ -1,10 +1,11 @@
 <?php
 namespace app\controllers;
-use app\models\{ReviewDpp,Dpp, DppSearch, PaketPengadaanDetails};
+use app\models\{ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails};
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
+use yii\web\BadRequestHttpException;
 use yii\web\{Controller, Response, NotFoundHttpException};
 class DppController extends Controller {
     private $_pageSize = 10;
@@ -41,10 +42,10 @@ class DppController extends Controller {
             'dataProvider' => $dataProvider,
         ]);
     }
-    public function actionTab($id){
-        $model=$this->findModel($id);
-        return $this->render('tab',[
-            'model'=>$model
+    public function actionTab($id) {
+        $model = $this->findModel($id);
+        return $this->render('tab', [
+            'model' => $model
         ]);
     }
     public function actionView($id) {
@@ -63,6 +64,67 @@ class DppController extends Controller {
             return $this->render('view', [
                 'model' => $this->findModel($id),
             ]);
+        }
+    }
+    public function actionAssign() {
+        $request = Yii::$app->request;
+        $pks = explode(',', $request->post('pks'));
+        foreach ($pks as $pk) {
+            $model = $this->findModel($pk);
+            if ($model::isAdmin()) {
+                $model->pejabat_pengadaan = $request->post('pejabat_pengadaan');
+                $model->save(false);
+            } elseif ($model) {
+                $model->pejabat_pengadaan = $request->post('pejabat_pengadaan');
+                $model->save(false);
+            } else {
+                Yii::$app->session->setFlash('warning', 'Sudah ditugaskan');
+            }
+        }
+        if ($request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ['forceClose' => true, 'forceReload' => '#crud-datatable-pjax'];
+        } else {
+            return $this->redirect(['index']);
+        }
+    }
+    public function actionAssignadmin() {
+        $request = Yii::$app->request;
+        $pks = explode(',', $request->post('pks'));
+        foreach ($pks as $pk) {
+            $model = $this->findModel($pk);
+            if ($model::isAdmin()) {
+                $model->admin_pengadaan = $request->post('admin_pengadaan');
+                $model->save(false);
+            } elseif ($model) {
+                $model->admin_pengadaan = $request->post('admin_pengadaan');
+                $model->save(false);
+            } else {
+                Yii::$app->session->setFlash('warning', 'Sudah ditugaskan');
+            }
+        }
+        if ($request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ['forceClose' => true, 'forceReload' => '#crud-datatable-pjax'];
+        } else {
+            return $this->redirect(['index']);
+        }
+    }
+    public function actionReject($id) {
+        $request = Yii::$app->request;
+        if ($request->isGet) {
+            $paket = $this->findModel($id)->paketpengadaan;
+            return $this->render('_frm_reject', ['model' => $paket]);
+        } elseif ($request->isPost) {
+            $model = $this->findModel($id)->paketpengadaan;
+            if ($model->load($request->post()) ) {
+                if($model->tanggal_reject && $model->alasan_reject){
+                    $model->save();
+                }else{
+                    throw new BadRequestHttpException('Data Tidak Lengkap');
+                }
+                return $this->redirect(['index']);
+            }
         }
     }
     public function actionApprove($id) {
@@ -100,14 +162,14 @@ class DppController extends Controller {
     }
     public function actionReviewdpp($id) {
         $model = $this->findModel($id);
-        if($model->reviews){
+        if ($model->reviews) {
             $pdf = Yii::$app->pdf;
             $pdf->content = $this->renderPartial('_reviewdpp', [
-                'model' => $model, 'template' => $model->reviews??[]
+                'model' => $model, 'template' => $model->reviews ?? []
             ]);
             $pdf->cssInline = ".center{text-align:center}.border1solid {border: #eee 1px solid;}";
             return $pdf->render();
-        }else{
+        } else {
             Yii::$app->session->setFlash('warning', 'Belum ada review dpp');
             return $this->redirect(['index']);
         }
@@ -120,30 +182,30 @@ class DppController extends Controller {
         if ($request->isGet) {
             return $this->render('_frmreviewdpp', [
                 'model' => $model,
-                'reviews' => $model->reviews??new ReviewDpp, 'template' => $template->data??[],
+                'reviews' => $model->reviews ?? new ReviewDpp, 'template' => $template->data ?? [],
             ]);
         }
         if ($request->isPost) {
-            $rr=ReviewDpp::where(['dpp_id'=>$model->id])->orderBy('id desc')->one();
-            if($rr){
-                $rr->uraian=json_encode($_POST['ReviewDpp']['uraian'],JSON_UNESCAPED_SLASHES);
-                $rr->keterangan=$_POST['ReviewDpp']['keterangan'];
-                $rr->kesimpulan=$_POST['ReviewDpp']['kesimpulan'];
-                $rr->tanggapan_ppk=$_POST['ReviewDpp']['tanggapan_ppk'];
-                $rr->dpp_id = $model->id;
-                $rr->pejabat=Yii::$app->user->id;
-                $rr->save();
-            }else{
-                $rr=new ReviewDpp;
-                $rr->uraian=json_encode($_POST['ReviewDpp']['uraian'],JSON_UNESCAPED_SLASHES);
-                $rr->keterangan=$_POST['ReviewDpp']['keterangan'];
+            $rr = ReviewDpp::where(['dpp_id' => $model->id])->orderBy('id desc')->one();
+            if ($rr) {
+                $rr->uraian = json_encode($_POST['ReviewDpp']['uraian'], JSON_UNESCAPED_SLASHES);
+                $rr->keterangan = $_POST['ReviewDpp']['keterangan'];
                 $rr->kesimpulan = $_POST['ReviewDpp']['kesimpulan'];
                 $rr->tanggapan_ppk = $_POST['ReviewDpp']['tanggapan_ppk'];
-                $rr->dpp_id=$model->id;
-                $rr->pejabat=Yii::$app->user->id;
+                $rr->dpp_id = $model->id;
+                $rr->pejabat = Yii::$app->user->id;
+                $rr->save();
+            } else {
+                $rr = new ReviewDpp;
+                $rr->uraian = json_encode($_POST['ReviewDpp']['uraian'], JSON_UNESCAPED_SLASHES);
+                $rr->keterangan = $_POST['ReviewDpp']['keterangan'];
+                $rr->kesimpulan = $_POST['ReviewDpp']['kesimpulan'];
+                $rr->tanggapan_ppk = $_POST['ReviewDpp']['tanggapan_ppk'];
+                $rr->dpp_id = $model->id;
+                $rr->pejabat = Yii::$app->user->id;
                 $rr->save();
             }
-            $model->status_review=1;
+            $model->status_review = 1;
             $model->save();
             Yii::$app->session->setFlash('success', 'Review DPP Berhasil');
             return $this->redirect(['index']);

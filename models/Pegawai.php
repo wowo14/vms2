@@ -12,12 +12,13 @@ class Pegawai extends \yii\db\ActiveRecord {
         return [
             [['nik', 'nama', 'alamat', 'telp', 'status', 'email', 'username', 'password'], 'required'],
             [['id_user'], 'integer'],
-            [['nik'], 'unique', 'targetAttribute' => ['nik']],
+            [['nik','nip'], 'unique', 'targetAttribute' => ['nik']],
             [['email'], 'email'],
             [['nama'], 'string', 'max' => 250],
             [['alamat', 'hak_akses', 'password'], 'string', 'max' => 255],
             ['telp', 'match', 'pattern' => '/^[0-9]{8,15}$/',],
             ['nik', 'match', 'pattern' => '/^[0-9]{8,16}$/',],
+            ['nip', 'match', 'pattern' => '/^[0-9]{8,16}$/',],
             [['status'], 'string', 'max' => 1],
             [['username'], 'string', 'max' => 50],
         ];
@@ -25,6 +26,7 @@ class Pegawai extends \yii\db\ActiveRecord {
     public function attributeLabels() {
         return [
             'id' => 'ID',
+            'nip' => 'NIP',
             'nik' => 'NIK',
             'nama' => 'Nama',
             'email' => 'email',
