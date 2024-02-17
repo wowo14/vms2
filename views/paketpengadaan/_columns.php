@@ -27,8 +27,21 @@ return [
         'attribute'=>'nomor',
     ],
     [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'tanggal_paket',
+        'class' => '\kartik\grid\DataColumn',
+        'attribute' => 'tanggal_paket',
+        'filterType' => \kartik\grid\GridView::FILTER_DATE_RANGE,
+        'filterWidgetOptions' => ([
+            'attribute' => 'only_date',
+            'presetDropdown' => true,
+            'convertFormat' => false,
+            'pluginOptions' => [
+                'separator' => ' - ',
+                'format' => 'YYYY-MM-DD',
+                'locale' => [
+                    'format' => 'YYYY-MM-DD'
+                ],
+            ],
+        ]),
     ],
     [
         'class'=>'\kartik\grid\DataColumn',

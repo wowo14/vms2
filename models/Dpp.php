@@ -15,7 +15,7 @@ class Dpp extends \yii\db\ActiveRecord
             ['paket_id','unique'],
             [['paket_id','pejabat_pengadaan', 'admin_pengadaan', 'created_by', 'updated_by'], 'integer'],
             [['status_review', 'is_approved'], 'integer','max'=>1],
-            [['nomor_dpp', 'bidang_bagian', 'nomor_persetujuan'], 'string', 'max' => 255],
+            [['nomor_dpp', 'bidang_bagian', 'nomor_persetujuan','kode'], 'string', 'max' => 255],
         ];
     }
     public function attributeLabels()
@@ -35,6 +35,7 @@ class Dpp extends \yii\db\ActiveRecord
             'updated_at' => 'Updated At',
             'created_by' => 'Created By',
             'updated_by' => 'Updated By',
+            'kode'=> 'Kode Paket/kode pemesanan'
         ];
     }
     public function beforeSave($insert)

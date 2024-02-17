@@ -27,8 +27,21 @@ return [
             ??''
     ],
     [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'tanggal_dpp',
+        'class' => '\kartik\grid\DataColumn',
+        'attribute' => 'tanggal_dpp',
+        'filterType' => \kartik\grid\GridView::FILTER_DATE_RANGE,
+        'filterWidgetOptions' => ([
+            'attribute' => 'only_date',
+            'presetDropdown' => true,
+            'convertFormat' => false,
+            'pluginOptions' => [
+                'separator' => ' - ',
+                'format' => 'YYYY-MM-DD',
+                'locale' => [
+                    'format' => 'YYYY-MM-DD'
+                ],
+            ],
+        ]),
     ],
     [
         'class'=>'\kartik\grid\DataColumn',
@@ -55,19 +68,24 @@ return [
         'value'=>fn($d)=>$d->staffadmin->nama??''
     ],
     [
+        'class'=>'\kartik\grid\DataColumn',
+        'attribute'=>'kode',
+        'value'=>fn($d)=>$d->kode??''
+    ],
+    [
         'class' => 'kartik\grid\ActionColumn',
         'dropdown' => false,
         'noWrap' => 'true',
-        'template' => '{reject} {reviewdpp} {formreview} {view} {update} {delete}',
+        'template' => '{reject} {approve} {reviewdpp} {formreview} {view} {update} {delete}',
         'vAlign' => 'middle',
         'urlCreator' => function($action, $model, $key, $index) {
                 return Url::to([$action,'id'=>$key]);
         },
         'buttons' => [
-            // 'approve' => function ($url, $model, $key) {
-            //     return Html::a('<span class="fa fa-check-double"></span>', $url,
-            //     ['class' => 'btn btn-sm btn-outline-danger','role' => 'modal-remote', 'title' => 'Approve', 'data-toggle' => 'tooltip']);
-            // },
+            'approve' => function ($url, $model, $key) {
+                return Html::a('<span class="fa fa-check-double"></span>', $url,
+                ['class' => 'btn btn-sm btn-outline-info','role' => 'modal-remote', 'title' => 'Approve', 'data-toggle' => 'tooltip']);
+            },
             'reject' => function ($url, $model, $key) {
                 return Html::a('<span class="fa fa-ban"></span>', $url,
                 ['class' => 'btn btn-sm btn-outline-danger', 'data-pjax' => 0, 'title' => 'Reject', 'data-toggle' => 'tooltip']);

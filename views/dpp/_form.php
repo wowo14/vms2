@@ -35,6 +35,11 @@ use kartik\select2\Select2;
             'placeholder' => 'Pilih Paket...',
         ]
     ]) ?>
+    <?php
+        if(!$model->isNewRecord && ($model->is_approved && $model->status_review)){// sudah review/sudah approved
+            echo $form->field($model, 'kode')->textInput(['maxlength' => true]);
+        }
+    ?>
     <?php if (!Yii::$app->request->isAjax) { ?>
         <div class="form-group">
             <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

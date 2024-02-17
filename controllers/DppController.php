@@ -139,16 +139,21 @@ class DppController extends Controller {
                         'model' => $model,
                     ]),
                     'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                        Html::button(Yii::t('yii2-ajaxcrud', 'Create'), ['class' => 'btn btn-primary', 'type' => 'submit'])
+                        Html::button(Yii::t('yii2-ajaxcrud', 'Approve'), ['class' => 'btn btn-primary', 'type' => 'submit'])
                 ];
-            } elseif ($model->load($request->post()) && $model->save()) {
-                return [
-                    'forceReload' => '#crud-datatable-pjax',
-                    'title' => "Approve Dpp",
-                    'content' => '<span class="text-success">Approve Dpp ' . Yii::t('yii2-ajaxcrud', 'Success') . '</span>',
-                    'footer' =>  Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                        Html::a(Yii::t('yii2-ajaxcrud', 'Create More'), ['create'], ['class' => 'btn btn-primary', 'role' => 'modal-remote'])
-                ];
+            } elseif ($model->load($request->post()) ) {
+                if($model->nomor_persetujuan && $model->nomor_dpp){
+                    $model->is_approved=1;
+                    $model->save();
+                    return [
+                        'forceReload' => '#crud-datatable-pjax',
+                        'title' => "Approve Dpp",
+                        'content' => '<span class="text-success">Approve Dpp ' . Yii::t('yii2-ajaxcrud', 'Success') . '</span>',
+                        'footer' =>  Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal'])
+                    ];
+                }else{
+                    throw new BadRequestHttpException('nomor_persetujuan harus diisi');
+                }
             }
         }
     }

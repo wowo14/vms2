@@ -9,7 +9,7 @@ class DppSearch extends Dpp{
     {
         return [
             [['id', 'created_by', 'updated_by'], 'integer'],
-            [['nomor_dpp', 'paket_id', 'pejabat_pengadaan', 'admin_pengadaan', 'tanggal_dpp', 'bidang_bagian', 'status_review', 'is_approved', 'nomor_persetujuan', 'created_at', 'updated_at'], 'safe'],
+            [['nomor_dpp', 'paket_id', 'kode','pejabat_pengadaan', 'admin_pengadaan', 'tanggal_dpp', 'bidang_bagian', 'status_review', 'is_approved', 'nomor_persetujuan', 'created_at', 'updated_at'], 'safe'],
         ];
     }
     public function scenarios()
@@ -35,7 +35,6 @@ class DppSearch extends Dpp{
         $query->joinWith(['staffadmin s']);
         $query->andFilterWhere([
             'id' => $this->id,
-            'tanggal_dpp' => $this->tanggal_dpp,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'created_by' => $this->created_by,
@@ -45,7 +44,9 @@ class DppSearch extends Dpp{
             ->andFilterWhere(['like', 'bidang_bagian', $this->bidang_bagian])
             ->andFilterWhere(['like', 'p.nama_paket', $this->paket_id])
             ->andFilterWhere(['like', 'p2.nama', $this->pejabat_pengadaan])
+            ->andFilterWhere(['between', 'tanggal_dpp', ($this->range($this->tanggal_dpp, 's')), ($this->range($this->tanggal_dpp, 'e'))])
             ->andFilterWhere(['like', 's.nama', $this->admin_pengadaan])
+            ->andFilterWhere(['like', 'dpp.kode', $this->kode])
             ->andFilterWhere(['like', 'status_review', $this->status_review])
             ->andFilterWhere(['like', 'is_approved', $this->is_approved])
             ->andFilterWhere(['like', 'nomor_persetujuan', $this->nomor_persetujuan]);

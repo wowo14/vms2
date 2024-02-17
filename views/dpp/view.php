@@ -14,6 +14,7 @@ use yii\widgets\DetailView;
                     'status_review',
                     'is_approved',
                     'nomor_persetujuan',
+                    'kode',
                     'created_at',
                     'updated_at',
                     ['attribute' => 'created_by', 'value' => fn ($model) => $model->usercreated->username ?? ''],
