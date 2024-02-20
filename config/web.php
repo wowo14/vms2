@@ -16,7 +16,7 @@ $config = [
         '@uploads' => '@app/web/uploads/',
     ],
     'modules' => [
-        
+
         'gridview' =>  [
             'class' => '\kartik\grid\Module',
             // 'bsVersion' => '4.x',
@@ -78,7 +78,7 @@ $config = [
         ],
         'request' => [
             'cookieValidationKey' => 'iaMA-BL8GNJP0pW5vbtvLov3Tchxh_6n',
-            'enableCsrfValidation' => false,
+            'enableCsrfValidation' => true,
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',

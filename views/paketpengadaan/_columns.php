@@ -2,8 +2,6 @@
 use kartik\grid\GridView;
 use yii\helpers\Html;
 use yii\helpers\Url;
-
-
 return [
     [
         'class' => 'kartik\grid\CheckboxColumn',

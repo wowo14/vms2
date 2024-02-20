@@ -2,52 +2,8 @@
 namespace app\models;
 use Yii;
 use yii\caching\TagDependency;
-use yii\helpers\ArrayHelper;
-use yii\helpers\BaseStringHelper;
+use yii\helpers\{ArrayHelper,BaseStringHelper,HtmlPurifier};
 trait GeneralModelsTrait {
-    public function getHash() {
-        $class = self::class;
-        $class = strpos($class, 'Search') ? str_replace('Search', '', $class) : $class;
-        return md5($class);
-    }
-    public function range($d, $type) { //filter condition date between
-        $dates = explode(' - ', $d); //return array
-        if ((bool) strtotime($dates[0]) && (bool) strtotime($dates[1])) {
-            return $type == 's' ? $dates[0] . ' 00:00:00' : $dates[1] . ' 23:59:59';
-        }
-    }
-    public static function where($condition, $params = []) {
-        return self::find()->cache(self::cachetime(), self::settagdep('tag_' . self::getModelname()))->where($condition, $params = []);
-    }
-    public static function first($condition) {
-        return self::where($condition)->one();
-    }
-    public static function last($condition) {
-        return self::where($condition)->orderby(['id' => SORT_DESC])->limit(1)->one();
-    }
-    public static function findOne($condition) {
-        $tags = self::settagdep('tag_' . self::getModelname());
-        return static::findByCondition($condition)->cache(self::cachetime(), $tags)->one();
-    }
-    public static function collectAll($condition = null, $params = []) { //Collection
-        if (isset($params) || isset($condition)) {
-            return collect(self::where($condition, $params = [])->all())->sortByDesc('id');
-        } else {
-            return collect(self::find()->cache(self::cachetime(), self::settagdep('tag_' . self::getModelname()))->all())->sortByDesc('id');
-        }
-    }
-    protected function findReplace($string, $find, $replace) {
-        if (preg_match("/[a-zA-Z\_]+/", $find)) {
-            return (string) preg_replace("/\{(\s+)?($find)(\s+)?\}/", $replace, $string);
-        } else {
-            throw new \Exception("Find statement must match regex pattern: /[a-zA-Z]+/");
-        }
-    }
-    public static function hashid($params) { // id as primarykey
-        $class = self::class;
-        $pk = $class::primaryKey()[0];
-        return BaseStringHelper::base64Urlencode(json_encode(['model' => $class, $pk => $params]));
-    }
     public static function settingType($type) {
         return Setting::type($type);
     }
@@ -74,41 +30,11 @@ trait GeneralModelsTrait {
         }
         return collect($settings)->pluck($callback)->toArray();
     }
-    public static function getModelname() {
-        $array = explode('\\', self::class);
-        $modelClasses = str_replace('Search', '', end($array));
-        return strtolower($modelClasses);
-    }
     public function getUsercreated() {
         return $this->hasAttribute('created_by') ? $this->hasOne(User::class, ['id' => 'created_by'])->cache(self::cachetime(), self::settagdep('tag_user')) : '';
     }
     public function getUserupdated() {
         return $this->hasAttribute('updated_by') ? $this->hasOne(User::class, ['id' => 'updated_by'])->cache(self::cachetime(), self::settagdep('tag_user')) : '';
-    }
-    public function allColumn() {
-        $ar = (new self)->attributes;
-        foreach ($ar as $key => $value) {
-            $ar2[] = $key;
-        }
-        return $ar2;
-    }
-    public static function settagdep($tag) {
-        return new TagDependency(['tags' => $tag]);
-    }
-    public static function cachetime() {
-        return 24 * 60 * 60;
-    }
-    public static function invalidatecache($tag) {
-        $dep = new TagDependency(['tags' => $tag]);
-        $dep->invalidate(Yii::$app->cache, $tag);
-    }
-    public function afterSave($insert, $changedAttributes) {
-        parent::afterSave($insert, $changedAttributes);
-        self::invalidatecache('tag_' . self::getModelname());
-    }
-    public function afterDelete() {
-        parent::afterDelete();
-        self::invalidatecache('tag_' . self::getModelname());
     }
     public static function profile($param) {
         $profile = collect(self::settingType('global'))->where('param', $param)->first();
@@ -214,5 +140,86 @@ trait GeneralModelsTrait {
     }
     public function getProduks() {
         return Produk::where(['active' => 1])->asArray()->all();
+    }
+    //==model commons ===//
+    public function beforeValidate(){
+        // HTML escape all attributes
+        foreach ($this->attributes as $key => $value) {
+            $this->$key = HtmlPurifier::process($value);
+        }
+        return parent::beforeValidate();
+    }
+    public function afterSave($insert, $changedAttributes) {
+        parent::afterSave($insert, $changedAttributes);
+        self::invalidatecache('tag_' . self::getModelname());
+    }
+    public function afterDelete() {
+        parent::afterDelete();
+        self::invalidatecache('tag_' . self::getModelname());
+    }
+    public function allColumn() {
+        $ar = (new self)->attributes;
+        foreach ($ar as $key => $value) {
+            $ar2[] = $key;
+        }
+        return $ar2;
+    }
+    public static function settagdep($tag) {
+        return new TagDependency(['tags' => $tag]);
+    }
+    public static function cachetime() {
+        return 24 * 60 * 60;
+    }
+    public static function invalidatecache($tag) {
+        $dep = new TagDependency(['tags' => $tag]);
+        $dep->invalidate(Yii::$app->cache, $tag);
+    }
+    public static function getModelname() {
+        $array = explode('\\', self::class);
+        $modelClasses = str_replace('Search', '', end($array));
+        return strtolower($modelClasses);
+    }
+    public function getHash() {
+        $class = self::class;
+        $class = strpos($class, 'Search') ? str_replace('Search', '', $class) : $class;
+        return md5($class);
+    }
+    public function range($d, $type) { //filter condition date between
+        $dates = explode(' - ', $d); //return array
+        if ((bool) strtotime($dates[0]) && (bool) strtotime($dates[1])) {
+            return $type == 's' ? $dates[0] . ' 00:00:00' : $dates[1] . ' 23:59:59';
+        }
+    }
+    public static function where($condition, $params = []) {
+        return self::find()->cache(self::cachetime(), self::settagdep('tag_' . self::getModelname()))->where($condition, $params = []);
+    }
+    public static function first($condition) {
+        return self::where($condition)->one();
+    }
+    public static function last($condition) {
+        return self::where($condition)->orderby(['id' => SORT_DESC])->limit(1)->one();
+    }
+    public static function findOne($condition) {
+        $tags = self::settagdep('tag_' . self::getModelname());
+        return static::findByCondition($condition)->cache(self::cachetime(), $tags)->one();
+    }
+    public static function collectAll($condition = null, $params = []) { //Collection
+        if (isset($params) || isset($condition)) {
+            return collect(self::where($condition, $params = [])->all())->sortByDesc('id');
+        } else {
+            return collect(self::find()->cache(self::cachetime(), self::settagdep('tag_' . self::getModelname()))->all())->sortByDesc('id');
+        }
+    }
+    protected function findReplace($string, $find, $replace) {
+        if (preg_match("/[a-zA-Z\_]+/", $find)) {
+            return (string) preg_replace("/\{(\s+)?($find)(\s+)?\}/", $replace, $string);
+        } else {
+            throw new \Exception("Find statement must match regex pattern: /[a-zA-Z]+/");
+        }
+    }
+    public static function hashid($params) { // id as primarykey
+        $class = self::class;
+        $pk = $class::primaryKey()[0];
+        return BaseStringHelper::base64Urlencode(json_encode(['model' => $class, $pk => $params]));
     }
 }
