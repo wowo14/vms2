@@ -54,6 +54,11 @@ $this->registerJs($js, \yii\web\View::POS_END);
             <td>:</td>
             <td><?= $model->jenisevaluasi->jenisevaluasi ?? '' ?></td>
         </tr>
+        <tr>
+            <td>Paket Pengadaan</td>
+            <td>:</td>
+            <td><?= $model->paketpengadaan->nama_paket ?? '' ?></td>
+        </tr>
     </table>
     <?= $form->field($model, 'assestment')->widget(MultipleInput::class, [
         'id' => 'dokassestment',

@@ -31,8 +31,8 @@ class ValidasikualifikasipenyediaController extends Controller {
     }
     public function actionAssestment($id) {
         $request = Yii::$app->request;
-        $model=ValidasiKualifikasiPenyedia::find()->cache(false)->where(['id' => $id])->one();
         if ($request->isGet) {
+            $model=ValidasiKualifikasiPenyedia::find()->cache(false)->where(['id' => $id])->one();
             return $this->render('assestment', [
                 'model' => $model
             ]);
