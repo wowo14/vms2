@@ -2,7 +2,7 @@
 namespace app\controllers;
 use Yii;
 use app\models\{Pegawai,PegawaiSearch};
-use yii\web\{Controller,NotFoundHttpException, Response};
+use yii\web\{NotFoundHttpException, Response};
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
 class PegawaiController extends Controller

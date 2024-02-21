@@ -39,4 +39,24 @@ class StaffAhli extends \yii\db\ActiveRecord
             'spesifikasi_pekerjaan' => 'Spesifikasi Pekerjaan',
         ];
     }
+    public function autoDeleteFile() {
+        $filePath = Yii::getAlias('@uploads') . $this->file;
+        if (file_exists($filePath) && !empty($this->file)) {
+            unlink($filePath);
+        }
+    }
+    public function init() {
+        parent::init();
+        $this->on(self::EVENT_AFTER_DELETE, [$this, 'autoDeleteFile']);
+    }
+    public function beforeSave($insert) {
+        if ($insert) {
+            $this->created_by = Yii::$app->user->identity->id;
+            $this->created_at = date('Y-m-d H:i:s', time());
+        } else {
+            $this->updated_by = Yii::$app->user->identity->id;
+            $this->updated_at = date('Y-m-d H:i:s', time());
+        }
+        return parent::beforeSave($insert);
+    }
 }

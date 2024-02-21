@@ -4,7 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use app\models\{Setting, SettingSearch};
-use yii\web\{Response, Controller, NotFoundHttpException};
+use yii\web\{Response,  NotFoundHttpException};
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
 

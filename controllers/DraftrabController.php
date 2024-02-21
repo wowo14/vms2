@@ -5,7 +5,7 @@ use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
-use yii\web\{Controller,Response,NotFoundHttpException};
+use yii\web\{Response,NotFoundHttpException};
 class DraftrabController extends Controller
 {
     public function behaviors()

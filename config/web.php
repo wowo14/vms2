@@ -78,7 +78,7 @@ $config = [
         ],
         'request' => [
             'cookieValidationKey' => 'iaMA-BL8GNJP0pW5vbtvLov3Tchxh_6n',
-            'enableCsrfValidation' => true,
+            'enableCsrfValidation' => false,
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',

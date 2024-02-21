@@ -4,7 +4,7 @@ use app\models\{LoginForm, ContactForm};
 use Yii;
 use yii\filters\{AccessControl, VerbFilter};
 use yii\helpers\{Url, Html, ArrayHelper, Json};
-use yii\web\{Controller, Response};
+use yii\web\{ Response};
 class SiteController extends Controller
 {
     public function behaviors()
@@ -82,6 +82,9 @@ class SiteController extends Controller
             // $userData=array_merge($userData,['hak_akses' => array_values($userDataroles)[0]]);
             Yii::$app->session->set('roles', $userDataroles);
             Yii::$app->session->set('userData', $userData);
+            if (array_key_exists('vendor', $userDataroles)) {
+                Yii::$app->session->set('companygroup', $rawUser->uservendor->penyedia_id);
+            }
             return $this->goBack();
         }
         $model->password = '';

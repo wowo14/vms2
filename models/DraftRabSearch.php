@@ -21,7 +21,7 @@ class DraftRabSearch extends DraftRab{
     {
         $query = DraftRab::find()->cache(self::cachetime(), self::settagdep('tag_draftrab'));
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,
+            'query' => $query,'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
         ]);
         $this->load($params);
         if (!$this->validate()) {
@@ -36,7 +36,6 @@ class DraftRabSearch extends DraftRab{
             'updated_by' => $this->updated_by,
             'is_completed' => $this->is_completed,
         ]);
-
         $query->andFilterWhere(['like', 'kode_program', $this->kode_program])
             ->andFilterWhere(['like', 'nama_program', $this->nama_program])
             ->andFilterWhere(['like', 'kode_kegiatan', $this->kode_kegiatan])

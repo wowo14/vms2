@@ -21,7 +21,7 @@ class AktaPenyedia extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'penyedia_id' => 'Penyedia ID',
+            'penyedia_id' => 'Penyedia',
             'jenis_akta' => 'Jenis Akta',
             'nomor_akta' => 'Nomor Akta',
             'tanggal_akta' => 'Tanggal Akta',
@@ -32,5 +32,31 @@ class AktaPenyedia extends \yii\db\ActiveRecord
             'created_by' => 'Created By',
             'updated_by' => 'Updated By',
         ];
+    }
+    public function autoDeleteFile(){
+        $filePath = Yii::getAlias('@uploads') . $this->file_akta;
+        if (file_exists($filePath) && !empty($this->file_akta)) {
+            unlink($filePath);
+        }
+    }
+    public function init(){
+        parent::init();
+        $this->on(self::EVENT_AFTER_DELETE, [$this, 'autoDeleteFile']);
+    }
+    public function beforeSave($insert) {
+        if ($insert) {
+            $this->file_akta = !empty($this->file_akta) ? $this->upload($this->file_akta, 'file_akta_' . $this->penyedia_id . '_' . time()) : '';
+        } else {
+            $this->file_akta = self::isBase64Encoded($this->file_akta) ? $this->upload($this->file_akta, 'file_akta_' . $this->penyedia_id . '_' . time()) : $this->file_akta;
+        }
+        
+        if ($insert) {
+            $this->created_by = Yii::$app->user->identity->id;
+            $this->created_at = date('Y-m-d H:i:s', time());
+        } else {
+            $this->updated_by = Yii::$app->user->identity->id;
+            $this->updated_at = date('Y-m-d H:i:s', time());
+        }
+        return parent::beforeSave($insert);
     }
 }

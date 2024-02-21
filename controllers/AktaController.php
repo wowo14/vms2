@@ -2,7 +2,7 @@
 namespace app\controllers;
 use Yii;
 use app\models\{AktaPenyedia,AktaPenyediaSearch};
-use yii\web\{Response,Controller,NotFoundHttpException};
+use yii\web\{Response,NotFoundHttpException};
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
 class AktaController extends Controller{
@@ -91,6 +91,7 @@ class AktaController extends Controller{
     {
         $request = Yii::$app->request;
         $model = $this->findModel($id);
+        $oldfile = $model->file_akta;
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             if ($request->isGet) {
@@ -102,7 +103,11 @@ class AktaController extends Controller{
                     'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
                         Html::button(Yii::t('yii2-ajaxcrud', 'Save'), ['class' => 'btn btn-primary', 'type' => 'submit'])
                 ];
-            } else if ($model->load($request->post()) && $model->save()) {
+            } else if ($model->load($request->post())) {
+                if (file_exists(Yii::getAlias('@uploads') . $oldfile) && !empty($oldfile) && ($model->isBase64Encoded($model->file_akta))) {
+                    unlink(Yii::getAlias('@uploads') . $oldfile);
+                }
+                $model->save();
                 return [
                     'forceReload' => '#crud-datatable-pjax',
                     'title' => "AktaPenyedia #" . $id,

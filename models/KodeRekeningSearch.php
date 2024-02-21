@@ -21,6 +21,7 @@ class KodeRekeningSearch extends KodeRekening{
         $query = KodeRekening::find()->cache(self::cachetime(), self::settagdep('tag_koderekening'));
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort'=>['defaultOrder' => ['id' => SORT_DESC]],
         ]);
         $this->load($params);
         if (!$this->validate()) {

@@ -3,7 +3,6 @@ namespace app\controllers;
 use Yii;
 use app\models\TemplateChecklistEvaluasiDetail;
 use app\models\TemplateChecklistEvaluasiDetailSearch;
-use yii\web\Controller;
 use yii\web\{Response,NotFoundHttpException};
 use yii\filters\VerbFilter;
 use yii\helpers\Html;

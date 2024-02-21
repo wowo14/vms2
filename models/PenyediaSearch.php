@@ -21,7 +21,6 @@ class PenyediaSearch extends Penyedia{
         $query = Penyedia::find()->cache(self::cachetime(), self::settagdep('tag_penyedia'));
         $dataProvider = new ActiveDataProvider([
             'query' => $query,'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
-
         ]);
         $this->load($params);
         if (!$this->validate()) {
@@ -34,7 +33,6 @@ class PenyediaSearch extends Penyedia{
             'created_by' => $this->created_by,
             'updated_by' => $this->updated_by,
         ]);
-
         $query->andFilterWhere(['like', 'npwp', $this->npwp])
             ->andFilterWhere(['like', 'nama_perusahaan', $this->nama_perusahaan])
             ->andFilterWhere(['like', 'alamat_perusahaan', $this->alamat_perusahaan])

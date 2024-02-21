@@ -5,7 +5,6 @@ namespace app\controllers;
 use Yii;
 use app\models\Unit;
 use app\models\UnitSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use \yii\web\Response;

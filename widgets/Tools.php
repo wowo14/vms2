@@ -76,11 +76,11 @@ class Tools extends Widget
   }
   public function isAdmin(){
     $role = $this->getcurrentroleuser();
-    return (ArrayHelper::keyExists('Admin', $role))?true:false;
+    return (ArrayHelper::keyExists('admin', $role))?true:false;
   }
   public function isAdminOrOperator(){
     $role = $this->getcurrentroleuser();
-    return (ArrayHelper::keyExists('Admin', $role) || ArrayHelper::keyExists('operator', $role))?true:false;
+    return (ArrayHelper::keyExists('admin', $role) || ArrayHelper::keyExists('operator', $role))?true:false;
   }
   public function dow(){
     $hari = [1=>'Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];

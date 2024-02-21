@@ -7,7 +7,6 @@ use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
-use yii\web\Controller;
 use yii\web\{Response,NotFoundHttpException};
 class TceController extends Controller
 {

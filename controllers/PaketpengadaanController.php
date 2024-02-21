@@ -6,7 +6,7 @@ use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-use yii\web\{ServerErrorHttpException,Controller, Response, NotFoundHttpException};
+use yii\web\{ServerErrorHttpException, Response, NotFoundHttpException};
 
 /**
  A Evaluasi Administrasi

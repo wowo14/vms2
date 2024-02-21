@@ -20,7 +20,7 @@ class ProgramKegiatanSearch extends ProgramKegiatan{
     {
         $query = ProgramKegiatan::find()->cache(self::cachetime(), self::settagdep('tag_programkegiatan'));
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,
+            'query' => $query,'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
         ]);
         $this->load($params);
         if (!$this->validate()) {
@@ -33,7 +33,6 @@ class ProgramKegiatanSearch extends ProgramKegiatan{
             'created_by' => $this->created_by,
             'updated_by' => $this->updated_by,
         ]);
-
         $query->andFilterWhere(['like', 'code', $this->code])
             ->andFilterWhere(['like', 'desc', $this->desc])
             ->andFilterWhere(['like', 'parent', $this->parent])

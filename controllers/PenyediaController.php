@@ -1,16 +1,10 @@
 <?php
-
 namespace app\controllers;
-
 use Yii;
-use app\models\Penyedia;
-use app\models\PenyediaSearch;
-use yii\web\Controller;
-use yii\web\NotFoundHttpException;
+use app\models\{AktaPenyediaSearch,IjinusahaSearch,PengalamanPenyediaSearch,PengurusperusahaanSearch,Penyedia,PenyediaSearch,PeralatanKerjaSearch,StaffAhliSearch};
 use yii\filters\VerbFilter;
-use \yii\web\Response;
 use yii\helpers\Html;
-
+use yii\web\{Response,NotFoundHttpException};
 class PenyediaController extends Controller
 {
     public function behaviors()
@@ -24,6 +18,21 @@ class PenyediaController extends Controller
                 ],
             ],
         ];
+    }
+    public function actionProfile($id = null) {
+        $companyId = empty($id) ? Yii::$app->session->get('companygroup') : $this->decodeurl($id)->id;
+        if (empty($companyId) || is_null($companyId)) {
+            return $this->redirect(['/site/logout']);
+        }
+        return $this->render('viewprofile', [
+            'model' => $this->findModel($companyId),
+            'p' => new PengalamanPenyediaSearch(),
+            'i' => new IjinusahaSearch(),
+            'a' => new AktaPenyediaSearch(),
+            's' => new StaffAhliSearch(),
+            'peralatankerja' => new PeralatanKerjaSearch(),
+            'pengurus' => new PengurusperusahaanSearch(),
+        ]);
     }
     public function actionIndex()
     {

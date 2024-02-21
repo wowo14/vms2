@@ -21,7 +21,7 @@ class RabSearch extends Rab{
     {
         $query = Rab::find()->cache(self::cachetime(), self::settagdep('tag_rab'));
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,
+            'query' => $query,'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
         ]);
         $this->load($params);
         if (!$this->validate()) {
@@ -35,7 +35,6 @@ class RabSearch extends Rab{
             'created_by' => $this->created_by,
             'updated_by' => $this->updated_by,
         ]);
-
         $query->andFilterWhere(['like', 'kode_program', $this->kode_program])
             ->andFilterWhere(['like', 'nama_program', $this->nama_program])
             ->andFilterWhere(['like', 'kode_kegiatan', $this->kode_kegiatan])

@@ -8,8 +8,8 @@ class AktaPenyediaSearch extends AktaPenyedia{
     public function rules()
     {
         return [
-            [['id', 'penyedia_id', 'created_by', 'updated_by'], 'integer'],
-            [['jenis_akta', 'nomor_akta', 'tanggal_akta', 'notaris', 'file_akta', 'created_at', 'updated_at'], 'safe'],
+            [['id', ], 'integer'],
+            [['jenis_akta','penyedia_id', 'created_by', 'updated_by', 'nomor_akta', 'tanggal_akta', 'notaris', 'file_akta', 'created_at', 'updated_at'], 'safe'],
         ];
     }
     public function scenarios()
@@ -27,15 +27,17 @@ class AktaPenyediaSearch extends AktaPenyedia{
         if (!$this->validate()) {
             return $dataProvider;
         }
+        $query->joinWith(['vendor p']);
+        $query->joinWith(['usercreated uc']);
+        $query->joinWith(['userupdated up']);
         $query->andFilterWhere([
             'id' => $this->id,
-            'penyedia_id' => $this->penyedia_id,
-            'created_by' => $this->created_by,
-            'updated_by' => $this->updated_by,
         ]);
-
         $query->andFilterWhere(['like', 'jenis_akta', $this->jenis_akta])
             ->andFilterWhere(['like', 'nomor_akta', $this->nomor_akta])
+            ->andFilterWhere(['like', 'p.nama_perusahaan', $this->penyedia_id])
+            ->andFilterWhere(['like', 'uc.username', $this->created_by])
+            ->andFilterWhere(['like', 'up.username', $this->updated_by])
             ->andFilterWhere(['like', 'tanggal_akta', $this->tanggal_akta])
             ->andFilterWhere(['like', 'notaris', $this->notaris])
             ->andFilterWhere(['like', 'file_akta', $this->file_akta])

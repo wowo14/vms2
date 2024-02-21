@@ -1,13 +1,9 @@
 <?php
 namespace app\controllers;
-use app\models\TemplateChecklistEvaluasi;
-use app\models\ValidasiKualifikasiPenyedia;
-use app\models\ValidasiKualifikasiPenyediaDetail;
-use app\models\ValidasiKualifikasiPenyediaSearch;
 use Yii;
+use app\models\{TemplateChecklistEvaluasi,ValidasiKualifikasiPenyedia,ValidasiKualifikasiPenyediaDetail,ValidasiKualifikasiPenyediaSearch};
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
-use yii\web\Controller;
 use yii\web\{Response, NotFoundHttpException};
 class ValidasikualifikasipenyediaController extends Controller {
     public function behaviors() {

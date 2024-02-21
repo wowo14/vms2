@@ -46,7 +46,7 @@ class Apiregion extends Widget
                 $e['nama'] = @$r['nama'];
                 $e['kode_provinsi'] = @$r['provinsi'];
                 $e['kode_kabupaten'] = @$r['kota'];
-                $e['kode_kecamatan'] = @$r['kecamatan'];
+                $e['kode_kecamatan'] = @$r['kecamatan'] . '0';
                 $e['jk'] = @$r['jk'];
                 $e['tglLahir'] = @$r['tglLahir'];
                 return $e;

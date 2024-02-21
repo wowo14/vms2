@@ -6,7 +6,7 @@ use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\web\BadRequestHttpException;
-use yii\web\{Controller, Response, NotFoundHttpException};
+use yii\web\{Response, NotFoundHttpException};
 class DppController extends Controller {
     private $_pageSize = 10;
     public function behaviors() {
