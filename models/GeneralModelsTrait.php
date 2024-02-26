@@ -30,6 +30,12 @@ trait GeneralModelsTrait {
         }
         return collect($settings)->pluck($callback)->toArray();
     }
+    public static function optionmetodepengadaan(){
+        return self::optionsSettingtype('metode_pengadaan', ['value','value']);
+    }
+    public static function optionkategoripengadaan(){
+        return self::optionsSettingtype('kategori_pengadaan', ['value','value']);
+    }
     public function getUsercreated() {
         return $this->hasAttribute('created_by') ? $this->hasOne(User::class, ['id' => 'created_by'])->cache(self::cachetime(), self::settagdep('tag_user')) : '';
     }
@@ -145,9 +151,14 @@ trait GeneralModelsTrait {
     public function beforeValidate(){
         // HTML escape all attributes
         foreach ($this->attributes as $key => $value) {
-            $this->$key = HtmlPurifier::process($value);
+            $processedValue = HtmlPurifier::process($value);
+            $this->$key = $processedValue;
         }
         return parent::beforeValidate();
+    }
+    public function isJsonEncoded($string) {
+        $decoded = json_decode($string);
+        return ($decoded !== null && $decoded !== $string);
     }
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);

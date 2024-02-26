@@ -57,7 +57,7 @@ return [
         'class' => 'kartik\grid\ActionColumn',
         'dropdown' => false,
         'noWrap' => 'true',
-        'template' => '{lampiran} {view} {update} {delete}',
+        'template' => '{lampiran} {kirimulang} {view} {update} {delete}',
         'vAlign' => 'middle',
         'urlCreator' => function($action, $model, $key, $index) {
                 return Url::to([$action,'id'=>$key]);
@@ -68,6 +68,12 @@ return [
                     'title' => Yii::t('yii2-ajaxcrud', 'Lampiran'),
                     'data-pjax' => '0','class'=> 'btn btn-sm btn-outline-warning'
                 ]);
+            },
+            'kirimulang' => function ($url, $model, $key) {
+                return ($model->alasan_reject && $model->tanggal_reject)?Html::a('<span class="fa fa-plane"></span>', $url, [
+                    'title' => Yii::t('yii2-ajaxcrud', 'Kirim Ulang DPP'),
+                    'data-pjax' => '0','class'=> 'btn btn-sm btn-outline-warning'
+                ]):'';
             }
         ],
         'viewOptions' => ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success'],

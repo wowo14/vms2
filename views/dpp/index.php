@@ -1,4 +1,5 @@
 <?php
+
 use app\assets\AppAsset;
 use kartik\grid\GridView;
 use mdm\admin\components\Helper;
@@ -8,6 +9,7 @@ use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii\bootstrap4\Modal;
 use yii\helpers\Html;
 use yii\helpers\Url;
+
 AppAsset::register($this);
 CrudAsset::register($this);
 $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\BootstrapPluginAsset']);
@@ -132,7 +134,7 @@ $this->params['breadcrumbs'][] = $this->title;
         "keyboard" => true,
     ],
     "options" => [
-        "tabindex" => false
+        "tabindex" => true
     ]
 ]) ?>
 <?php Modal::end(); ?>

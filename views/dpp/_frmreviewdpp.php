@@ -1,10 +1,20 @@
 <?php
-use kartik\switchinput\SwitchInput;
-use yii\helpers\Html;
-use yii\bootstrap4\ActiveForm;
-use unclead\multipleinput\MultipleInput;
-use unclead\multipleinput\MultipleInputColumn;
+use app\assets\AppAsset;
+use app\widgets\FilePreview;
 use kartik\date\DatePicker;
+use kartik\switchinput\SwitchInput;
+use unclead\multipleinput\MultipleInput;
+// use Yii;
+use unclead\multipleinput\MultipleInputColumn;
+use yii\bootstrap4\ActiveForm;
+use yii\helpers\Html;
+use yii\web\View;
+
+AppAsset::register($this);
+$this->registerJs('
+jQuery(function ($) {
+    setupImagePreview($("#imageInput"), $("#imagePreview"), $("#file_tanggapan"));
+});', View::POS_END);
 ?>
 <div id="form-reviewdpp">
     <?php $form = ActiveForm::begin([
@@ -109,6 +119,22 @@ use kartik\date\DatePicker;
     ]) ?>
     Tanggapan PPK:<br>
     <?= $form->field($reviews, 'tanggapan_ppk') ?>
+    <?= $form->field($reviews, 'file_tanggapan')->hiddenInput(['id' => 'file_tanggapan'])->label(false) ?>
+    <div class="form-group ">
+        <div class="row">
+            <label class="control-label right col-sm-3" for="reviewdpp-file_tanggapan">File Tanggapan PPK (images/pdf)</label>
+            <div class="col-sm-9">
+                <input type="file" accept=".pdf, .png, .jpg, .jpeg, .gif" id="imageInput">
+                <div id="imagePreview"></div>
+            </div>
+        </div>
+    </div>
+    <?php echo $reviews->file_tanggapan?Html::a(
+     FilePreview::widget([
+        'model' => $reviews,
+        'attribute' => 'file_tanggapan',
+     ]),Yii::getAlias('@web/uploads/').$reviews->file_tanggapan, ['target' => '_blank']):'';
+    ?>
     <?php if (!Yii::$app->request->isAjax) { ?>
         <div class="form-group">
             <?= Html::submitButton('Submit', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

@@ -1,10 +1,12 @@
 <?php
+
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\bootstrap4\Modal;
 use kartik\grid\GridView;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
+
 $this->title = 'Draft Usulans';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
@@ -91,7 +93,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
         "keyboard" => true,
     ],
     "options" => [
-        "tabindex" => false
+        "tabindex" => true
     ]
 ]) ?>
 <?php Modal::end(); ?>

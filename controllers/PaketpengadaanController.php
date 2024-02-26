@@ -7,7 +7,6 @@ use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\{ServerErrorHttpException, Response, NotFoundHttpException};
-
 /**
  A Evaluasi Administrasi
 T Evaluasi Teknis
@@ -264,6 +263,14 @@ class PaketpengadaanController extends Controller {
             }
         }
     }
+    public function actionKirimulang($id){
+        $model = $this->findModel($id);
+        $model->alasan_reject ='';
+        $model->tanggal_reject ='';
+        $model->save();
+        Yii::$app->session->setFlash('success', 'PaketPengadaan Berhasil Dikirim -> DPP');
+        return $this->redirect('index');
+    }
     public function actionUpdate($id) {
         $request = Yii::$app->request;
         $model = $this->findModel($id);
@@ -279,6 +286,12 @@ class PaketpengadaanController extends Controller {
                         Html::button(Yii::t('yii2-ajaxcrud', 'Save'), ['class' => 'btn btn-primary', 'type' => 'submit'])
                 ];
             } else if ($model->load($request->post()) && $model->save()) {
+                if(!empty($_POST['ReviewDpp'])){
+                    $model->dpp->reviews->file_tanggapan = $_POST['ReviewDpp']['file_tanggapan'];
+                    $model->dpp->reviews->tgl_dikembalikan = $_POST['ReviewDpp']['tgl_dikembalikan'];
+                    $model->dpp->reviews->tanggapan_ppk = $_POST['ReviewDpp']['tanggapan_ppk'];
+                    $model->dpp->reviews->save();
+                }
                 return [
                     'forceReload' => '#crud-datatable-pjax',
                     'title' => "PaketPengadaan #" . $id,

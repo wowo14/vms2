@@ -3,7 +3,7 @@ use app\widgets\FilePreview;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 ?>
-<div class="row">
+<div class="row clear-fix">
     <div class="col-md-6">
         <div class="paket-pengadaan-view">
             <?= DetailView::widget([
@@ -18,7 +18,8 @@ use yii\widgets\DetailView;
                     'ppkom:ntext',
                     'pagu',
                     'metode_pengadaan:ntext',
-                    'created_by',
+                    'kategori_pengadaan:ntext',
+                    ['attribute' => 'created_by', 'value' => $model->usercreated->username ?? ''],
                     'tahun_anggaran',
                     'approval_by',
                     'alasan_reject:ntext',
@@ -37,8 +38,8 @@ use yii\widgets\DetailView;
                     'model' => $el,
                     'attributes' => [
                         [
-                            'attribute' => 'name','format'=>'raw',
-                            'value' => fn ($d) => Html::a($d->name, Yii::getAlias('@web/uploads/').$d->uri, ['target' => '_blank'])
+                            'attribute' => 'name', 'format' => 'raw',
+                            'value' => fn ($d) => Html::a($d->name, Yii::getAlias('@web/uploads/') . $d->uri, ['target' => '_blank'])
                         ],
                         [
                             'attribute' => 'jenis_dokumen',
@@ -63,4 +64,5 @@ use yii\widgets\DetailView;
         }
         ?>
     </div>
+    <div class="clear-fix"></div>
 </div>

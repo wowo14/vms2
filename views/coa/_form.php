@@ -1,5 +1,4 @@
 <?php
-
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
 ?>
@@ -13,23 +12,10 @@ use yii\bootstrap4\ActiveForm;
         ],
     ]); ?>
     <?= $form->field($model, 'kode')->textarea(['rows' => 6]) ?>
-
     <?= $form->field($model, 'rekening')->textarea(['rows' => 6]) ?>
-
     <?= $form->field($model, 'parent')->textInput() ?>
-
     <?= $form->field($model, 'is_active')->textInput() ?>
-
     <?= $form->field($model, 'tahun_anggaran')->textInput() ?>
-
-    <?= $form->field($model, 'created_at')->textarea(['rows' => 6]) ?>
-
-    <?= $form->field($model, 'updated_at')->textarea(['rows' => 6]) ?>
-
-    <?= $form->field($model, 'created_by')->textInput() ?>
-
-    <?= $form->field($model, 'updated_by')->textInput() ?>
-
     <?php if (!Yii::$app->request->isAjax) { ?>
         <div class="form-group">
             <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

@@ -14,7 +14,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             [['pagu'], 'number'],
             [['nama_paket'], 'unique'],
             [['created_by', 'tahun_anggaran', 'approval_by'], 'integer'],
-            [['nomor', 'nama_paket', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'metode_pengadaan'], 'string', 'max' => 255],
+            [['nomor', 'kategori_pengadaan','nama_paket', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'metode_pengadaan'], 'string', 'max' => 255],
         ];
     }
     public function attributeLabels() {
@@ -28,7 +28,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             'kode_rekening' => 'Kode Rekening',
             'ppkom' => 'Ppkom',
             'pagu' => 'Pagu',
-            'metode_pengadaan' => 'Metode Pengadaan',
+            'metode_pengadaan' => 'Metode Pengadaan',//EPL,PL,E-Purchasing,
+            'kategori_pengadaan' => 'Kategori Pengadaan', //barang/jasa, konstruksi, konsultansi
             'created_by' => 'Created By',
             'tahun_anggaran' => 'Tahun Anggaran',
             'approval_by' => 'Approval By',//null->belom,ditolak oleh ,<>0->diterima oleh
@@ -60,6 +61,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             }
         } else {
         }
+        self::invalidatecache('tag_' . self::getModelname());
+        Dpp::invalidatecache('tag_' . Dpp::getModelname());
         return parent::beforeSave($insert);
     }
     public function getAttachments() {
@@ -67,5 +70,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     }
     public function getRequiredlampiran(){//array id
         return collect(self::settingType('jenis_dokumen'))->where('param', 'lampiran')->pluck('id')->toArray();
+    }
+    public function getDpp(){
+        return $this->hasOne(Dpp::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_dpp'));
     }
 }

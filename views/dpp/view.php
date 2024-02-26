@@ -2,7 +2,7 @@
 use app\models\PaketPengadaan;
 use yii\widgets\DetailView;
 ?>
-<div class="row">
+<div class="row clear-fix">
     <div class="col-md-4">
         <div class="dpp-view">DPP
             <?= DetailView::widget([

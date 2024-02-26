@@ -9,15 +9,15 @@ $aa = json_decode($model->details[0]->hasil, true)[0];
 $col = [];
 foreach (array_keys($aa) as $item) {
     $col[] = [
-        'name' => $item,
+        'name' => trim($item),
         'title' => ucfirst(trim($item)),
         'type' => 'textArea'
     ];
 }
-$js=<<<JS
-$('.list-cell__button').hide();
-JS;
-$this->registerJs($js, \yii\web\View::POS_END);
+// $js=<<<JS
+// $('.list-cell__button').hide();
+// JS;
+// $this->registerJs($js, \yii\web\View::POS_END);
 ?>
 <div id="form-reviewdpp">
     <?php $form = ActiveForm::begin([
@@ -66,10 +66,10 @@ $this->registerJs($js, \yii\web\View::POS_END);
         'cloneButton' => false,
         'addButtonOptions' => [
             'class' => 'btn btn-success',
-            'label' => ''
+            'label' => '+'
         ],
         'removeButtonOptions' => [
-            'label' => ''
+            'label' => 'x'
         ],
         'data' => $rr ?? [],
         'columns' =>$col

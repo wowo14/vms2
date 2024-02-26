@@ -100,7 +100,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
         "keyboard" => true,
     ],
     "options" => [
-        "tabindex" => false
+        "tabindex" => true
     ]
 ]) ?>
 <?php Modal::end(); ?>

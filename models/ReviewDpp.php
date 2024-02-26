@@ -9,7 +9,7 @@ class ReviewDpp extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['dpp_id', 'pejabat', 'kesesuaian', 'created_by', 'updated_by'], 'integer'],
-            [['tanggal_review', 'created_at', 'updated_at', 'tgl_dikembalikan'], 'safe'],
+            [['tanggal_review', 'file_tanggapan', 'created_at', 'updated_at', 'tgl_dikembalikan'], 'safe'],
             [['uraian', 'keterangan', 'kesimpulan', 'tanggapan_ppk'], 'string'],
         ];
     }
@@ -25,6 +25,7 @@ class ReviewDpp extends \yii\db\ActiveRecord {
             'kesimpulan' => 'Kesimpulan',
             'tanggapan_ppk' => 'Tanggapan PPK',
             'tgl_dikembalikan' => 'Tanggal Dikembalikan',
+            'file_tanggapan' => 'File upload lampiran tanggapan',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'created_by' => 'Created By',
@@ -38,6 +39,11 @@ class ReviewDpp extends \yii\db\ActiveRecord {
         } else {
             $this->updated_by = Yii::$app->user->identity->id;
             $this->updated_at = date('Y-m-d H:i:s', time());
+        }
+        if ($insert) {
+            $this->file_tanggapan = !empty($this->file_tanggapan)&& self::isBase64Encoded($this->file_tanggapan) ? $this->upload($this->file_tanggapan, 'file_tanggapan'.'_' . time()) : '';
+        } else {
+            $this->file_tanggapan = !empty($this->file_tanggapan) && self::isBase64Encoded($this->file_tanggapan) ? $this->upload($this->file_tanggapan, 'file_tanggapan'.'_' . time()) : $this->file_tanggapan;
         }
         $this->tanggal_review=date('Y-m-d H:i:s');
         return parent::beforeSave($insert);

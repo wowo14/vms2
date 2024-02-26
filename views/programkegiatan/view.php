@@ -14,8 +14,8 @@ use yii\widgets\DetailView;
             'is_active',
             'created_at:ntext',
             'updated_at:ntext',
-            'created_by',
-            'updated_by',
+            ['attribute' => 'created_by', 'value' => $model->usercreated->username ?? ''],
+            ['attribute' => 'updated_by', 'value' => $model->userupdated->username ?? ''],
         ],
     ]) ?>
 </div>

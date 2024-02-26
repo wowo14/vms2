@@ -4,9 +4,11 @@ use kartik\date\DatePicker;
 use kartik\depdrop\DepDrop;
 use kartik\select2\Select2;
 use kartik\switchinput\SwitchInput;
+use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\{ArrayHelper,Html,Url};
-AppAsset::register($this);
+// AppAsset::register($this);
+CrudAsset::register($this);
 $js = <<< JS
 function depdropchange(){
     var propinsinya=$('#penyedia-propinsi').find(':selected').text().split('- ').pop();

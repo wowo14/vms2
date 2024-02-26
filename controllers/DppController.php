@@ -8,7 +8,7 @@ use yii\helpers\Html;
 use yii\web\BadRequestHttpException;
 use yii\web\{Response, NotFoundHttpException};
 class DppController extends Controller {
-    private $_pageSize = 10;
+    private $_pageSize = 1;
     public function behaviors() {
         return [
             'verbs' => [
@@ -36,7 +36,7 @@ class DppController extends Controller {
     }
     public function actionIndex() {
         $searchModel = new DppSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $this->_pageSize);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -120,6 +120,8 @@ class DppController extends Controller {
             if ($model->load($request->post()) ) {
                 if($model->tanggal_reject && $model->alasan_reject){
                     $model->save();
+                    Dpp::invalidatecache('tag_'.Dpp::getModelname());
+                    $model::invalidatecache('tag_'.$model::getModelname());
                 }else{
                     throw new BadRequestHttpException('Data Tidak Lengkap');
                 }
@@ -193,10 +195,15 @@ class DppController extends Controller {
         if ($request->isPost) {
             $rr = ReviewDpp::where(['dpp_id' => $model->id])->orderBy('id desc')->one();
             if ($rr) {
+                $oldfile=$rr->file_tanggapan;
+                if (file_exists(Yii::getAlias('@uploads') . $oldfile) && !empty($oldfile) && ($rr->isBase64Encoded($_POST['ReviewDpp']['file_tanggapan']))) {
+                    unlink(Yii::getAlias('@uploads') . $oldfile);
+                }
                 $rr->uraian = json_encode($_POST['ReviewDpp']['uraian'], JSON_UNESCAPED_SLASHES);
                 $rr->keterangan = $_POST['ReviewDpp']['keterangan'];
                 $rr->kesimpulan = $_POST['ReviewDpp']['kesimpulan'];
                 $rr->tanggapan_ppk = $_POST['ReviewDpp']['tanggapan_ppk'];
+                $rr->file_tanggapan = $_POST['ReviewDpp']['file_tanggapan'];
                 $rr->dpp_id = $model->id;
                 $rr->pejabat = Yii::$app->user->id;
                 $rr->save();
@@ -206,6 +213,7 @@ class DppController extends Controller {
                 $rr->keterangan = $_POST['ReviewDpp']['keterangan'];
                 $rr->kesimpulan = $_POST['ReviewDpp']['kesimpulan'];
                 $rr->tanggapan_ppk = $_POST['ReviewDpp']['tanggapan_ppk'];
+                $rr->file_tanggapan = $_POST['ReviewDpp']['file_tanggapan'];
                 $rr->dpp_id = $model->id;
                 $rr->pejabat = Yii::$app->user->id;
                 $rr->save();

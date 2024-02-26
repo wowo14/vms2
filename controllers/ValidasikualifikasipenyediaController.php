@@ -1,9 +1,10 @@
 <?php
 namespace app\controllers;
-use Yii;
 use app\models\{TemplateChecklistEvaluasi,ValidasiKualifikasiPenyedia,ValidasiKualifikasiPenyediaDetail,ValidasiKualifikasiPenyediaSearch};
+use Yii;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
+use yii\helpers\HtmlPurifier;
 use yii\web\{Response, NotFoundHttpException};
 class ValidasikualifikasipenyediaController extends Controller {
     public function behaviors() {
@@ -35,9 +36,16 @@ class ValidasikualifikasipenyediaController extends Controller {
         }
         if($request->isPost){
             $assestment=$request->post('ValidasiKualifikasiPenyedia')['assestment'];
+            $pure=collect($assestment)->map(function($e){
+                foreach($e as $key => $value){
+                    $e[$key]=HtmlPurifier::process($value);
+                }
+                return $e;
+            });
             ValidasiKualifikasiPenyediaDetail::updateAll([
-                'hasil' => json_encode($assestment),
+                'hasil' => json_encode($pure),
             ], ['header_id' => $id]);
+            Yii::$app->session->setFlash('success', 'Data Assestment Berhasil disimpan');
             return $this->redirect('index');
         }
     }

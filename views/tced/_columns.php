@@ -20,10 +20,11 @@ return [
     [
         'class'=>'\kartik\grid\DataColumn',
         'attribute'=>'created_by',
+        'value'=>fn($d)=>$d->usercreated->username??'',
     ],
     [
         'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'updated_by',
+        'attribute'=>'updated_by','value'=>fn($d)=>$d->userupdated->username??'',
     ],
     [
         'class' => 'kartik\grid\ActionColumn',
