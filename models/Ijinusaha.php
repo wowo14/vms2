@@ -21,7 +21,7 @@ class Ijinusaha extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'penyedia_id' => 'Penyedia ID',
+            'penyedia_id' => 'Penyedia',
             'instansi_pemberi' => 'Instansi Pemberi',
             'nomor_ijinusaha' => 'Nomor Ijinusaha',
             'tanggal_ijinusaha' => 'Tanggal Ijinusaha',

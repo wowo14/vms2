@@ -6,6 +6,7 @@ use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\helpers\HtmlPurifier;
 use yii\web\{Response, NotFoundHttpException};
+
 class ValidasikualifikasipenyediaController extends Controller {
     public function behaviors() {
         return [
@@ -42,6 +43,7 @@ class ValidasikualifikasipenyediaController extends Controller {
                 }
                 return $e;
             });
+            Yii::error('pure :', json_encode($pure));
             ValidasiKualifikasiPenyediaDetail::updateAll([
                 'hasil' => json_encode($pure),
             ], ['header_id' => $id]);

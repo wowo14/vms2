@@ -8,16 +8,18 @@ $rr = json_decode($model->details[0]->hasil, true);
 $aa = json_decode($model->details[0]->hasil, true)[0];
 $col = [];
 foreach (array_keys($aa) as $item) {
+    $trimmedKey= ucfirst(trim($item));
+    $title = ($trimmedKey === 'Sesuai') ? 'Sesuai(ya/tidak)' : (($trimmedKey === 'Skala') ? 'Skala(1-5)' : ucfirst($trimmedKey));
     $col[] = [
         'name' => trim($item),
-        'title' => ucfirst(trim($item)),
+        'title' => $title,
         'type' => 'textArea'
     ];
 }
 // $js=<<<JS
 // $('.list-cell__button').hide();
 // JS;
-// $this->registerJs($js, \yii\web\View::POS_END);
+// $this->registerJs($js, \yii\web\View::POS_END); //ValidasiKualifikasiPenyedia[assestment][1][uraian]
 ?>
 <div id="form-reviewdpp">
     <?php $form = ActiveForm::begin([
@@ -64,6 +66,7 @@ foreach (array_keys($aa) as $item) {
         'id' => 'dokassestment',
         'enableGuessTitle'  => true,
         'cloneButton' => false,
+        'addButtonPosition'=> MultipleInput::POS_FOOTER,
         'addButtonOptions' => [
             'class' => 'btn btn-success',
             'label' => '+'
@@ -72,7 +75,7 @@ foreach (array_keys($aa) as $item) {
             'label' => 'x'
         ],
         'data' => $rr ?? [],
-        'columns' =>$col
+        'columns' => $col
     ])->label(false); ?>
     <?php if (!Yii::$app->request->isAjax) { ?>
         <div class="form-group">

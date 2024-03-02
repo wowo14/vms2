@@ -23,7 +23,7 @@ use yii\widgets\DetailView;
             ['attribute' => 'created_by', 'value' => $model->usercreated->username ?? ''],
             ['attribute' => 'updated_by', 'value' => $model->userupdated->username ?? ''],
             'user_id',
-            'penyedia_id',
+            ['attribute'=>'penyedia_id','value' => $model->vendor->nama_perusahaan??''],
             'password:ntext',
         ],
     ]) ?>

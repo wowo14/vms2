@@ -1,13 +1,10 @@
 <?php
-
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\bootstrap4\Modal;
 use kartik\grid\GridView;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
-/* @var $searchModel app\models\PengurusperusahaanSearch */
-
 $this->title = 'Pengurusperusahaan';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);

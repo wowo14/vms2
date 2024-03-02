@@ -12,6 +12,7 @@ return [
         [
         'class'=>'\kartik\grid\DataColumn',
         'attribute'=>'penyedia_id',
+        'value' => fn($d)=>$d->vendor->nama_perusahaan??''
     ],
     [
         'class'=>'\kartik\grid\DataColumn',

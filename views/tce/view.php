@@ -8,6 +8,7 @@ use yii\widgets\DetailView;
             'id',
             'template:ntext',
             'jenis_evaluasi:ntext',
+            'element',
             'created_at:ntext',
             'updated_at:ntext',
             ['attribute' => 'created_by', 'value' => $model->usercreated->username ?? ''],
