@@ -128,7 +128,11 @@ class AktaController extends Controller{
                 ];
             }
         } else {
-            if ($model->load($request->post()) && $model->save()) {
+            if ($model->load($request->post()) ) {
+                if (file_exists(Yii::getAlias('@uploads') . $oldfile) && !empty($oldfile) && ($model->isBase64Encoded($model->file_akta))) {
+                    unlink(Yii::getAlias('@uploads') . $oldfile);
+                }
+                $model->save();
                 return $this->redirect(['view', 'id' => $model->id]);
             } else {
                 return $this->render('update', [

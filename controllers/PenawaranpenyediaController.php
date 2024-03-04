@@ -53,7 +53,6 @@ class PenawaranpenyediaController extends Controller
         $request = Yii::$app->request;
         $model = new PenawaranPengadaan();
         if($request->isAjax){
-
             Yii::$app->response->format = Response::FORMAT_JSON;
             if($request->isGet){
                 return [
@@ -83,7 +82,6 @@ class PenawaranpenyediaController extends Controller
                 ];
             }
         }else{
-
             if ($model->load($request->post()) && $model->save()){
                 return $this->redirect(['view', 'id' => $model->id]);
             }else{
@@ -97,6 +95,8 @@ class PenawaranpenyediaController extends Controller
     {
         $request = Yii::$app->request;
         $model = $this->findModel($id);
+        $oldlampiran_penawaran = $model->lampiran_penawaran;
+        $oldlampiran_penawaran_harga = $model->lampiran_penawaran_harga;
         if($request->isAjax){
             Yii::$app->response->format = Response::FORMAT_JSON;
             if($request->isGet){
@@ -108,7 +108,14 @@ class PenawaranpenyediaController extends Controller
                     'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']).
                         Html::button(Yii::t('yii2-ajaxcrud', 'Save'), ['class' => 'btn btn-primary', 'type' => 'submit'])
                 ];
-            }else if($model->load($request->post()) && $model->save()){
+            }else if($model->load($request->post()) ){
+                if (file_exists(Yii::getAlias('@uploads') . $oldlampiran_penawaran) && !empty($oldlampiran_penawaran) && ($model->isBase64Encoded($model->lampiran_penawaran))) {
+                    unlink(Yii::getAlias('@uploads') . $oldlampiran_penawaran);
+                }
+                if (file_exists(Yii::getAlias('@uploads') . $oldlampiran_penawaran_harga) && !empty($oldlampiran_penawaran_harga) && ($model->isBase64Encoded($model->lampiran_penawaran_harga))) {
+                    unlink(Yii::getAlias('@uploads') . $oldlampiran_penawaran_harga);
+                }
+                $model->save();
                 return [
                     'forceReload' => '#crud-datatable-pjax',
                     'title' => "PenawaranPengadaan #".$id,
@@ -129,7 +136,14 @@ class PenawaranpenyediaController extends Controller
                 ];
             }
         }else{
-            if ($model->load($request->post()) && $model->save()){
+            if ($model->load($request->post()) ){
+                if (file_exists(Yii::getAlias('@uploads') . $oldlampiran_penawaran) && !empty($oldlampiran_penawaran) && ($model->isBase64Encoded($model->lampiran_penawaran))) {
+                    unlink(Yii::getAlias('@uploads') . $oldlampiran_penawaran);
+                }
+                if (file_exists(Yii::getAlias('@uploads') . $oldlampiran_penawaran_harga) && !empty($oldlampiran_penawaran_harga) && ($model->isBase64Encoded($model->lampiran_penawaran_harga))) {
+                    unlink(Yii::getAlias('@uploads') . $oldlampiran_penawaran_harga);
+                }
+                $model->save();
                 return $this->redirect(['view', 'id' => $model->id]);
             }else{
                 return $this->render('update', [
