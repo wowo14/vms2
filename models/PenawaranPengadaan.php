@@ -70,6 +70,7 @@ class PenawaranPengadaan extends \yii\db\ActiveRecord
         if ($insert) {
             $this->created_by = Yii::$app->user->identity->id;
             $this->created_at = date('Y-m-d H:i:s', time());
+            $this->ip_client= Yii::$app->request->userIp;
         } else {
             $this->updated_by = Yii::$app->user->identity->id;
             $this->updated_at = date('Y-m-d H:i:s', time());

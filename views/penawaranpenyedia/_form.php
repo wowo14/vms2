@@ -1,9 +1,11 @@
 <?php
+use app\assets\AppAsset;
 use kartik\date\DatePicker;
 use kartik\select2\Select2;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\{ArrayHelper, Html};
 use yii\web\View;
+AppAsset::register($this);
 $paket = ArrayHelper::map($model->allpaketpengadaan, 'id', 'nomornamapaket');
 $penyedia = ArrayHelper::map($model->vendors, 'id', 'nama_perusahaan');
 $this->registerJs('
