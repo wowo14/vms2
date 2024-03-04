@@ -1,9 +1,8 @@
 <?php
 namespace app\models;
-use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\PenawaranPengadaan;
+use yii\db\Expression;
 class PenawaranPengadaanSearch extends PenawaranPengadaan{
     public function rules()
     {
@@ -39,7 +38,7 @@ class PenawaranPengadaanSearch extends PenawaranPengadaan{
         ]);
         $query->andFilterWhere(['like', 'nomor', $this->nomor])
             ->andFilterWhere(['like', 'kode', $this->kode])
-            ->andFilterWhere(['like', 'pp.nama_paket', $this->paket_id])
+            ->andFilterWhere(['like', new Expression('pp.nomor || pp.nama_paket'),$this->paket_id])
             ->andFilterWhere(['like', 'p.nama_perusahaan', $this->penyedia_id])
             ->andFilterWhere(['like', 'ip_client', $this->ip_client])
             ->andFilterWhere(['like', 'masa_berlaku', $this->masa_berlaku])

@@ -12,7 +12,7 @@ return [
         [
         'class'=>'\kartik\grid\DataColumn',
         'attribute'=>'paket_id',
-        'value' => fn($d)=>$d->paket->nama??''
+        'value' => fn($d)=>$d->paketPengadaan->nomornamapaket??''
     ],
     [
         'class'=>'\kartik\grid\DataColumn',
@@ -21,7 +21,7 @@ return [
     ],
     [
         'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'nomor',
+        'attribute'=>'masa_berlaku',
     ],
     [
         'class'=>'\kartik\grid\DataColumn',
