@@ -1,15 +1,9 @@
 <?php
-use yii\bootstrap\{Collapse, Tabs, Modal};
+use yii\bootstrap4\{Collapse, Tabs, Modal};
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\widgets\Pjax;
 ?>
-<?php Modal::begin([
-    "id"=>$model->hash,
-    "size"=>"modal-md",
-    "footer"=>"",// always need it for jquery plugin
-])?>
-<?php Modal::end(); ?>
 <div class="row">
     <div class="col-md-3">
         <div class="panel panel-default">

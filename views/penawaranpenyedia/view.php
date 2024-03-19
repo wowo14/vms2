@@ -1,9 +1,10 @@
 <?php
+use app\assets\AppAsset;
 use app\widgets\FilePreview;
 use yii\bootstrap4\Tabs;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
-
+AppAsset::register($this);
 ?>
 <div class="row">
     <div class="col-md-6 penawaran-pengadaan-view">
@@ -30,7 +31,7 @@ use yii\widgets\DetailView;
     <div class="clear-fix"></div>
     <div class="col-md-6">
         <?php
-         echo Tabs::widget([
+        echo Tabs::widget([
             'items' => [
                 [
                     'label' => 'Lampiran Penawaran',

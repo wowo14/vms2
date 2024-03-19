@@ -1,5 +1,5 @@
 <?php
-use yii\helpers\Url;
+use yii\helpers\{Url,Html};
 return [
     [
         'class' => 'kartik\grid\CheckboxColumn',
@@ -42,6 +42,17 @@ return [
         'urlCreator' => function($action, $model, $key, $index) {
                 return Url::to([$action,'id'=>$key]);
         },
+        'buttons' => [
+            'view' => function ($url, $model, $key) {
+                return Html::a(
+                    '<span class="fa fa-eye"></span>',
+                    $url,
+                    // $url='/pengurusperusahaan/view?id='.$key,
+                    ['class' => 'btn btn-sm btn-outline-info', 'role' => 'modal-remote', 'title' => 'View', 'data-toggle' => 'tooltip']
+                );
+            },
+
+        ],
         'viewOptions' => ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success'],
         'updateOptions' => ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Update'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-primary'],
         'deleteOptions' => ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Delete'), 'class' => 'btn btn-sm btn-outline-danger',

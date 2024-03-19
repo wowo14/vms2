@@ -25,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'content' =>
                     Html::a(
                         '<i class="fa fa-plus"></i>',
-                        ['create'],
+                        ['pegawai/create'],
                         ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Pegawai', 'class' => 'btn btn-outline-primary']
                     ) .
                         Html::a(

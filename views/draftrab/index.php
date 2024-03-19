@@ -1,12 +1,10 @@
 <?php
-
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\bootstrap4\Modal;
 use kartik\grid\GridView;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
-
 $this->title = 'Draft Rab';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
@@ -30,7 +28,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
                     ) .
                         Html::a(
                             '<i class="fa fa-plus"></i>',
-                            ['create'],
+                            ['draftrab/create'],
                             ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Draft Rabs', 'class' => 'btn btn-outline-primary']
                         ) .
                         Html::a(

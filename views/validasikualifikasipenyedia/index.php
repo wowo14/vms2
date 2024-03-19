@@ -1,12 +1,10 @@
 <?php
-
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\bootstrap4\Modal;
 use kartik\grid\GridView;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
-
 $this->title = 'Validasi Kualifikasi Penyedia';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
@@ -25,7 +23,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
                     'content' =>
                     Html::a(
                         '<i class="fa fa-plus"></i>',
-                        ['create'],
+                        ['validasikualifikasipenyedia/create'],
                         ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Validasi Kualifikasi Penyedias', 'class' => 'btn btn-outline-primary']
                     ) .
                         Html::a(

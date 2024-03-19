@@ -26,7 +26,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
                     'content' =>
                     Html::a(
                         '<i class="fa fa-plus"></i>',
-                        ['create'],
+                        ['tced/create'],
                         ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Template Checklist Evaluasi Details', 'class' => 'btn btn-outline-primary']
                     ) .
                         Html::a(

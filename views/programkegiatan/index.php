@@ -30,7 +30,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
                     ) .
                         Html::a(
                             '<i class="fa fa-plus"></i>',
-                            ['create'],
+                            ['programkegiatan/create'],
                             ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Program Kegiatans', 'class' => 'btn btn-outline-primary']
                         ) .
                         Html::a(

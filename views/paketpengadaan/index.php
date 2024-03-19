@@ -1,5 +1,4 @@
 <?php
-
 use app\assets\AppAsset;
 use kartik\grid\GridView;
 use mdm\admin\components\Helper;
@@ -8,7 +7,6 @@ use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii\bootstrap4\Modal;
 use yii\helpers\Html;
 use yii\helpers\Url;
-
 $this->title = 'Paket Pengadaan';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
@@ -28,7 +26,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
                     'content' =>
                     Html::a(
                         '<i class="fa fa-plus"></i>',
-                        ['create'],
+                        ['paketpengadaan/create'],
                         ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Paket Pengadaans', 'class' => 'btn btn-outline-primary']
                     ) .
                         Html::a(

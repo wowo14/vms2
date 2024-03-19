@@ -23,12 +23,12 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
                     'content' =>
                     Html::a(
                         '<i class="fa fa-plus"></i>',
-                        ['create'],
+                        ['/penawaranpenyedia/create'],
                         ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Penawaran Pengadaans', 'class' => 'btn btn-outline-primary']
                     ) .
                         Html::a(
                             '<i class="fa fa-redo"></i>',
-                            [''],
+                            ['/penawaranpenyedia'],
                             ['data-pjax' => 1, 'class' => 'btn btn-outline-success', 'title' => Yii::t('yii2-ajaxcrud', 'Reset Grid')]
                         ) .
                         '{toggleData}' .

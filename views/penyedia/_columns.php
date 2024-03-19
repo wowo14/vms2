@@ -1,5 +1,5 @@
 <?php
-use yii\helpers\Url;
+use yii\helpers\{Url,Html};
 return [
     [
         'class' => 'kartik\grid\CheckboxColumn',
@@ -14,8 +14,12 @@ return [
         'attribute'=>'npwp',
     ],
     [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'nama_perusahaan',
+        'class' => '\kartik\grid\DataColumn',
+        'attribute' => 'nama_perusahaan',
+        'format' => 'raw',
+        'value' => function ($model) {
+            return Html::a($model->nama_perusahaan, ['penyedia/profile', 'id' => $model->hashid($model->id)], ['data-pjax' => 0]);
+        }
     ],
     [
         'class'=>'\kartik\grid\DataColumn',
