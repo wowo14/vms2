@@ -1,6 +1,6 @@
 <?php
 namespace app\controllers;
-use app\models\{TemplateChecklistEvaluasi,ValidasiKualifikasiPenyedia,ValidasiKualifikasiPenyediaDetail,ValidasiKualifikasiPenyediaSearch};
+use app\models\{PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia, ValidasiKualifikasiPenyediaDetail, ValidasiKualifikasiPenyediaSearch};
 use Yii;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
@@ -29,16 +29,16 @@ class ValidasikualifikasipenyediaController extends Controller {
     public function actionAssestment($id) {
         $request = Yii::$app->request;
         if ($request->isGet) {
-            $model=ValidasiKualifikasiPenyedia::find()->cache(false)->where(['id' => $id])->one();
+            $model = ValidasiKualifikasiPenyedia::find()->cache(false)->where(['id' => $id])->one();
             return $this->render('assestment', [
                 'model' => $model
             ]);
         }
-        if($request->isPost){
-            $assestment=$request->post('ValidasiKualifikasiPenyedia')['assestment'];
-            $pure=collect($assestment)->map(function($e){
-                foreach($e as $key => $value){
-                    $e[$key]=HtmlPurifier::process($value);
+        if ($request->isPost) {
+            $assestment = $request->post('ValidasiKualifikasiPenyedia')['assestment'];
+            $pure = collect($assestment)->map(function ($e) {
+                foreach ($e as $key => $value) {
+                    $e[$key] = HtmlPurifier::process($value);
                 }
                 return $e;
             });
@@ -86,17 +86,23 @@ class ValidasikualifikasipenyediaController extends Controller {
                 if ($model->template) {
                     $hasil = [];
                     $collect = TemplateChecklistEvaluasi::findOne($model->template);
-                    $ar_element = explode(',', $collect->element);
+                    if ($collect->element) {
+                        $ar_element = explode(',', $collect->element);
+                    }
                     foreach (json_decode($collect->detail->uraian, true) as $v) {
                         $c = ['uraian' => $v['uraian']];
-                        foreach ($ar_element as $element) {
-                            if ($element) { $c[$element] = '';}
+                        if ($collect->element) {
+                            foreach ($ar_element as $element) {
+                                if ($element) {
+                                    $c[$element] = '';
+                                }
+                            }
                         }
                         $hasil[] = $c;
                     }
                     $detail = new ValidasiKualifikasiPenyediaDetail();
                     $detail->header_id = $model->id;
-                    $detail->hasil =json_encode($hasil);
+                    $detail->hasil = json_encode($hasil);
                     $detail->save(false);
                 }
                 return [
@@ -121,12 +127,16 @@ class ValidasikualifikasipenyediaController extends Controller {
                 if ($model->template) {
                     $hasil = [];
                     $collect = TemplateChecklistEvaluasi::findOne($model->template);
-                    $ar_element = explode(',', $collect->element);
+                    if ($collect->element) {
+                        $ar_element = explode(',', $collect->element);
+                    }
                     foreach (json_decode($collect->detail->uraian, true) as $v) {
                         $c = ['uraian' => $v['uraian']];
-                        foreach ($ar_element as $element) {
-                            if ($element) {
-                                $c[$element] = '';
+                        if ($collect->element) {
+                            foreach ($ar_element as $element) {
+                                if ($element) {
+                                    $c[$element] = '';
+                                }
                             }
                         }
                         $hasil[] = $c;
@@ -163,17 +173,23 @@ class ValidasikualifikasipenyediaController extends Controller {
                     ValidasiKualifikasiPenyediaDetail::deleteAll(['header_id' => $model->id]);
                     $hasil = [];
                     $collect = TemplateChecklistEvaluasi::findOne($model->template);
-                    $ar_element = explode(',', $collect->element);
+                    if ($collect->element) {
+                        $ar_element = explode(',', $collect->element);
+                    }
                     foreach (json_decode($collect->detail->uraian, true) as $v) {
                         $c = ['uraian' => $v['uraian']];
-                        foreach ($ar_element as $element) {
-                            if ($element) { $c[$element] = '';}
+                        if ($collect->element){
+                            foreach ($ar_element as $element) {
+                                if ($element) {
+                                    $c[$element] = '';
+                                }
+                            }
                         }
                         $hasil[] = $c;
                     }
                     $detail = new ValidasiKualifikasiPenyediaDetail();
                     $detail->header_id = $model->id;
-                    $detail->hasil =json_encode($hasil);
+                    $detail->hasil = json_encode($hasil);
                     $detail->save(false);
                 }
                 return [
@@ -201,12 +217,16 @@ class ValidasikualifikasipenyediaController extends Controller {
                     ValidasiKualifikasiPenyediaDetail::deleteAll(['header_id' => $model->id]);
                     $hasil = [];
                     $collect = TemplateChecklistEvaluasi::findOne($model->template);
-                    $ar_element = explode(',', $collect->element);
+                    if ($collect->element) {
+                        $ar_element = explode(',', $collect->element);
+                    }
                     foreach (json_decode($collect->detail->uraian, true) as $v) {
                         $c = ['uraian' => $v['uraian']];
-                        foreach ($ar_element as $element) {
-                            if ($element) {
-                                $c[$element] = '';
+                        if ($collect->element) {
+                            foreach ($ar_element as $element) {
+                                if ($element) {
+                                    $c[$element] = '';
+                                }
                             }
                         }
                         $hasil[] = $c;
@@ -255,24 +275,27 @@ class ValidasikualifikasipenyediaController extends Controller {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
-    public function actionViewvalidasipenyedia($id){
+    public function actionViewvalidasipenyedia($id) {
         $request = Yii::$app->request;
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return [
                 'title' => "ValidasiKualifikasiPenyedia #" . $id,
                 'content' => $this->renderAjax('allviewvalidasi', [
-                    'model' => ValidasiKualifikasiPenyedia::where(['penyedia_id' => $id])->one(),
+                    'kualifikasi' => ValidasiKualifikasiPenyedia::findAll(['penyedia_id' => $id]),
+                    'penawaran' => PenawaranPengadaan::collectAll(['penyedia_id' => $id]),
+                    'templates' => TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->all(),
                 ]),
                 'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'role' => 'modal-remote'])
+                    Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'role' => 'modal-remote'])
             ];
         } else {
             return $this->render('allviewvalidasi', [
-                'model' =>ValidasiKualifikasiPenyedia::where(['penyedia_id' => $id])->one(),
+                'kualifikasi' => ValidasiKualifikasiPenyedia::findAll(['penyedia_id' => $id]),
+                'penawaran' => PenawaranPengadaan::collectAll(['penyedia_id' => $id]),
+                'templates' => TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->all(),
             ]);
         }
-        // $templates= TemplateChecklistEvaluasi::where(['status' => 1])->andFilterWhere(['like','template','checklist_evaluasi'])->all();
         // return $this->render('validasikualifikasipenyedia',['templates' => $templates,'model'=>new ValidasiKualifikasiPenyedia]);
     }
 }

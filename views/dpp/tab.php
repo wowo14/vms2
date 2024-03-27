@@ -1,9 +1,5 @@
 <?php
-use app\models\PenawaranPengadaanSearch;
-use app\models\TemplateChecklistEvaluasi;
-use app\models\TemplateChecklistEvaluasiSearch;
-use app\models\ValidasiKualifikasiPenyedia;
-use app\models\ValidasiKualifikasiPenyediaSearch;
+use app\models\PenawaranPengadaan;
 use yii\bootstrap4\{Collapse, Tabs, Modal};
 ?>
 <?php
@@ -28,19 +24,15 @@ use yii\bootstrap4\{Collapse, Tabs, Modal};
                 [
                     'label' => 'Peserta',
                     'content' =>$this->render('//penawaranpenyedia/allpenawaran', [
-                        'searchModel' => $penawaran=new PenawaranPengadaanSearch(),
-                        'dataProvider' => $penawaran->search($penawaranparams),
-                        'params' => $model->hashid($model->id), //penyedia_id
+                        'model'=> PenawaranPengadaan::collectAll(['paket_id'=>$model->paket_id]),
                     ]),
                     'options' => ['id' => 'peserta' . $model->hash],
                 ],
                 [
                     'label' => 'Evaluasi',
                     'content' =>$this->render('//validasikualifikasipenyedia/validasikualifikasipenyedia', [
-                        'searchModel' => $evaluasipenyedia = new ValidasiKualifikasiPenyediaSearch(),
-                        'dataProvider' => $evaluasipenyedia->search($evaluasipenyediaparams),
                         // 'templates'=> TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->all(),
-                        // 'model' => ValidasiKualifikasiPenyedia::collectAll(),
+                        'model' => PenawaranPengadaan::collectAll(['paket_id' => $model->paket_id]),
                     ]),
                     'options' => ['id' => 'evaluasi' . $model->hash],
                 ],

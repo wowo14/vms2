@@ -74,4 +74,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     public function getDpp(){
         return $this->hasOne(Dpp::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_dpp'));
     }
+    public function getSubmitedpenawaran(){
+        return $this->hasMany(PenawaranPengadaan::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_penawaranpengadaan'));
+    }
 }

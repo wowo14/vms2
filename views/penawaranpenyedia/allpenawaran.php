@@ -11,7 +11,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
     <div id="ajaxCrudDatatable">
         <?= GridView::widget([
             'id' => 'crud-datatable',
-            'dataProvider' => $dataProvider,
+            'dataProvider' =>new yii\data\ArrayDataProvider(['allModels' => $model->toArray(), 'pagination' => false]),
             'columns' => [
                 [
                     'class' => 'yii\grid\SerialColumn',
