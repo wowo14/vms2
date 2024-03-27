@@ -1,4 +1,5 @@
 <?php
+use yii\grid\GridView;
 use yii\widgets\DetailView;
 ?>
 <div class="validasi-kualifikasi-penyedia-view">
@@ -19,11 +20,11 @@ use yii\widgets\DetailView;
     ]) ?>
 </div>
 <div class="clear-fix"></div>
-<?php echo 'det'; //print_r($model->details[0]->hasil); die;
+<?php
 if ($model->details) :
     $aa= json_decode($model->details[0]->hasil,true);
     $col = [];
-    foreach (array_keys($aa) as $item) {
+    foreach (array_keys($aa[0]) as $item) {
         $trimmedKey = ucfirst(trim($item));
         $title = ($trimmedKey === 'Sesuai') ? 'Sesuai(ya/tidak)' : (($trimmedKey === 'Skala') ? 'Skala(1-5)' : ucfirst($trimmedKey));
         $col[] = [
@@ -31,9 +32,14 @@ if ($model->details) :
             'header' => $title,
         ];
     }
-    echo $aa['uraian'];
+    echo GridView::widget([
+        'dataProvider' => new \yii\data\ArrayDataProvider([
+            'allModels' => $aa,
+        ]),
+        'columns' => $col,
+        'tableOptions' => ['class' => 'table responsive'],
+    ]);
 ?>
-
 <?php
 endif;
 ?>

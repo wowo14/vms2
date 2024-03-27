@@ -6,7 +6,6 @@ use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\helpers\HtmlPurifier;
 use yii\web\{Response, NotFoundHttpException};
-
 class ValidasikualifikasipenyediaController extends Controller {
     public function behaviors() {
         return [
@@ -255,5 +254,25 @@ class ValidasikualifikasipenyediaController extends Controller {
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+    public function actionViewvalidasipenyedia($id){
+        $request = Yii::$app->request;
+        if ($request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return [
+                'title' => "ValidasiKualifikasiPenyedia #" . $id,
+                'content' => $this->renderAjax('allviewvalidasi', [
+                    'model' => ValidasiKualifikasiPenyedia::where(['penyedia_id' => $id])->one(),
+                ]),
+                'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
+                Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'role' => 'modal-remote'])
+            ];
+        } else {
+            return $this->render('allviewvalidasi', [
+                'model' =>ValidasiKualifikasiPenyedia::where(['penyedia_id' => $id])->one(),
+            ]);
+        }
+        // $templates= TemplateChecklistEvaluasi::where(['status' => 1])->andFilterWhere(['like','template','checklist_evaluasi'])->all();
+        // return $this->render('validasikualifikasipenyedia',['templates' => $templates,'model'=>new ValidasiKualifikasiPenyedia]);
     }
 }

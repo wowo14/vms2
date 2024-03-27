@@ -1,15 +1,15 @@
 <?php
 namespace app\models;
-use Yii;
+use app\models\ValidasiKualifikasiPenyedia;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\ValidasiKualifikasiPenyedia;
+use yii\db\Expression;
 class ValidasiKualifikasiPenyediaSearch extends ValidasiKualifikasiPenyedia{
     public function rules()
     {
         return [
-            [['id', 'penyedia_id', 'is_active', 'created_by', 'updated_by'], 'integer'],
-            [['paket_pengadaan_id', 'template','keperluan', 'created_at', 'updated_at'], 'safe'],
+            [['id', 'is_active', 'created_by', 'updated_by'], 'integer'],
+            [['paket_pengadaan_id', 'penyedia_id', 'template','keperluan', 'created_at', 'updated_at'], 'safe'],
         ];
     }
     public function scenarios()
@@ -27,15 +27,16 @@ class ValidasiKualifikasiPenyediaSearch extends ValidasiKualifikasiPenyedia{
         if (!$this->validate()) {
             return $dataProvider;
         }
+        $query->joinWith(['paketpengadaan pp']);
+        $query->joinWith(['vendor p']);
         $query->andFilterWhere([
             'id' => $this->id,
-            'penyedia_id' => $this->penyedia_id,
             'is_active' => $this->is_active,
             'created_by' => $this->created_by,
             'updated_by' => $this->updated_by,
         ]);
-
-        $query->andFilterWhere(['like', 'paket_pengadaan_id', $this->paket_pengadaan_id])
+        $query->andFilterWhere(['like', new Expression('pp.nomor || pp.nama_paket'), $this->paket_pengadaan_id])
+            ->andFilterWhere(['like', new Expression('p.nama_perusahaan'), $this->penyedia_id])
             ->andFilterWhere(['like', 'keperluan', $this->keperluan])
             ->andFilterWhere(['like', 'created_at', $this->created_at])
             ->andFilterWhere(['like', 'updated_at', $this->updated_at]);

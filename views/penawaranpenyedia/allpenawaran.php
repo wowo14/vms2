@@ -6,7 +6,6 @@ $this->title = 'Penawaran Pengadaan';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
 $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\BootstrapPluginAsset']);
-//detail penawaran penyedia
 ?>
 <div class="penawaran-pengadaan-index">
     <div id="ajaxCrudDatatable">
