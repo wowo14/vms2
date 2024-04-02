@@ -10,87 +10,88 @@ use yii\widgets\Pjax;
             <div class="panel-heading">
                 <div class="row">
                     <div class="col-xs-6">
-                        <h3 class="panel-title"><?=$model->nama_perusahaan?></h3>
+                        <h3 class="panel-title"><?= $model->nama_perusahaan ?></h3>
                     </div>
                     <div class="col-xs-6 text-right">
-                        <?=Html::a('Edit',['update','id'=>$model->id],['class'=>'btn btn-primary','role'=>'modal-remote','data-target'=>'#'.$model->hash])?>
+                        <?= Html::a('Edit', ['update', 'id' => $model->id], ['class' => 'btn btn-primary', 'role' => 'modal-remote', 'data-target' => '#' . $model->hash]) ?>
                     </div>
                 </div>
             </div>
             <div class="panel-body">
-            <?= DetailView::widget([
-                'model' => $model,
-                'attributes' => [
-                    'npwp',
-                    'nama_perusahaan',
-                    'alamat_perusahaan',
-                    'nomor_telepon',
-                    'email_perusahaan:email',
-                    'tanggal_pendirian',
-                    'kategori_usaha',
-                    'akreditasi',
-                    'active',
-                ],
-            ]);
-            ?>
+                <?= DetailView::widget([
+                    'model' => $model,
+                    'attributes' => [
+                        'npwp',
+                        'nama_perusahaan',
+                        'alamat_perusahaan',
+                        'nomor_telepon',
+                        'email_perusahaan:email',
+                        'tanggal_pendirian',
+                        'kategori_usaha',
+                        'akreditasi',
+                        'active',
+                    ],
+                ]);
+                ?>
             </div>
         </div>
     </div>
     <div class="col-md-9">
         <?php
+        $qparams= Yii::$app->request->queryParams;
         echo Tabs::widget([
             'items' => [
                 [
                     'label' => 'Pengurus',
-                    'content' => $this->render('/pengurusperusahaan/index',[
+                    'content' => $this->render('//pengurusperusahaan/index', [
                         'searchModel' => $pengurus,
-                        'dataProvider' => $pengurus->search(Yii::$app->request->queryParams,['penyedia_id'=>$model->id]),
-                        'params' => $model->hashid($model->id), //penyedia_id
+                        'dataProvider' => $pengurus->search($qparams['PengurusperusahaanSearch']['penyedia_id']=$model->id),
+                        // 'params' => '?id=' . $model->hashid($model->id), //penyedia_id
                     ]),
                     'options' => ['id' => 'pengurus'.$model->hash],
                 ],
                 [
                     'label' => 'Ijin Usaha',
-                    'content' => $this->render('/ijinusaha/index',[
+                    'content' => $this->render('//ijinusaha/index', [
                         'searchModel' => $i,
-                        'dataProvider' => $i->search(Yii::$app->request->queryParams,['penyedia_id'=>$model->id]),
-                        'params' => $model->hashid($model->id), //penyedia_id
+                        'dataProvider' => $i->search($qparams, ['penyedia_id' => $model->id]),
+                        // 'params' => '?id=' . $model->hashid($model->id), //penyedia_id
                     ]),
                     'options' => ['id' => 'iu'.$model->hash],
                 ],
                 [
                     'label' => 'Akta',
-                    'content' => $this->render('//akta/index',[
+                    'content' => $this->render('//akta/index', [
                         'searchModel' => $a,
-                        'dataProvider' => $a->search(Yii::$app->request->queryParams,['penyedia_id'=>$model->id]),
-                        'params' => $model->hashid($model->id), //penyedia_id
+                        'dataProvider' => $a->search($qparams, ['penyedia_id' => $model->id]),
+                        // 'params' => '?id=' . $model->hashid($model->id), //penyedia_id
                     ]),
                     'options' => ['id' => 'akta'.$model->hash],
                 ],
                 [
                     'label' => 'Staff Ahli',
-                    'content' => $this->render('//staffahli/index',[
+                    'content' => $this->render('//staffahli/index', [
                         'searchModel' => $s,
-                        'dataProvider' => $s->search(Yii::$app->request->queryParams,['penyedia_id'=>$model->id]),
-                        'params' => $model->hashid($model->id), //penyedia_id
+                        'dataProvider' => $s->search($qparams, ['penyedia_id' => $model->id]),
+                        // 'params' => '?id=' . $model->hashid($model->id), //penyedia_id
                     ]),
                     'options' => ['id' => 'stafahli'.$model->hash],
                 ],
                 [
                     'label' => 'Peralatan Kerja',
-                    'content' => $this->render('//peralatankerja/index',[
+                    'content' => $this->render('//peralatankerja/index', [
                         'searchModel' => $peralatankerja,
-                        'dataProvider' => $peralatankerja->search(Yii::$app->request->queryParams,['penyedia_id'=>$model->id]),
-                        'params' => $model->hashid($model->id), //penyedia_id
+                        'dataProvider' => $peralatankerja->search($qparams, ['penyedia_id' => $model->id]),
+                        // 'params' => '?id=' . $model->hashid($model->id), //penyedia_id
                     ]),
                     'options' => ['id' => 'peralatan'.$model->hash],
                 ],
                 [
                     'label' => 'Pengalaman',
-                    'content' => $this->render('//pengalaman/index',[
+                    'content' => $this->render('//pengalaman/index', [
                         'searchModel' => $p,
-                        'dataProvider' => $p->search(Yii::$app->request->queryParams,['penyedia_id'=>$model->id]),
-                        'params' => $model->hashid($model->id), //penyedia_id
+                        'dataProvider' => $p->search($qparams, ['penyedia_id' => $model->id]),
+                        // 'params' => '?id='.$model->hashid($model->id), //penyedia_id
                     ]),
                     'options' => ['id' => 'pengalaman'.$model->hash],
                 ],

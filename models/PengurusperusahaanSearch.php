@@ -8,8 +8,8 @@ class PengurusperusahaanSearch extends Pengurusperusahaan{
     public function rules()
     {
         return [
-            [['id', 'unit', 'is_vendor', 'is_internal', 'is_active', 'created_by', 'updated_by', 'user_id', 'penyedia_id'], 'integer'],
-            [['nama', 'nik', 'alamat', 'email', 'telepon', 'nip', 'jabatan', 'instansi', 'created_at', 'updated_at', 'password'], 'safe'],
+            [['id', 'unit', 'is_vendor', 'is_internal', 'is_active', 'created_by', 'updated_by', 'user_id', ], 'integer'],
+            [['nama', 'nik', 'alamat', 'email', 'telepon', 'nip', 'jabatan', 'instansi', 'penyedia_id', 'created_at', 'updated_at', 'password'], 'safe'],
         ];
     }
     public function scenarios()
@@ -27,6 +27,7 @@ class PengurusperusahaanSearch extends Pengurusperusahaan{
         if (!$this->validate()) {
             return $dataProvider;
         }
+        $query->joinWith(['vendor p']);
         $query->where(['or',['is_vendor'=>1],['not',['penyedia_id'=>NULL]]]);
         $query->andFilterWhere([
             'id' => $this->id,
@@ -37,11 +38,12 @@ class PengurusperusahaanSearch extends Pengurusperusahaan{
             'created_by' => $this->created_by,
             'updated_by' => $this->updated_by,
             'user_id' => $this->user_id,
-            'penyedia_id' => $this->penyedia_id,
+            // 'penyedia_id' => $this->penyedia_id,
         ]);
         $query->andFilterWhere(['like', 'nama', $this->nama])
             ->andFilterWhere(['like', 'nik', $this->nik])
             ->andFilterWhere(['like', 'alamat', $this->alamat])
+            ->andFilterWhere(['like', 'p.nama_perusahaan', $this->penyedia_id])
             ->andFilterWhere(['like', 'email', $this->email])
             ->andFilterWhere(['like', 'telepon', $this->telepon])
             ->andFilterWhere(['like', 'nip', $this->nip])

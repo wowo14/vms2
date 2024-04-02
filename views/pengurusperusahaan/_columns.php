@@ -40,23 +40,12 @@ return [
         'template' => '{view} {update} {delete}',
         'vAlign' => 'middle',
         'urlCreator' => function($action, $model, $key, $index) {
-                return Url::to([$action,'id'=>$key]);
+                return Url::to(['pengurusperusahaan/' . $action,'id'=>$key]);
         },
-        'buttons' => [
-            'view' => function ($url, $model, $key) {
-                return Html::a(
-                    '<span class="fa fa-eye"></span>',
-                    $url,
-                    // $url='/pengurusperusahaan/view?id='.$key,
-                    ['class' => 'btn btn-sm btn-outline-info', 'role' => 'modal-remote', 'title' => 'View', 'data-toggle' => 'tooltip']
-                );
-            },
-
-        ],
-        'viewOptions' => ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success'],
-        'updateOptions' => ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Update'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-primary'],
+        'viewOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success'],
+        'updateOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Update'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-primary'],
         'deleteOptions' => ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Delete'), 'class' => 'btn btn-sm btn-outline-danger',
-            'data-confirm' => false,
+            'data-confirm' => false, 'data-target' => '#' . $idmodal,
             'data-method' => false,// for overide yii data api
             'data-request-method' => 'post',
             'data-toggle' => 'tooltip',

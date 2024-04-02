@@ -16,7 +16,6 @@ $config = [
         '@uploads' => '@app/web/uploads/',
     ],
     'modules' => [
-
         'gridview' =>  [
             'class' => '\kartik\grid\Module',
             // 'bsVersion' => '4.x',
@@ -43,7 +42,7 @@ $config = [
         'assetManager' => [
             'class' => 'yii\web\AssetManager',
             'linkAssets' => false,
-            'appendTimestamp' => true,
+            'appendTimestamp' => false,
             'bundles' => [
                 'yii\web\JqueryAsset' => [
                     'js' => [

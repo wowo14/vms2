@@ -6,6 +6,7 @@ use yii\bootstrap4\Modal;
 use kartik\grid\GridView;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
+$idmodal = $searchModel->hash;
 
 $this->title = 'Program Kegiatan';
 $this->params['breadcrumbs'][] = $this->title;
@@ -26,7 +27,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
                     Html::a(
                         '<i class="fa fa-check"></i>',
                         ['programkegiatan/copyto'],
-                        ['role' => 'modal-remote', 'data-target' => '#' . $searchModel->hash, 'title' => 'Copy To', 'class' => 'btn btn-default']
+                        ['role' => 'modal-remote','data-target' => '#' . $idmodal, 'title' => 'Copy To', 'class' => 'btn btn-default']
                     ) .
                         Html::a(
                             '<i class="fa fa-plus"></i>',
@@ -56,6 +57,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
                         [
                             'class' => 'btn btn-danger btn-xs',
                             'role' => 'modal-remote-bulk',
+                            'data-target' => '#' . $idmodal,
                             'data-confirm' => false,
                             'data-method' => false,
                             'data-request-method' => 'post',
@@ -70,7 +72,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
     </div>
 </div>
 <?php Modal::begin([
-    "id" => "ajaxCrudModal",
+    "id" => $idmodal,
     "footer" => "",
     "clientOptions" => [
         "tabindex" => false,

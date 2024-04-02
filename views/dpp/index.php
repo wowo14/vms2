@@ -9,6 +9,7 @@ use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii\bootstrap4\Modal;
 use yii\helpers\Html;
 use yii\helpers\Url;
+$idmodal = $searchModel->hash;
 
 AppAsset::register($this);
 CrudAsset::register($this);
@@ -57,12 +58,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     Html::a(
                         '<i class="fa fa-plus"></i>',
                         ['dpp/create'],
-                        ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Dpps', 'class' => 'btn btn-outline-primary']
+                        ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Dpps', 'class' => 'btn btn-outline-primary']
                     ) .
                         Html::a(
                             '<i class="fa fa-redo"></i>',
                             [''],
-                            ['data-pjax' => 1, 'class' => 'btn btn-outline-success', 'title' => Yii::t('yii2-ajaxcrud', 'Reset Grid')]
+                            ['data-pjax' => 1, 'data-target' => '#' . $idmodal, 'class' => 'btn btn-outline-success', 'title' => Yii::t('yii2-ajaxcrud', 'Reset Grid')]
                         ) .
                         '{toggleData}' .
                         '{export}'
@@ -81,6 +82,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         [
                             'class' => 'btn btn-primary btn-xs',
                             'role' => 'modal-remote-bulk',
+                            'data-target' => '#' . $idmodal,
                             'data-confirm' => false,
                             'data-method' => false,
                             'data-request-method' => 'post',
@@ -95,6 +97,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         [
                             'class' => 'btn btn-warning btn-xs',
                             'role' => 'modal-remote-bulk',
+                            'data-target' => '#' . $idmodal,
                             'data-confirm' => false,
                             'data-method' => false,
                             'data-request-method' => 'post',
@@ -112,6 +115,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         [
                             'class' => 'btn btn-danger btn-xs',
                             'role' => 'modal-remote-bulk',
+                            'data-target' => '#' . $idmodal,
                             'data-confirm' => false,
                             'data-method' => false,
                             'data-request-method' => 'post',
@@ -126,7 +130,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 <?php Modal::begin([
-    "id" => "ajaxCrudModal", "size" => "modal-xl",
+    "id" => $idmodal, "size" => "modal-xl",
     "footer" => "",
     "clientOptions" => [
         "tabindex" => false,

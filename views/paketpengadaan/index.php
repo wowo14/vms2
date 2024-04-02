@@ -1,4 +1,5 @@
 <?php
+
 use app\assets\AppAsset;
 use kartik\grid\GridView;
 use mdm\admin\components\Helper;
@@ -7,6 +8,8 @@ use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii\bootstrap4\Modal;
 use yii\helpers\Html;
 use yii\helpers\Url;
+$idmodal = $searchModel->hash;
+
 $this->title = 'Paket Pengadaan';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
@@ -27,12 +30,12 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
                     Html::a(
                         '<i class="fa fa-plus"></i>',
                         ['paketpengadaan/create'],
-                        ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Paket Pengadaans', 'class' => 'btn btn-outline-primary']
+                        ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Paket Pengadaans', 'class' => 'btn btn-outline-primary']
                     ) .
                         Html::a(
                             '<i class="fa fa-redo"></i>',
                             [''],
-                            ['data-pjax' => 1, 'class' => 'btn btn-outline-success', 'title' => Yii::t('yii2-ajaxcrud', 'Reset Grid')]
+                            ['data-pjax' => 1, 'data-target' => '#' . $idmodal, 'class' => 'btn btn-outline-success', 'title' => Yii::t('yii2-ajaxcrud', 'Reset Grid')]
                         ) .
                         '{toggleData}' .
                         '{export}'
@@ -77,6 +80,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
                         [
                             'class' => 'btn btn-danger btn-xs',
                             'role' => 'modal-remote-bulk',
+                            'data-target' => '#' . $idmodal,
                             'data-confirm' => false,
                             'data-method' => false,
                             'data-request-method' => 'post',
@@ -94,6 +98,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
                         [
                             'class' => 'btn btn-danger btn-xs',
                             'role' => 'modal-remote-bulk',
+                            'data-target' => '#' . $idmodal,
                             'data-confirm' => false,
                             'data-method' => false,
                             'data-request-method' => 'post',
@@ -108,7 +113,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
     </div>
 </div>
 <?php Modal::begin([
-    "id" => "ajaxCrudModal",
+    "id" => $idmodal,
     "footer" => "",
     "size" => "modal-xl",
     "clientOptions" => [
