@@ -3,8 +3,7 @@ namespace app\controllers;
 use app\models\{PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia, ValidasiKualifikasiPenyediaDetail, ValidasiKualifikasiPenyediaSearch};
 use Yii;
 use yii\filters\VerbFilter;
-use yii\helpers\Html;
-use yii\helpers\HtmlPurifier;
+use yii\helpers\{Html, HtmlPurifier};
 use yii\web\{Response, NotFoundHttpException};
 class ValidasikualifikasipenyediaController extends Controller {
     public function behaviors() {
@@ -26,6 +25,83 @@ class ValidasikualifikasipenyediaController extends Controller {
             'dataProvider' => $dataProvider,
         ]);
     }
+    public function actionGeneratekesimpulan($params) { //hashurl ['vendor_id', 'paket_pengadaan_id']
+        $params = $this->decodeurl($params);
+        if (!$params->vendor_id || !$params->paket_pengadaan_id) {
+            throw new NotFoundHttpException('Params vendor_id or paket_pengadaan_id is not found');
+        }
+        $vkp = ValidasiKualifikasiPenyedia::collectAll(['penyedia_id' => $params->vendor_id, 'paket_pengadaan_id' => $params->paket_pengadaan_id]);
+        if ($vkp->isEmpty()) {
+            throw new NotFoundHttpException('Query collections vendor_id or paket_pengadaan_id is not found');
+        }
+        $tmp = TemplateChecklistEvaluasi::where(['template' => 'Ceklist_Evaluasi_Kesimpulan'])->one();
+        if (!$tmp) {
+            throw new NotFoundHttpException('Template Ceklist_Evaluasi_Kesimpulan not found');
+        }
+        $isTmpNull = $vkp->contains(function ($e) use ($tmp) {
+            return $e->template == $tmp->id;
+        });
+        if (!$isTmpNull) { //generate new kesimpulan
+            $model = new ValidasiKualifikasiPenyedia();
+            $model->template = $tmp->id;
+            $model->penyedia_id = $params->vendor_id;
+            $model->paket_pengadaan_id = $params->paket_pengadaan_id;
+            $model->is_active = 1;
+            $model->keperluan = 'Kesimpulan';
+            if ($model->save()) {
+                $hasil = [];
+                if ($tmp->element) {
+                    $ar_element = explode(',', $tmp->element);
+                }
+                foreach (json_decode($tmp->detail->uraian, true) as $v) {
+                    $c = ['uraian' => $v['uraian']];
+                    if ($tmp->element) {
+                        foreach ($ar_element as $element) {
+                            if ($element) {
+                                $c[$element] = '';
+                            }
+                            if ($element == 'komentar') {
+                                $c[$element] = 'tes gagal kesimpulan';//callback logic kesimpulan
+                            }
+                        }
+                    }
+                    $c['sesuai'] = '';
+                    $hasil[] = $c;
+                }
+                $detail = new ValidasiKualifikasiPenyediaDetail();
+                $detail->header_id = $model->id;
+                $detail->hasil = json_encode($hasil);
+                $detail->save(false);
+            }
+            if ($model->getErrors()) {
+                Yii::$app->session->setFlash('error', "Gagal membuat kesimpulan penilaian kualifikasi penyedia, error: " . json_encode($model->getErrors()));
+            } else {
+                Yii::$app->session->setFlash('success', "Berhasil membuat kesimpulan penilaian kualifikasi penyedia");
+            }
+        } else {//load existing data and detail then update kesimpulan
+            $model = ValidasiKualifikasiPenyedia::where(['penyedia_id' => $params->vendor_id, 'paket_pengadaan_id' => $params->paket_pengadaan_id, 'template' => $tmp->id])->one();
+            if (!$model) {
+                throw new NotFoundHttpException('Data kesimpulan not found');
+            }
+            $details = $model->details[0];
+            $rr = json_decode($details->hasil, true);
+            $hasil = collect($rr)->map(function ($e) {
+                $e['sesuai'] = '';
+                $e['komentar'] = 'tes lagi wawa kesimpulan'; //callback fungsi hasil
+                return $e;
+            })->toArray();
+            if ($details) {// update kesimpulan
+                $details->hasil = json_encode($hasil);
+                $details->save();
+                if($details->getErrors()){
+                    Yii::$app->session->setFlash('error', "Gagal update kesimpulan penilaian kualifikasi penyedia, error: " . json_encode($details->getErrors()));
+                } else {
+                    Yii::$app->session->setFlash('success', "Berhasil update kesimpulan penilaian kualifikasi penyedia");
+                }
+            }
+        }
+        return $this->redirect(['index']);
+    }
     public function actionAssestment($id) {
         $request = Yii::$app->request;
         if ($request->isGet) {
@@ -36,9 +112,22 @@ class ValidasikualifikasipenyediaController extends Controller {
         }
         if ($request->isPost) {
             $assestment = $request->post('ValidasiKualifikasiPenyedia')['assestment'];
-            $pure = collect($assestment)->map(function ($e) {
+            $pure1 = collect($assestment)->map(function ($e) {
                 foreach ($e as $key => $value) {
                     $e[$key] = HtmlPurifier::process($value);
+                }
+                return $e;
+            });
+            $pure = $pure1->map(function ($e) { // switchinput
+                if (isset($e['sesuai'])) {
+                    $e['sesuai'] = 'ya';
+                } else {
+                    $e['sesuai'] = '';
+                }
+                if (array_key_exists('sesuai', $e)) {
+                    $sesuaiValue = $e['sesuai'] ?? '';
+                    unset($e['sesuai']);
+                    $e = array_merge(['uraian' => $e['uraian'], 'sesuai' => $sesuaiValue], $e);
                 }
                 return $e;
             });
@@ -178,7 +267,7 @@ class ValidasikualifikasipenyediaController extends Controller {
                     }
                     foreach (json_decode($collect->detail->uraian, true) as $v) {
                         $c = ['uraian' => $v['uraian']];
-                        if ($collect->element){
+                        if ($collect->element) {
                             foreach ($ar_element as $element) {
                                 if ($element) {
                                     $c[$element] = '';
@@ -272,28 +361,85 @@ class ValidasikualifikasipenyediaController extends Controller {
         if (($model = ValidasiKualifikasiPenyedia::findOne($id)) !== null) {
             return $model;
         } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException('The requested page or id does not exist.');
         }
     }
     public function actionViewvalidasipenyedia($id) {
+        $templates = TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->all();
+        $kualifikasi = ValidasiKualifikasiPenyedia::findAll(['penyedia_id' => $id]);
+        $penawaran = PenawaranPengadaan::collectAll(['penyedia_id' => $id]);
+        $tabs = collect($templates)->map(function ($e) use ($kualifikasi) {
+            foreach ($kualifikasi as $k) {
+                if ($k->template == $e->id) {
+                    $filteredModels[] = $k;
+                }
+            }
+            $content = '';
+            if (!empty($filteredModels)) {
+                $rr = json_decode($filteredModels[0]->details[0]->hasil, true);
+                $count = $total = 0;
+                foreach ($rr as $c) {
+                    if ($c['sesuai'] == 'ya') {
+                        $count++;
+                    }
+                    if ($c) {
+                        $total++;
+                    }
+                }
+                if ($total <> $count) {
+                    $content .= 'Alasan Tidak Lulus <br> Persyaratan Tidak Lengkap';
+                } else {
+                    $col = array_keys($rr[0]);
+                    $content .= \yii\grid\GridView::widget([
+                        'dataProvider' => new \yii\data\ArrayDataProvider([
+                            'allModels' => $rr
+                        ]),
+                        'columns' => $col
+                    ]);
+                }
+            } else {
+                $content .= 'Alasan Tidak Lulus <br> Persyaratan Tidak Lengkap';
+            }
+            if ($e->jenis_evaluasi == 'Kesimpulan') {
+                $col = array_keys($rr[0]);
+                $index = array_search('sesuai', $col);
+                if ($index !== false) {
+                    unset($col[$index]);
+                }
+                $content = \yii\grid\GridView::widget([
+                    'dataProvider' => new \yii\data\ArrayDataProvider([
+                        'allModels' => $rr
+                    ]),
+                    'layout' => '{items}',
+                    'columns' => $col
+                ]);
+            }
+            return [
+                'label' => $e->jenis_evaluasi,
+                'content' => $content,
+                'options' => ['id' => 'val' . $e->id . $e->template],
+            ];
+        })->toArray();
         $request = Yii::$app->request;
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return [
                 'title' => "ValidasiKualifikasiPenyedia #" . $id,
                 'content' => $this->renderAjax('allviewvalidasi', [
-                    'kualifikasi' => ValidasiKualifikasiPenyedia::findAll(['penyedia_id' => $id]),
-                    'penawaran' => PenawaranPengadaan::collectAll(['penyedia_id' => $id]),
-                    'templates' => TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->all(),
+                    'tabs' => $tabs,
+                    'kualifikasi' => $kualifikasi,
+                    'penawaran' => $penawaran,
+                    'templates' => $templates,
                 ]),
                 'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
                     Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'role' => 'modal-remote'])
             ];
         } else {
             return $this->render('allviewvalidasi', [
-                'kualifikasi' => ValidasiKualifikasiPenyedia::findAll(['penyedia_id' => $id]),
-                'penawaran' => PenawaranPengadaan::collectAll(['penyedia_id' => $id]),
-                'templates' => TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->all(),
+                'tabs' => $tabs,
+                'kualifikasi' => $kualifikasi,
+                'penawaran' => $penawaran,
+                'templates' => $templates,
             ]);
         }
         // return $this->render('validasikualifikasipenyedia',['templates' => $templates,'model'=>new ValidasiKualifikasiPenyedia]);

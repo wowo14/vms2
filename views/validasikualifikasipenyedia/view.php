@@ -22,7 +22,18 @@ use yii\widgets\DetailView;
 <div class="clear-fix"></div>
 <?php
 if ($model->details) :
-    $aa= json_decode($model->details[0]->hasil,true);
+    $aa = json_decode($model->details[0]->hasil, true);
+    $count = $total = 0;
+    foreach ($aa as $c) {
+        if (key_exists('sesuai', $c)) {
+            if ($c['sesuai'] == 'ya') {
+                $count++;
+            }
+        }
+        if ($c) {
+            $total++;
+        }
+    }
     $col = [];
     foreach (array_keys($aa[0]) as $item) {
         $trimmedKey = ucfirst(trim($item));
@@ -39,7 +50,5 @@ if ($model->details) :
         'columns' => $col,
         'tableOptions' => ['class' => 'table responsive'],
     ]);
-?>
-<?php
 endif;
 ?>

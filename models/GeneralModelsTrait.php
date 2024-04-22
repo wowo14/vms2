@@ -25,7 +25,7 @@ trait GeneralModelsTrait {
             Yii::error('callbak closure');
             return collect($settings)->map($callback)->toArray();
         } elseif (is_array($callback)) {
-            Yii::error('callbak isarray');
+            // Yii::error('callbak isarray');
             return collect($settings)->pluck(...$callback)->toArray();
         }
         return collect($settings)->pluck($callback)->toArray();
@@ -83,6 +83,9 @@ trait GeneralModelsTrait {
     }
     public static function getAlladmin() {
         return collect(Pegawai::where('id_user<>""')->all())->where('hak_akses', 'staffAdmin')->pluck('nama', 'id')->toArray();
+    }
+    public static function optionppkom() {
+        return collect(Pegawai::where('id_user<>""')->all())->where('hak_akses', 'PPK')->pluck('nama', 'id')->toArray();
     }
     public static function formassignpetugas($pks = null) {
         $optpetugas = self::getAllpetugas();

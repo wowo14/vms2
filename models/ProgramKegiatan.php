@@ -1,15 +1,16 @@
 <?php
+
 namespace app\models;
+
 use Yii;
-class ProgramKegiatan extends \yii\db\ActiveRecord
-{
+use yii\helpers\ArrayHelper;
+
+class ProgramKegiatan extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'program_kegiatan';
     }
-    public function rules()
-    {
+    public function rules() {
         return [
             [['code', 'desc', 'type', 'tahun_anggaran', 'is_active'], 'required'],
             [['tahun_anggaran', 'is_active', 'created_by', 'updated_by'], 'integer'],
@@ -17,8 +18,7 @@ class ProgramKegiatan extends \yii\db\ActiveRecord
             [['code', 'desc', 'parent', 'type'], 'string', 'max' => 255],
         ];
     }
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'id' => 'ID',
             'code' => 'Code',
@@ -32,6 +32,17 @@ class ProgramKegiatan extends \yii\db\ActiveRecord
             'created_by' => 'Created By',
             'updated_by' => 'Updated By',
         ];
+    }
+    public function getCodename() {
+        return $this->code . '||' . $this->desc;
+    }
+    public static function optionprogram($code = null, $th = null) {
+        $where = ['is_active' => 1];
+        $where = isset($th) ? array_merge($where, ['tahun_anggaran' => $th]) : $where;
+        $where = isset($code) ? array_merge($where, ['code' => $code]) : $where;
+        Yii::error(json_encode($where));
+
+        return ArrayHelper::map(self::where($where)->all(), 'code', 'codename');
     }
     public static function getTree($cnd = NULL) {
         $data2 = [];

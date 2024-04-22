@@ -2,29 +2,6 @@
 use yii\bootstrap4\Tabs;
 use yii\grid\GridView;
 use yii\helpers\{Html, Url};
-$t = collect($templates)->map(function ($e) use ($kualifikasi) {
-    foreach ($kualifikasi as $k) {
-        if ($k->template == $e->id) {
-            $filteredModels[] = $k;
-        }
-    }
-    $content = '';
-    if (!empty($filteredModels)) {
-        $rr = json_decode($filteredModels[0]->details[0]->hasil, true);
-        $col = array_keys($rr[0]);
-        $content.=GridView::widget([
-            'dataProvider' => new yii\data\ArrayDataProvider([
-                'allModels' => $rr
-            ]),
-            'columns' =>$col
-        ]);
-    }
-    return [
-        'label' => $e->jenis_evaluasi,
-        'content' => $content,
-        'options' => ['id' => 'val' . $e->id . $e->template],
-    ];
-})->toArray();
 echo GridView::widget([
     'id' => 'crud-datatable',
     'dataProvider' => new yii\data\ArrayDataProvider([
@@ -62,5 +39,5 @@ echo GridView::widget([
     ]
 ]);
 echo Tabs::widget([
-    'items' => $t
+    'items' => $tabs
 ]);

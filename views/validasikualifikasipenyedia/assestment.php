@@ -1,20 +1,38 @@
 <?php
-use yii\helpers\Html;
-use yii\bootstrap4\ActiveForm;
+use kartik\switchinput\SwitchInput;
 use unclead\multipleinput\MultipleInput;
-use unclead\multipleinput\MultipleInputColumn;
+use yii\bootstrap4\ActiveForm;
+use yii\helpers\Html;
 $rr = json_decode($model->details[0]->hasil, true);
 //generate columns
-$aa = json_decode($model->details[0]->hasil, true)[0];
+$aa = [...$rr]; //clone array
+$aa = $aa[0];
 $col = [];
 foreach (array_keys($aa) as $item) {
-    $trimmedKey= ucfirst(trim($item));
+    $trimmedKey = ucfirst(trim($item));
     $title = ($trimmedKey === 'Sesuai') ? 'Sesuai(ya/tidak)' : (($trimmedKey === 'Skala') ? 'Skala(1-5)' : ucfirst($trimmedKey));
-    $col[] = [
+    $col[] = $trimmedKey === 'Sesuai' ? [
+        'name' => trim($item),
+        'title' => $title,
+        'type' => SwitchInput::class,
+        'options' => [
+            'pluginOptions' => [
+                'required' => true,
+                'size' => 'mini',
+                'onText' => 'Ya', 'offText' => 'Tidak'
+            ]
+        ]
+    ] : [
         'name' => trim($item),
         'title' => $title,
         'type' => 'textArea'
     ];
+}
+if ($model->jenisevaluasi->jenis_evaluasi == 'Kesimpulan') {
+    $key = array_search('sesuai', array_column($col, 'name'));
+    if ($key !== false) {
+        unset($col[$key]);
+    }
 }
 // $js=<<<JS
 // $('.list-cell__button').hide();
@@ -66,7 +84,7 @@ foreach (array_keys($aa) as $item) {
         'id' => 'dokassestment',
         'enableGuessTitle'  => true,
         'cloneButton' => false,
-        'addButtonPosition'=> MultipleInput::POS_FOOTER,
+        'addButtonPosition' => MultipleInput::POS_FOOTER,
         'addButtonOptions' => [
             'class' => 'btn btn-success',
             'label' => '+'
