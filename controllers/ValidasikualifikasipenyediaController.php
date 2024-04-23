@@ -1,10 +1,13 @@
 <?php
+
 namespace app\controllers;
+
 use app\models\{PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia, ValidasiKualifikasiPenyediaDetail, ValidasiKualifikasiPenyediaSearch};
 use Yii;
 use yii\filters\VerbFilter;
 use yii\helpers\{Html, HtmlPurifier};
 use yii\web\{Response, NotFoundHttpException};
+
 class ValidasikualifikasipenyediaController extends Controller {
     public function behaviors() {
         return [
@@ -25,7 +28,7 @@ class ValidasikualifikasipenyediaController extends Controller {
             'dataProvider' => $dataProvider,
         ]);
     }
-    public function actionGeneratekesimpulan($params) { //hashurl ['vendor_id', 'paket_pengadaan_id']
+    public function actionGeneratekesimpulan($params) { //hashurl ['vendor_id'=>1, 'paket_pengadaan_id'=>1,'callback'=>'callbackkesimpulan']
         $params = $this->decodeurl($params);
         if (!$params->vendor_id || !$params->paket_pengadaan_id) {
             throw new NotFoundHttpException('Params vendor_id or paket_pengadaan_id is not found');
@@ -61,7 +64,7 @@ class ValidasikualifikasipenyediaController extends Controller {
                                 $c[$element] = '';
                             }
                             if ($element == 'komentar') {
-                                $c[$element] = 'tes gagal kesimpulan';//callback logic kesimpulan
+                                $c[$element] = 'tes gagal kesimpulan'; //callback logic kesimpulan
                             }
                         }
                     }
@@ -78,7 +81,7 @@ class ValidasikualifikasipenyediaController extends Controller {
             } else {
                 Yii::$app->session->setFlash('success', "Berhasil membuat kesimpulan penilaian kualifikasi penyedia");
             }
-        } else {//load existing data and detail then update kesimpulan
+        } else { //load existing data and detail then update kesimpulan
             $model = ValidasiKualifikasiPenyedia::where(['penyedia_id' => $params->vendor_id, 'paket_pengadaan_id' => $params->paket_pengadaan_id, 'template' => $tmp->id])->one();
             if (!$model) {
                 throw new NotFoundHttpException('Data kesimpulan not found');
@@ -90,10 +93,10 @@ class ValidasikualifikasipenyediaController extends Controller {
                 $e['komentar'] = 'tes lagi wawa kesimpulan'; //callback fungsi hasil
                 return $e;
             })->toArray();
-            if ($details) {// update kesimpulan
+            if ($details) { // update kesimpulan
                 $details->hasil = json_encode($hasil);
                 $details->save();
-                if($details->getErrors()){
+                if ($details->getErrors()) {
                     Yii::$app->session->setFlash('error', "Gagal update kesimpulan penilaian kualifikasi penyedia, error: " . json_encode($details->getErrors()));
                 } else {
                     Yii::$app->session->setFlash('success', "Berhasil update kesimpulan penilaian kualifikasi penyedia");
@@ -131,10 +134,14 @@ class ValidasikualifikasipenyediaController extends Controller {
                 }
                 return $e;
             });
-            Yii::error('pure :', json_encode($pure));
             ValidasiKualifikasiPenyediaDetail::updateAll([
                 'hasil' => json_encode($pure),
             ], ['header_id' => $id]);
+            $parent = ValidasiKualifikasiPenyedia::findOne(['id' => $id]);
+            $others=ValidasiKualifikasiPenyedia::collectAll(['penyedia_id'=>$parent->penyedia_id,'paket_pengadaan_id'=>$parent->paket_pengadaan_id]);
+            $others->map(function ($e) {
+                ValidasiKualifikasiPenyediaDetail::hitungTotalSesuai($e->id);
+            });
             Yii::$app->session->setFlash('success', 'Data Assestment Berhasil disimpan');
             return $this->redirect('index');
         }
@@ -379,8 +386,10 @@ class ValidasikualifikasipenyediaController extends Controller {
                 $rr = json_decode($filteredModels[0]->details[0]->hasil, true);
                 $count = $total = 0;
                 foreach ($rr as $c) {
-                    if ($c['sesuai'] == 'ya') {
-                        $count++;
+                    if (array_key_exists('sesuai', $c)) {
+                        if ($c['sesuai'] == 'ya') {
+                            $count++;
+                        }
                     }
                     if ($c) {
                         $total++;
