@@ -1,13 +1,10 @@
 <?php
-
 namespace app\controllers;
-
 use app\models\{PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia, ValidasiKualifikasiPenyediaDetail, ValidasiKualifikasiPenyediaSearch};
 use Yii;
 use yii\filters\VerbFilter;
 use yii\helpers\{Html, HtmlPurifier};
 use yii\web\{Response, NotFoundHttpException};
-
 class ValidasikualifikasipenyediaController extends Controller {
     public function behaviors() {
         return [
@@ -64,7 +61,7 @@ class ValidasikualifikasipenyediaController extends Controller {
                                 $c[$element] = '';
                             }
                             if ($element == 'komentar') {
-                                $c[$element] = 'tes gagal kesimpulan'; //callback logic kesimpulan
+                                $c[$element] = 'proses validasi administrasi'; //callback logic kesimpulan
                             }
                         }
                     }
@@ -87,13 +84,15 @@ class ValidasikualifikasipenyediaController extends Controller {
                 throw new NotFoundHttpException('Data kesimpulan not found');
             }
             $details = $model->details[0];
-            $rr = json_decode($details->hasil, true);
-            $hasil = collect($rr)->map(function ($e) {
-                $e['sesuai'] = '';
-                $e['komentar'] = 'tes lagi wawa kesimpulan'; //callback fungsi hasil
-                return $e;
-            })->toArray();
             if ($details) { // update kesimpulan
+                $rr = json_decode($details->hasil, true);
+                $r = ValidasiKualifikasiPenyedia::getCalculated($params->paket_pengadaan_id);
+                $r = collect($r)->where('penyedia_id', $params->vendor_id)->where('paket_pengadaan_id', $params->paket_pengadaan_id)->first();
+                $hasil = collect($rr)->map(function ($e)use($r) {
+                    $e['sesuai'] = '';
+                    $e['komentar'] = $r['total_sesuai']==$r['total_element']?'Lolos Administrasi Validasi Dokumen':'Tidak Lolos Administrasi Validasi Dokumen';
+                    return $e;
+                })->toArray();
                 $details->hasil = json_encode($hasil);
                 $details->save();
                 if ($details->getErrors()) {
@@ -107,8 +106,8 @@ class ValidasikualifikasipenyediaController extends Controller {
     }
     public function actionAssestment($id) {
         $request = Yii::$app->request;
+        $model = ValidasiKualifikasiPenyedia::find()->cache(false)->where(['id' => $id])->one();
         if ($request->isGet) {
-            $model = ValidasiKualifikasiPenyedia::find()->cache(false)->where(['id' => $id])->one();
             return $this->render('assestment', [
                 'model' => $model
             ]);
@@ -138,10 +137,20 @@ class ValidasikualifikasipenyediaController extends Controller {
                 'hasil' => json_encode($pure),
             ], ['header_id' => $id]);
             $parent = ValidasiKualifikasiPenyedia::findOne(['id' => $id]);
-            $others=ValidasiKualifikasiPenyedia::collectAll(['penyedia_id'=>$parent->penyedia_id,'paket_pengadaan_id'=>$parent->paket_pengadaan_id]);
-            $others->map(function ($e) {
-                ValidasiKualifikasiPenyediaDetail::hitungTotalSesuai($e->id);
+            $tmp = TemplateChecklistEvaluasi::where(['template' => 'Ceklist_Evaluasi_Kesimpulan'])->one();
+            if (!$tmp) {
+                throw new NotFoundHttpException('Template Ceklist_Evaluasi_Kesimpulan not found');
+            }
+            $others = ValidasiKualifikasiPenyedia::collectAll(['penyedia_id' => $parent->penyedia_id, 'paket_pengadaan_id' => $parent->paket_pengadaan_id]);
+            $others->map(function ($e)use($tmp) {
+                if($e->template!==$tmp->id){
+                    ValidasiKualifikasiPenyediaDetail::hitungTotalSesuai($e->id);
+                }
             });
+            $this->actionGeneratekesimpulan($this->hashurl([
+                'vendor_id' => $model->penyedia_id,
+                'paket_pengadaan_id' => $model->paket_pengadaan_id
+            ]));
             Yii::$app->session->setFlash('success', 'Data Assestment Berhasil disimpan');
             return $this->redirect('index');
         }
@@ -374,7 +383,13 @@ class ValidasikualifikasipenyediaController extends Controller {
     public function actionViewvalidasipenyedia($id) {
         $templates = TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->all();
         $kualifikasi = ValidasiKualifikasiPenyedia::findAll(['penyedia_id' => $id]);
+        if(!$kualifikasi){
+            throw new NotFoundHttpException('Petugas Belom Memvalidasi Kualifikasi Penyedia');
+        }
         $penawaran = PenawaranPengadaan::collectAll(['penyedia_id' => $id]);
+        if(!$penawaran){
+            throw new NotFoundHttpException('Petugas Belom memasukkan Dokumen Penawaran Penyedia');
+        }
         $tabs = collect($templates)->map(function ($e) use ($kualifikasi) {
             foreach ($kualifikasi as $k) {
                 if ($k->template == $e->id) {

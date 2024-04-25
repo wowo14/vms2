@@ -1,5 +1,7 @@
 <?php
+
 namespace app\commands;
+
 use app\models\PaketPengadaan;
 use app\models\PaketPengadaanDetails;
 use app\models\Sertipikat;
@@ -9,10 +11,12 @@ use app\models\ValidasiKualifikasiPenyedia;
 use app\models\ValidasiKualifikasiPenyediaDetail;
 use Yii;
 use yii\console\Controller;
-class HelloController extends Controller
-{
-    public function actionIndex()
-    {
+
+class HelloController extends Controller {
+    public function actionHitung() { // hitung pada paket pengadaan mana?
+       
+    }
+    public function actionIndex() {
         echo "\n";
         $hasil = [];
         $collect = TemplateChecklistEvaluasi::findOne(1);
@@ -20,18 +24,17 @@ class HelloController extends Controller
         foreach (json_decode($collect->detail->uraian, true) as $v) {
             $c = ['uraian' => $v['uraian']];
             foreach ($ar_element as $element) {
-                if($element){
+                if ($element) {
                     $c[$element] = '';
                 }
             }
-            $hasil[]=$c;
+            $hasil[] = $c;
         }
         print_r($hasil);
     }
-    public function actionSeed(){
+    public function actionSeed() {
     }
-    public function actionDropAllTables()
-    {
+    public function actionDropAllTables() {
         $db = \Yii::$app->db;
         $schema = $db->schema;
         $tables = $schema->getTableNames();
@@ -43,12 +46,11 @@ class HelloController extends Controller
         $db->createCommand('SET FOREIGN_KEY_CHECKS = 1;')->execute();
         echo "All tables dropped successfully.\n";
     }
-    public function actionTruncateTransaksi()
-    {
+    public function actionTruncateTransaksi() {
         $db = \Yii::$app->db;
         $schema = $db->schema;
         // $tables = $schema->getTableNames();
-        $tables=[
+        $tables = [
             // 'setting',
             'validasi_kualifikasi_penyedia',
             'validasi_kualifikasi_penyedia_detail',
@@ -60,7 +62,7 @@ class HelloController extends Controller
         foreach ($tables as $table) {
             echo "Dropping table: $table\n";
             $db->createCommand()->delete($table)->execute();
-            $db->createCommand()->delete('sqlite_sequence',['name'=>$table])->execute();
+            $db->createCommand()->delete('sqlite_sequence', ['name' => $table])->execute();
             // DELETE FROM 'sqlite_sequence' WHERE name='your_table';
             // $db->createCommand()->truncateTable($table)->execute();
         }
@@ -69,8 +71,7 @@ class HelloController extends Controller
         // cache flush
         Yii::$app->cache->flush();
     }
-    public function actionJenisakta()
-    {
+    public function actionJenisakta() {
         $jenisAkta = [
             'PENDIRIAN PT',
             'PENDIRIAN CV',
@@ -95,9 +96,9 @@ class HelloController extends Controller
             Yii::$app->db->createCommand()->insert('setting', ['active' => 1, 'type' => 'jenis_akta', 'value' => $value])->execute();
         }
     }
-    public function actionJenisperalihan(){
-        $peralihan=[
-            'JUAL BELI','HIBAH','WARIS','KONVERSI','PECAH','SERTIPIKAT HILANG'
+    public function actionJenisperalihan() {
+        $peralihan = [
+            'JUAL BELI', 'HIBAH', 'WARIS', 'KONVERSI', 'PECAH', 'SERTIPIKAT HILANG'
         ];
         foreach ($peralihan as $key => $value) {
             Yii::$app->db->createCommand()->insert('setting', ['active' => 1, 'type' => 'jenis_peralihan', 'value' => $value])->execute();
