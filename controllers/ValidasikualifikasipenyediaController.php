@@ -4,8 +4,7 @@ use app\models\{PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifika
 use Yii;
 use yii\filters\VerbFilter;
 use yii\helpers\{Html, HtmlPurifier};
-use yii\web\{Response, NotFoundHttpException};
-class ValidasikualifikasipenyediaController extends Controller {
+use yii\web\{Response, NotFoundHttpException};class ValidasikualifikasipenyediaController extends Controller {
     public function behaviors() {
         return [
             'verbs' => [
@@ -87,18 +86,20 @@ class ValidasikualifikasipenyediaController extends Controller {
             if ($details) { // update kesimpulan
                 $rr = json_decode($details->hasil, true);
                 $r = ValidasiKualifikasiPenyedia::getCalculated($params->paket_pengadaan_id);
-                $r = collect($r)->where('penyedia_id', $params->vendor_id)->where('paket_pengadaan_id', $params->paket_pengadaan_id)->first();
-                $hasil = collect($rr)->map(function ($e)use($r) {
-                    $e['sesuai'] = '';
-                    $e['komentar'] = $r['total_sesuai']==$r['total_element']?'Lolos Administrasi Validasi Dokumen':'Tidak Lolos Administrasi Validasi Dokumen';
-                    return $e;
-                })->toArray();
-                $details->hasil = json_encode($hasil);
-                $details->save();
-                if ($details->getErrors()) {
-                    Yii::$app->session->setFlash('error', "Gagal update kesimpulan penilaian kualifikasi penyedia, error: " . json_encode($details->getErrors()));
-                } else {
-                    Yii::$app->session->setFlash('success', "Berhasil update kesimpulan penilaian kualifikasi penyedia");
+                if ($r) {
+                    $r = collect($r)->where('penyedia_id', $params->vendor_id)->where('paket_pengadaan_id', $params->paket_pengadaan_id)->first();
+                    $hasil = collect($rr)->map(function ($e) use ($r) {
+                        $e['sesuai'] = '';
+                        $e['komentar'] = $r['total_sesuai'] == $r['total_element'] ? 'Lolos Administrasi Validasi Dokumen' : 'Tidak Lolos Administrasi Validasi Dokumen';
+                        return $e;
+                    })->toArray();
+                    $details->hasil = json_encode($hasil);
+                    $details->save();
+                    if ($details->getErrors()) {
+                        Yii::$app->session->setFlash('error', "Gagal update kesimpulan penilaian kualifikasi penyedia, error: " . json_encode($details->getErrors()));
+                    } else {
+                        Yii::$app->session->setFlash('success', "Berhasil update kesimpulan penilaian kualifikasi penyedia");
+                    }
                 }
             }
         }
@@ -142,8 +143,8 @@ class ValidasikualifikasipenyediaController extends Controller {
                 throw new NotFoundHttpException('Template Ceklist_Evaluasi_Kesimpulan not found');
             }
             $others = ValidasiKualifikasiPenyedia::collectAll(['penyedia_id' => $parent->penyedia_id, 'paket_pengadaan_id' => $parent->paket_pengadaan_id]);
-            $others->map(function ($e)use($tmp) {
-                if($e->template!==$tmp->id){
+            $others->map(function ($e) use ($tmp) {
+                if ($e->template !== $tmp->id) {
                     ValidasiKualifikasiPenyediaDetail::hitungTotalSesuai($e->id);
                 }
             });
@@ -162,14 +163,14 @@ class ValidasikualifikasipenyediaController extends Controller {
             return [
                 'title' => "ValidasiKualifikasiPenyedia #" . $id,
                 'content' => $this->renderAjax('view', [
-                    'model' => $this->findModel($id),
+                    'model' => $model = $this->findModel($id),
                 ]),
                 'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                    Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'role' => 'modal-remote'])
+                    Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote'])
             ];
         } else {
             return $this->render('view', [
-                'model' => $this->findModel($id),
+                'model' => $model = $this->findModel($id),
             ]);
         }
     }
@@ -215,7 +216,7 @@ class ValidasikualifikasipenyediaController extends Controller {
                     'title' => Yii::t('yii2-ajaxcrud', 'Create New') . " ValidasiKualifikasiPenyedia",
                     'content' => '<span class="text-success">' . Yii::t('yii2-ajaxcrud', 'Create') . ' ValidasiKualifikasiPenyedia ' . Yii::t('yii2-ajaxcrud', 'Success') . '</span>',
                     'footer' =>  Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                        Html::a(Yii::t('yii2-ajaxcrud', 'Create More'), ['create'], ['class' => 'btn btn-primary', 'role' => 'modal-remote'])
+                        Html::a(Yii::t('yii2-ajaxcrud', 'Create More'), ['create'], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote'])
                 ];
             } else {
                 return [
@@ -304,7 +305,7 @@ class ValidasikualifikasipenyediaController extends Controller {
                         'model' => $model,
                     ]),
                     'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                        Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'role' => 'modal-remote'])
+                        Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote'])
                 ];
             } else {
                 return [
@@ -383,11 +384,11 @@ class ValidasikualifikasipenyediaController extends Controller {
     public function actionViewvalidasipenyedia($id) {
         $templates = TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->all();
         $kualifikasi = ValidasiKualifikasiPenyedia::findAll(['penyedia_id' => $id]);
-        if(!$kualifikasi){
+        if (!$kualifikasi) {
             throw new NotFoundHttpException('Petugas Belom Memvalidasi Kualifikasi Penyedia');
         }
         $penawaran = PenawaranPengadaan::collectAll(['penyedia_id' => $id]);
-        if(!$penawaran){
+        if (!$penawaran) {
             throw new NotFoundHttpException('Petugas Belom memasukkan Dokumen Penawaran Penyedia');
         }
         $tabs = collect($templates)->map(function ($e) use ($kualifikasi) {
@@ -456,7 +457,7 @@ class ValidasikualifikasipenyediaController extends Controller {
                     'templates' => $templates,
                 ]),
                 'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                    Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'role' => 'modal-remote'])
+                    Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote'])
             ];
         } else {
             return $this->render('allviewvalidasi', [

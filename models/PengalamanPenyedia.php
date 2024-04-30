@@ -51,6 +51,11 @@ class PengalamanPenyedia extends \yii\db\ActiveRecord
     }
     public function beforeSave($insert) {
         if ($insert) {
+            $this->file = !empty($this->file) ? $this->upload($this->file, 'file_' . $this->penyedia_id . '_' . time()) : '';
+        } else {
+            $this->file = self::isBase64Encoded($this->file) ? $this->upload($this->file, 'file_' . $this->penyedia_id . '_' . time()) : $this->file;
+        }
+        if ($insert) {
             $this->created_by = Yii::$app->user->identity->id;
             $this->created_at = date('Y-m-d H:i:s', time());
         } else {

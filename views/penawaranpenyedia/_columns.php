@@ -10,27 +10,27 @@ return [
         'class' => 'kartik\grid\SerialColumn',
         'width' => '30px',
     ],
-        [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'paket_id',
-        'value' => fn($d)=>$d->paketPengadaan->nomornamapaket??''
+    [
+        'class' => '\kartik\grid\DataColumn',
+        'attribute' => 'paket_id',
+        'value' => fn ($d) => $d->paketPengadaan->nomornamapaket ?? ''
     ],
     [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'penyedia_id',
-        'value' => fn($d)=>$d->vendor->nama_perusahaan??''
+        'class' => '\kartik\grid\DataColumn',
+        'attribute' => 'penyedia_id',
+        'value' => fn ($d) => $d->vendor->nama_perusahaan ?? ''
     ],
     [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'masa_berlaku',
+        'class' => '\kartik\grid\DataColumn',
+        'attribute' => 'masa_berlaku',
     ],
     [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'kode',
+        'class' => '\kartik\grid\DataColumn',
+        'attribute' => 'kode',
     ],
     [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'tanggal_mendaftar',
+        'class' => '\kartik\grid\DataColumn',
+        'attribute' => 'tanggal_mendaftar',
     ],
     [
         'class' => 'kartik\grid\ActionColumn',
@@ -38,9 +38,9 @@ return [
         'noWrap' => 'true',
         'template' => '{view} {update} {delete}',
         'vAlign' => 'middle',
-        'buttons'=>[
+        'buttons' => [
             'view' => function ($url, $model, $key) {
-                $url = '/penawaranpenyedia/view?id='.$key;
+                $url = '/penawaranpenyedia/view?id=' . $key;
                 $options = [
                     'title' => Yii::t('yii2-ajaxcrud', 'View'),
                     'aria-label' => Yii::t('yii2-ajaxcrud', 'View'),
@@ -49,7 +49,7 @@ return [
                 return Html::a('<i class="fa fa-eye"></i>', $url, $options);
             },
             'update' => function ($url, $model, $key) {
-                $url = '/penawaranpenyedia/update?id='.$key;
+                $url = '/penawaranpenyedia/update?id=' . $key;
                 $options = [
                     'title' => Yii::t('yii2-ajaxcrud', 'Update'),
                     'aria-label' => Yii::t('yii2-ajaxcrud', 'Update'),
@@ -57,8 +57,8 @@ return [
                 ];
                 return Html::a('<i class="fa fa-edit"></i>', $url, $options);
             },
-            'delete'=> function ($url, $model, $key) {
-                $url = '/penawaranpenyedia/delete?id='.$key;
+            'delete' => function ($url, $model, $key) {
+                $url = '/penawaranpenyedia/delete?id=' . $key;
                 $options = [
                     'title' => Yii::t('yii2-ajaxcrud', 'Delete'),
                     'aria-label' => Yii::t('yii2-ajaxcrud', 'Delete'),

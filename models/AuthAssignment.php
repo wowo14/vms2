@@ -1,15 +1,12 @@
 <?php
 namespace app\models;
 use Yii;
-class AuthAssignment extends \yii\db\ActiveRecord
-{
+class AuthAssignment extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'auth_assignment';
     }
-    public function rules()
-    {
+    public function rules() {
         return [
             [['item_name', 'user_id'], 'required'],
             [['created_at'], 'integer'],
@@ -17,13 +14,11 @@ class AuthAssignment extends \yii\db\ActiveRecord
             [['item_name', 'user_id'], 'unique', 'targetAttribute' => ['item_name', 'user_id']],
         ];
     }
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'item_name' => 'Item Name',
             'user_id' => 'User ID',
             'created_at' => 'Created At',
         ];
     }
-    
 }

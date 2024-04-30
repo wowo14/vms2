@@ -1,15 +1,12 @@
 <?php
 namespace app\models;
 use Yii;
-class Unit extends \yii\db\ActiveRecord
-{
+class Unit extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'unit';
     }
-    public function rules()
-    {
+    public function rules() {
         return [
             [['is_vip', 'aktif'], 'integer'],
             [['logo'], 'string'],
@@ -17,8 +14,7 @@ class Unit extends \yii\db\ActiveRecord
             [['unit'], 'string', 'max' => 255],
         ];
     }
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'id' => 'ID',
             'kode' => 'Kode',
@@ -29,5 +25,4 @@ class Unit extends \yii\db\ActiveRecord
             'logo' => 'Logo',
         ];
     }
-  
 }

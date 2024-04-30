@@ -1,13 +1,8 @@
 <?php
-
-namespace app\models;
-
-use Yii;
+namespace app\models;use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Pegawai;
-
-class PegawaiSearch extends Pegawai
+use app\models\Pegawai;class PegawaiSearch extends Pegawai
 {
     public function rules()
     {

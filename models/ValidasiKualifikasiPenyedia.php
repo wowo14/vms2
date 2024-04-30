@@ -1,9 +1,6 @@
 <?php
-
 namespace app\models;
-
 use Yii;
-
 class ValidasiKualifikasiPenyedia extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
     public $detail;
@@ -64,6 +61,10 @@ class ValidasiKualifikasiPenyedia extends \yii\db\ActiveRecord {
     public static function getCalculated($paket_id){
         $query = self::find()
             ->select([
+                'GROUP_CONCAT(
+                    CASE WHEN validasi_kualifikasi_penyedia.template != 10
+                    THEN validasi_kualifikasi_penyedia.template END
+                )templates',
                 'penyedia_id',
                 'paket_pengadaan_id',
                 'SUM(validasi_kualifikasi_penyedia_detail.total_sesuai) AS total_sesuai',

@@ -6,8 +6,7 @@ use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\web\BadRequestHttpException;
-use yii\web\{Response, NotFoundHttpException};
-class DppController extends Controller {
+use yii\web\{Response, NotFoundHttpException};class DppController extends Controller {
     private $_pageSize = 1;
     public function behaviors() {
         return [
@@ -55,14 +54,14 @@ class DppController extends Controller {
             return [
                 'title' => "Dpp #" . $id,
                 'content' => $this->renderAjax('view', [
-                    'model' => $this->findModel($id),
+                    'model' => $model = $this->findModel($id),
                 ]),
                 'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                    Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'role' => 'modal-remote'])
+                    Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote'])
             ];
         } else {
             return $this->render('view', [
-                'model' => $this->findModel($id),
+                'model' => $model = $this->findModel($id),
             ]);
         }
     }
@@ -117,12 +116,12 @@ class DppController extends Controller {
             return $this->render('_frm_reject', ['model' => $paket]);
         } elseif ($request->isPost) {
             $model = $this->findModel($id)->paketpengadaan;
-            if ($model->load($request->post()) ) {
-                if($model->tanggal_reject && $model->alasan_reject){
+            if ($model->load($request->post())) {
+                if ($model->tanggal_reject && $model->alasan_reject) {
                     $model->save();
-                    Dpp::invalidatecache('tag_'.Dpp::getModelname());
-                    $model::invalidatecache('tag_'.$model::getModelname());
-                }else{
+                    Dpp::invalidatecache('tag_' . Dpp::getModelname());
+                    $model::invalidatecache('tag_' . $model::getModelname());
+                } else {
                     throw new BadRequestHttpException('Data Tidak Lengkap');
                 }
                 return $this->redirect(['index']);
@@ -143,9 +142,9 @@ class DppController extends Controller {
                     'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
                         Html::button(Yii::t('yii2-ajaxcrud', 'Approve'), ['class' => 'btn btn-primary', 'type' => 'submit'])
                 ];
-            } elseif ($model->load($request->post()) ) {
-                if($model->nomor_persetujuan && $model->nomor_dpp){
-                    $model->is_approved=1;
+            } elseif ($model->load($request->post())) {
+                if ($model->nomor_persetujuan && $model->nomor_dpp) {
+                    $model->is_approved = 1;
                     $model->save();
                     return [
                         'forceReload' => '#crud-datatable-pjax',
@@ -153,7 +152,7 @@ class DppController extends Controller {
                         'content' => '<span class="text-success">Approve Dpp ' . Yii::t('yii2-ajaxcrud', 'Success') . '</span>',
                         'footer' =>  Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal'])
                     ];
-                }else{
+                } else {
                     throw new BadRequestHttpException('nomor_persetujuan harus diisi');
                 }
             }
@@ -195,7 +194,7 @@ class DppController extends Controller {
         if ($request->isPost) {
             $rr = ReviewDpp::where(['dpp_id' => $model->id])->orderBy('id desc')->one();
             if ($rr) {
-                $oldfile=$rr->file_tanggapan;
+                $oldfile = $rr->file_tanggapan;
                 if (file_exists(Yii::getAlias('@uploads') . $oldfile) && !empty($oldfile) && ($rr->isBase64Encoded($_POST['ReviewDpp']['file_tanggapan']))) {
                     unlink(Yii::getAlias('@uploads') . $oldfile);
                 }
@@ -244,7 +243,7 @@ class DppController extends Controller {
                     'title' => Yii::t('yii2-ajaxcrud', 'Create New') . " Dpp",
                     'content' => '<span class="text-success">' . Yii::t('yii2-ajaxcrud', 'Create') . ' Dpp ' . Yii::t('yii2-ajaxcrud', 'Success') . '</span>',
                     'footer' =>  Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                        Html::a(Yii::t('yii2-ajaxcrud', 'Create More'), ['create'], ['class' => 'btn btn-primary', 'role' => 'modal-remote'])
+                        Html::a(Yii::t('yii2-ajaxcrud', 'Create More'), ['create'], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote'])
                 ];
             } else {
                 return [
@@ -288,7 +287,7 @@ class DppController extends Controller {
                         'model' => $model,
                     ]),
                     'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                        Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'role' => 'modal-remote'])
+                        Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote'])
                 ];
             } else {
                 return [

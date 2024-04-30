@@ -1,9 +1,6 @@
 <?php
-
 use yii\helpers\Html;
-use yii\helpers\Url;
-
-return [
+use yii\helpers\Url;return [
     [
         'class' => 'kartik\grid\CheckboxColumn',
         'width' => '20px',

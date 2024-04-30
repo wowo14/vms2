@@ -2,7 +2,7 @@
 namespace app\models;
 use Yii;
 use yii\caching\TagDependency;
-use yii\helpers\{ArrayHelper,BaseStringHelper,HtmlPurifier};
+use yii\helpers\{ArrayHelper, BaseStringHelper, HtmlPurifier};
 trait GeneralModelsTrait {
     public static function settingType($type) {
         return Setting::type($type);
@@ -30,11 +30,11 @@ trait GeneralModelsTrait {
         }
         return collect($settings)->pluck($callback)->toArray();
     }
-    public static function optionmetodepengadaan(){
-        return self::optionsSettingtype('metode_pengadaan', ['value','value']);
+    public static function optionmetodepengadaan() {
+        return self::optionsSettingtype('metode_pengadaan', ['value', 'value']);
     }
-    public static function optionkategoripengadaan(){
-        return self::optionsSettingtype('kategori_pengadaan', ['value','value']);
+    public static function optionkategoripengadaan() {
+        return self::optionsSettingtype('kategori_pengadaan', ['value', 'value']);
     }
     public function getUsercreated() {
         return $this->hasAttribute('created_by') ? $this->hasOne(User::class, ['id' => 'created_by'])->cache(self::cachetime(), self::settagdep('tag_user')) : '';
@@ -151,7 +151,7 @@ trait GeneralModelsTrait {
         return Produk::where(['active' => 1])->asArray()->all();
     }
     //==model commons ===//
-    public function beforeValidate(){
+    public function beforeValidate() {
         // HTML escape all attributes
         foreach ($this->attributes as $key => $value) {
             $processedValue = HtmlPurifier::process($value);

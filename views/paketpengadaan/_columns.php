@@ -20,9 +20,9 @@ return [
         'detailUrl' => Url::to(['/paketpengadaan/details']),
         'hiddenFromExport' => true
     ],
-        [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'nomor',
+    [
+        'class' => '\kartik\grid\DataColumn',
+        'attribute' => 'nomor',
     ],
     [
         'class' => '\kartik\grid\DataColumn',
@@ -42,16 +42,16 @@ return [
         ]),
     ],
     [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'nama_paket',
+        'class' => '\kartik\grid\DataColumn',
+        'attribute' => 'nama_paket',
     ],
     [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'kode_program',
+        'class' => '\kartik\grid\DataColumn',
+        'attribute' => 'kode_program',
     ],
     [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'kode_kegiatan',
+        'class' => '\kartik\grid\DataColumn',
+        'attribute' => 'kode_kegiatan',
     ],
     [
         'class' => 'kartik\grid\ActionColumn',
@@ -59,31 +59,33 @@ return [
         'noWrap' => 'true',
         'template' => '{lampiran} {kirimulang} {view} {update} {delete}',
         'vAlign' => 'middle',
-        'urlCreator' => function($action, $model, $key, $index) {
-                return Url::to([$action,'id'=>$key]);
+        'urlCreator' => function ($action, $model, $key, $index) {
+            return Url::to([$action, 'id' => $key]);
         },
-        'buttons'=>[
+        'buttons' => [
             'lampiran' => function ($url, $model, $key) {
                 return Html::a('<span class="fa fa-paperclip"></span>', $url, [
                     'title' => Yii::t('yii2-ajaxcrud', 'Lampiran'),
-                    'data-pjax' => '0','class'=> 'btn btn-sm btn-outline-warning'
+                    'data-pjax' => '0', 'class' => 'btn btn-sm btn-outline-warning'
                 ]);
             },
             'kirimulang' => function ($url, $model, $key) {
-                return ($model->alasan_reject && $model->tanggal_reject)?Html::a('<span class="fa fa-plane"></span>', $url, [
+                return ($model->alasan_reject && $model->tanggal_reject) ? Html::a('<span class="fa fa-plane"></span>', $url, [
                     'title' => Yii::t('yii2-ajaxcrud', 'Kirim Ulang DPP'),
-                    'data-pjax' => '0','class'=> 'btn btn-sm btn-outline-warning'
-                ]):'';
+                    'data-pjax' => '0', 'class' => 'btn btn-sm btn-outline-warning'
+                ]) : '';
             }
         ],
-        'viewOptions' => ['role' => 'modal-remote','data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success'],
+        'viewOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success'],
         'updateOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Update'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-primary'],
-        'deleteOptions' => ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Delete'), 'class' => 'btn btn-sm btn-outline-danger',
+        'deleteOptions' => [
+            'role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Delete'), 'class' => 'btn btn-sm btn-outline-danger',
             'data-confirm' => false, 'data-target' => '#' . $idmodal,
-            'data-method' => false,// for overide yii data api
+            'data-method' => false, // for overide yii data api
             'data-request-method' => 'post',
             'data-toggle' => 'tooltip',
             'data-confirm-title' => Yii::t('yii2-ajaxcrud', 'Delete'),
-            'data-confirm-message' => Yii::t('yii2-ajaxcrud', 'Delete Confirm') ],
+            'data-confirm-message' => Yii::t('yii2-ajaxcrud', 'Delete Confirm')
+        ],
     ],
 ];

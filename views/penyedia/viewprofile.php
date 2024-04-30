@@ -13,7 +13,7 @@ use yii\widgets\Pjax;
                         <h3 class="panel-title"><?= $model->nama_perusahaan ?></h3>
                     </div>
                     <div class="col-xs-6 text-right">
-                        <?= Html::a('Edit', ['update', 'id' => $model->id], ['class' => 'btn btn-primary', 'role' => 'modal-remote', 'data-target' => '#' . $model->hash]) ?>
+                        <?= Html::a('Edit', ['update', 'id' => $model->id], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote', 'data-target' => '#' . $model->hash]) ?>
                     </div>
                 </div>
             </div>
@@ -38,17 +38,17 @@ use yii\widgets\Pjax;
     </div>
     <div class="col-md-9">
         <?php
-        $qparams= Yii::$app->request->queryParams;
+        $qparams = Yii::$app->request->queryParams;
         echo Tabs::widget([
             'items' => [
                 [
                     'label' => 'Pengurus',
                     'content' => $this->render('//pengurusperusahaan/index', [
                         'searchModel' => $pengurus,
-                        'dataProvider' => $pengurus->search($qparams['PengurusperusahaanSearch']['penyedia_id']=$model->id),
+                        'dataProvider' => $pengurus->search($qparams['PengurusperusahaanSearch']['penyedia_id'] = $model->id),
                         // 'params' => '?id=' . $model->hashid($model->id), //penyedia_id
                     ]),
-                    'options' => ['id' => 'pengurus'.$model->hash],
+                    'options' => ['id' => 'pengurus' . $model->hash],
                 ],
                 [
                     'label' => 'Ijin Usaha',
@@ -57,7 +57,7 @@ use yii\widgets\Pjax;
                         'dataProvider' => $i->search($qparams, ['penyedia_id' => $model->id]),
                         // 'params' => '?id=' . $model->hashid($model->id), //penyedia_id
                     ]),
-                    'options' => ['id' => 'iu'.$model->hash],
+                    'options' => ['id' => 'iu' . $model->hash],
                 ],
                 [
                     'label' => 'Akta',
@@ -66,7 +66,7 @@ use yii\widgets\Pjax;
                         'dataProvider' => $a->search($qparams, ['penyedia_id' => $model->id]),
                         // 'params' => '?id=' . $model->hashid($model->id), //penyedia_id
                     ]),
-                    'options' => ['id' => 'akta'.$model->hash],
+                    'options' => ['id' => 'akta' . $model->hash],
                 ],
                 [
                     'label' => 'Staff Ahli',
@@ -75,7 +75,7 @@ use yii\widgets\Pjax;
                         'dataProvider' => $s->search($qparams, ['penyedia_id' => $model->id]),
                         // 'params' => '?id=' . $model->hashid($model->id), //penyedia_id
                     ]),
-                    'options' => ['id' => 'stafahli'.$model->hash],
+                    'options' => ['id' => 'stafahli' . $model->hash],
                 ],
                 [
                     'label' => 'Peralatan Kerja',
@@ -84,7 +84,7 @@ use yii\widgets\Pjax;
                         'dataProvider' => $peralatankerja->search($qparams, ['penyedia_id' => $model->id]),
                         // 'params' => '?id=' . $model->hashid($model->id), //penyedia_id
                     ]),
-                    'options' => ['id' => 'peralatan'.$model->hash],
+                    'options' => ['id' => 'peralatan' . $model->hash],
                 ],
                 [
                     'label' => 'Pengalaman',
@@ -93,7 +93,7 @@ use yii\widgets\Pjax;
                         'dataProvider' => $p->search($qparams, ['penyedia_id' => $model->id]),
                         // 'params' => '?id='.$model->hashid($model->id), //penyedia_id
                     ]),
-                    'options' => ['id' => 'pengalaman'.$model->hash],
+                    'options' => ['id' => 'pengalaman' . $model->hash],
                 ],
             ],
         ]);

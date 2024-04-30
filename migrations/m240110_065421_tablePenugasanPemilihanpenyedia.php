@@ -1,8 +1,5 @@
 <?php
-
-use yii\db\Migration;
-
-/**
+use yii\db\Migration;/**
  * Class m240110_065421_tablePenugasanPemilihanpenyedia
  */
 class m240110_065421_tablePenugasanPemilihanpenyedia extends Migration
@@ -31,30 +28,18 @@ class m240110_065421_tablePenugasanPemilihanpenyedia extends Migration
         ]);
         //add foreignkey to table dpp for dpp_id
         // $this->addForeignKey('fk-penugasan-dpp_id-dpp','penugasan_pemilihanpenyedia','dpp_id', 'dpp','id','CASCADE','CASCADE');
-    }
-
-    /**
+    }    /**
      * {@inheritdoc}
      */
     public function safeDown()
     {
-        echo "m240110_065421_tablePenugasanPemilihanpenyedia cannot be reverted.\n";
-
-        return false;
-    }
-
-    /*
+        echo "m240110_065421_tablePenugasanPemilihanpenyedia cannot be reverted.\n";        return false;
+    }    /*
     // Use up()/down() to run migration code without a transaction.
     public function up()
+    {    }    public function down()
     {
-
-    }
-
-    public function down()
-    {
-        echo "m240110_065421_tablePenugasanPemilihanpenyedia cannot be reverted.\n";
-
-        return false;
+        echo "m240110_065421_tablePenugasanPemilihanpenyedia cannot be reverted.\n";        return false;
     }
     */
 }

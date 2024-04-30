@@ -4,25 +4,20 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\Setting;
-class SettingSearch extends Setting
-{
-    public function rules()
-    {
+class SettingSearch extends Setting {
+    public function rules() {
         return [
             [['id', 'active'], 'integer'],
             [['type', 'param', 'value'], 'safe'],
         ];
     }
-    public function scenarios()
-    {
+    public function scenarios() {
         return Model::scenarios();
     }
-    public function search($params)
-    {
+    public function search($params) {
         $query = Setting::find()->cache(self::cachetime(), self::settagdep('tag_setting'));
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
-
+            'query' => $query, 'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
         ]);
         $this->load($params);
         if (!$this->validate()) {

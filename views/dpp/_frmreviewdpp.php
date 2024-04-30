@@ -9,7 +9,6 @@ use unclead\multipleinput\MultipleInputColumn;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\Html;
 use yii\web\View;
-
 AppAsset::register($this);
 $this->registerJs('
 jQuery(function ($) {
@@ -129,11 +128,14 @@ jQuery(function ($) {
             </div>
         </div>
     </div>
-    <?php echo $reviews->file_tanggapan?Html::a(
-     FilePreview::widget([
-        'model' => $reviews,
-        'attribute' => 'file_tanggapan',
-     ]),Yii::getAlias('@web/uploads/').$reviews->file_tanggapan, ['target' => '_blank']):'';
+    <?php echo $reviews->file_tanggapan ? Html::a(
+        FilePreview::widget([
+            'model' => $reviews,
+            'attribute' => 'file_tanggapan',
+        ]),
+        Yii::getAlias('@web/uploads/') . $reviews->file_tanggapan,
+        ['target' => '_blank']
+    ) : '';
     ?>
     <?php if (!Yii::$app->request->isAjax) { ?>
         <div class="form-group">

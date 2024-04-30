@@ -41,12 +41,11 @@ class ReviewDpp extends \yii\db\ActiveRecord {
             $this->updated_at = date('Y-m-d H:i:s', time());
         }
         if ($insert) {
-            $this->file_tanggapan = !empty($this->file_tanggapan)&& self::isBase64Encoded($this->file_tanggapan) ? $this->upload($this->file_tanggapan, 'file_tanggapan'.'_' . time()) : '';
+            $this->file_tanggapan = !empty($this->file_tanggapan) && self::isBase64Encoded($this->file_tanggapan) ? $this->upload($this->file_tanggapan, 'file_tanggapan' . '_' . time()) : '';
         } else {
-            $this->file_tanggapan = !empty($this->file_tanggapan) && self::isBase64Encoded($this->file_tanggapan) ? $this->upload($this->file_tanggapan, 'file_tanggapan'.'_' . time()) : $this->file_tanggapan;
+            $this->file_tanggapan = !empty($this->file_tanggapan) && self::isBase64Encoded($this->file_tanggapan) ? $this->upload($this->file_tanggapan, 'file_tanggapan' . '_' . time()) : $this->file_tanggapan;
         }
-        $this->tanggal_review=date('Y-m-d H:i:s');
+        $this->tanggal_review = date('Y-m-d H:i:s');
         return parent::beforeSave($insert);
     }
-
 }

@@ -4,15 +4,14 @@ use yii\helpers\Html;
 use yii\bootstrap4\Modal;
 use kartik\grid\GridView;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
-use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
-$this->title = 'Pengurusperusahaan';
+use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;$this->title = 'Pengurusperusahaan';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
 $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\BootstrapPluginAsset']);
 $idmodal = $searchModel->hash;
 ?>
 <div class="pengurusperusahaan-index">
-    <div id="ajaxCrudDatatable<?=$idmodal?>">
+    <div id="ajaxCrudDatatable<?= $idmodal ?>">
         <?= GridView::widget([
             'id' => 'crud-datatable',
             'dataProvider' => $dataProvider,
@@ -29,7 +28,7 @@ $idmodal = $searchModel->hash;
                     ) .
                         Html::a(
                             '<i class="fa fa-redo"></i>',
-                            [''. $searchModel->hashid($searchModel->id)],
+                            ['' . $searchModel->hashid($searchModel->id)],
                             ['data-pjax' => 1, 'data-target' => '#' . $idmodal, 'class' => 'btn btn-outline-success', 'title' => Yii::t('yii2-ajaxcrud', 'Reset Grid')]
                         ) .
                         '{toggleData}' .

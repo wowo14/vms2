@@ -30,9 +30,7 @@ return [
             'tableOptions' => 'ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci”', // if mysql >= 5.7, you can set “ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci”,
         ],
     ],
-    'modules'=>[
-
-    ],
+    'modules' => [],
     'components' => [
         'tools' => [
             'class' => 'app\widgets\Tools'

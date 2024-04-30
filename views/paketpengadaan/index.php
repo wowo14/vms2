@@ -1,5 +1,4 @@
 <?php
-
 use app\assets\AppAsset;
 use kartik\grid\GridView;
 use mdm\admin\components\Helper;
@@ -7,10 +6,7 @@ use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii\bootstrap4\Modal;
 use yii\helpers\Html;
-use yii\helpers\Url;
-$idmodal = $searchModel->hash;
-
-$this->title = 'Paket Pengadaan';
+use yii\helpers\Url;$idmodal = $searchModel->hash;$this->title = 'Paket Pengadaan';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
 AppAsset::register($this);

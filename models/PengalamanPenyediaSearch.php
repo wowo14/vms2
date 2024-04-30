@@ -4,25 +4,21 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\PengalamanPenyedia;
-class PengalamanPenyediaSearch extends PengalamanPenyedia{
-    public function rules()
-    {
+class PengalamanPenyediaSearch extends PengalamanPenyedia {
+    public function rules() {
         return [
             [['id', 'penyedia_id', 'created_by', 'updated_by'], 'integer'],
             [['paket_pengadaan_id', 'link', 'pekerjaan', 'lokasi', 'instansi_pemberi_tugas', 'alamat_instansi', 'tanggal_kontrak', 'tanggal_selesai_kontrak', 'created_at', 'updated_at', 'file'], 'safe'],
             [['nilai_kontrak'], 'number'],
         ];
     }
-    public function scenarios()
-    {
+    public function scenarios() {
         return Model::scenarios();
     }
-    public function search($params)
-    {
+    public function search($params) {
         $query = PengalamanPenyedia::find()->cache(self::cachetime(), self::settagdep('tag_pengalamanpenyedia'));
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
-
+            'query' => $query, 'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
         ]);
         $this->load($params);
         if (!$this->validate()) {
@@ -35,7 +31,6 @@ class PengalamanPenyediaSearch extends PengalamanPenyedia{
             'updated_by' => $this->updated_by,
             'nilai_kontrak' => $this->nilai_kontrak,
         ]);
-
         $query->andFilterWhere(['like', 'paket_pengadaan_id', $this->paket_pengadaan_id])
             ->andFilterWhere(['like', 'link', $this->link])
             ->andFilterWhere(['like', 'pekerjaan', $this->pekerjaan])

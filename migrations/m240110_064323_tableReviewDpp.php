@@ -1,8 +1,5 @@
 <?php
-
-use yii\db\Migration;
-
-/**
+use yii\db\Migration;/**
  * Class m240110_064323_tableReviewDpp
  */
 class m240110_064323_tableReviewDpp extends Migration
@@ -32,30 +29,18 @@ class m240110_064323_tableReviewDpp extends Migration
         ]);
         //add foreignkey to table dpp
         // $this->addForeignKey('fk-review_dpp-dpp_id-dpp','review_dpp','dpp_id', 'dpp','id','CASCADE','CASCADE');
-    }
-
-    /**
+    }    /**
      * {@inheritdoc}
      */
     public function safeDown()
     {
-        echo "m240110_064323_tableReviewDpp cannot be reverted.\n";
-
-        return false;
-    }
-
-    /*
+        echo "m240110_064323_tableReviewDpp cannot be reverted.\n";        return false;
+    }    /*
     // Use up()/down() to run migration code without a transaction.
     public function up()
+    {    }    public function down()
     {
-
-    }
-
-    public function down()
-    {
-        echo "m240110_064323_tableReviewDpp cannot be reverted.\n";
-
-        return false;
+        echo "m240110_064323_tableReviewDpp cannot be reverted.\n";        return false;
     }
     */
 }

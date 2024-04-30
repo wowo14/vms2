@@ -1,11 +1,7 @@
 <?php
-
 namespace app\models;
-
 use Yii;
-use yii\helpers\ArrayHelper;
-
-class ProgramKegiatan extends \yii\db\ActiveRecord {
+use yii\helpers\ArrayHelper;class ProgramKegiatan extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
     public static function tableName() {
         return 'program_kegiatan';
@@ -40,9 +36,7 @@ class ProgramKegiatan extends \yii\db\ActiveRecord {
         $where = ['is_active' => 1];
         $where = isset($th) ? array_merge($where, ['tahun_anggaran' => $th]) : $where;
         $where = isset($code) ? array_merge($where, ['code' => $code]) : $where;
-        Yii::error(json_encode($where));
-
-        return ArrayHelper::map(self::where($where)->all(), 'code', 'codename');
+        Yii::error(json_encode($where));        return ArrayHelper::map(self::where($where)->all(), 'code', 'codename');
     }
     public static function getTree($cnd = NULL) {
         $data2 = [];

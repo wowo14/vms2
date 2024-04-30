@@ -1,14 +1,10 @@
 <?php
-
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\bootstrap4\Modal;
 use kartik\grid\GridView;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
-use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
-$idmodal = $searchModel->hash;
-
-$this->title = 'Penyedia';
+use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;$idmodal = $searchModel->hash;$this->title = 'Penyedia';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
 $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\BootstrapPluginAsset']);
@@ -27,7 +23,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
                     Html::a(
                         '<i class="fa fa-plus"></i>',
                         ['penyedia/create'],
-                        ['role' => 'modal-remote','data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Penyedias', 'class' => 'btn btn-outline-primary']
+                        ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Penyedias', 'class' => 'btn btn-outline-primary']
                     ) .
                         Html::a(
                             '<i class="fa fa-redo"></i>',
@@ -63,9 +59,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
                     ],
                 ],
                 'json' => ['filename' => str_replace(' ', '', $this->title)],
-            ],
-
-            'striped' => true,
+            ],            'striped' => true,
             'condensed' => true,
             'responsive' => true,
             'panel' => [

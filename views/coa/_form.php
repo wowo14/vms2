@@ -1,5 +1,4 @@
 <?php
-
 use kartik\select2\Select2;
 use kartik\switchinput\SwitchInput;
 use yii\bootstrap4\ActiveForm;
@@ -33,9 +32,7 @@ use yii\helpers\Html;
             // 'templateSelection' => new JsExpression('format'),
             'allowClear' => true
         ],
-    ]) ?>
-
-    <?= $form->field($model, 'is_active')->widget(SwitchInput::class, [
+    ]) ?>    <?= $form->field($model, 'is_active')->widget(SwitchInput::class, [
         'pluginOptions' => ['size' => 'mini'],
     ]); ?>
     <?php if (!Yii::$app->request->isAjax) { ?>

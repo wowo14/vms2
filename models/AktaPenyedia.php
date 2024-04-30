@@ -1,15 +1,12 @@
 <?php
 namespace app\models;
 use Yii;
-class AktaPenyedia extends \yii\db\ActiveRecord
-{
+class AktaPenyedia extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'dok_akta_penyedia';
     }
-    public function rules()
-    {
+    public function rules() {
         return [
             [['penyedia_id', 'jenis_akta', 'nomor_akta', 'tanggal_akta'], 'required'],
             [['penyedia_id', 'created_by', 'updated_by'], 'integer'],
@@ -17,8 +14,7 @@ class AktaPenyedia extends \yii\db\ActiveRecord
             [['jenis_akta', 'nomor_akta', 'notaris'], 'string', 'max' => 255],
         ];
     }
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'id' => 'ID',
             'penyedia_id' => 'Penyedia',
@@ -33,13 +29,13 @@ class AktaPenyedia extends \yii\db\ActiveRecord
             'updated_by' => 'Updated By',
         ];
     }
-    public function autoDeleteFile(){
+    public function autoDeleteFile() {
         $filePath = Yii::getAlias('@uploads') . $this->file_akta;
         if (file_exists($filePath) && !empty($this->file_akta)) {
             unlink($filePath);
         }
     }
-    public function init(){
+    public function init() {
         parent::init();
         $this->on(self::EVENT_AFTER_DELETE, [$this, 'autoDeleteFile']);
     }
@@ -49,7 +45,6 @@ class AktaPenyedia extends \yii\db\ActiveRecord
         } else {
             $this->file_akta = self::isBase64Encoded($this->file_akta) ? $this->upload($this->file_akta, 'file_akta_' . $this->penyedia_id . '_' . time()) : $this->file_akta;
         }
-        
         if ($insert) {
             $this->created_by = Yii::$app->user->identity->id;
             $this->created_at = date('Y-m-d H:i:s', time());

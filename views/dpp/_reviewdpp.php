@@ -1,5 +1,4 @@
 <?php
-
 use yii\helpers\Html;
 ?>
 <table style="width: 100%; font-size: 14px; text-align: center; font-weight: bold;">

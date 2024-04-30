@@ -66,6 +66,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
 <?php Modal::begin([
     "id" => $idmodal,
     "footer" => "",
+    'size' => Modal::SIZE_LARGE,
     "clientOptions" => [
         "tabindex" => false,
         "backdrop" => "static",

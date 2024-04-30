@@ -1,13 +1,12 @@
 <?php
 namespace app\controllers;
 use Yii;
-use app\models\{Attachment,Dpp, PaketPengadaanDetails, PaketPengadaanSearch, PaketPengadaan};
+use app\models\{Attachment, Dpp, PaketPengadaanDetails, PaketPengadaanSearch, PaketPengadaan};
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-use yii\web\{ServerErrorHttpException, Response, NotFoundHttpException};
-/**
+use yii\web\{ServerErrorHttpException, Response, NotFoundHttpException};/**
  A Evaluasi Administrasi
 T Evaluasi Teknis
 ST Skor Teknis
@@ -43,7 +42,7 @@ class PaketpengadaanController extends Controller {
             return $this->render('lampiran', ['model' => $model]);
         }
         if ($request->isPost) {
-            $i=0;
+            $i = 0;
             foreach ($_FILES['PaketPengadaan']['name']['lampiran'] as $index => $filename) {
                 $fileType = $_FILES['PaketPengadaan']['type']['lampiran'][$index]['name'];
                 $fileTmpName = $_FILES['PaketPengadaan']['tmp_name']['lampiran'][$index]['name'];
@@ -57,8 +56,8 @@ class PaketpengadaanController extends Controller {
                 if ($fileError === 0) {
                     $newFilename = uniqid() . '.' . $extension;
                     $destination = Yii::getAlias('@uploads') . $newFilename;
-                    $jenisdokumen= $request->post('PaketPengadaan')['lampiran'][$index]['jenis_dokumen'];
-                    $att=Attachment::where(['jenis_dokumen'=>$jenisdokumen, 'user_id'=>$model->id])->one();
+                    $jenisdokumen = $request->post('PaketPengadaan')['lampiran'][$index]['jenis_dokumen'];
+                    $att = Attachment::where(['jenis_dokumen' => $jenisdokumen, 'user_id' => $model->id])->one();
                     if ($att) {
                         $att->delete();
                     }
@@ -77,7 +76,7 @@ class PaketpengadaanController extends Controller {
                     if (!$attachment->save()) {
                         $content = "Error saving attachment: " . json_encode($attachment->errors) . "\n";
                         Yii::$app->session->setFlash('error', $content);
-                    }else{
+                    } else {
                         $i++;
                     }
                 } else {
@@ -85,7 +84,7 @@ class PaketpengadaanController extends Controller {
                     Yii::$app->session->setFlash('error', $content);
                 }
             }
-            $i>0?Yii::$app->session->setFlash('success', $i . 'File Berhasil di upload'):'';
+            $i > 0 ? Yii::$app->session->setFlash('success', $i . 'File Berhasil di upload') : '';
             return $this->redirect(['index']);
         }
     }
@@ -94,14 +93,14 @@ class PaketpengadaanController extends Controller {
         $pks = explode(',', $request->post('pks'));
         foreach ($pks as $pk) {
             $model = $this->findModel($pk);
-            $jenisdokumen= Attachment::collectAll(['user_id'=>$model->id])->pluck('jenis_dokumen')->toArray();
+            $jenisdokumen = Attachment::collectAll(['user_id' => $model->id])->pluck('jenis_dokumen')->toArray();
             sort($jenisdokumen);
-            if($jenisdokumen!==$model->requiredlampiran){
+            if ($jenisdokumen !== $model->requiredlampiran) {
                 throw new ServerErrorHttpException('Paket Pengadaan: Lampiran belum diupload semua');
             }
-            $dp=Dpp::where(['paket_id'=>$model->id])->one();
-            if($dp){
-                if($model->tanggal_reject && $model->alasan_reject){
+            $dp = Dpp::where(['paket_id' => $model->id])->one();
+            if ($dp) {
+                if ($model->tanggal_reject && $model->alasan_reject) {
                     throw new ServerErrorHttpException('Paket Pengadaan: DPP Ditolak, mohon koreksi/revisi terlebih dahulu');
                 }
                 throw new ServerErrorHttpException('Paket Pengadaan: DPP sudah diinput');
@@ -212,14 +211,14 @@ class PaketpengadaanController extends Controller {
             return [
                 'title' => "PaketPengadaan #" . $id,
                 'content' => $this->renderAjax('view', [
-                    'model' => $this->findModel($id),
+                    'model' => $model = $this->findModel($id),
                 ]),
                 'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                    Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'role' => 'modal-remote'])
+                    Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote'])
             ];
         } else {
             return $this->render('view', [
-                'model' => $this->findModel($id),
+                'model' => $model = $this->findModel($id),
             ]);
         }
     }
@@ -243,7 +242,7 @@ class PaketpengadaanController extends Controller {
                     'title' => Yii::t('yii2-ajaxcrud', 'Create New') . " PaketPengadaan",
                     'content' => '<span class="text-success">' . Yii::t('yii2-ajaxcrud', 'Create') . ' PaketPengadaan ' . Yii::t('yii2-ajaxcrud', 'Success') . '</span>',
                     'footer' =>  Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                        Html::a(Yii::t('yii2-ajaxcrud', 'Create More'), ['create'], ['class' => 'btn btn-primary', 'role' => 'modal-remote'])
+                        Html::a(Yii::t('yii2-ajaxcrud', 'Create More'), ['create'], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote'])
                 ];
             } else {
                 return [
@@ -263,10 +262,10 @@ class PaketpengadaanController extends Controller {
             }
         }
     }
-    public function actionKirimulang($id){
+    public function actionKirimulang($id) {
         $model = $this->findModel($id);
-        $model->alasan_reject ='';
-        $model->tanggal_reject ='';
+        $model->alasan_reject = '';
+        $model->tanggal_reject = '';
         $model->save();
         Yii::$app->session->setFlash('success', 'PaketPengadaan Berhasil Dikirim -> DPP');
         return $this->redirect('index');
@@ -286,7 +285,7 @@ class PaketpengadaanController extends Controller {
                         Html::button(Yii::t('yii2-ajaxcrud', 'Save'), ['class' => 'btn btn-primary', 'type' => 'submit'])
                 ];
             } else if ($model->load($request->post()) && $model->save()) {
-                if(!empty($_POST['ReviewDpp'])){
+                if (!empty($_POST['ReviewDpp'])) {
                     $model->dpp->reviews->file_tanggapan = $_POST['ReviewDpp']['file_tanggapan'];
                     $model->dpp->reviews->tgl_dikembalikan = $_POST['ReviewDpp']['tgl_dikembalikan'];
                     $model->dpp->reviews->tanggapan_ppk = $_POST['ReviewDpp']['tanggapan_ppk'];
@@ -299,7 +298,7 @@ class PaketpengadaanController extends Controller {
                         'model' => $model,
                     ]),
                     'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                        Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'role' => 'modal-remote'])
+                        Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote'])
                 ];
             } else {
                 return [

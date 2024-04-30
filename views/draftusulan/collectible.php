@@ -70,7 +70,6 @@ use yii\widgets\ActiveForm;
                                 'options' => [
                                     // 'disabled' => true,
                                     'placeholder' => 'Select RAB ...',
-
                                 ],
                                 'pluginOptions' => [
                                     // 'disabled' => true,

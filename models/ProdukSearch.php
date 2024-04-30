@@ -4,21 +4,18 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\Produk;
-class ProdukSearch extends Produk{
-    public function rules()
-    {
+class ProdukSearch extends Produk {
+    public function rules() {
         return [
             [['id', 'active', 'created_by', 'updated_by'], 'integer'],
             [['kode_kbki', 'nama_produk', 'merk', 'status_merk', 'nama_pemilik_merk', 'nomor_produk_penyedia', 'unit_pengukuran', 'jenis_produk', 'nilai_tkdn', 'nomor_sni', 'garansi_produk', 'spesifikasi_produk', 'layanan_lain', 'komponen_biaya', 'lokasi_tempat_usaha', 'keterangan_lainya', 'barcode', 'created_at', 'updated_at'], 'safe'],
             [['hargapasar', 'hargabeli', 'hargahps', 'hargalainya'], 'number'],
         ];
     }
-    public function scenarios()
-    {
+    public function scenarios() {
         return Model::scenarios();
     }
-    public function search($params)
-    {
+    public function search($params) {
         $query = Produk::find()->cache(self::cachetime(), self::settagdep('tag_produk'));
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -38,7 +35,6 @@ class ProdukSearch extends Produk{
             'created_by' => $this->created_by,
             'updated_by' => $this->updated_by,
         ]);
-
         $query->andFilterWhere(['like', 'kode_kbki', $this->kode_kbki])
             ->andFilterWhere(['like', 'nama_produk', $this->nama_produk])
             ->andFilterWhere(['like', 'merk', $this->merk])

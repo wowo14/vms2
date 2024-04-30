@@ -1,5 +1,4 @@
 <?php
-
 use kartik\switchinput\SwitchInput;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\Html;

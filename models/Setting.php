@@ -2,20 +2,19 @@
 namespace app\models;
 use Yii;
 use app\models\GeneralModelsTrait;
-class Setting extends \yii\db\ActiveRecord
-{
+class Setting extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
-    public static function tableName(){
+    public static function tableName() {
         return 'setting';
     }
-    public function rules(){
+    public function rules() {
         return [
             [['type', 'active'], 'required'],
             [['active'], 'integer'],
             [['type', 'param', 'value'], 'string', 'max' => 255],
         ];
     }
-    public function attributeLabels(){
+    public function attributeLabels() {
         return [
             'id' => 'ID',
             'type' => 'Type',
@@ -24,14 +23,13 @@ class Setting extends \yii\db\ActiveRecord
             'active' => 'Active',
         ];
     }
-    public static function type($type){
+    public static function type($type) {
         return self::where(['type' => $type, 'active' => 1])->all();
     }
-    public function getParamvalue(){
+    public function getParamvalue() {
         return $this->param . ' | ' . $this->value;
     }
-    public function getValueparam(){
+    public function getValueparam() {
         return $this->value . ' | ' . $this->param;
     }
-
 }
