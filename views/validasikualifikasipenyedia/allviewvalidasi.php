@@ -1,7 +1,9 @@
 <?php
+
 use yii\bootstrap4\Tabs;
 use yii\grid\GridView;
 use yii\helpers\{Html, Url};
+
 echo GridView::widget([
     'id' => 'crud-datatable',
     'dataProvider' => new yii\data\ArrayDataProvider([
@@ -17,6 +19,10 @@ echo GridView::widget([
         ],
         'tanggal_mendaftar',
         'ip_client',
+        [
+            'attribute' => 'nilai_penawaran',
+            'value' => fn ($e) => Yii::$app->formatter->asCurrency($e->nilai_penawaran ?? 0),
+        ],
         [
             'header' => 'Dokumen kualifikasi', 'format' => 'raw',
         ],

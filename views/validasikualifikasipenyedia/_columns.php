@@ -1,6 +1,9 @@
 <?php
+
 use yii\helpers\Html;
-use yii\helpers\Url;return [
+use yii\helpers\Url;
+
+return [
     [
         'class' => 'kartik\grid\CheckboxColumn',
         'width' => '20px',
@@ -25,7 +28,22 @@ use yii\helpers\Url;return [
     ],
     [
         'class' => '\kartik\grid\DataColumn',
-        'attribute' => 'is_active',
+        'attribute' => 'tgl_paket',
+        'label' => 'Tanggal Pengadaan',
+        'value' => 'paketpengadaan.tanggal_paket',
+        'filterType' => \kartik\grid\GridView::FILTER_DATE_RANGE,
+        'filterWidgetOptions' => ([
+            'attribute' => 'only_date',
+            'presetDropdown' => true,
+            'convertFormat' => false,
+            'pluginOptions' => [
+                'separator' => ' - ',
+                'format' => 'YYYY-MM-DD',
+                'locale' => [
+                    'format' => 'YYYY-MM-DD'
+                ],
+            ],
+        ]),
     ],
     [
         'class' => 'kartik\grid\ActionColumn',

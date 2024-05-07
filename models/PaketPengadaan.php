@@ -10,11 +10,11 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['nomor', 'tanggal_paket', 'nama_paket'], 'required'],
-            [['tanggal_paket','tanggal_reject', 'alasan_reject'], 'string'],
+            [['tanggal_paket', 'tanggal_reject', 'alasan_reject'], 'string'],
             [['pagu'], 'number'],
             [['nama_paket'], 'unique'],
             [['created_by', 'tahun_anggaran', 'approval_by'], 'integer'],
-            [['nomor', 'kategori_pengadaan','nama_paket', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'metode_pengadaan'], 'string', 'max' => 255],
+            [['nomor', 'kategori_pengadaan', 'nama_paket', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'metode_pengadaan'], 'string', 'max' => 255],
         ];
     }
     public function attributeLabels() {
@@ -28,13 +28,13 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             'kode_rekening' => 'Kode Rekening',
             'ppkom' => 'Ppkom',
             'pagu' => 'Pagu',
-            'metode_pengadaan' => 'Metode Pengadaan',//EPL,PL,E-Purchasing,
+            'metode_pengadaan' => 'Metode Pengadaan', //EPL,PL,E-Purchasing,
             'kategori_pengadaan' => 'Kategori Pengadaan', //barang/jasa, konstruksi, konsultansi
             'created_by' => 'Created By',
             'tahun_anggaran' => 'Tahun Anggaran',
-            'approval_by' => 'Approval By',//null->belom,ditolak oleh ,<>0->diterima oleh
-            'alasan_reject'=>'Alasan Reject',//not null ditolak
-            'tanggal_reject'=>'Tanggal Reject',//not null ditolak
+            'approval_by' => 'Approval By', //null->belom,ditolak oleh ,<>0->diterima oleh
+            'alasan_reject' => 'Alasan Reject', //not null ditolak
+            'tanggal_reject' => 'Tanggal Reject', //not null ditolak
         ];
     }
     public function getListpaketoutstanding() {
@@ -68,13 +68,25 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     public function getAttachments() {
         return $this->hasMany(Attachment::class, ['user_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_attachment'));
     }
-    public function getRequiredlampiran(){//array id
+    public function getRequiredlampiran() { //array id
         return collect(self::settingType('jenis_dokumen'))->where('param', 'lampiran')->pluck('id')->toArray();
     }
-    public function getDpp(){
+    public function getDpp() {
         return $this->hasOne(Dpp::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_dpp'));
     }
-    public function getSubmitedpenawaran(){
+    public function getSubmitedpenawaran() {
         return $this->hasMany(PenawaranPengadaan::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_penawaranpengadaan'));
+    }
+    public function getPejabatppkom() {
+        return $this->hasOne(Pegawai::class, ['id' => 'ppkom'])->cache(self::cachetime(), self::settagdep('tag_pegawai'));
+    }
+    public function getProgramnya() {
+        return $this->hasOne(ProgramKegiatan::class, ['code' => 'kode_program'])->cache(self::cachetime(), self::settagdep('tag_programkegiatan'));
+    }
+    public function getKegiatannya() {
+        return $this->hasOne(ProgramKegiatan::class, ['code' => 'kode_kegiatan'])->cache(self::cachetime(), self::settagdep('tag_programkegiatan'));
+    }
+    public function getRekeningnya() {
+        return $this->hasOne(KodeRekening::class, ['kode' => 'kode_rekening'])->cache(self::cachetime(), self::settagdep('tag_koderekening'));
     }
 }

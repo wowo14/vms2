@@ -4,7 +4,8 @@ use app\models\{PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifika
 use Yii;
 use yii\filters\VerbFilter;
 use yii\helpers\{Html, HtmlPurifier};
-use yii\web\{Response, NotFoundHttpException};class ValidasikualifikasipenyediaController extends Controller {
+use yii\web\{Response, NotFoundHttpException};
+class ValidasikualifikasipenyediaController extends Controller {
     public function behaviors() {
         return [
             'verbs' => [
@@ -23,6 +24,17 @@ use yii\web\{Response, NotFoundHttpException};class ValidasikualifikasipenyediaC
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+    }
+    public function hitungValidasi($params) { //['paket_pengadaan_id'=>1,'vendor_id'=>1]
+        $r = ValidasiKualifikasiPenyedia::getCalculated($params['paket_pengadaan_id']);
+        $r = collect($r)->where('penyedia_id', $params['vendor_id'])->where('paket_pengadaan_id', $params['paket_pengadaan_id'])->first();
+        $templates = TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->andWhere(['!=', 'template', 'Ceklist_Evaluasi_Kesimpulan'])->asArray()->all();
+        $arTemplate = collect($templates)->pluck('id')->toArray();
+        $ar1 = $r['templates'];
+        $ar1 = (explode(',', $ar1));
+        sort($ar1, SORT_NUMERIC);
+        $ar_difference = array_diff($arTemplate, $ar1);
+        return !empty($ar_difference) ? false : true;
     }
     public function actionGeneratekesimpulan($params) { //hashurl ['vendor_id'=>1, 'paket_pengadaan_id'=>1,'callback'=>'callbackkesimpulan']
         $params = $this->decodeurl($params);
@@ -87,10 +99,12 @@ use yii\web\{Response, NotFoundHttpException};class ValidasikualifikasipenyediaC
                 $rr = json_decode($details->hasil, true);
                 $r = ValidasiKualifikasiPenyedia::getCalculated($params->paket_pengadaan_id);
                 if ($r) {
+                    $isValid = $this->hitungValidasi(['paket_pengadaan_id' => $params->paket_pengadaan_id, 'vendor_id' => $params->vendor_id]);
+                    // Yii::error('isVValid'.json_encode($isValid));
                     $r = collect($r)->where('penyedia_id', $params->vendor_id)->where('paket_pengadaan_id', $params->paket_pengadaan_id)->first();
-                    $hasil = collect($rr)->map(function ($e) use ($r) {
+                    $hasil = collect($rr)->map(function ($e) use ($r, $isValid) {
                         $e['sesuai'] = '';
-                        $e['komentar'] = $r['total_sesuai'] == $r['total_element'] ? 'Lolos Administrasi Validasi Dokumen' : 'Tidak Lolos Administrasi Validasi Dokumen';
+                        $e['komentar'] = $isValid && ($r['total_sesuai'] == $r['total_element']) ? 'Lolos Administrasi Validasi Dokumen' : 'Tidak Lolos Administrasi Validasi Dokumen';
                         return $e;
                     })->toArray();
                     $details->hasil = json_encode($hasil);
@@ -105,6 +119,15 @@ use yii\web\{Response, NotFoundHttpException};class ValidasikualifikasipenyediaC
         }
         return $this->redirect(['index']);
     }
+    // public function actionListPemenang() {
+    //     //Lolos Administrasi Validasi Dokumen order by nilai_penawaran
+    //     $model = ValidasiKualifikasiPenyedia::find()
+    //     ->joinWith('paketpengadaan',function($q){
+    //         $q->andWhere('paket_pengadaan.is_active = 1');
+    //     })
+    //     ->where(['is_active' => 1, 'template' => $tmp->id])
+    //     ->orderBy('nilai_penawaran')->all();
+    // }
     public function actionAssestment($id) {
         $request = Yii::$app->request;
         $model = ValidasiKualifikasiPenyedia::find()->cache(false)->where(['id' => $id])->one();

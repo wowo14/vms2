@@ -8,7 +8,7 @@ class PenawaranPengadaanSearch extends PenawaranPengadaan{
     {
         return [
             [['id',  'penilaian', 'created_by', 'created_at', 'updated_by', 'updated_at'], 'integer'],
-            [['nomor', 'paket_id', 'penyedia_id', 'kode', 'tanggal_mendaftar', 'ip_client', 'masa_berlaku', 'lampiran_penawaran', 'lampiran_penawaran_harga'], 'safe'],
+            [['nomor', 'paket_id', 'penyedia_id', 'kode', 'tanggal_mendaftar', 'nilai_penawaran','ip_client', 'masa_berlaku', 'lampiran_penawaran', 'lampiran_penawaran_harga'], 'safe'],
         ];
     }
     public function scenarios()

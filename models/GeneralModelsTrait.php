@@ -199,9 +199,11 @@ trait GeneralModelsTrait {
         return md5($class);
     }
     public function range($d, $type) { //filter condition date between
-        $dates = explode(' - ', $d); //return array
-        if ((bool) strtotime($dates[0]) && (bool) strtotime($dates[1])) {
-            return $type == 's' ? $dates[0] . ' 00:00:00' : $dates[1] . ' 23:59:59';
+        if($d!==null){
+            $dates = explode(' - ', $d); //return array
+            if ((bool) strtotime($dates[0]) && (bool) strtotime($dates[1])) {
+                return $type == 's' ? $dates[0] . ' 00:00:00' : $dates[1] . ' 23:59:59';
+            }
         }
     }
     public static function where($condition, $params = []) {

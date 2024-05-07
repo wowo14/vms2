@@ -4,6 +4,7 @@ use Yii;
 class ValidasiKualifikasiPenyedia extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
     public $detail;
+    public $tgl_paket;
     public static function tableName() {
         return 'validasi_kualifikasi_penyedia';
     }
@@ -58,7 +59,7 @@ class ValidasiKualifikasiPenyedia extends \yii\db\ActiveRecord {
     public function getPaketpengadaan() {
         return $this->hasOne(PaketPengadaan::class, ['id' => 'paket_pengadaan_id'])->cache(self::cachetime(), self::settagdep('tag_paketpengadaan'));
     }
-    public static function getCalculated($paket_id){
+    public static function getCalculated($paket_id) {
         $query = self::find()
             ->select([
                 'GROUP_CONCAT(

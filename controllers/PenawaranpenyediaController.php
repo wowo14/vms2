@@ -57,7 +57,7 @@ use yii\helpers\Html;class PenawaranpenyediaController extends Controller {
                     'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
                         Html::button(Yii::t('yii2-ajaxcrud', 'Create'), ['class' => 'btn btn-primary', 'type' => 'submit'])
                 ];
-            } else if ($model->load($request->post()) && $model->save()) {
+            } else if ($model->load($request->post()) && $model->save(false)) {
                 return [
                     'forceReload' => '#crud-datatable-pjax',
                     'title' => Yii::t('yii2-ajaxcrud', 'Create New') . " PenawaranPengadaan",
@@ -76,7 +76,7 @@ use yii\helpers\Html;class PenawaranpenyediaController extends Controller {
                 ];
             }
         } else {
-            if ($model->load($request->post()) && $model->save()) {
+            if ($model->load($request->post()) && $model->save(false)) {
                 return $this->redirect(['view', 'id' => $model->id]);
             } else {
                 return $this->render('create', [
@@ -108,7 +108,7 @@ use yii\helpers\Html;class PenawaranpenyediaController extends Controller {
                 if (file_exists(Yii::getAlias('@uploads') . $oldlampiran_penawaran_harga) && !empty($oldlampiran_penawaran_harga) && ($model->isBase64Encoded($model->lampiran_penawaran_harga))) {
                     unlink(Yii::getAlias('@uploads') . $oldlampiran_penawaran_harga);
                 }
-                $model->save();
+                $model->save(false);
                 return [
                     'forceReload' => '#crud-datatable-pjax',
                     'title' => "PenawaranPengadaan #" . $id,
@@ -136,7 +136,7 @@ use yii\helpers\Html;class PenawaranpenyediaController extends Controller {
                 if (file_exists(Yii::getAlias('@uploads') . $oldlampiran_penawaran_harga) && !empty($oldlampiran_penawaran_harga) && ($model->isBase64Encoded($model->lampiran_penawaran_harga))) {
                     unlink(Yii::getAlias('@uploads') . $oldlampiran_penawaran_harga);
                 }
-                $model->save();
+                $model->save(false);
                 return $this->redirect(['view', 'id' => $model->id]);
             } else {
                 return $this->render('update', [

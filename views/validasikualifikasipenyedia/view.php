@@ -1,4 +1,5 @@
 <?php
+
 use yii\grid\GridView;
 use yii\widgets\DetailView;
 ?>

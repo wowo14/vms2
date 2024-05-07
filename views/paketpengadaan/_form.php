@@ -58,7 +58,6 @@ $datakodeprogram = $model->isNewRecord ? \app\models\ProgramKegiatan::optionprog
     ]) ?>
     <?= $form->field($model, 'kode_program')->widget(DepDrop::class, [
         'type' => DepDrop::TYPE_SELECT2,
-        // 'data' => $model->isNewRecord ? \app\models\ProgramKegiatan::optionprogram() : \app\models\ProgramKegiatan::optionprogram($model->kode_program, $model->tahun_anggaran),
         'options' => ['placeholder' => 'Select ...'],
         'select2Options' => [
             'data' => $datakodeprogram,

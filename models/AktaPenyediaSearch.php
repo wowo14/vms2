@@ -43,6 +43,6 @@ class AktaPenyediaSearch extends AktaPenyedia{
             ->andFilterWhere(['like', 'file_akta', $this->file_akta])
             ->andFilterWhere(['like', 'created_at', $this->created_at])
             ->andFilterWhere(['like', 'updated_at', $this->updated_at]);
-        return $dataProvider;
+        return $dataProvider;//MARZU
     }
 }

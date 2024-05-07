@@ -1,12 +1,16 @@
 <?php
+
 namespace app\controllers;
-use app\models\{ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails};
+
+use app\models\{ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails, PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia};
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\web\BadRequestHttpException;
-use yii\web\{Response, NotFoundHttpException};class DppController extends Controller {
+use yii\web\{Response, NotFoundHttpException};
+
+class DppController extends Controller {
     private $_pageSize = 1;
     public function behaviors() {
         return [
@@ -46,6 +50,17 @@ use yii\web\{Response, NotFoundHttpException};class DppController extends Contro
         return $this->render('tab', [
             'model' => $model
         ]);
+    }
+    public function actionListpemenang($params) { //[paket_pengadaan_id]
+        // Yii::$app->response->format = Response::FORMAT_JSON;
+        $tmp = TemplateChecklistEvaluasi::where(['template' => 'Ceklist_Evaluasi_Kesimpulan'])->one();
+        $lolos = ValidasiKualifikasiPenyedia::find()->joinWith('detail')
+            ->where(['template' => $tmp->id, 'paket_pengadaan_id' => $params['paket_pengadaan_id']])->asArray()->all();
+        $filtered = collect($lolos)->where('detail.hasil', '[{"uraian":"Catatan Oleh Pejabat Pengadaan","komentar":"Lolos Administrasi Validasi Dokumen","sesuai":""}]');
+        $mapPenawaran = $filtered->map(function ($e) {
+            return PenawaranPengadaan::where(['paket_id' => $e['paket_pengadaan_id'], 'penyedia_id' => $e['penyedia_id']])->one();
+        })->sortBy('nilai_penawaran')->values()->all();
+        return $mapPenawaran;
     }
     public function actionView($id) {
         $request = Yii::$app->request;

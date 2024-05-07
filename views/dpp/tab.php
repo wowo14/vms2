@@ -38,12 +38,12 @@ use yii\bootstrap4\{Collapse, Tabs, Modal};
                 ],
                 [
                     'label' => 'Pemenang',
-                    'content' =>'List pemenang',
-                    // $this->render('//akta/index', [
-                    //     'searchModel' => $a,
-                    //     'dataProvider' => $a->search(Yii::$app->request->queryParams, ['penyedia_id' => $model->id]),
-                    //     'params' => $model->hashid($model->id), //penyedia_id
-                    // ]),
+                    'content' =>$this->render('//dpp/_pemenang', [
+                        'model'=>$this->context->actionListpemenang(['paket_pengadaan_id' => $model->paket_id]),
+                        // 'searchModel' => $a,
+                        // 'dataProvider' => $a->search(Yii::$app->request->queryParams, ['penyedia_id' => $model->id]),
+                        // 'params' => $model->hashid($model->id), //penyedia_id
+                    ]),
                     'options' => ['id' => 'pemenang' . $model->hash],
                 ],
             ],
