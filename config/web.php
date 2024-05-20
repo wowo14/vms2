@@ -53,7 +53,7 @@ $config = [
                     'css' => ['css/bootstrap.min.css']
                 ],
                 'yii\bootstrap4\BootstrapPluginAsset' => [
-                    'js' => ['js/bootstrap.min.js']
+                    'js' => ['js/bootstrap.bundle.min.js']
                 ],
             ],
         ],

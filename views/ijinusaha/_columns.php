@@ -1,5 +1,7 @@
 <?php
+use kartik\grid\GridView;
 use yii\helpers\Url;
+
 return [
     [
         'class' => 'kartik\grid\CheckboxColumn',
@@ -12,7 +14,13 @@ return [
     [
         'class' => '\kartik\grid\DataColumn',
         'attribute' => 'penyedia_id',
-        'value' => fn ($d) => $d->vendor->nama_perusahaan ?? ''
+        'value' => 'vendor.nama_perusahaan',
+        'filterType' => GridView::FILTER_SELECT2,
+        'filter' => \app\models\Penyedia::collectAll(['active' => 1])->pluck('nama_perusahaan', 'id')->toArray(),
+        'filterWidgetOptions' => [
+            'pluginOptions' => ['allowClear' => true],
+        ],
+        'filterInputOptions' => ['placeholder' => 'Pilih penyedia'],
     ],
     [
         'class' => '\kartik\grid\DataColumn',
@@ -42,7 +50,7 @@ return [
         'viewOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success'],
         'updateOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Update'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-primary'],
         'deleteOptions' => [
-            'data-target' => '#' . $model->hash, 'role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Delete'), 'class' => 'btn btn-sm btn-outline-danger',
+            'role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Delete'), 'class' => 'btn btn-sm btn-outline-danger',
             'data-confirm' => false,
             'data-method' => false, // for overide yii data api
             'data-request-method' => 'post',

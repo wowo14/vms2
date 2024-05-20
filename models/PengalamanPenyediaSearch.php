@@ -1,9 +1,12 @@
 <?php
+
 namespace app\models;
+
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\PengalamanPenyedia;
+
 class PengalamanPenyediaSearch extends PengalamanPenyedia {
     public function rules() {
         return [
@@ -15,8 +18,8 @@ class PengalamanPenyediaSearch extends PengalamanPenyedia {
     public function scenarios() {
         return Model::scenarios();
     }
-    public function search($params) {
-        $query = PengalamanPenyedia::find()->cache(self::cachetime(), self::settagdep('tag_pengalamanpenyedia'));
+    public function search($params, $where = null) {
+        $query = PengalamanPenyedia::find()->cache(self::cachetime(), self::settagdep('tag_pengalamanpenyedia'))->where($where);
         $dataProvider = new ActiveDataProvider([
             'query' => $query, 'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
         ]);

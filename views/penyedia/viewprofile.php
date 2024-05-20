@@ -13,7 +13,7 @@ use yii\widgets\Pjax;
                         <h3 class="panel-title"><?= $model->nama_perusahaan ?></h3>
                     </div>
                     <div class="col-xs-6 text-right">
-                        <?= Html::a('Edit', ['update', 'id' => $model->id], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote', 'data-target' => '#' . $model->hash]) ?>
+                        <?= Html::a('Edit', ['update', 'id' => $model->id], ['class' => 'btn btn-primary', 'role' => 'modal-remote', 'data-target' => '#' . $model->hash]) ?>
                     </div>
                 </div>
             </div>
@@ -45,7 +45,8 @@ use yii\widgets\Pjax;
                     'label' => 'Pengurus',
                     'content' => $this->render('//pengurusperusahaan/index', [
                         'searchModel' => $pengurus,
-                        'dataProvider' => $pengurus->search($qparams['PengurusperusahaanSearch']['penyedia_id'] = $model->id),
+                        'dataProvider' => $pengurus->search($qparams,['penyedia_id' => $model->id]),
+                        // new ArrayDataProvider($pengurus->where(['penyedia_id' => $model->id])),
                         // 'params' => '?id=' . $model->hashid($model->id), //penyedia_id
                     ]),
                     'options' => ['id' => 'pengurus' . $model->hash],

@@ -4,28 +4,26 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\StaffAhli;
-class StaffAhliSearch extends StaffAhli{
-    public function rules()
-    {
+class StaffAhliSearch extends StaffAhli {
+    public function rules() {
         return [
             [['id', 'penyedia_id', 'created_by', 'updated_by'], 'integer'],
             [['nama', 'tanggal_lahir', 'alamat', 'email', 'jenis_kelamin', 'pendidikan', 'warga_negara', 'lama_pengalaman', 'file', 'keahlian', 'created_at', 'updated_at', 'spesifikasi_pekerjaan'], 'safe'],
         ];
     }
-    public function scenarios()
-    {
+    public function scenarios() {
         return Model::scenarios();
     }
-    public function search($params)
-    {
-        $query = StaffAhli::find()->cache(self::cachetime(), self::settagdep('tag_staffahli'));
+    public function search($params, $where) {
+        $query = StaffAhli::find()->cache(self::cachetime(), self::settagdep('tag_staffahli'))->where($where);
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
+            'query' => $query, 'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
         ]);
         $this->load($params);
         if (!$this->validate()) {
             return $dataProvider;
         }
+        $query->joinWith('vendor p');
         $query->andFilterWhere([
             'id' => $this->id,
             'penyedia_id' => $this->penyedia_id,

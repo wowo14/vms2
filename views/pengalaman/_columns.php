@@ -1,5 +1,9 @@
 <?php
+
+use kartik\grid\GridView;
 use yii\helpers\Url;
+
+
 return [
     [
         'class' => 'kartik\grid\CheckboxColumn',
@@ -12,10 +16,18 @@ return [
     [
         'class' => '\kartik\grid\DataColumn',
         'attribute' => 'penyedia_id',
+        'value' => 'vendor.nama_perusahaan',
+        'filterType' => GridView::FILTER_SELECT2,
+        'filter' => \app\models\Penyedia::collectAll(['active' => 1])->pluck('nama_perusahaan', 'id')->toArray(),
+        'filterWidgetOptions' => [
+            'pluginOptions' => ['allowClear' => true],
+        ],
+        'filterInputOptions' => ['placeholder' => 'Pilih penyedia'],
     ],
     [
         'class' => '\kartik\grid\DataColumn',
         'attribute' => 'paket_pengadaan_id',
+        'value' => 'paketnya.nama_paket'
     ],
     [
         'class' => '\kartik\grid\DataColumn',

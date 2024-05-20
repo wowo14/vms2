@@ -16,9 +16,9 @@ class PeralatanKerjaSearch extends Peralatankerja{
     {
         return Model::scenarios();
     }
-    public function search($params)
+    public function search($params,$where=null)
     {
-        $query = Peralatankerja::find()->cache(self::cachetime(), self::settagdep('tag_peralatankerja'));
+        $query = Peralatankerja::find()->cache(self::cachetime(), self::settagdep('tag_peralatankerja'))->where($where);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
         ]);

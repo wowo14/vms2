@@ -1,15 +1,15 @@
 <?php
+
 namespace app\models;
+
 use Yii;
-class PengalamanPenyedia extends \yii\db\ActiveRecord
-{
+
+class PengalamanPenyedia extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'pengalaman_penyedia';
     }
-    public function rules()
-    {
+    public function rules() {
         return [
             [['penyedia_id', 'pekerjaan', 'lokasi', 'instansi_pemberi_tugas', 'alamat_instansi', 'tanggal_kontrak'], 'required'],
             [['penyedia_id', 'created_by', 'updated_by'], 'integer'],
@@ -18,8 +18,7 @@ class PengalamanPenyedia extends \yii\db\ActiveRecord
             [['paket_pengadaan_id', 'link', 'pekerjaan', 'lokasi', 'instansi_pemberi_tugas', 'alamat_instansi'], 'string', 'max' => 255],
         ];
     }
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'id' => 'ID',
             'penyedia_id' => 'Penyedia ID',
@@ -38,6 +37,9 @@ class PengalamanPenyedia extends \yii\db\ActiveRecord
             'nilai_kontrak' => 'Nilai Kontrak',
             'file' => 'File',
         ];
+    }
+    public function getPaketnya() {
+        return $this->hasOne(PaketPengadaan::class, ['id' => 'paket_pengadaan_id'])->cache(self::cachetime(), self::settagdep('tag_paketpengadaan'));
     }
     public function autoDeleteFile() {
         $filePath = Yii::getAlias('@uploads') . $this->file;

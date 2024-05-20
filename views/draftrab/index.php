@@ -23,7 +23,7 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
                     Html::a(
                         '<i class="fa fa-plane"></i>',
                         ['draftrab/rekap'],
-                        ['data-target' => '#' . $model->hash, 'role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'data-target' => '#modaltahun', 'title' => 'Rekap Draft', 'class' => 'btn btn-default']
+                        ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'data-target' => '#modaltahun', 'title' => 'Rekap Draft', 'class' => 'btn btn-default']
                     ) .
                         Html::a(
                             '<i class="fa fa-plus"></i>',

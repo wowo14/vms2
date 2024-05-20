@@ -1,10 +1,12 @@
 <?php
+
 use app\assets\AppAsset;
 use kartik\date\DatePicker;
 use kartik\select2\Select2;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\{ArrayHelper, Html};
 use yii\web\View;
+
 AppAsset::register($this);
 $paket = ArrayHelper::map($model->allpaketpengadaan, 'id', 'nomornamapaket');
 $penyedia = ArrayHelper::map($model->vendors, 'id', 'nama_perusahaan');
@@ -46,7 +48,7 @@ jQuery(function ($) {
         ],
     ]) ?>
     <?= $form->field($model, 'masa_berlaku')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'nilai_penawaran')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'nilai_penawaran')->textInput(['maxlength' => true, 'type' => 'number']) ?>
     <?= $form->field($model, 'lampiran_penawaran')->hiddenInput(['id' => 'lampiran_penawaran'])->label(false) ?>
     <div class="form-group ">
         <div class="row">
