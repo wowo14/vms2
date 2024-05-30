@@ -1,8 +1,11 @@
 <?php
+
 namespace app\models;
+
 use Yii;
 use yii\caching\TagDependency;
 use yii\helpers\{ArrayHelper, BaseStringHelper, HtmlPurifier};
+
 trait GeneralModelsTrait {
     public static function settingType($type) {
         return Setting::type($type);
@@ -53,6 +56,22 @@ trait GeneralModelsTrait {
                 fn ($el) => $el['id'] == $this->kota
             )->pluck('name', 'id')->toArray();
         }
+    }
+    public function getKabupaten() {
+        if ($this->hasAttribute('propinsi') && $this->hasAttribute('kota')) {
+            return ($this->getRegionName('kabupaten', $this->kota, $this->propinsi)) ?? '';
+        }
+    }
+    public function getPropinsi() {
+        if ($this->hasAttribute('propinsi')) {
+            return ($this->getRegionName('propinsi', $this->propinsi)) ?? '';
+        }
+    }
+    public function getRegionName($type, $code, $parentCode = null) {
+        $data = Yii::$app->regions->getData($type, $parentCode);
+        return collect($data)->filter(
+            fn ($el) => $el['id'] == $code
+        )->pluck('name')->first(); //name
     }
     public function getIncompanygrouporadmin() { // boolean
         if ($this->getIsVendor()) {
@@ -199,7 +218,7 @@ trait GeneralModelsTrait {
         return md5($class);
     }
     public function range($d, $type) { //filter condition date between
-        if($d!==null){
+        if ($d !== null) {
             $dates = explode(' - ', $d); //return array
             if ((bool) strtotime($dates[0]) && (bool) strtotime($dates[1])) {
                 return $type == 's' ? $dates[0] . ' 00:00:00' : $dates[1] . ' 23:59:59';

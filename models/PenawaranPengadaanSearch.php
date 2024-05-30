@@ -35,11 +35,13 @@ class PenawaranPengadaanSearch extends PenawaranPengadaan{
             'created_at' => $this->created_at,
             'updated_by' => $this->updated_by,
             'updated_at' => $this->updated_at,
+            'penyedia_id' => $this->penyedia_id,
+            'paket_id' => $this->paket_id,
         ]);
         $query->andFilterWhere(['like', 'nomor', $this->nomor])
             ->andFilterWhere(['like', 'kode', $this->kode])
-            ->andFilterWhere(['like', new Expression('pp.nomor || pp.nama_paket'),$this->paket_id])
-            ->andFilterWhere(['like', 'p.nama_perusahaan', $this->penyedia_id])
+            // ->andFilterWhere(['like', new Expression('pp.nomor || pp.nama_paket'),$this->paket_id])
+            // ->andFilterWhere(['like', 'p.nama_perusahaan', $this->penyedia_id])
             ->andFilterWhere(['like', 'ip_client', $this->ip_client])
             ->andFilterWhere(['like', 'masa_berlaku', $this->masa_berlaku])
             ->andFilterWhere(['like', 'lampiran_penawaran', $this->lampiran_penawaran])

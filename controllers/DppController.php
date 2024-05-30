@@ -1,7 +1,5 @@
 <?php
-
 namespace app\controllers;
-
 use app\models\{ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails, PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia};
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -9,7 +7,6 @@ use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\web\BadRequestHttpException;
 use yii\web\{Response, NotFoundHttpException};
-
 class DppController extends Controller {
     private $_pageSize = 1;
     public function behaviors() {

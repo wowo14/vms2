@@ -30,12 +30,15 @@ class ValidasiKualifikasiPenyediaSearch extends ValidasiKualifikasiPenyedia {
         $query->andFilterWhere([
             'id' => $this->id,
             'is_active' => $this->is_active,
+            'penyedia_id' => $this->penyedia_id,
+            'paket_pengadaan_id' => $this->paket_pengadaan_id,
             'created_by' => $this->created_by,
             'updated_by' => $this->updated_by,
         ]);
-        $query->andFilterWhere(['like', new Expression('pp.nomor || pp.nama_paket'), $this->paket_pengadaan_id])
+        $query
+            // ->andFilterWhere(['like', new Expression('pp.nomor || pp.nama_paket'), $this->paket_pengadaan_id])
             ->andFilterWhere(['between', 'pp.tanggal_paket', $this->range($this->tgl_paket, 's'), $this->range($this->tgl_paket, 'e')])
-            ->andFilterWhere(['like', new Expression('p.nama_perusahaan'), $this->penyedia_id])
+            // ->andFilterWhere(['like', new Expression('p.nama_perusahaan'), $this->penyedia_id])
             ->andFilterWhere(['like', 'keperluan', $this->keperluan])
             ->andFilterWhere(['like', 'created_at', $this->created_at])
             ->andFilterWhere(['like', 'updated_at', $this->updated_at]);

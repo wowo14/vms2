@@ -1,6 +1,9 @@
 <?php
+
+use kartik\grid\GridView;
 use yii\helpers\Html;
 use yii\helpers\Url;
+
 return [
     [
         'class' => 'kartik\grid\CheckboxColumn',
@@ -13,12 +16,24 @@ return [
     [
         'class' => '\kartik\grid\DataColumn',
         'attribute' => 'paket_id',
-        'value' => fn ($d) => $d->paketPengadaan->nomornamapaket ?? ''
+        'value' => 'paketPengadaan.nomornamapaket',
+        'filterType' => GridView::FILTER_SELECT2,
+        'filter' => \app\models\PaketPengadaan::collectAll()->pluck('nama_paket', 'id')->toArray(),
+        'filterWidgetOptions' => [
+            'pluginOptions' => ['allowClear' => true],
+        ],
+        'filterInputOptions' => ['placeholder' => 'Pilih Paket'],
     ],
     [
         'class' => '\kartik\grid\DataColumn',
         'attribute' => 'penyedia_id',
-        'value' => fn ($d) => $d->vendor->nama_perusahaan ?? ''
+        'value' => 'vendor.nama_perusahaan',
+        'filterType' => GridView::FILTER_SELECT2,
+        'filter' => \app\models\Penyedia::collectAll(['active' => 1])->pluck('nama_perusahaan', 'id')->toArray(),
+        'filterWidgetOptions' => [
+            'pluginOptions' => ['allowClear' => true],
+        ],
+        'filterInputOptions' => ['placeholder' => 'Pilih penyedia'],
     ],
     [
         'class' => '\kartik\grid\DataColumn',

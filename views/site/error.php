@@ -1,7 +1,6 @@
-<?php/* @var $this yii\web\View */
-/* @var $name string */
-/* @var $message string */
-/* @var $exception Exception */use yii\helpers\Html;$this->title = $name;
+<?php
+use yii\helpers\Html;
+$this->title = $name;
 $this->params['breadcrumbs'] = [['label' => $this->title]];
 ?>
 <div class="error-page">

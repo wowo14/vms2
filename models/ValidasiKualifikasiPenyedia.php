@@ -30,6 +30,9 @@ class ValidasiKualifikasiPenyedia extends \yii\db\ActiveRecord {
             'updated_by' => 'Updated By',
         ];
     }
+    public function getDistkeperluan(){
+        return self::where(['is_active' => 1])->select('keperluan')->orderBy('keperluan')->distinct()->all();
+    }
     public function beforeSave($insert) {
         if ($insert) {
             $this->created_by = Yii::$app->user->identity->id;

@@ -31,7 +31,6 @@ use yii\bootstrap4\{Collapse, Tabs, Modal};
                 [
                     'label' => 'Evaluasi',
                     'content' =>$this->render('//validasikualifikasipenyedia/validasikualifikasipenyedia', [
-                        // 'templates'=> TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->all(),
                         'model' => PenawaranPengadaan::collectAll(['paket_id' => $model->paket_id]),
                     ]),
                     'options' => ['id' => 'evaluasi' . $model->hash],
@@ -40,9 +39,6 @@ use yii\bootstrap4\{Collapse, Tabs, Modal};
                     'label' => 'Pemenang',
                     'content' =>$this->render('//dpp/_pemenang', [
                         'model'=>$this->context->actionListpemenang(['paket_pengadaan_id' => $model->paket_id]),
-                        // 'searchModel' => $a,
-                        // 'dataProvider' => $a->search(Yii::$app->request->queryParams, ['penyedia_id' => $model->id]),
-                        // 'params' => $model->hashid($model->id), //penyedia_id
                     ]),
                     'options' => ['id' => 'pemenang' . $model->hash],
                 ],

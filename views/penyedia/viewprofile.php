@@ -29,7 +29,7 @@ use yii\widgets\Pjax;
                         'tanggal_pendirian',
                         'kategori_usaha',
                         'akreditasi',
-                        'active',
+                        'active:boolean',
                     ],
                 ]);
                 ?>

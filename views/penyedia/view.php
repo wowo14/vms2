@@ -5,7 +5,6 @@ use yii\widgets\DetailView;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
             'npwp:ntext',
             'nama_perusahaan:ntext',
             'alamat_perusahaan:ntext',
@@ -14,13 +13,13 @@ use yii\widgets\DetailView;
             'tanggal_pendirian:ntext',
             'kategori_usaha:ntext',
             'akreditasi:ntext',
-            'active',
+            'active:boolean',
             'propinsi:ntext',
             'kota:ntext',
             'kode_pos:ntext',
             'mobile_phone:ntext',
             'website:ntext',
-            'is_cabang',
+            'is_cabang:boolean',
             'alamat_kantorpusat:ntext',
             'telepon_kantorpusat:ntext',
             'fax_kantorpusat:ntext',
