@@ -2,8 +2,6 @@
 use app\models\PenawaranPengadaan;
 use yii\bootstrap4\{Collapse, Tabs, Modal};
 ?>
-<?php
-?>
 <div class="row">
     <div class="col-md-12">
         <?php

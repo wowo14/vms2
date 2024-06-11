@@ -404,23 +404,24 @@ class ValidasikualifikasipenyediaController extends Controller {
             throw new NotFoundHttpException('The requested page or id does not exist.');
         }
     }
-    public function actionViewvalidasipenyedia($id) {
+    public function actionViewvalidasipenyedia($id,$paket_id) {
         $templates = TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->all();
-        $kualifikasi = ValidasiKualifikasiPenyedia::findAll(['penyedia_id' => $id]);
+        $kualifikasi = ValidasiKualifikasiPenyedia::findAll(['penyedia_id' => $id,'paket_pengadaan_id'=>$paket_id]);
         if (!$kualifikasi) {
             throw new NotFoundHttpException('Petugas Belom Memvalidasi Kualifikasi Penyedia');
         }
-        $penawaran = PenawaranPengadaan::collectAll(['penyedia_id' => $id]);
+        $penawaran = PenawaranPengadaan::collectAll(['penyedia_id' => $id,'paket_id'=>$paket_id]);
         if (!$penawaran) {
             throw new NotFoundHttpException('Petugas Belom memasukkan Dokumen Penawaran Penyedia');
         }
         $tabs = collect($templates)->map(function ($e) use ($kualifikasi) {
+            $filteredModels=[];
             foreach ($kualifikasi as $k) {
                 if ($k->template == $e->id) {
                     $filteredModels[] = $k;
                 }
             }
-            $content = '';
+            $content = ''; $rr=[];
             if (!empty($filteredModels)) {
                 $rr = json_decode($filteredModels[0]->details[0]->hasil, true);
                 $count = $total = 0;
@@ -448,7 +449,7 @@ class ValidasikualifikasipenyediaController extends Controller {
             } else {
                 $content .= 'Alasan Tidak Lulus <br> Persyaratan Tidak Lengkap';
             }
-            if ($e->jenis_evaluasi == 'Kesimpulan') {
+            if ($e->jenis_evaluasi == 'Kesimpulan' && !empty($rr)) {
                 $col = array_keys($rr[0]);
                 $index = array_search('sesuai', $col);
                 if ($index !== false) {
