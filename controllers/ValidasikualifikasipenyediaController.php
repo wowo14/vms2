@@ -17,6 +17,23 @@ class ValidasikualifikasipenyediaController extends Controller {
             ],
         ];
     }
+    public function actionDetail() {
+        if (isset($_POST['expandRowKey'])) {
+            $model = ValidasiKualifikasiPenyedia::find()->cache(false)->where(['id' =>$_POST['expandRowKey']])->one();
+            $rr = json_decode($model->details[0]->hasil, true);
+            $content='';
+            $col = array_keys($rr[0]);
+                    $content .= \yii\grid\GridView::widget([
+                        'dataProvider' => new \yii\data\ArrayDataProvider([
+                            'allModels' => $rr
+                        ]),
+                        'columns' => $col
+                    ]);
+            echo $content;
+        } else {
+            return '<div class="alert alert-danger">No data found</div>';
+        }
+    }
     public function actionIndex() {
         $searchModel = new ValidasiKualifikasiPenyediaSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);

@@ -12,6 +12,14 @@ return [
         'width' => '30px',
     ],
     [
+        'class' => '\kartik\grid\ExpandRowColumn',
+        'value' => function ($model, $key, $index, $column) {
+            return GridView::ROW_COLLAPSED;
+        },
+        'detailUrl' => Url::to(['/validasikualifikasipenyedia/detail']),
+        'hiddenFromExport' => true
+    ],
+    [
         'class' => '\kartik\grid\DataColumn',
         'attribute' => 'penyedia_id',
         'value' => 'vendor.nama_perusahaan',
