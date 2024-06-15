@@ -2,15 +2,13 @@
 use app\assets\AppAsset;
 use kartik\grid\GridView;
 use mdm\admin\components\Helper;
-use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
-use yii2ajaxcrud\ajaxcrud\CrudAsset;
+use yii2ajaxcrud\ajaxcrud\{CrudAsset,BulkButtonWidget};
 use yii\bootstrap4\Modal;
-use yii\helpers\Html;
-use yii\helpers\Url;$idmodal = $searchModel->hash;$this->title = 'Paket Pengadaan';
+use yii\helpers\{Html,Url};
+$idmodal = $searchModel->hash;$this->title = 'Paket Pengadaan';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
 AppAsset::register($this);
-$this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\BootstrapPluginAsset']);
 ?>
 <div class="paket-pengadaan-index">
     <div id="ajaxCrudDatatable">
@@ -20,6 +18,12 @@ $this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\Bootstr
             'filterModel' => $searchModel,
             'pjax' => true,
             'columns' => require(__DIR__ . '/_columns.php'),
+            'rowOptions' => function ($model) {
+                // $model->statuspengadaan; die;
+                if ($model->alasan_reject) {
+                    return ['class' => 'bg-orange'];
+                }
+            },
             'toolbar' => [
                 [
                     'content' =>

@@ -7,9 +7,9 @@ use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii\bootstrap4\Modal;
 use yii\helpers\Html;
-use yii\helpers\Url;$idmodal = $searchModel->hash;AppAsset::register($this);
+use yii\helpers\Url;
+$idmodal = $searchModel->hash;AppAsset::register($this);
 CrudAsset::register($this);
-$this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\BootstrapPluginAsset']);
 $this->title = 'Dpp';
 $this->params['breadcrumbs'][] = $this->title;
 ?>

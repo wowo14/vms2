@@ -7,7 +7,7 @@ use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;$idmodal = $searchModel->hash;$this->title = 'Staff Ahli';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
-$this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\BootstrapPluginAsset']);
+
 ?>
 <div class="staff-ahli-index">
     <div id="ajaxCrudDatatable">

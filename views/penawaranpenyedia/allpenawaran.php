@@ -5,7 +5,7 @@ use yii2ajaxcrud\ajaxcrud\CrudAsset;
 $this->title = 'Penawaran Pengadaan';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
-$this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\BootstrapPluginAsset']);
+
 ?>
 <div class="penawaran-pengadaan-index">
     <div id="ajaxCrudDatatable">

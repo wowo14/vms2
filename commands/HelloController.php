@@ -6,7 +6,9 @@ use app\models\Sertipikat;
 use app\models\TemplateChecklistEvaluasi;
 use app\models\TemplateChecklistEvaluasiDetail;
 use app\models\ValidasiKualifikasiPenyedia;
+use app\models\PenawaranPengadaan;
 use app\models\ValidasiKualifikasiPenyediaDetail;
+use app\Controllers\DppController;
 use Yii;
 use yii\console\Controller;
 class HelloController extends Controller {
@@ -26,19 +28,28 @@ class HelloController extends Controller {
     }
     public function actionIndex() {
         echo "\n";
-        $hasil = [];
-        $collect = TemplateChecklistEvaluasi::findOne(1);
-        $ar_element = explode(',', $collect->element);
-        foreach (json_decode($collect->detail->uraian, true) as $v) {
-            $c = ['uraian' => $v['uraian']];
-            foreach ($ar_element as $element) {
-                if ($element) {
-                    $c[$element] = '';
-                }
-            }
-            $hasil[] = $c;
-        }
-        print_r($hasil);
+        $params=['paket_pengadaan_id' => 1];
+        $tmp = TemplateChecklistEvaluasi::where(['template' => 'Ceklist_Evaluasi_Kesimpulan'])->one();
+        $lolos = ValidasiKualifikasiPenyedia::find()->joinWith('detail')
+            ->where(['template' => $tmp->id, 'paket_pengadaan_id' => $params['paket_pengadaan_id']])->asArray()->all();
+        $filtered = collect($lolos)->where('detail.hasil', '[{"uraian":"Catatan Oleh Pejabat Pengadaan","komentar":"Lolos Administrasi Validasi Dokumen","sesuai":""}]');
+        $mapPenawaran = $filtered->map(function ($e) {
+            return PenawaranPengadaan::where(['paket_id' => $e['paket_pengadaan_id'], 'penyedia_id' => $e['penyedia_id']])->one();
+        })->sortBy('nilai_penawaran')->values()->all();// nilai penawaran terendah
+        print_r($mapPenawaran);
+        // $hasil = [];
+        // $collect = TemplateChecklistEvaluasi::findOne(1);
+        // $ar_element = explode(',', $collect->element);
+        // foreach (json_decode($collect->detail->uraian, true) as $v) {
+        //     $c = ['uraian' => $v['uraian']];
+        //     foreach ($ar_element as $element) {
+        //         if ($element) {
+        //             $c[$element] = '';
+        //         }
+        //     }
+        //     $hasil[] = $c;
+        // }
+        // print_r($hasil);
     }
     public function actionSeed() {
     }

@@ -4,10 +4,10 @@ use yii\helpers\Html;
 use yii\bootstrap4\Modal;
 use kartik\grid\GridView;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
-use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;$idmodal = $searchModel->hash;$this->title = 'Draft Usulans';
+use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
+$idmodal = $searchModel->hash;$this->title = 'Draft Usulans';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
-$this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\BootstrapPluginAsset']);
 ?>
 <div class="draft-usulan-index">
     <div id="ajaxCrudDatatable">

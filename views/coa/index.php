@@ -4,11 +4,11 @@ use yii\helpers\Html;
 use yii\bootstrap4\Modal;
 use kartik\grid\GridView;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
-use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;$idmodal = $searchModel->hash;
+use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
+$idmodal = $searchModel->hash;
 $this->title = 'Kode Rekening';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
-$this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\BootstrapPluginAsset']);
 ?>
 <div class="kode-rekening-index">
     <div id="ajaxCrudDatatable">

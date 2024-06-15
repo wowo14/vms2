@@ -4,6 +4,7 @@ use Yii;
 class PaketPengadaan extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
     public $oldrecord;
+    public $statusPengadaan;
     public static function tableName() {
         return 'paket_pengadaan';
     }
@@ -35,6 +36,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             'approval_by' => 'Approval By', //null->belom,ditolak oleh ,<>0->diterima oleh
             'alasan_reject' => 'Alasan Reject', //not null ditolak
             'tanggal_reject' => 'Tanggal Reject', //not null ditolak
+            'pemenang'=>'Pemenang', // id vendor pemenang
         ];
     }
     public function getListpaketoutstanding() {

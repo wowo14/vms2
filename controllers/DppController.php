@@ -20,6 +20,13 @@ class DppController extends Controller {
             ],
         ];
     }
+    public function actionPemenang($idvendor,$idpaket){// id vendor
+        $model = Dpp::where(['paket_id'=>$idpaket])->one();
+        $model->paketpengadaan->pemenang=$idvendor;
+        $model->paketpengadaan->save();
+        Yii::$app->session->setFlash('success', 'Pemenang berhasil diterapkan');
+        return $this->goBack(Yii::$app->request->referrer ?: ['//dpp/index']);
+    }
     public function actionDetailpaket() {
         if (isset($_POST['expandRowKey'])) {
             $model = $this->findModel($_POST['expandRowKey']);
@@ -49,14 +56,13 @@ class DppController extends Controller {
         ]);
     }
     public function actionListpemenang($params) { //[paket_pengadaan_id]
-        // Yii::$app->response->format = Response::FORMAT_JSON;
         $tmp = TemplateChecklistEvaluasi::where(['template' => 'Ceklist_Evaluasi_Kesimpulan'])->one();
         $lolos = ValidasiKualifikasiPenyedia::find()->joinWith('detail')
             ->where(['template' => $tmp->id, 'paket_pengadaan_id' => $params['paket_pengadaan_id']])->asArray()->all();
         $filtered = collect($lolos)->where('detail.hasil', '[{"uraian":"Catatan Oleh Pejabat Pengadaan","komentar":"Lolos Administrasi Validasi Dokumen","sesuai":""}]');
         $mapPenawaran = $filtered->map(function ($e) {
             return PenawaranPengadaan::where(['paket_id' => $e['paket_pengadaan_id'], 'penyedia_id' => $e['penyedia_id']])->one();
-        })->sortBy('nilai_penawaran')->values()->all();
+        })->sortBy('nilai_penawaran')->values()->all();// nilai penawaran terendah
         return $mapPenawaran;
     }
     public function actionView($id) {

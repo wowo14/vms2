@@ -9,7 +9,7 @@ $idmodal = $searchModel->hash;
 $this->title = 'Pengalaman Penyedia';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
-$this->registerJsFile('js/popper.min.js', ['depends' => '\yii\bootstrap4\BootstrapPluginAsset']);
+
 ?>
 <div class="pengalaman-penyedia-index">
     <div id="ajaxCrudDatatable">

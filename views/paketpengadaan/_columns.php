@@ -59,6 +59,11 @@ return [
         'noWrap' => 'true',
         'template' => '{lampiran} {kirimulang} {view} {update} {delete}',
         'vAlign' => 'middle',
+        'visibleButtons'=>[
+            'delete'=>function($model){
+                return !$model->alasan_reject ;//|| $model->statuspengadaan;
+            }
+        ],
         'urlCreator' => function ($action, $model, $key, $index) {
             return Url::to([$action, 'id' => $key]);
         },
@@ -74,7 +79,7 @@ return [
                     'title' => Yii::t('yii2-ajaxcrud', 'Kirim Ulang DPP'),
                     'data-pjax' => '0', 'class' => 'btn btn-sm btn-outline-warning'
                 ]) : '';
-            }
+            },
         ],
         'viewOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success'],
         'updateOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Update'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-primary'],
