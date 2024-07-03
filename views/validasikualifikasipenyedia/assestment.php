@@ -28,6 +28,10 @@ foreach (array_keys($aa) as $item) {
         'type' => 'textArea'
     ];
 }
+$rr=collect($rr)->map(function($el){
+    $el['sesuai'] = $el['sesuai'] == 'ya' ? '1' : '0';
+    return $el;
+})->toArray();
 if ($model->jenisevaluasi->jenis_evaluasi == 'Kesimpulan') {
     $key = array_search('sesuai', array_column($col, 'name'));
     if ($key !== false) {
@@ -43,6 +47,7 @@ if ($model->jenisevaluasi->jenis_evaluasi == 'Kesimpulan') {
     <?php $form = ActiveForm::begin([
         'id' => 'review-form-dpp',
         'enableAjaxValidation' => false,
+        'action'=>'/validasikualifikasipenyedia/assestment?id='.$model->id,
         'fieldConfig' => [
             'template' => "<div class='row'>{label}\n<div class='col-sm-12'>{input}\n{error}</div></div>",
             'labelOptions' => ['class' => 'col-sm-3 col-md-3 control-label text-sm-left text-md-right'],

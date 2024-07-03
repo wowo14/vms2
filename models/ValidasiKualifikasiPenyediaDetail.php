@@ -50,7 +50,7 @@ class ValidasiKualifikasiPenyediaDetail extends \yii\db\ActiveRecord {
             })->count();
             $total= collect($raw)->count();
             self::updateAll(['total_sesuai' => $count,'total_element'=>$total], ['header_id' => $header_id]);
-            Yii::error(json_encode('hitungTotalSesuai total_sesuai=' . $count . ',total_element=' . $total . ', header=' . $header_id));
+            // Yii::error(json_encode('hitungTotalSesuai total_sesuai=' . $count . ',total_element=' . $total . ', header=' . $header_id));
         }
     }
 }

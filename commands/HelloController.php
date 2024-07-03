@@ -3,6 +3,7 @@ namespace app\commands;
 use app\models\PaketPengadaan;
 use app\models\PaketPengadaanDetails;
 use app\models\Sertipikat;
+use app\models\Dpp;
 use app\models\TemplateChecklistEvaluasi;
 use app\models\TemplateChecklistEvaluasiDetail;
 use app\models\ValidasiKualifikasiPenyedia;
@@ -34,9 +35,11 @@ class HelloController extends Controller {
             ->where(['template' => $tmp->id, 'paket_pengadaan_id' => $params['paket_pengadaan_id']])->asArray()->all();
         $filtered = collect($lolos)->where('detail.hasil', '[{"uraian":"Catatan Oleh Pejabat Pengadaan","komentar":"Lolos Administrasi Validasi Dokumen","sesuai":""}]');
         $mapPenawaran = $filtered->map(function ($e) {
+        //     return Dpp::where(['paket_id'=>$e['paket_pengadaan_id']])->one();
             return PenawaranPengadaan::where(['paket_id' => $e['paket_pengadaan_id'], 'penyedia_id' => $e['penyedia_id']])->one();
-        })->sortBy('nilai_penawaran')->values()->all();// nilai penawaran terendah
+        })->sortBy('nilai_penawaran')->first();//->values()->all();// nilai penawaran terendah
         print_r($mapPenawaran);
+        // print_r($filtered); *ops23Tms#
         // $hasil = [];
         // $collect = TemplateChecklistEvaluasi::findOne(1);
         // $ar_element = explode(',', $collect->element);

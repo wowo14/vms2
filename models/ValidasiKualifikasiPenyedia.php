@@ -89,4 +89,5 @@ class ValidasiKualifikasiPenyedia extends \yii\db\ActiveRecord {
             return $result;
         }
     }
+    
 }

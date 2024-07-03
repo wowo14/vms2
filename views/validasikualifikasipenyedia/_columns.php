@@ -79,6 +79,17 @@ return [
         'urlCreator' => function ($action, $model, $key, $index) {
             return Url::to(['validasikualifikasipenyedia/' . $action, 'id' => $key]);
         },
+        'visibleButtons'=>[
+            'assestment'=>function($d){
+                return !$d->paketpengadaan->pemenang;
+            },
+            'delete'=>function($d){
+                return !$d->paketpengadaan->pemenang;
+            },
+            'update'=>function($d){
+                return !$d->paketpengadaan->pemenang;
+            },
+        ],
         'buttons' => [
             'assestment' => function ($url, $model) {
                 return Html::a('<span class="fa fa-plus"></span>', $url, [

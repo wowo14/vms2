@@ -60,9 +60,12 @@ return [
         'template' => '{lampiran} {kirimulang} {view} {update} {delete}',
         'vAlign' => 'middle',
         'visibleButtons'=>[
-            'delete'=>function($model){
-                return !$model->alasan_reject ;//|| $model->statuspengadaan;
-            }
+            'delete'=>function($d){
+                return !$d->paketpengadaan->pemenang || !$d->alasan_reject;
+            },
+            'update'=>function($d){
+                return !$d->paketpengadaan->pemenang;
+            },
         ],
         'urlCreator' => function ($action, $model, $key, $index) {
             return Url::to([$action, 'id' => $key]);

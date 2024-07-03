@@ -19,7 +19,6 @@ AppAsset::register($this);
             'pjax' => true,
             'columns' => require(__DIR__ . '/_columns.php'),
             'rowOptions' => function ($model) {
-                // $model->statuspengadaan; die;
                 if ($model->alasan_reject) {
                     return ['class' => 'bg-orange'];
                 }

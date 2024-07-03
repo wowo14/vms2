@@ -81,6 +81,17 @@ return [
         'urlCreator' => function ($action, $model, $key, $index) {
             return Url::to([$action, 'id' => $key]);
         },
+        'visibleButtons'=>[
+            'delete'=>function($d){
+                return !$d->paketpengadaan->pemenang;
+            },
+            'update'=>function($d){
+                return !$d->paketpengadaan->pemenang;
+            },
+            'reject'=>function($d){
+                return !$d->paketpengadaan->pemenang;
+            }
+        ],
         'buttons' => [
             'approve' => function ($url, $model, $key) {
                 return Html::a(

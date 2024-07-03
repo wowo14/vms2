@@ -145,10 +145,15 @@ class ValidasikualifikasipenyediaController extends Controller {
     //     ->where(['is_active' => 1, 'template' => $tmp->id])
     //     ->orderBy('nilai_penawaran')->all();
     // }
-    public function actionAssestment($id) {
+    public function actionAssestment($id,$partial=null) {
         $request = Yii::$app->request;
         $model = ValidasiKualifikasiPenyedia::find()->cache(false)->where(['id' => $id])->one();
         if ($request->isGet) {
+            if($partial){
+                return $this->renderPartial('assestment', [
+                    'model' => $model
+                ]);
+            }
             return $this->render('assestment', [
                 'model' => $model
             ]);
@@ -174,6 +179,7 @@ class ValidasikualifikasipenyediaController extends Controller {
                 }
                 return $e;
             });
+            // Yii::error('edit ppost '.json_encode($pure));
             ValidasiKualifikasiPenyediaDetail::updateAll([
                 'hasil' => json_encode($pure),
             ], ['header_id' => $id]);
@@ -193,7 +199,11 @@ class ValidasikualifikasipenyediaController extends Controller {
                 'paket_pengadaan_id' => $model->paket_pengadaan_id
             ]));
             Yii::$app->session->setFlash('success', 'Data Assestment Berhasil disimpan');
-            return $this->redirect('index');
+            return $this->redirect(Yii::$app->request->referrer);
+            // if($partial){
+            // }else{
+            //     return $this->redirect('index');
+            // }
         }
     }
     public function actionView($id) {
@@ -337,6 +347,12 @@ class ValidasikualifikasipenyediaController extends Controller {
                     $detail->header_id = $model->id;
                     $detail->hasil = json_encode($hasil);
                     $detail->save(false);
+                    //hitung ulang
+                    ValidasiKualifikasiPenyediaDetail::hitungTotalSesuai($model->id);
+                    $this->actionGeneratekesimpulan($this->hashurl([
+                        'vendor_id' => $model->penyedia_id,
+                        'paket_pengadaan_id' => $model->paket_pengadaan_id
+                    ]));
                 }
                 return [
                     'forceReload' => '#crud-datatable-pjax',
@@ -381,6 +397,12 @@ class ValidasikualifikasipenyediaController extends Controller {
                     $detail->header_id = $model->id;
                     $detail->hasil = json_encode($hasil);
                     $detail->save(false);
+                    //hitung ulang
+                    ValidasiKualifikasiPenyediaDetail::hitungTotalSesuai($model->id);
+                    $this->actionGeneratekesimpulan($this->hashurl([
+                        'vendor_id' => $model->penyedia_id,
+                        'paket_pengadaan_id' => $model->paket_pengadaan_id
+                    ]));
                 }
                 return $this->redirect(['view', 'id' => $model->id]);
             } else {
@@ -441,6 +463,10 @@ class ValidasikualifikasipenyediaController extends Controller {
             $content = ''; $rr=[];
             if (!empty($filteredModels)) {
                 $rr = json_decode($filteredModels[0]->details[0]->hasil, true);
+                // $rr=collect($rr)->map(function($el){
+                //     $el['sesuai'] = $el['sesuai'] == 'ya' ? '1' : '0';
+                //     return $el;
+                // })->toArray();
                 $count = $total = 0;
                 foreach ($rr as $c) {
                     if (array_key_exists('sesuai', $c)) {
@@ -453,12 +479,17 @@ class ValidasikualifikasipenyediaController extends Controller {
                     }
                 }
                 if ($total <> $count) {
-                    $content .= 'Alasan Tidak Lulus <br> Persyaratan Tidak Lengkap';
+                    // $content .= 'Alasan Tidak Lulus <br> Persyaratan Tidak Lengkap';
+                    $content=$this->actionAssestment($filteredModels[0]->id,$partial=1);
                 } else {
                     $col = array_keys($rr[0]);
                     $content .= \yii\grid\GridView::widget([
                         'dataProvider' => new \yii\data\ArrayDataProvider([
-                            'allModels' => $rr
+                            'allModels' => $rr,
+                            // 'allModels' => collect($rr)->map(function($el){
+                            //                 $el['sesuai'] = $el['sesuai'] == 'ya' ? '1' : '0';
+                            //                 return $el;
+                            //             })->toArray()
                         ]),
                         'columns' => $col
                     ]);
