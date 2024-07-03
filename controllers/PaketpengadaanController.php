@@ -38,6 +38,10 @@ class PaketpengadaanController extends Controller {
     public function actionLampiran($id) {
         $request = Yii::$app->request;
         $model = $this->findModel($id);
+        if($model->pemenang){
+            Yii::$app->session->setFlash('warning', 'Pemenang sudah ditentukan');
+            return $this->redirect(['index']);
+        }
         if ($request->isGet) {
             return $this->render('lampiran', ['model' => $model]);
         }
@@ -206,19 +210,21 @@ class PaketpengadaanController extends Controller {
     }
     public function actionView($id) {
         $request = Yii::$app->request;
+        $model = $this->findModel($id);
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return [
                 'title' => "PaketPengadaan #" . $id,
                 'content' => $this->renderAjax('view', [
-                    'model' => $model = $this->findModel($id),
+                    'model' => $model,
                 ]),
                 'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                    Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote'])
+                ($model->pemenang?'':
+                Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote']))
             ];
         } else {
             return $this->render('view', [
-                'model' => $model = $this->findModel($id),
+                'model' => $model,
             ]);
         }
     }
@@ -273,6 +279,10 @@ class PaketpengadaanController extends Controller {
     public function actionUpdate($id) {
         $request = Yii::$app->request;
         $model = $this->findModel($id);
+        if($model->pemenang){
+            Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
+            return $this->redirect('index');
+        }
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             if ($request->isGet) {
@@ -322,8 +332,13 @@ class PaketpengadaanController extends Controller {
     }
     public function actionDelete($id) {
         $request = Yii::$app->request;
-        $this->findModel($id)->unlinkAll('details', true);
-        $this->findModel($id)->delete();
+        $model=$this->findModel($id);
+        if($model->pemenang){
+                Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
+                return $this->redirect('index');
+            }
+        $model->unlinkAll('details', true);
+        $model->delete();
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return ['forceClose' => true, 'forceReload' => '#crud-datatable-pjax'];
@@ -336,6 +351,10 @@ class PaketpengadaanController extends Controller {
         $pks = explode(',', $request->post('pks'));
         foreach ($pks as $pk) {
             $model = $this->findModel($pk);
+            if($model->pemenang){
+                Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada pemenang');
+                return $this->redirect('index');
+            }
             $model->unlinkAll('details', true);
             $model->delete();
         }

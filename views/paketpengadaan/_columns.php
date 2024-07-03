@@ -61,10 +61,13 @@ return [
         'vAlign' => 'middle',
         'visibleButtons'=>[
             'delete'=>function($d){
-                return !$d->paketpengadaan->pemenang || !$d->alasan_reject;
+                return !$d->pemenang ;// || !$d->alasan_reject;
             },
             'update'=>function($d){
-                return !$d->paketpengadaan->pemenang;
+                return !$d->pemenang;
+            },
+            'lampiran'=>function($d){
+                return !$d->pemenang;
             },
         ],
         'urlCreator' => function ($action, $model, $key, $index) {

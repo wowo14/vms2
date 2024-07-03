@@ -90,6 +90,9 @@ return [
             },
             'reject'=>function($d){
                 return !$d->paketpengadaan->pemenang;
+            },
+            'formreview'=>function($d){
+                return !$d->paketpengadaan->pemenang;
             }
         ],
         'buttons' => [

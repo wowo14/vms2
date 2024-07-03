@@ -85,6 +85,14 @@ return [
                 return Html::a('<i class="fa fa-trash"></i>', $url, $options);
             }
         ],
+        'visibleButtons'=>[
+            'update'=>function($d){
+                return !$d->paketPengadaan->pemenang;
+            },
+            'delete'=>function($d){
+                return !$d->paketPengadaan->pemenang;
+            },
+        ],
         'viewOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success'],
         'updateOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Update'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-primary'],
         'deleteOptions' => [

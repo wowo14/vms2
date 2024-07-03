@@ -67,19 +67,22 @@ class DppController extends Controller {
     }
     public function actionView($id) {
         $request = Yii::$app->request;
+        $model = $this->findModel($id);
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return [
                 'title' => "Dpp #" . $id,
                 'content' => $this->renderAjax('view', [
-                    'model' => $model = $this->findModel($id),
+                    'model' => $model,
                 ]),
                 'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                    Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote'])
+                ( $model->paketpengadaan->pemenang?'':
+                Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote'])
+                )
             ];
         } else {
             return $this->render('view', [
-                'model' => $model = $this->findModel($id),
+                'model' => $model,
             ]);
         }
     }
@@ -286,6 +289,10 @@ class DppController extends Controller {
     public function actionUpdate($id) {
         $request = Yii::$app->request;
         $model = $this->findModel($id);
+        if($model->paketpengadaan->pemenang){
+            Yii::$app->session->setFlash('warning', 'Pemenang sudah ditentukan');
+            return $this->goBack(Yii::$app->request->referrer ?: ['//dpp/index']);
+        }
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             if ($request->isGet) {
