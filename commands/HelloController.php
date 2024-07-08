@@ -13,6 +13,64 @@ use app\Controllers\DppController;
 use Yii;
 use yii\console\Controller;
 class HelloController extends Controller {
+    public function actionGen1($id,$paket_id) {
+        $templates = TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->all();
+        $kualifikasi = ValidasiKualifikasiPenyedia::findAll(['penyedia_id' => $id,'paket_pengadaan_id'=>$paket_id]);
+        if (!$kualifikasi) {
+            // throw new NotFoundHttpException('Petugas Belom Memvalidasi Kualifikasi Penyedia');
+            //auto generate dokumen kualifikasi
+            /*
+            Ceklist_Evaluasi_Administrasi
+            Ceklist_Evaluasi_Kesimpulan
+            Ceklist_Evaluasi_Negosiasi
+            Ceklist_Evaluasi_Penawaran
+            Ceklist_Evaluasi_Teknis
+            */
+            foreach($templates as $tmp){
+                if($tmp->jenis_evaluasi!=='Kesimpulan'){
+                    $params=[
+                        'penyedia_id'=>$id,
+                        'paket_pengadaan_id'=>$paket_id,
+                        'keperluan'=>$tmp->jenis_evaluasi,
+                        'template'=>$tmp->id,
+                        'is_active'=>1,
+                    ];
+                    $model=new ValidasiKualifikasiPenyedia();
+                    $model->attributes=$params;
+                    $model->save();
+                    if ($tmp->id) {
+                        $hasil = [];
+                        $collect = $tmp;
+                        if ($collect->element) {
+                            $ar_element = explode(',', $collect->element);
+                        }
+                        foreach (json_decode($collect->detail->uraian, true) as $v) {
+                            $c = ['uraian' => $v['uraian']];
+                            if ($collect->element) {
+                                foreach ($ar_element as $element) {
+                                    if ($element) {
+                                        $c[$element] = '';
+                                    }
+                                }
+                            }
+                            $hasil[] = $c;
+                        }
+                        $detail = new ValidasiKualifikasiPenyediaDetail();
+                        $detail->header_id = $model->id;
+                        $detail->hasil = json_encode($hasil);
+                        $detail->save(false);
+                    }
+                }
+            }
+            // print_r($params);
+            // print_r($templates);
+            $this->actionGeneratekesimpulan($this->hashurl([
+                'vendor_id' => $id,
+                'paket_pengadaan_id' => $paket_id
+            ]));
+            print_r('auto generate dokumen kualifikasi');
+        }
+    }
     public function actionHitung() { // hitung pada paket pengadaan mana?
         $r = ValidasiKualifikasiPenyedia::getCalculated(1);
         $r = collect($r)->where('penyedia_id', 1)->where('paket_pengadaan_id', 1)->first();

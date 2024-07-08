@@ -53,7 +53,7 @@ class ValidasikualifikasipenyediaController extends Controller {
         $ar_difference = array_diff($arTemplate, $ar1);
         return !empty($ar_difference) ? false : true;
     }
-    public function actionGeneratekesimpulan($params) { //hashurl ['vendor_id'=>1, 'paket_pengadaan_id'=>1,'callback'=>'callbackkesimpulan']
+    public function actionGeneratekesimpulan($params,$callback=null) { //hashurl ['vendor_id'=>1, 'paket_pengadaan_id'=>1,'callback'=>'callbackkesimpulan']
         $params = $this->decodeurl($params);
         if (!$params->vendor_id || !$params->paket_pengadaan_id) {
             throw new NotFoundHttpException('Params vendor_id or paket_pengadaan_id is not found');
@@ -134,7 +134,10 @@ class ValidasikualifikasipenyediaController extends Controller {
                 }
             }
         }
-        return $this->redirect(['index']);
+        // return $this->redirect(['index']);
+        if(!$callback){
+            return $this->redirect(Yii::$app->request->referrer);
+        }
     }
     // public function actionListPemenang() {
     //     //Lolos Administrasi Validasi Dokumen order by nilai_penawaran
@@ -197,7 +200,7 @@ class ValidasikualifikasipenyediaController extends Controller {
             $this->actionGeneratekesimpulan($this->hashurl([
                 'vendor_id' => $model->penyedia_id,
                 'paket_pengadaan_id' => $model->paket_pengadaan_id
-            ]));
+            ]),$callback=true);
             Yii::$app->session->setFlash('success', 'Data Assestment Berhasil disimpan');
             return $this->redirect(Yii::$app->request->referrer);
             // if($partial){
@@ -352,7 +355,7 @@ class ValidasikualifikasipenyediaController extends Controller {
                     $this->actionGeneratekesimpulan($this->hashurl([
                         'vendor_id' => $model->penyedia_id,
                         'paket_pengadaan_id' => $model->paket_pengadaan_id
-                    ]));
+                    ]),$callback=true);
                 }
                 return [
                     'forceReload' => '#crud-datatable-pjax',
@@ -402,7 +405,7 @@ class ValidasikualifikasipenyediaController extends Controller {
                     $this->actionGeneratekesimpulan($this->hashurl([
                         'vendor_id' => $model->penyedia_id,
                         'paket_pengadaan_id' => $model->paket_pengadaan_id
-                    ]));
+                    ]),$callback=true);
                 }
                 return $this->redirect(['view', 'id' => $model->id]);
             } else {
@@ -447,7 +450,51 @@ class ValidasikualifikasipenyediaController extends Controller {
         $templates = TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->all();
         $kualifikasi = ValidasiKualifikasiPenyedia::findAll(['penyedia_id' => $id,'paket_pengadaan_id'=>$paket_id]);
         if (!$kualifikasi) {
-            throw new NotFoundHttpException('Petugas Belom Memvalidasi Kualifikasi Penyedia');
+            // throw new NotFoundHttpException('Petugas Belom Memvalidasi Kualifikasi Penyedia');
+            //auto generate dokumen kualifikasi
+            /*
+            Ceklist_Evaluasi_Administrasi || Ceklist_Evaluasi_Kesimpulan || Ceklist_Evaluasi_Negosiasi || Ceklist_Evaluasi_Penawaran || Ceklist_Evaluasi_Teknis
+            */
+            foreach($templates as $tmp){
+                if($tmp->jenis_evaluasi!=='Kesimpulan'){
+                    $params=[
+                        'penyedia_id'=>$id,
+                        'paket_pengadaan_id'=>$paket_id,
+                        'keperluan'=>$tmp->jenis_evaluasi,
+                        'template'=>$tmp->id,
+                        'is_active'=>1,
+                    ];
+                    $model=new ValidasiKualifikasiPenyedia();
+                    $model->attributes=$params;
+                    $model->save();
+                    if ($model->template) { // auto generate details
+                        $hasil = [];
+                        $collect = $tmp;
+                        if ($collect->element) {
+                            $ar_element = explode(',', $collect->element);
+                        }
+                        foreach (json_decode($collect->detail->uraian, true) as $v) {
+                            $c = ['uraian' => $v['uraian']];
+                            if ($collect->element) {
+                                foreach ($ar_element as $element) {
+                                    if ($element) {
+                                        $c[$element] = '';
+                                    }
+                                }
+                            }
+                            $hasil[] = $c;
+                        }
+                        $detail = new ValidasiKualifikasiPenyediaDetail();
+                        $detail->header_id = $model->id;
+                        $detail->hasil = json_encode($hasil);
+                        $detail->save(false);
+                    }
+                }
+            }
+            $this->actionGeneratekesimpulan($this->hashurl([ //auto generate kesimpulan
+                'vendor_id' => $id,
+                'paket_pengadaan_id' => $paket_id
+            ]),$callback=true);
         }
         $penawaran = PenawaranPengadaan::collectAll(['penyedia_id' => $id,'paket_id'=>$paket_id]);
         if (!$penawaran) {
