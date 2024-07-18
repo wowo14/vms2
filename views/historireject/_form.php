@@ -11,6 +11,11 @@ $js=<<<JS
 jQuery(function ($) {
     setupImagePreview($("#imageInput"), $("#imagePreview"), $("#file_tanggapan"));
 });
+function autogenerates(el){
+    console.log(el);
+    $('#historireject-nomor').val();
+
+}
 JS;
 $this->registerJs($js, \yii\web\View::POS_END);
 ?>
@@ -31,7 +36,7 @@ $this->registerJs($js, \yii\web\View::POS_END);
         'pluginEvents' => [
             "change" => "function(){
                         var el=$(this);
-                        console.log(this);
+                        autogenerates(el);
                     }",
         ],
     ]) ?>

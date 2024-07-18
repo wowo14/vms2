@@ -1,17 +1,18 @@
 <?php
 namespace app\commands;
+use app\Controllers\DppController;
+use app\models\Dpp;
 use app\models\PaketPengadaan;
 use app\models\PaketPengadaanDetails;
+use app\models\PenawaranPengadaan;
 use app\models\Sertipikat;
-use app\models\Dpp;
 use app\models\TemplateChecklistEvaluasi;
 use app\models\TemplateChecklistEvaluasiDetail;
 use app\models\ValidasiKualifikasiPenyedia;
-use app\models\PenawaranPengadaan;
 use app\models\ValidasiKualifikasiPenyediaDetail;
-use app\Controllers\DppController;
 use Yii;
 use yii\console\Controller;
+
 class HelloController extends Controller {
     public function actionGen1($id,$paket_id) {
         $templates = TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->all();
@@ -87,6 +88,8 @@ class HelloController extends Controller {
     }
     public function actionIndex() {
         echo "\n";
+        Yii::error('hello world');
+        die;
         $params=['paket_pengadaan_id' => 1];
         $tmp = TemplateChecklistEvaluasi::where(['template' => 'Ceklist_Evaluasi_Kesimpulan'])->one();
         $lolos = ValidasiKualifikasiPenyedia::find()->joinWith('detail')

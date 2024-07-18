@@ -49,15 +49,10 @@ return [
         ],
         'log' => [
             'targets' => [
-                [
+                  [
                     'class' => 'yii\log\FileTarget',
-                    'levels' => [
-                        // 'info',
-                        // 'trace',
-                        // 'profile',
-                        'error',
-                        // 'warning'
-                    ],
+                    'levels' => ['error', 'warning'],
+                    'logVars' => ['_GET', '_POST', '_FILES', '_SESSION'], // Exclude $_SERVER
                 ],
             ],
         ],

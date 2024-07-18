@@ -1,10 +1,12 @@
 <?php
 namespace app\controllers;
 use app\models\{LoginForm, ContactForm};
+use app\widgets\ImageConverter;
 use Yii;
 use yii\filters\{AccessControl, VerbFilter};
 use yii\helpers\{Url, Html, ArrayHelper, Json};
 use yii\web\{ Response};
+
 class SiteController extends Controller
 {
     public function behaviors()
@@ -91,6 +93,16 @@ class SiteController extends Controller
         return $this->render('login', [
             'model' => $model,
         ]);
+    }
+    public function actionConvertImages()
+    {
+        $sourceDir = Yii::getAlias('@app/web/uploads');
+        $targetDir = Yii::getAlias('@app/web/uploads/avif');
+
+        $converter = new ImageConverter();
+        $converter->convertImagesToAvif($sourceDir, $targetDir);
+
+        return 'Images have been converted to AVIF format.';
     }
     public function actionLogout()
     {
