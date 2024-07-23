@@ -1,6 +1,6 @@
 <?php
 namespace app\controllers;
-use app\models\{ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails, PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia};
+use app\models\{HistoriReject,ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails, PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia};
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
@@ -132,21 +132,30 @@ class DppController extends Controller {
     }
     public function actionReject($id) {
         $request = Yii::$app->request;
+        $paket = $this->findModel($id)->paketpengadaan;
         if ($request->isGet) {
-            $paket = $this->findModel($id)->paketpengadaan;
             return $this->render('_frm_reject', ['model' => $paket]);
         } elseif ($request->isPost) {
-            $model = $this->findModel($id)->paketpengadaan;
-            if ($model->load($request->post())) {
-                if ($model->tanggal_reject && $model->alasan_reject) {
-                    $model->save();
+            //update paketpengadaan
+            if($paket->load($request->post())){
+                $paket->save();
+                Dpp::invalidatecache('tag_' . Dpp::getModelname());
+                $paket::invalidatecache('tag_' . $paket::getModelname());
+            }
+            //update historireject
+            $data=$_POST['PaketPengadaan'];
+            $data['paket_id']=$data['id'];
+            unset($data['id']);
+            $historyreject= HistoriReject::where(['paket_id' =>$data['paket_id']])->one()??new HistoriReject();
+                $historyreject->attributes=$data;
+                if ($historyreject->tanggal_reject && $historyreject->alasan_reject) {
+                    $historyreject->save();
                     Dpp::invalidatecache('tag_' . Dpp::getModelname());
-                    $model::invalidatecache('tag_' . $model::getModelname());
+                    $historyreject::invalidatecache('tag_' . $historyreject::getModelname());
                 } else {
-                    throw new BadRequestHttpException('Data Tidak Lengkap');
+                    throw new BadRequestHttpException('Data Tidak Lurat');
                 }
                 return $this->redirect(['index']);
-            }
         }
     }
     public function actionApprove($id) {

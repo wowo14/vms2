@@ -37,4 +37,14 @@ class HistoriReject extends \yii\db\ActiveRecord
     public function getPaketpengadaan(){
         return $this->hasOne(PaketPengadaan::class, ['id' => 'paket_id'])->cache(self::cachetime(), self::settagdep('tag_paketpengadaan'));
     }
+    public function beforeSave($insert) {
+        if (parent::beforeSave($insert)) {
+            if ($this->isNewRecord) {
+                $this->created_at = date('Y-m-d H:i:s');
+                $this->user_id= \Yii::$app->user->identity->id;
+            }
+            return true;
+        }
+        return false;
+    }
 }

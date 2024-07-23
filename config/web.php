@@ -99,13 +99,8 @@ $config = [
             'targets' => [
                 [
                     'class' => 'yii\log\FileTarget',
-                    'levels' => [
-                        // 'info',
-                        // 'trace',
-                        // 'profile',
-                        'error',
-                        // 'warning'
-                    ],
+                    'levels' => ['error', 'warning'],
+                    'logVars' => ['_GET', '_POST', '_FILES', '_SESSION'],
                 ],
             ],
         ],
@@ -184,16 +179,16 @@ if (YII_DEBUG) {
         'class' => 'yii\debug\Module',
         'allowedIPs' => ['127.0.0.1', '::1'],
     ];
-    $config['modules']['gii'] = [
-        'class' => 'yii\gii\Module',
-        'generators' => [ // here
-            'crud' => [ // generator name
-                'class' => 'yii\gii\generators\crud\Generator', // generator class
-                'templates' => [ // setting for our templates
-                    'yii2-adminlte3' => '@vendor/hail812/yii2-adminlte3/src/gii/generators/crud/default' // template name => path to template
-                ]
-            ]
-        ]
-    ];
+    // $config['modules']['gii'] = [
+    //     'class' => 'yii\gii\Module',
+    //     'generators' => [ // here
+    //         'crud' => [ // generator name
+    //             'class' => 'yii\gii\generators\crud\Generator', // generator class
+    //             'templates' => [ // setting for our templates
+    //                 'yii2-adminlte3' => '@vendor/hail812/yii2-adminlte3/src/gii/generators/crud/default' // template name => path to template
+    //             ]
+    //         ]
+    //     ]
+    // ];
 }
 return $config;

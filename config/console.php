@@ -52,7 +52,7 @@ return [
                   [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
-                    'logVars' => ['_GET', '_POST', '_FILES', '_SESSION'], // Exclude $_SERVER
+                    'logVars' => ['_GET', '_POST', '_FILES', '_SESSION'],
                 ],
             ],
         ],

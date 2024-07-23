@@ -12,18 +12,53 @@ return [
         [
         'class'=>'\kartik\grid\DataColumn',
         'attribute'=>'paket_id',
-    ],
-    [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'nomor',
-    ],
-    [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'nama_paket',
+        'value'=>'paketpengadaan.nomornamapaket',
     ],
     [
         'class'=>'\kartik\grid\DataColumn',
         'attribute'=>'alasan_reject',
+    ],
+    [
+        'class' => '\kartik\grid\DataColumn',
+        'attribute' => 'tanggal_reject',
+        'filterType' => \kartik\grid\GridView::FILTER_DATE_RANGE,
+        'filterWidgetOptions' => ([
+            'attribute' => 'only_date',
+            'presetDropdown' => true,
+            'convertFormat' => false,
+            'pluginOptions' => [
+                'separator' => ' - ',
+                'format' => 'YYYY-MM-DD',
+                'locale' => [
+                    'format' => 'YYYY-MM-DD'
+                ],
+            ],
+        ]),
+    ],
+    [
+        'class'=>'\kartik\grid\DataColumn',
+        'attribute'=>'kesimpulan',
+    ],
+    [
+        'class' => '\kartik\grid\DataColumn',
+        'attribute' => 'tanggal_dikembalikan',
+        'filterType' => \kartik\grid\GridView::FILTER_DATE_RANGE,
+        'filterWidgetOptions' => ([
+            'attribute' => 'only_date',
+            'presetDropdown' => true,
+            'convertFormat' => false,
+            'pluginOptions' => [
+                'separator' => ' - ',
+                'format' => 'YYYY-MM-DD',
+                'locale' => [
+                    'format' => 'YYYY-MM-DD'
+                ],
+            ],
+        ]),
+    ],
+    [
+        'class'=>'\kartik\grid\DataColumn',
+        'attribute'=>'tanggapan_ppk',
     ],
     [
         'class' => 'kartik\grid\ActionColumn',
@@ -34,9 +69,9 @@ return [
         'urlCreator' => function($action, $model, $key, $index) {
                 return Url::to([$action,'id'=>$key]);
         },
-        'viewOptions' => ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success'],
-        'updateOptions' => ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Update'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-primary'],
-        'deleteOptions' => ['role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Delete'), 'class' => 'btn btn-sm btn-outline-danger',
+        'viewOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success'],
+        'updateOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal,'title' => Yii::t('yii2-ajaxcrud', 'Update'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-primary'],
+        'deleteOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal,'title' => Yii::t('yii2-ajaxcrud', 'Delete'), 'class' => 'btn btn-sm btn-outline-danger',
             'data-confirm' => false,
             'data-method' => false,// for overide yii data api
             'data-request-method' => 'post',

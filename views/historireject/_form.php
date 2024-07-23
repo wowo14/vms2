@@ -2,7 +2,7 @@
 use app\assets\AppAsset;
 use app\models\PaketPengadaan;
 use app\widgets\FilePreview;
-use kartik\date\DatePicker;
+use kartik\datetime\DateTimePicker;
 use kartik\select2\Select2;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\Html;
@@ -14,7 +14,6 @@ jQuery(function ($) {
 function autogenerates(el){
     console.log(el);
     $('#historireject-nomor').val();
-
 }
 JS;
 $this->registerJs($js, \yii\web\View::POS_END);
@@ -43,21 +42,21 @@ $this->registerJs($js, \yii\web\View::POS_END);
       <?= $form->field($model, 'nomor')->textInput(['maxlength' => true]) ?>
       <?= $form->field($model, 'nama_paket')->textInput(['maxlength' => true]) ?>
       <?= $form->field($model, 'alasan_reject')->textarea(['rows' => 2]) ?>
-      <?= $form->field($model, 'tanggal_reject')->widget(DatePicker::class, [
-                    'pluginOptions' => [
-                        'format' => 'yyyy-mm-dd',
-                        'todayHighlight' => true,
-                        'autoclose' => true
-                    ],
-                ]) ?>
+      <?= $form->field($model, 'tanggal_reject')->widget(DateTimePicker::class, [
+        'pluginOptions' => [
+            'format' => 'yyyy-mm-dd hh:ii:ss',
+            'todayHighlight' => true,
+            'autoclose' => true
+        ],
+    ]) ?>
       <?= $form->field($model, 'kesimpulan')->textarea(['rows' => 2]) ?>
-      <?= $form->field($model, 'tanggal_dikembalikan')->widget(DatePicker::class, [
-                    'pluginOptions' => [
-                        'format' => 'yyyy-mm-dd',
-                        'todayHighlight' => true,
-                        'autoclose' => true
-                    ],
-                ]) ?>
+      <?= $form->field($model, 'tanggal_dikembalikan')->widget(DateTimePicker::class, [
+        'pluginOptions' => [
+            'format' => 'yyyy-mm-dd hh:ii:ss',
+            'todayHighlight' => true,
+            'autoclose' => true
+        ],
+    ]) ?>
       <?= $form->field($model, 'tanggapan_ppk')->textarea(['rows' => 2]) ?>
       <?= $form->field($model, 'file_tanggapan')->hiddenInput(['id' => 'file_tanggapan'])->label(false) ?>
         <div class="form-group ">

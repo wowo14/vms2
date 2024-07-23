@@ -1,15 +1,16 @@
 <?php
 namespace app\models;
+use app\models\HistoriReject;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\HistoriReject;
+use yii\db\Expression;
 class HistoriRejectSearch extends HistoriReject{
     public function rules()
     {
         return [
-            [['id', 'paket_id', 'user_id', 'created_at'], 'integer'],
-            [['nomor', 'nama_paket', 'alasan_reject', 'tanggal_reject', 'kesimpulan', 'tanggal_dikembalikan', 'tanggapan_ppk', 'file_tanggapan'], 'safe'],
+            [['id',  'user_id', 'created_at'], 'integer'],
+            [['nomor', 'paket_id','nama_paket', 'alasan_reject', 'tanggal_reject', 'kesimpulan', 'tanggal_dikembalikan', 'tanggapan_ppk', 'file_tanggapan'], 'safe'],
         ];
     }
     public function scenarios()
@@ -31,17 +32,19 @@ class HistoriRejectSearch extends HistoriReject{
         if (!$this->validate()) {
             return $dataProvider;
         }
-        $query->joinWith(['paketpengadaan p']);
+        $query->joinWith(['paketpengadaan pp']);
         $query->andFilterWhere([
             'id' => $this->id,
-            'paket_id' => $this->paket_id,
+            // 'paket_id' => $this->paket_id,
             'user_id' => $this->user_id,
-            'tanggal_reject' => $this->tanggal_reject,
-            'tanggal_dikembalikan' => $this->tanggal_dikembalikan,
+            // 'tanggal_reject' => $this->tanggal_reject,
+            // 'tanggal_dikembalikan' => $this->tanggal_dikembalikan,
             'created_at' => $this->created_at,
         ]);
-
         $query->andFilterWhere(['like', 'nomor', $this->nomor])
+            ->andFilterWhere(['like', new Expression('pp.nomor || pp.nama_paket'),$this->paket_id])
+            ->andFilterWhere(['between', 'histori_reject.tanggal_reject', ($this->range($this->tanggal_reject, 's')), ($this->range($this->tanggal_reject, 'e'))])
+            ->andFilterWhere(['between', 'histori_reject.tanggal_dikembalikan', ($this->range($this->tanggal_dikembalikan, 's')), ($this->range($this->tanggal_dikembalikan, 'e'))])
             ->andFilterWhere(['like', 'nama_paket', $this->nama_paket])
             ->andFilterWhere(['like', 'alasan_reject', $this->alasan_reject])
             ->andFilterWhere(['like', 'kesimpulan', $this->kesimpulan])

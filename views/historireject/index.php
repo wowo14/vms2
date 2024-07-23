@@ -1,10 +1,8 @@
 <?php
-use yii\helpers\Url;
-use yii\helpers\Html;
+use yii\helpers\{Url,Html};
 use yii\bootstrap4\Modal;
 use kartik\grid\GridView;
-use yii2ajaxcrud\ajaxcrud\CrudAsset;
-use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
+use yii2ajaxcrud\ajaxcrud\{CrudAsset,BulkButtonWidget};
 $this->title = 'Histori Reject';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);

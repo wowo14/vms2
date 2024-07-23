@@ -18,7 +18,7 @@ class FilePreview extends Widget {
             echo "<div id=\"$containerId\" width=\"100%\" height=\"600\"></div>";
             $jsScript = $this->generatePdfViewerScript($file, $containerId); // Pass container ID
             $view->registerJs($jsScript, \yii\web\View::POS_END);
-        } elseif (in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
+        } elseif (in_array($extension, ['jpg', 'jpeg', 'png', 'gif','avif','webp'])) {
             echo Html::a(
                 Html::img(Url::to([$file]), array_merge(['width' => '100%', 'height' => 'auto'], $this->options)),
                 Url::to($file),
