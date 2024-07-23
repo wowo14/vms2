@@ -7,6 +7,12 @@ use kartik\select2\Select2;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\Html;
 AppAsset::register($this);
+$referrer = Yii::$app->request->referrer;
+if (strpos($referrer, 'paketpengadaan') !== false) { //disable edit from paketpengadaan
+    $isactive=true;
+} else {
+    $isactive=false;
+}
 $js=<<<JS
 jQuery(function ($) {
     setupImagePreview($("#imageInput"), $("#imagePreview"), $("#file_tanggapan"));
@@ -29,6 +35,7 @@ $this->registerJs($js, \yii\web\View::POS_END);
     ]); ?>
      <?= $form->field($model, 'paket_id')->widget(Select2::class, [
         'data' => PaketPengadaan::collectAll(['approval_by' => null,'pemenang'=>null])->pluck('nomornamapaket', 'id')->toArray(),
+        'disabled'=>$isactive,
         'options' => [
             'placeholder' => 'Pilih Paket...',
         ],
@@ -39,15 +46,16 @@ $this->registerJs($js, \yii\web\View::POS_END);
                     }",
         ],
     ]) ?>
-      <?= $form->field($model, 'nomor')->textInput(['maxlength' => true]) ?>
-      <?= $form->field($model, 'nama_paket')->textInput(['maxlength' => true]) ?>
-      <?= $form->field($model, 'alasan_reject')->textarea(['rows' => 2]) ?>
+      <?= $form->field($model, 'nomor')->textInput(['maxlength' => true,'disabled'=>$isactive]) ?>
+      <?= $form->field($model, 'nama_paket')->textInput(['maxlength' => true,'disabled'=>$isactive]) ?>
+      <?= $form->field($model, 'alasan_reject')->textarea(['rows' => 2,'disabled'=>$isactive]) ?>
       <?= $form->field($model, 'tanggal_reject')->widget(DateTimePicker::class, [
         'pluginOptions' => [
             'format' => 'yyyy-mm-dd hh:ii:ss',
             'todayHighlight' => true,
             'autoclose' => true
         ],
+        'disabled'=>$isactive
     ]) ?>
       <?= $form->field($model, 'kesimpulan')->textarea(['rows' => 2]) ?>
       <?= $form->field($model, 'tanggal_dikembalikan')->widget(DateTimePicker::class, [
@@ -56,6 +64,7 @@ $this->registerJs($js, \yii\web\View::POS_END);
             'todayHighlight' => true,
             'autoclose' => true
         ],
+        // 'disabled'=>$isactive
     ]) ?>
       <?= $form->field($model, 'tanggapan_ppk')->textarea(['rows' => 2]) ?>
       <?= $form->field($model, 'file_tanggapan')->hiddenInput(['id' => 'file_tanggapan'])->label(false) ?>
@@ -68,6 +77,7 @@ $this->registerJs($js, \yii\web\View::POS_END);
                 </div>
             </div>
         </div>
+        <div class="col-md-5">
         <?php echo $model->file_tanggapan ? Html::a(
             FilePreview::widget([
                 'model' => $model,
@@ -77,6 +87,7 @@ $this->registerJs($js, \yii\web\View::POS_END);
             ['target' => '_blank']
         ) : '';
         ?>
+        </div>
     <?php if (!Yii::$app->request->isAjax){ ?>
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

@@ -15,12 +15,12 @@ class FilePreview extends Widget {
         $extension = pathinfo($file, PATHINFO_EXTENSION);
         if ($extension === 'pdf') {
             $containerId = md5($this->model->{$this->attribute}); // Generate unique container ID
-            echo "<div id=\"$containerId\" width=\"100%\" height=\"600\"></div>";
+            echo "<div id=\"$containerId\" style=\"width:100%\" height=\"600\"></div>";
             $jsScript = $this->generatePdfViewerScript($file, $containerId); // Pass container ID
             $view->registerJs($jsScript, \yii\web\View::POS_END);
         } elseif (in_array($extension, ['jpg', 'jpeg', 'png', 'gif','avif','webp'])) {
             echo Html::a(
-                Html::img(Url::to([$file]), array_merge(['width' => '100%', 'height' => 'auto'], $this->options)),
+                Html::img(Url::to([$file]), array_merge(['width' => '100%', 'height' => 'auto','class'=>'img-fluid'], $this->options)),
                 Url::to($file),
                 ['target' => '_blank']
             );
@@ -31,18 +31,20 @@ class FilePreview extends Widget {
     private function generatePdfViewerScript($file, $containerId) {
         $pdfFile = Url::to([$file], true);
         return <<<JS
-        const pdfFile{$containerId} = "{$pdfFile}";
-        const pdfViewer{$containerId} = document.getElementById("$containerId");
-        const initialPage{$containerId} = 1;
-        const loadingTask{$containerId}= pdfjsLib.getDocument(pdfFile{$containerId});
+        var pdfFile{$containerId} = "{$pdfFile}";
+        var pdfViewer{$containerId} = document.getElementById("$containerId");
+        var initialPage{$containerId} = 1;
+        var loadingTask{$containerId}= pdfjsLib.getDocument(pdfFile{$containerId});
         loadingTask{$containerId}.promise.then(function(pdf) {
                 pdf.getPage(initialPage{$containerId}).then(function(page) {
-                    var scale = 0.55;
+                    var scale = 1;
                     var viewport = page.getViewport({ scale: scale });
                     var canvas = document.createElement("canvas");
                     var context = canvas.getContext("2d");
                     canvas.height = viewport.height;
                     canvas.width = viewport.width;
+                    // set canvas style = width:inherit
+                    canvas.style = "width:inherit";
                     pdfViewer{$containerId}.appendChild(canvas);
                     page.render({ canvasContext: context, viewport: viewport });
                 });

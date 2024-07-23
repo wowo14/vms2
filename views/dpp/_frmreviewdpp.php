@@ -4,14 +4,18 @@ use app\widgets\FilePreview;
 use kartik\date\DatePicker;
 use kartik\switchinput\SwitchInput;
 use unclead\multipleinput\MultipleInput;
-// use Yii;
 use unclead\multipleinput\MultipleInputColumn;
+use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii\bootstrap4\ActiveForm;
+use yii\bootstrap4\Modal;
 use yii\helpers\Html;
 use yii\web\View;
+$idmodal='modal-reviewdpp';
+CrudAsset::register($this);
 AppAsset::register($this);
 $this->registerJs('
 jQuery(function ($) {
+    $(".list-cell__button").hide();
     setupImagePreview($("#imageInput"), $("#imagePreview"), $("#file_tanggapan"));
 });', View::POS_END);
 ?>
@@ -107,6 +111,21 @@ jQuery(function ($) {
     ])->label(false); ?>
     Review Oleh Pejabat Pengadaan:<br>
     <?= $form->field($reviews, 'keterangan') ?>
+    <div class="form-group row">
+    <div class="col-sm-3">&nbsp;</div>
+    <div class="col-sm-9">
+        <?php
+        if($model->paketpengadaan->historireject){
+            echo Html::a('History Reject', [
+                '/historireject/showbypaket',
+                'id' => $model->paketpengadaan->id], [
+                    'role' => 'modal-remote',
+                    'data-target' => '#' . $idmodal,
+                    'data-pjax'=>1,'data-toggle' => 'tooltip',
+                    'class' => 'btn btn-danger']);
+        }
+        ?>
+    </div></div>
     Kesimpulan :<br>
     <?= $form->field($reviews, 'kesimpulan') ?>
     <?= $form->field($reviews, 'tgl_dikembalikan')->widget(DatePicker::class, [
@@ -128,6 +147,7 @@ jQuery(function ($) {
             </div>
         </div>
     </div>
+    <div class="col-md-4">
     <?php echo $reviews->file_tanggapan ? Html::a(
         FilePreview::widget([
             'model' => $reviews,
@@ -137,6 +157,7 @@ jQuery(function ($) {
         ['target' => '_blank']
     ) : '';
     ?>
+    </div>
     <?php if (!Yii::$app->request->isAjax) { ?>
         <div class="form-group">
             <?= Html::submitButton('Submit', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
@@ -144,3 +165,16 @@ jQuery(function ($) {
     <?php } ?>
     <?php ActiveForm::end(); ?>
 </div>
+<?php Modal::begin([
+    "id" => $idmodal, "size" => "modal-xl",
+    "footer" => "",
+    "clientOptions" => [
+        "tabindex" => false,
+        "backdrop" => "static",
+        "keyboard" => true,
+    ],
+    "options" => [
+        "tabindex" => true
+    ]
+]) ?>
+<?php Modal::end(); ?>

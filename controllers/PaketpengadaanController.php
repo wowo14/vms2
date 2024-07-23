@@ -270,11 +270,19 @@ class PaketpengadaanController extends Controller {
     }
     public function actionKirimulang($id) {
         $model = $this->findModel($id);
-        $model->alasan_reject = '';
-        $model->tanggal_reject = '';
-        $model->save();
-        Yii::$app->session->setFlash('success', 'PaketPengadaan Berhasil Dikirim -> DPP');
-        return $this->redirect('index');
+        if (Yii::$app->request->isGet) {
+            return $this->render('/historireject/update', ['model' => $model->historireject,]);
+        }
+        if (Yii::$app->request->isPost) {
+            $histori=$model->historireject;
+            $histori->load(Yii::$app->request->post());
+            $histori->save();
+            $model->alasan_reject = '';
+            $model->tanggal_reject = '';
+            $model->save();
+            Yii::$app->session->setFlash('success', 'PaketPengadaan Berhasil Dikirim -> DPP');
+            return $this->redirect('index');
+        }
     }
     public function actionUpdate($id) {
         $request = Yii::$app->request;

@@ -30,6 +30,22 @@ class HistorirejectController extends Controller
             'dataProvider' => $dataProvider,
         ]);
     }
+    public function actionShowbypaket($id){
+        $model=Historireject::where(['paket_id' => $id])->asArray()->all();
+        $request = Yii::$app->request;
+        if($request->isAjax){
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return [
+                'title' => "HistoriReject #".$id,
+                'content' =>$this->renderAjax('_tblhistori', ['model' => $model]),
+                'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal'])
+            ];
+        }else{
+            return $this->render('_tblhistori', [
+                'model' => $model
+            ]);
+        }
+    }
     public function actionView($id)
     {
         $request = Yii::$app->request;
@@ -54,7 +70,6 @@ class HistorirejectController extends Controller
         $request = Yii::$app->request;
         $model = new HistoriReject();
         if($request->isAjax){
-
             Yii::$app->response->format = Response::FORMAT_JSON;
             if($request->isGet){
                 return [
@@ -84,7 +99,6 @@ class HistorirejectController extends Controller
                 ];
             }
         }else{
-
             if ($model->load($request->post()) && $model->save()){
                 return $this->redirect(['view', 'id' => $model->id]);
             }else{

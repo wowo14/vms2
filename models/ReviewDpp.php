@@ -32,6 +32,16 @@ class ReviewDpp extends \yii\db\ActiveRecord {
             'updated_by' => 'Updated By',
         ];
     }
+    public function autoDeleteFile() {
+        $filePath = Yii::getAlias('@uploads') . $this->file_tanggapan;
+        if (file_exists($filePath) && !empty($this->file_tanggapan)) {
+            unlink($filePath);
+        }
+    }
+    public function init() {
+        parent::init();
+        $this->on(self::EVENT_AFTER_DELETE, [$this, 'autoDeleteFile']);
+    }
     public function beforeSave($insert) {
         if ($insert) {
             $this->created_by = Yii::$app->user->identity->id;

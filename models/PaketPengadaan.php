@@ -91,4 +91,10 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     public function getRekeningnya() {
         return $this->hasOne(KodeRekening::class, ['kode' => 'kode_rekening'])->cache(self::cachetime(), self::settagdep('tag_koderekening'));
     }
+    public function getHistorireject(){
+        return $this->hasOne(HistoriReject::class, ['paket_id' => 'id'])->orderBy(['id' => SORT_DESC])->cache(self::cachetime(), self::settagdep('tag_historireject'));
+    }
+    public function getHistorirejects(){
+        return $this->hasMany(HistoriReject::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_historireject'));
+    }
 }

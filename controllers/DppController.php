@@ -146,14 +146,15 @@ class DppController extends Controller {
             $data=$_POST['PaketPengadaan'];
             $data['paket_id']=$data['id'];
             unset($data['id']);
-            $historyreject= HistoriReject::where(['paket_id' =>$data['paket_id']])->one()??new HistoriReject();
+            $historyreject= new HistoriReject();
+            // $historyreject= HistoriReject::where(['paket_id' =>$data['paket_id']])->one()??new HistoriReject();
                 $historyreject->attributes=$data;
                 if ($historyreject->tanggal_reject && $historyreject->alasan_reject) {
                     $historyreject->save();
                     Dpp::invalidatecache('tag_' . Dpp::getModelname());
                     $historyreject::invalidatecache('tag_' . $historyreject::getModelname());
                 } else {
-                    throw new BadRequestHttpException('Data Tidak Lurat');
+                    throw new BadRequestHttpException('Data Gagal disimpan');
                 }
                 return $this->redirect(['index']);
         }
@@ -215,13 +216,25 @@ class DppController extends Controller {
         $model = $this->findModel($id);
         $r = file_get_contents(Yii::getAlias('@app/uraianreviewdpp.json'));
         $template = (json_decode($r));
+        $reviews=$model->reviews;
+        $histori=$model->paketpengadaan->historireject;
+        if($histori){
+            $reviews->keterangan=$histori->alasan_reject;
+            $reviews->kesimpulan=$histori->kesimpulan;
+            $reviews->tgl_dikembalikan=$histori->tanggal_dikembalikan;
+            $reviews->tanggapan_ppk=$histori->tanggapan_ppk;
+            $reviews->file_tanggapan=$histori->file_tanggapan;
+        }
         if ($request->isGet) {
             return $this->render('_frmreviewdpp', [
                 'model' => $model,
-                'reviews' => $model->reviews ?? new ReviewDpp, 'template' => $template->data ?? [],
+                'reviews' => $reviews ?? new ReviewDpp,
+                'template' => $template->data ?? [],
             ]);
         }
         if ($request->isPost) {
+            $paket=$model->paketpengadaan;
+            $historireject=$paket->historireject;
             $rr = ReviewDpp::where(['dpp_id' => $model->id])->orderBy('id desc')->one();
             if ($rr) {
                 $oldfile = $rr->file_tanggapan;

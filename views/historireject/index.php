@@ -1,11 +1,13 @@
 <?php
-use yii\helpers\{Url,Html};
-use yii\bootstrap4\Modal;
+use app\assets\AppAsset;
 use kartik\grid\GridView;
 use yii2ajaxcrud\ajaxcrud\{CrudAsset,BulkButtonWidget};
+use yii\bootstrap4\Modal;
+use yii\helpers\{Url,Html};
 $this->title = 'Histori Reject';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
+AppAsset::register($this);
 $idmodal = $searchModel->hash;
 ?>
 <div class="histori-reject-index">
