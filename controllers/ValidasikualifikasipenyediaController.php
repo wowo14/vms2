@@ -446,6 +446,30 @@ class ValidasikualifikasipenyediaController extends Controller {
             throw new NotFoundHttpException('The requested page or id does not exist.');
         }
     }
+    public function actionExtractdetail($model): Array {
+        $aa = json_decode($model->details[0]->hasil, true);
+        $count = $total = 0;
+        foreach ($aa as $c) {
+            if (key_exists('sesuai', $c)) {
+                if ($c['sesuai'] == 'ya') {
+                    $count++;
+                }
+            }
+            if ($c) {
+                $total++;
+            }
+        }
+        $col = [];
+        foreach (array_keys($aa[0]) as $item) {
+            $trimmedKey = ucfirst(trim($item));
+            $title = ($trimmedKey === 'Sesuai') ? 'Sesuai(ya/tidak)' : (($trimmedKey === 'Skala') ? 'Skala(1-5)' : ucfirst($trimmedKey));
+            $col[] = [
+                'attribute' => trim($item),
+                'header' => $title,
+            ];
+        }
+        return ['models'=>$aa,'columns'=>$col];
+    }
     public function actionViewvalidasipenyedia($id,$paket_id) {
         $templates = TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->all();
         $kualifikasi = ValidasiKualifikasiPenyedia::findAll(['penyedia_id' => $id,'paket_pengadaan_id'=>$paket_id]);

@@ -57,7 +57,7 @@ return [
         'class' => 'kartik\grid\ActionColumn',
         'dropdown' => false,
         'noWrap' => 'true',
-        'template' => '{lampiran} {kirimulang} {view} {update} {delete}',
+        'template' => '{ceklistadmin} {printceklistadmin} {lampiran} {kirimulang} {view} {update} {delete}',
         'vAlign' => 'middle',
         'visibleButtons'=>[
             'delete'=>function($d){
@@ -69,11 +69,29 @@ return [
             'lampiran'=>function($d){
                 return !$d->pemenang;
             },
+            'ceklistadmin'=>function($d){
+                return !$d->pemenang;
+            },
+            'printceklistadmin'=>function($d){
+                return !$d->pemenang && $d->addition;
+            },
         ],
         'urlCreator' => function ($action, $model, $key, $index) {
             return Url::to([$action, 'id' => $key]);
         },
         'buttons' => [
+            'ceklistadmin' => function ($url, $model, $key) {
+                return Html::a('<span class="fa fa-archive"></span>', $url, [
+                    'title' => Yii::t('yii2-ajaxcrud', 'Ceklist Admin'),
+                    'data-pjax' => '0', 'class' => 'btn btn-sm btn-outline-warning'
+                ]);
+            },
+            'printceklistadmin' => function ($url, $model, $key) {
+                return Html::a('<span class="fa fa-print"></span>', $url, [
+                    'title' => Yii::t('yii2-ajaxcrud', 'Print Ceklist Admin'),
+                    'data-pjax' => '0', 'class' => 'btn btn-sm btn-outline-primary'
+                ]);
+            },
             'lampiran' => function ($url, $model, $key) {
                 return Html::a('<span class="fa fa-paperclip"></span>', $url, [
                     'title' => Yii::t('yii2-ajaxcrud', 'Lampiran'),

@@ -1,11 +1,8 @@
 <?php
-
 namespace app\models;
-
 use Yii;
 use yii\caching\TagDependency;
 use yii\helpers\{ArrayHelper, BaseStringHelper, HtmlPurifier};
-
 trait GeneralModelsTrait {
     public static function settingType($type) {
         return Setting::type($type);
@@ -256,5 +253,23 @@ trait GeneralModelsTrait {
         $class = self::class;
         $pk = $class::primaryKey()[0];
         return BaseStringHelper::base64Urlencode(json_encode(['model' => $class, $pk => $params]));
+    }
+    public function reorderArray($original, $template) {// make ordered array by template
+        $result = array();
+        foreach ($template as $key => $value) {
+            if (strpos($value, '=>') !== false) {
+                $parts = explode('=>', $value);
+                foreach ($parts as $part) {
+                    if (($index = array_search(trim($part), $original)) !== false) {
+                        $result[] = $original[$index];
+                    }
+                }
+            } else {
+                if (($index = array_search(trim($value), $original)) !== false) {
+                    $result[] = $original[$index];
+                }
+            }
+        }
+        return $result;
     }
 }

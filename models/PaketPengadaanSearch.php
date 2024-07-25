@@ -9,7 +9,7 @@ class PaketPengadaanSearch extends PaketPengadaan{
     {
         return [
             [['id', 'created_by', 'tahun_anggaran', 'approval_by'], 'integer'],
-            [['nomor', 'kategori_pengadaan','tanggal_paket', 'tanggal_reject','alasan_reject', 'nama_paket', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'metode_pengadaan'], 'safe'],
+            [['nomor', 'kategori_pengadaan','addition','tanggal_paket', 'tanggal_reject','alasan_reject', 'nama_paket', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'metode_pengadaan'], 'safe'],
             [['pagu'], 'number'],
         ];
     }

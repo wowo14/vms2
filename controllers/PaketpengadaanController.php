@@ -1,11 +1,11 @@
 <?php
 namespace app\controllers;
+use app\models\Unit;
+use app\models\{TemplateChecklistEvaluasi,Attachment, Dpp, PaketPengadaanDetails, PaketPengadaanSearch, PaketPengadaan};
 use Yii;
-use app\models\{Attachment, Dpp, PaketPengadaanDetails, PaketPengadaanSearch, PaketPengadaan};
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
+use yii\helpers\{ArrayHelper,Html,HtmlPurifier};
 use yii\web\{ServerErrorHttpException, Response, NotFoundHttpException};/**
  A Evaluasi Administrasi
 T Evaluasi Teknis
@@ -67,15 +67,16 @@ class PaketpengadaanController extends Controller {
                     }
                     move_uploaded_file($fileTmpName, $destination);
                     if (in_array($extension, ['png', 'jpg', 'jpeg', 'gif'])) {
-                        Yii::$app->tools->resizeImageToMaxSize($destination, 512 * 1024);
+                        // Yii::$app->tools->resizeImageToMaxSize($destination, 512 * 1024);
+                        $newFilename=Yii::$app->tools->convertavif($destination, Yii::getAlias('@uploads'), 90);
                     }
                     $attachment = new Attachment();
                     $attachment->name = $newFilename;
                     $attachment->uri = Yii::getAlias('@web/uploads/') . $newFilename;
-                    $attachment->user_id = $model->id;
-                    $attachment->mime = $fileType;
-                    $attachment->type = $fileType;
-                    $attachment->size = $fileSize;
+                    $attachment->user_id = $model->id; //based on paket_id
+                    $attachment->mime = mime_content_type(Yii::getAlias('@uploads').$newFilename)?:$fileType;
+                    $attachment->type = mime_content_type(Yii::getAlias('@uploads').$newFilename)?:$fileType;
+                    $attachment->size = filesize(Yii::getAlias('@uploads').$newFilename)?:$fileSize;
                     $attachment->jenis_dokumen = $jenisdokumen;
                     if (!$attachment->save()) {
                         $content = "Error saving attachment: " . json_encode($attachment->errors) . "\n";
@@ -267,6 +268,71 @@ class PaketpengadaanController extends Controller {
                 return $this->render('create', ['model' => $model,]);
             }
         }
+    }
+    public function actionCeklistadmin($id){
+        $request = Yii::$app->request;
+        $title="Kelengkapan DPP";
+        $model=PaketPengadaan::find()->cache(false)->where(['id'=>$id])->one();
+        $temp = TemplateChecklistEvaluasi::where(['like', 'template', 'Ceklist_Kelengkapan_DPP'])->one();
+        if ($temp) {
+            $ar_element = $temp->element ? explode(',', $temp->element) : [];
+            $details = json_decode($temp->detail->uraian, true);
+            $hasil = [];
+            foreach ($details as $v) {
+                $c = ['uraian' => $v['uraian']];
+                foreach ($ar_element as $element) {
+                    if ($element) {
+                        $c[$element] = '';
+                    }
+                }
+                $hasil[] = $c;
+            }
+            $temp = $hasil;
+        }
+        if(!$model->addition){
+            $data=['template'=>$temp];
+            $model->addition=json_encode($data, JSON_UNESCAPED_SLASHES);
+            $model->save();
+        }
+        $dataPaket=PaketPengadaan::collectAll(['approval_by' => null,'pemenang'=>null,'id'=>$id])->pluck('nomornamapaket', 'id')->toArray();
+        if($request->isGet){
+            return $this->render('_checklistadmin', ['model'=>$model,'dataPaket'=>$dataPaket,'temp'=>$temp,'title'=>$title]);
+        }
+        if($request->isPost){
+            $template = $request->post('PaketPengadaan')['template'];
+            $pure1 = collect($template)->map(function ($e) {
+                foreach ($e as $key => $value) {
+                    $e[$key] = HtmlPurifier::process($value);
+                }
+                if(key_exists('sesuai',$e)){
+                    if($e['sesuai']=='on'){
+                        $e['sesuai']='ya';
+                    }
+                }
+                return $e;
+            });
+            $model->addition=json_encode([
+                'unit'=>$_POST['PaketPengadaan']['unit'],
+                'id'=>$_POST['PaketPengadaan']['id'],
+                'template'=>$pure1
+            ],JSON_UNESCAPED_SLASHES);
+            $model->save();
+            Yii::$app->session->setFlash('success', 'Kelengkapan DPP Berhasil Ditambahkan');
+            return $this->redirect('index');
+        }
+    }
+    public function actionPrintceklistadmin($id){
+        $model=$this->findModel($id);
+        $title='Ceklist Kelengkapan DPP';
+        $data=[
+            'unit'=>Unit::findOne(json_decode($model->addition,true)['unit'])->unit,
+            'paket'=>$model->nama_paket,
+            'details'=>json_decode($model->addition,true)['template']
+        ];
+        $cetakan=$this->renderPartial('_printceklistadmin', ['data'=>$data,'model'=>$model,'title'=>$title]);
+        $pdf=Yii::$app->pdf;
+        $pdf->content=$cetakan;
+        return $pdf->render();
     }
     public function actionKirimulang($id) {
         $model = $this->findModel($id);

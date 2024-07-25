@@ -21,6 +21,8 @@ class ImageConverter extends Component
             $targetFilePath = $targetDir . DIRECTORY_SEPARATOR . $fileName . '.avif';
             // Save the image in AVIF format
             $image->encode('avif', $quality)->save($targetFilePath);
+            // add detection mime/type
+            // add detection filesize
         }
     }
 }

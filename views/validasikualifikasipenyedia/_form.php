@@ -3,6 +3,7 @@ use app\models\{Dpp,Penyedia,TemplateChecklistEvaluasi};
 use kartik\select2\Select2;
 use kartik\switchinput\SwitchInput;
 use yii\bootstrap4\ActiveForm;
+use yii\grid\GridView;
 use yii\helpers\Html;
 $dpp=Dpp::find()->with('paketpengadaans')->where(['status_review' => 1])->orderBy('created_at desc')->all();
 $dpp=collect($dpp)->pluck('paketpengadaans')->flatten()->pluck('nomornamapaket','id')->toArray();
@@ -51,3 +52,17 @@ $dpp=collect($dpp)->pluck('paketpengadaans')->flatten()->pluck('nomornamapaket',
     <?php } ?>
     <?php ActiveForm::end(); ?>
 </div>
+<div class="clear-fix"></div>
+<?php
+if ($model->details) :
+    $ext=$this->context->actionExtractdetail($model);
+    echo GridView::widget([
+        'dataProvider' => new \yii\data\ArrayDataProvider([
+            'allModels' => $ext['models'],
+        ]),
+        'columns' => $ext['columns'],
+        'tableOptions' => ['class' => 'table responsive'],
+        'summary' => false
+    ]);
+endif;
+?>

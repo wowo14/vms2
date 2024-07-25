@@ -5,13 +5,14 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
     public $oldrecord;
     public $statusPengadaan;
+    public $unit;
     public static function tableName() {
         return 'paket_pengadaan';
     }
     public function rules() {
         return [
             [['nomor', 'tanggal_paket', 'nama_paket'], 'required'],
-            [['tanggal_paket', 'tanggal_reject', 'alasan_reject'], 'string'],
+            [['tanggal_paket', 'tanggal_reject', 'alasan_reject','addition'], 'string'],
             [['pagu'], 'number'],
             [['nama_paket'], 'unique'],
             [['created_by', 'tahun_anggaran', 'approval_by'], 'integer'],
@@ -37,6 +38,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             'alasan_reject' => 'Alasan Reject', //not null ditolak
             'tanggal_reject' => 'Tanggal Reject', //not null ditolak
             'pemenang'=>'Pemenang', // id vendor pemenang
+            'addition'=>'Addition', // kolom tambahan
         ];
     }
     public function getListpaketoutstanding() {
@@ -61,7 +63,28 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
                 Yii::$app->session->setFlash('error', 'Paket Pengadaan sudah ada');
                 return false;
             }
-        } else {
+            $hasil = [];
+            $template = TemplateChecklistEvaluasi::where(['like', 'template', 'Ceklist_Kelengkapan_DPP'])->one();
+            if($template){
+                if ($template->element) {
+                    $ar_element = explode(',', $template->element);
+                }
+                foreach (json_decode($template->detail->uraian, true) as $v) {
+                    $c = ['uraian' => $v['uraian']];
+                    if ($template->element) {
+                        foreach ($ar_element as $element) {
+                            if ($element) {
+                                $c[$element] = '';
+                            }
+                        }
+                    }
+                    $hasil['template'][] = $c;
+                }
+                $this->addition=json_encode($hasil);
+            }
+        } else {//update
+            // $this->updated_at = date('Y-m-d H:i:s', time());
+            // $this->updated_by = Yii::$app->user->identity->id;
         }
         self::invalidatecache('tag_' . self::getModelname());
         Dpp::invalidatecache('tag_' . Dpp::getModelname());

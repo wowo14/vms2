@@ -2,6 +2,7 @@
 namespace app\widgets;
 use DateTime;
 use Yii;
+use Intervention\Image\ImageManagerStatic as Image;
 use yii\base\Widget;
 use yii\caching\FileCache;
 use yii\helpers\ArrayHelper;
@@ -154,7 +155,8 @@ class Tools extends Widget
           $filePath = Yii::getAlias('@uploads') . $filename;
           file_put_contents($filePath, $binaryData);
           if (in_array($extension, ['png', 'jpg', 'jpeg', 'gif'])) {
-              $this->resizeImageToMaxSize($filePath, 512 * 1024);
+              // $this->resizeImageToMaxSize($filePath, 512 * 1024);
+              $fileName=$this->convertavif($filePath);
           }
           return $filename;
       } else {
@@ -184,6 +186,14 @@ class Tools extends Widget
             imagedestroy($image);
         }
     }
+  }
+  public function convertavif($imageFile,$targetDir,$quality = 90){
+    $image = Image::make($imageFile);
+    $fileName = pathinfo($imageFile, PATHINFO_FILENAME);
+    $targetFilePath = $targetDir . DIRECTORY_SEPARATOR . $fileName . '.avif';
+    $image->encode('avif', $quality)->save($targetFilePath);
+    unlink($imageFile);
+    return $fileName . '.avif';
   }
   public function extractKTPInfo($ktpNumber) { // 16 digit KTP INDONESIA
     $info = [];
