@@ -18,6 +18,8 @@ class m240703_043250_historiReject extends Migration
             'file_tanggapan'=>$this->text(),
             'created_at' => $this->integer(),
         ]);
+        // alter table paket_pengadaan add new columns addition
+        $this->addColumn('paket_pengadaan','addition',$this->text());
     }
     public function safeDown()
     {

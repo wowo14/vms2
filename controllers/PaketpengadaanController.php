@@ -293,6 +293,8 @@ class PaketpengadaanController extends Controller {
             $data=['template'=>$temp];
             $model->addition=json_encode($data, JSON_UNESCAPED_SLASHES);
             $model->save();
+            // refresh page
+            // return $this->redirect(['ceklistadmin', 'id' => $id]);
         }
         $dataPaket=PaketPengadaan::collectAll(['approval_by' => null,'pemenang'=>null,'id'=>$id])->pluck('nomornamapaket', 'id')->toArray();
         if($request->isGet){
