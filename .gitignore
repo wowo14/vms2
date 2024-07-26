@@ -41,3 +41,4 @@ params.php
 test*
 web/uploads/attachment/*
 web/uploads/
+web/assets

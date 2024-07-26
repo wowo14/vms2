@@ -308,7 +308,7 @@ class PaketpengadaanController extends Controller {
                 }
                 if(key_exists('sesuai',$e)){
                     if($e['sesuai']=='on'){
-                        $e['sesuai']='ya';
+                        $e['sesuai']=1;
                     }
                 }
                 return $e;
@@ -329,11 +329,20 @@ class PaketpengadaanController extends Controller {
         $data=[
             'unit'=>Unit::findOne(json_decode($model->addition,true)['unit'])->unit,
             'paket'=>$model->nama_paket,
-            'details'=>json_decode($model->addition,true)['template']
+            'details'=>collect(json_decode($model->addition,true)['template'])->map(function ($e) {
+                if(key_exists('sesuai',$e)){
+                    $e['sesuai'] = $e['sesuai'] == 1 ? 'Ya' : 'Tidak';
+                }else{
+                    // $e['sesuai'] = 'Tidak';
+                }
+                return $e;
+            })->toArray(),
         ];
         $cetakan=$this->renderPartial('_printceklistadmin', ['data'=>$data,'model'=>$model,'title'=>$title]);
         $pdf=Yii::$app->pdf;
         $pdf->content=$cetakan;
+        $pdf->cssFile = '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css';
+        // return $pdf->content;
         return $pdf->render();
     }
     public function actionKirimulang($id) {

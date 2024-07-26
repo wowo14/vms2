@@ -49,7 +49,8 @@ use yii\helpers\Html;
 CATATAN:<br>
 *) Paket akan diproses setelah berkas lengkap
 <br>
-<table>
+
+<table border='0' width="100%">
     <tr>
         <td width="33%" style="text-align:center">
             Mengetahui,<br>
@@ -60,7 +61,7 @@ CATATAN:<br>
             <u>(NAMA)</u><br>
             NIP.
         </td>
-        <td width="33%" style="text-align:center">
+        <td width="34%" style="text-align:center">
             Yang Menerima,<br>
             (Admin Pengadaan Barang/Jasa)<br>
             <br>
