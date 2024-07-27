@@ -337,10 +337,14 @@ class PaketpengadaanController extends Controller {
                 }
                 return $e;
             })->toArray(),
+            'logogresik'=>Yii::getAlias('@webroot/images/logogresik.png', true),
+            'logors'=>Yii::getAlias('@webroot/images/logors.png', true),
+            'kepalapengadaan'=>null,
+            'nipkepalapengadaan'=>'',
+            'admin'=>null,
+            'nipadmin'=>''
         ];
         $cetakan=$this->renderPartial('_printceklistadmin', ['data'=>$data,
-        'logogresik'=>Yii::getAlias('@webroot/images/logogresik.png', true),
-        'logors'=>Yii::getAlias('@webroot/images/logors.png', true),
         'model'=>$model,'title'=>$title]);
         $pdf=Yii::$app->pdf;
         $pdf->content=$cetakan;

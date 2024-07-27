@@ -5,13 +5,13 @@ use yii\helpers\{Html};
 <table style="width: 100%; font-size: 14px; text-align: center; font-weight: bold;">
     <tr>
         <td style="width: 15%;">
-            <?= Html::img($logogresik, ['width' => '77px']) ?>
+            <?= Html::img($data['logogresik'], ['width' => '77px']) ?>
         </td>
         <td><?= $model::profile('dinas') ?> KABUPATEN GRESIK <br>
             <p><?= $model::profile('address') ?></p>
         </td>
         <td style="width: 15%;">
-            <?= Html::img($logors, ['width' => '77px']) ?>
+            <?= Html::img($data['logors'], ['width' => '77px']) ?>
         </td>
     </tr>
 </table>
@@ -40,9 +40,12 @@ use yii\helpers\{Html};
                 [
                     'class' => 'yii\grid\SerialColumn',
                 ],
-                'uraian',
-                ['attribute'=>'sesuai','label'=>'Sesuai (Ya/Tidak)'],
-                'keterangan'
+                ['attribute'=>'uraian','format'=>'raw','headerOptions' => ['class'=>'text-center'],],
+                ['attribute'=>'sesuai',
+                'headerOptions' => ['class'=>'text-center'],
+                'contentOptions' => ['class'=>'text-center'],
+                'label'=>'Sesuai (Ya/Tidak)'],
+                ['attribute'=>'keterangan','headerOptions' => ['class'=>'text-center'],],
             ]
     ]);
 ?>
@@ -58,8 +61,8 @@ CATATAN:<br>
             <br>
             <br>
             <br>
-            <u>(NAMA)</u><br>
-            NIP.
+            <u>(<?=$data['kepalapengadaan']??' . . . . . . . . . . . '?>)</u><br>
+            NIP. <?=$data['nipkepalapengadaan']??''?>
         </td>
         <td width="34%" style="text-align:center">
             Yang Menerima,<br>
@@ -67,11 +70,11 @@ CATATAN:<br>
             <br>
             <br>
             <br>
-            <u>( . . . . . . . . . . . )</u><br>
-            NIP.
+            <u>(<?=$data['admin']??' . . . . . . . . . . . '?>)</u><br>
+            NIP. <?=$data['nipadmin']??''?>
         </td>
         <td width="33%" style="text-align:center">
-            Gresik, 10,<br>
+            Gresik, <?=date('d F Y', strtotime($model->tanggal_paket??date('Y-m-d')))?>,<br>
             Yang Menyerahkan,<br>
             <br>
             <br>

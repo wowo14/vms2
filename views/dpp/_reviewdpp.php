@@ -4,13 +4,13 @@ use yii\helpers\Html;
 <table style="width: 100%; font-size: 14px; text-align: center; font-weight: bold;">
     <tr>
         <td style="width: 15%;">
-            <?= Html::img(Yii::getAlias('@web/images/logogresik.png'), ['width' => '77px']) ?>
+            <?= Html::img($logogresik, ['width' => '77px']) ?>
         </td>
         <td><?= $model::profile('dinas') ?> KABUPATEN GRESIK <br>
             <p><?= $model::profile('address') ?></p>
         </td>
         <td style="width: 15%;">
-            <?= Html::img(Yii::getAlias('@web/images/logors.png'), ['width' => '77px']) ?>
+            <?= Html::img($logors, ['width' => '77px']) ?>
         </td>
     </tr>
 </table>
@@ -65,14 +65,14 @@ Kesimpulan:<br>
     <tr>
         <td width="33%"></td>
         <td width="33%"></td>
-        <td style="text-align: center;" width="33%">Gresik, <?= date('d F Y', strtotime($model->created_at)) ?><br>
+        <td style="text-align: center;" width="33%">Gresik, <?= date('d F Y', strtotime($model->created_at??'')) ?><br>
             (Pejabat Pengadaan Barang/Jasa)
             <br>
             <br>
             <br>
             <br>
-            <span style="text-align:center"><?= $model->pejabat->nama ?></span><br>
-            NIP. <?= $model->pejabat->nip ?>
+            <span style="text-align:center"><?= $model->pejabat->nama??'' ?></span><br>
+            NIP. <?= $model->pejabat->nip??'' ?>
         </td>
     </tr>
 </table>
@@ -88,8 +88,8 @@ Tanggapan PPK atas dikembalikan DPP :<br>
             <br>
             <br>
             <br>
-            <span style="text-align:center"><?= $model->pejabat->nama ?></span><br>
-            NIP. <?= $model->pejabat->nip ?>
+            <span style="text-align:center"><?= $model->pejabat->nama??'' ?></span><br>
+            NIP. <?= $model->pejabat->nip??'' ?>
         </td>
         <td width="50%" style="text-align:center">Gresik, <?= $template->tgl_dikembalikan ? date('d F Y', strtotime($template->tgl_dikembalikan)) : ' ...... ' ?><br>
             (Pejabat Pembuat Komitmen)<br>
@@ -97,7 +97,7 @@ Tanggapan PPK atas dikembalikan DPP :<br>
             <br>
             <br>
             <br>
-            ( <?= $model->paketpengadaan->ppkom ?> )
+            ( <?= $model->paketpengadaan->ppkom??'' ?> )
         </td>
     </tr>
 </table>

@@ -200,9 +200,14 @@ class DppController extends Controller {
     public function actionReviewdpp($id) {
         $model = $this->findModel($id);
         if ($model->reviews) {
+            $logogresik= Yii::getAlias('@webroot') . '/images/logogresik.png';
+            $logors= Yii::getAlias('@webroot') . '/images/logors.png';
             $pdf = Yii::$app->pdf;
             $pdf->content = $this->renderPartial('_reviewdpp', [
-                'model' => $model, 'template' => $model->reviews ?? []
+                'model' => $model,
+                'logogresik' => $logogresik,
+                'logors' => $logors,
+                'template' => $model->reviews ?? []
             ]);
             $pdf->cssInline = ".center{text-align:center}.border1solid {border: #eee 1px solid;}";
             return $pdf->render();
