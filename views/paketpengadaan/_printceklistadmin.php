@@ -19,9 +19,9 @@ use yii\helpers\{Html};
 <h5 style="text-align: center;">CHECK LIST DOKUMEN KELENGKAPAN DPP</h5>
 <table width="100%">
     <tr>
-        <td width="30%">Bidang / Bagian</td>
+        <td width="35%">Bidang / Bagian</td>
         <td width="1%;">:</td>
-        <td width="69%"><?=$data['unit']?></td>
+        <td width="64%"><?=$data['unit']?></td>
     </tr>
     <tr>
         <td>Nama Paket / Jenis Kegiatan</td>
