@@ -1,17 +1,17 @@
 <?php
 use yii\grid\GridView;
-use yii\helpers\Html;
+use yii\helpers\{Html};
 ?>
 <table style="width: 100%; font-size: 14px; text-align: center; font-weight: bold;">
     <tr>
         <td style="width: 15%;">
-            <?= Html::img(Yii::getAlias('@web/images/logogresik.png'), ['width' => '77px']) ?>
+            <?= Html::img($logogresik, ['width' => '77px']) ?>
         </td>
         <td><?= $model::profile('dinas') ?> KABUPATEN GRESIK <br>
             <p><?= $model::profile('address') ?></p>
         </td>
         <td style="width: 15%;">
-            <?= Html::img(Yii::getAlias('@web/images/logors.png'), ['width' => '77px']) ?>
+            <?= Html::img($logors, ['width' => '77px']) ?>
         </td>
     </tr>
 </table>

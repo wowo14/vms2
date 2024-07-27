@@ -338,11 +338,13 @@ class PaketpengadaanController extends Controller {
                 return $e;
             })->toArray(),
         ];
-        $cetakan=$this->renderPartial('_printceklistadmin', ['data'=>$data,'model'=>$model,'title'=>$title]);
+        $cetakan=$this->renderPartial('_printceklistadmin', ['data'=>$data,
+        'logogresik'=>Yii::getAlias('@webroot/images/logogresik.png', true),
+        'logors'=>Yii::getAlias('@webroot/images/logors.png', true),
+        'model'=>$model,'title'=>$title]);
         $pdf=Yii::$app->pdf;
         $pdf->content=$cetakan;
         $pdf->cssFile = '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css';
-        // return $pdf->content;
         return $pdf->render();
     }
     public function actionKirimulang($id) {
