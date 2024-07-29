@@ -301,8 +301,7 @@ class DppController extends Controller {
             'admin'=>$dpp->staffadmin->nama,
             'nipadmin'=>$dpp->staffadmin->nip,
         ];
-        $cetakan=$this->renderPartial('/paketpengadaan/_printceklistadmin', ['data'=>$data,
-        'model'=>$model,'title'=>$title]);
+        $cetakan=$this->renderPartial('/paketpengadaan/_printceklistadmin', ['data'=>$data,'model'=>$model,'title'=>$title]);
         $pdf=Yii::$app->pdf;
         $pdf->content=$cetakan;
         $pdf->cssFile = '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css';

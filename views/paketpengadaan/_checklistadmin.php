@@ -30,8 +30,8 @@ foreach ($model->reorderArray(array_keys($temp[0]),$template) as $item) {
         'type' => SwitchInput::class,
         'options' => [
             'pluginOptions' => [
-                'type' => 'checkbox',
-                'required' => true,
+                // 'type' => 'checkbox',
+                // 'required' => true,
                 'size' => 'mini',
                 'onText' => 'Ya', 'offText' => 'Tidak'
             ]
