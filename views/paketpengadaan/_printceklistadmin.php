@@ -40,7 +40,11 @@ use yii\helpers\{Html};
                 [
                     'class' => 'yii\grid\SerialColumn',
                 ],
-                ['attribute'=>'uraian','format'=>'raw','headerOptions' => ['class'=>'text-center'],],
+                ['attribute'=>'uraian','format'=>'raw',
+                'value'=>function($model){
+                    return nl2br($model['uraian']);
+                },
+                'headerOptions' => ['class'=>'text-center'],],
                 ['attribute'=>'sesuai',
                 'headerOptions' => ['class'=>'text-center'],
                 'contentOptions' => ['class'=>'text-center'],
@@ -61,7 +65,7 @@ CATATAN:<br>
             <br>
             <br>
             <br>
-            <u>(<?=$data['kepalapengadaan']??' . . . . . . . . . . . '?>)</u><br>
+            <u>( <?=$data['kepalapengadaan']??' . . . . . . . . . . . '?> )</u><br>
             NIP. <?=$data['nipkepalapengadaan']??''?>
         </td>
         <td width="34%" style="text-align:center">
@@ -70,7 +74,7 @@ CATATAN:<br>
             <br>
             <br>
             <br>
-            <u>(<?=$data['admin']??' . . . . . . . . . . . '?>)</u><br>
+            <u>( <?=$data['admin']??' . . . . . . . . . . . '?> )</u><br>
             NIP. <?=$data['nipadmin']??''?>
         </td>
         <td width="33%" style="text-align:center">

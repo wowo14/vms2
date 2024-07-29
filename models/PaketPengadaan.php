@@ -83,8 +83,6 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
                 $this->addition=json_encode($hasil);
             }
         } else {//update
-            // $this->updated_at = date('Y-m-d H:i:s', time());
-            // $this->updated_by = Yii::$app->user->identity->id;
         }
         self::invalidatecache('tag_' . self::getModelname());
         Dpp::invalidatecache('tag_' . Dpp::getModelname());

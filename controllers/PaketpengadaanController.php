@@ -5,7 +5,7 @@ use app\models\{TemplateChecklistEvaluasi,Attachment, Dpp, PaketPengadaanDetails
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
-use yii\helpers\{ArrayHelper,Html,HtmlPurifier};
+use yii\helpers\{ArrayHelper,Html};
 use yii\web\{ServerErrorHttpException, Response, NotFoundHttpException};/**
  A Evaluasi Administrasi
 T Evaluasi Teknis
@@ -295,14 +295,14 @@ class PaketpengadaanController extends Controller {
                 $model->addition=json_encode($data, JSON_UNESCAPED_SLASHES);
                 $model->save();
             }
-            $dataPaket=PaketPengadaan::collectAll(['approval_by' => null,'pemenang'=>null,'id'=>$id])->pluck('nomornamapaket', 'id')->toArray();
+            $dataPaket=$model::collectAll(['approval_by' => null,'pemenang'=>null,'id'=>$id])->pluck('nomornamapaket', 'id')->toArray();
             return $this->render('_checklistadmin', ['model'=>$model,'dataPaket'=>$dataPaket,'temp'=>$temp,'title'=>$title]);
         }
         if($request->isPost){
             $template = $request->post('PaketPengadaan')['template'];
-            $pure1 = collect($template)->map(function ($e) {
+            $pure1 = collect($template)->map(function ($e)use($model) {
                 foreach ($e as $key => $value) {
-                    $e[$key] = HtmlPurifier::process($value);
+                    $e[$key] = $model->getPurifier($value);
                 }
                 if(key_exists('sesuai',$e)){
                     if($e['sesuai']=='on'){

@@ -65,6 +65,9 @@ class Dpp extends \yii\db\ActiveRecord {
     public function getStaffadmin() {
         return $this->hasOne(Pegawai::class, ['id' => 'admin_pengadaan'])->cache(self::cachetime(), self::settagdep('tag_pegawai'));
     }
+    public function getPenugasan(){
+        return $this->hasOne(PenugasanPemilihanpenyedia::class, ['dpp_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_penugasanpemilihanpenyedia'));
+    }
     // public function getPenawaranpenyedia(){
     //     return $this->hasMany(PenawaranPengadaan::class, ['paket_id' => 'paket_id'])->cache(self::cachetime(), self::settagdep('tag_penawaranpengadaan'));
     // }

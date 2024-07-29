@@ -88,7 +88,7 @@ Tanggapan PPK atas dikembalikan DPP :<br>
             <br>
             <br>
             <br>
-            <span style="text-align:center"><?= $model->pejabat->nama??'' ?></span><br>
+            <u>( <?= $model->pejabat->nama??'' ?> )</u><br>
             NIP. <?= $model->pejabat->nip??'' ?>
         </td>
         <td width="50%" style="text-align:center">Gresik, <?= $template->tgl_dikembalikan ? date('d F Y', strtotime($template->tgl_dikembalikan)) : ' ...... ' ?><br>
@@ -97,7 +97,8 @@ Tanggapan PPK atas dikembalikan DPP :<br>
             <br>
             <br>
             <br>
-            ( <?= $model->paketpengadaan->ppkom??'' ?> )
+            <u>( <?= $model->paketpengadaan->pejabatppkom->nama??'' ?> )</u><br>
+            NIP. <?= $model->paketpengadaan->pejabatppkom->nip??'' ?>
         </td>
     </tr>
 </table>

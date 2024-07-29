@@ -272,4 +272,7 @@ trait GeneralModelsTrait {
         }
         return $result;
     }
+    public function getPurifier($value){
+        return HtmlPurifier::process($value);
+    }
 }

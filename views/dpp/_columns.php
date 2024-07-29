@@ -76,12 +76,15 @@ return [
         'class' => 'kartik\grid\ActionColumn',
         'dropdown' => false,
         'noWrap' => 'true',
-        'template' => '{reject} {approve} {reviewdpp} {formreview} {view} {update} {delete}',
+        'template' => '{penugasan} {reject} {approve} {ceklistadmin} {printceklistadmin} {reviewdpp} {formreview} {view} {update} {delete}',
         'vAlign' => 'middle',
         'urlCreator' => function ($action, $model, $key, $index) {
             return Url::to([$action, 'id' => $key]);
         },
         'visibleButtons'=>[
+            'penugasan'=>function($d){
+                return !$d->paketpengadaan->pemenang;
+            },
             'delete'=>function($d){
                 return !$d->paketpengadaan->pemenang;
             },
@@ -91,17 +94,43 @@ return [
             'reject'=>function($d){
                 return !$d->paketpengadaan->pemenang;
             },
+            'ceklistadmin'=>function($d){
+                return !$d->paketpengadaan->pemenang;
+            },
+            'printceklistadmin'=>function($d){
+                return !$d->paketpengadaan->pemenang;
+            },
             'formreview'=>function($d){
                 return !$d->paketpengadaan->pemenang;
             }
         ],
         'buttons' => [
+            'penugasan' => function ($url, $model, $key) {
+                return Html::a(
+                    '<span class="fa fa-flag"></span>',
+                    $url,
+                    ['class' => 'btn btn-sm btn-outline-info', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote', 'title' => 'Penugasan', 'data-toggle' => 'tooltip']
+                );
+            },
             'approve' => function ($url, $model, $key) {
                 return Html::a(
                     '<span class="fa fa-check-double"></span>',
                     $url,
                     ['class' => 'btn btn-sm btn-outline-info', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote', 'title' => 'Approve', 'data-toggle' => 'tooltip']
                 );
+            },
+            'ceklistadmin' => function ($url, $model, $key) {
+                return Html::a(
+                    '<span class="fa fa-archive"></span>',
+                    $url,
+                    ['class' => 'btn btn-sm btn-outline-warning', 'data-pjax' => 0, 'title' => 'Ceklist Admin', 'data-toggle' => 'tooltip']
+                );
+            },
+            'printceklistadmin' => function ($url, $model, $key) {
+                return Html::a('<span class="fa fa-print"></span>', $url, [
+                    'title' => Yii::t('yii2-ajaxcrud', 'Print Ceklist Admin'),
+                    'data-pjax' => '0', 'class' => 'btn btn-sm btn-outline-primary'
+                ]);
             },
             'reject' => function ($url, $model, $key) {
                 return Html::a(

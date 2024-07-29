@@ -51,7 +51,7 @@ jQuery(function ($) {
     <?php $form = ActiveForm::begin([
         'id' => 'ceklistadmin-dpp',
         'enableAjaxValidation' => false,
-        'action'=>'/paketpengadaan/ceklistadmin?id='.$model->id,
+        // 'action'=>'/paketpengadaan/ceklistadmin?id='.$model->id,
         'fieldConfig' => [
             'template' => "<div class='row'>{label}\n<div class='col-sm-12'>{input}\n{error}</div></div>",
             'labelOptions' => ['class' => 'col-sm-3 col-md-3 control-label text-sm-left text-md-right'],

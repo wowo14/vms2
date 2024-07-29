@@ -1,5 +1,6 @@
 <?php
 namespace app\controllers;
+use app\models\Unit;
 use app\models\{HistoriReject,ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails, PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia};
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -106,6 +107,16 @@ class DppController extends Controller {
             return ['forceClose' => true, 'forceReload' => '#crud-datatable-pjax'];
         } else {
             return $this->redirect(['index']);
+        }
+    }
+    public function actionPenugasan($id){
+        $penugasan=$this->findModel($id)->penugasan;
+        if($penugasan){
+            $anotherController = new PenugasanController('penugasan', $this->module);
+           return $result = $anotherController->actionUpdate($id=$penugasan->id);
+        }else{
+            $anotherController = new PenugasanController('penugasan', $this->module);
+           return $result = $anotherController->actionCreate($iddpp=$id);
         }
     }
     public function actionAssignadmin() {
@@ -215,6 +226,87 @@ class DppController extends Controller {
             Yii::$app->session->setFlash('warning', 'Belum ada review dpp');
             return $this->redirect(['index']);
         }
+    }
+    public function actionCeklistadmin($id){
+        $request = Yii::$app->request;
+        $title="Kelengkapan DPP";
+        $dpp=$this->findModel($id);
+        $model=$dpp->paketpengadaan; //model paketpengadaan
+        if($request->isGet){
+            $temp = TemplateChecklistEvaluasi::where(['like', 'template', 'Ceklist_Kelengkapan_DPP'])->one();
+            if ($temp) {
+                $ar_element = $temp->element ? explode(',', $temp->element) : [];
+                $details = json_decode($temp->detail->uraian, true);
+                $hasil = [];
+                foreach ($details as $v) {
+                    $c = ['uraian' => $v['uraian']];
+                    foreach ($ar_element as $element) {
+                        if ($element) {
+                            $c[$element] = '';
+                        }
+                    }
+                    $hasil[] = $c;
+                }
+                $temp = $hasil;
+            }
+            if(!$model->addition){
+                $data=['template'=>$temp];
+                $model->addition=json_encode($data, JSON_UNESCAPED_SLASHES);
+                $model->save();
+            }
+            $dataPaket=$model::collectAll(['approval_by' => null,'pemenang'=>null,'id'=>$model->id])->pluck('nomornamapaket', 'id')->toArray();
+            return $this->render('/paketpengadaan/_checklistadmin', ['model'=>$model,'dataPaket'=>$dataPaket,'temp'=>$temp,'title'=>$title]);
+        }
+        if($request->isPost){
+            $template = $request->post('PaketPengadaan')['template'];
+            $pure1 = collect($template)->map(function ($e)use($model) {
+                foreach ($e as $key => $value) {
+                    $e[$key] = $model->getPurifier($value);
+                }
+                if (isset($e['sesuai']) && $e['sesuai'] === 'on') {
+                    $e['sesuai'] = 1;
+                }
+                return $e;
+            });
+            $model->addition=json_encode([
+                'unit'=>$_POST['PaketPengadaan']['unit'],
+                'id'=>$_POST['PaketPengadaan']['id'],
+                'template'=>$pure1
+            ],JSON_UNESCAPED_SLASHES);
+            $model->save();
+            Yii::$app->session->setFlash('success', 'Kelengkapan DPP Berhasil Ditambahkan');
+            return $this->redirect(['/dpp/index']);
+        }
+    }
+    public function actionPrintceklistadmin($id){
+        $dpp=$this->findModel($id);
+        $model=$dpp->paketpengadaan;
+        $title='Ceklist Kelengkapan DPP';
+        $chief=\app\models\Pegawai::findOne($dpp::profile('kepalapengadaan'));
+        $data=[
+            'unit'=>Unit::findOne(json_decode($model->addition,true)['unit'])->unit,
+            'paket'=>$model->nama_paket,
+            'details'=>collect(json_decode($model->addition,true)['template'])->map(function ($e) {
+                if(key_exists('sesuai',$e)){
+                    $e['sesuai'] = $e['sesuai'] == 1 ? 'Ya' : 'Tidak';
+                }else{
+                    // $e['sesuai'] = 'Tidak';
+                }
+                return $e;
+            })->toArray(),
+            'logogresik'=>Yii::getAlias('@webroot/images/logogresik.png', true),
+            'logors'=>Yii::getAlias('@webroot/images/logors.png', true),
+            'kepalapengadaan'=>$chief->nama,
+            'nipkepalapengadaan'=>$chief->nip,
+            'admin'=>$dpp->staffadmin->nama,
+            'nipadmin'=>$dpp->staffadmin->nip,
+        ];
+        $cetakan=$this->renderPartial('/paketpengadaan/_printceklistadmin', ['data'=>$data,
+        'model'=>$model,'title'=>$title]);
+        $pdf=Yii::$app->pdf;
+        $pdf->content=$cetakan;
+        $pdf->cssFile = '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css';
+        return $pdf->render();
     }
     public function actionFormreview($id) {
         $request = Yii::$app->request;

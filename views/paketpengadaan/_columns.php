@@ -57,7 +57,7 @@ return [
         'class' => 'kartik\grid\ActionColumn',
         'dropdown' => false,
         'noWrap' => 'true',
-        'template' => '{ceklistadmin} {printceklistadmin} {lampiran} {kirimulang} {view} {update} {delete}',
+        'template' => ' {lampiran} {kirimulang} {view} {update} {delete}',
         'vAlign' => 'middle',
         'visibleButtons'=>[
             'delete'=>function($d){
