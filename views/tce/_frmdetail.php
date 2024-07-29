@@ -38,6 +38,11 @@ use unclead\multipleinput\MultipleInputColumn;
             [
                 'name' => 'uraian',
                 'title' => 'Uraian',
+                'type' => 'textarea',
+                'options' => [
+                    'rows' => 4,
+                    'class' => 'form-control'
+                ]
             ],
         ],
     ])->label(false); ?>

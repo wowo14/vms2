@@ -273,31 +273,29 @@ class PaketpengadaanController extends Controller {
         $request = Yii::$app->request;
         $title="Kelengkapan DPP";
         $model=PaketPengadaan::find()->cache(false)->where(['id'=>$id])->one();
-        $temp = TemplateChecklistEvaluasi::where(['like', 'template', 'Ceklist_Kelengkapan_DPP'])->one();
-        if ($temp) {
-            $ar_element = $temp->element ? explode(',', $temp->element) : [];
-            $details = json_decode($temp->detail->uraian, true);
-            $hasil = [];
-            foreach ($details as $v) {
-                $c = ['uraian' => $v['uraian']];
-                foreach ($ar_element as $element) {
-                    if ($element) {
-                        $c[$element] = '';
-                    }
-                }
-                $hasil[] = $c;
-            }
-            $temp = $hasil;
-        }
-        if(!$model->addition){
-            $data=['template'=>$temp];
-            $model->addition=json_encode($data, JSON_UNESCAPED_SLASHES);
-            $model->save();
-            // refresh page
-            // return $this->redirect(['ceklistadmin', 'id' => $id]);
-        }
-        $dataPaket=PaketPengadaan::collectAll(['approval_by' => null,'pemenang'=>null,'id'=>$id])->pluck('nomornamapaket', 'id')->toArray();
         if($request->isGet){
+            $temp = TemplateChecklistEvaluasi::where(['like', 'template', 'Ceklist_Kelengkapan_DPP'])->one();
+            if ($temp) {
+                $ar_element = $temp->element ? explode(',', $temp->element) : [];
+                $details = json_decode($temp->detail->uraian, true);
+                $hasil = [];
+                foreach ($details as $v) {
+                    $c = ['uraian' => $v['uraian']];
+                    foreach ($ar_element as $element) {
+                        if ($element) {
+                            $c[$element] = '';
+                        }
+                    }
+                    $hasil[] = $c;
+                }
+                $temp = $hasil;
+            }
+            if(!$model->addition){
+                $data=['template'=>$temp];
+                $model->addition=json_encode($data, JSON_UNESCAPED_SLASHES);
+                $model->save();
+            }
+            $dataPaket=PaketPengadaan::collectAll(['approval_by' => null,'pemenang'=>null,'id'=>$id])->pluck('nomornamapaket', 'id')->toArray();
             return $this->render('_checklistadmin', ['model'=>$model,'dataPaket'=>$dataPaket,'temp'=>$temp,'title'=>$title]);
         }
         if($request->isPost){

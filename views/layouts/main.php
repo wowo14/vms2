@@ -14,7 +14,17 @@ $publishedRes = Yii::$app->assetManager->publish('@vendor/hail812/yii2-adminlte3
 $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\hail812\adminlte3\assets\AdminLteAsset']);
 $js=<<< JS
     $(".toast").toast('show');
-     $(".alert").animate({opacity: 1.0}, 5000).fadeOut("slow");
+    $(".alert").animate({opacity: 1.0}, 5000).fadeOut("slow");
+    document.onkeyup = KeyCheck;
+    function KeyCheck(e) {
+        var KeyID = window.event ? event.keyCode : e.keyCode;
+        if (KeyID == 113) { // F2 key
+            $('a[href*="create"]').click();
+        }
+        if (KeyID == 27) {// esc key
+            $("button[data-dismiss]").click();
+        }
+    }
 JS;
 $this->registerJs($js, yii\web\View::POS_READY);
 $this->registerCssFile('/css/site.css');

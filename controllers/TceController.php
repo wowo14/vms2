@@ -34,7 +34,7 @@ use yii\web\{Response, NotFoundHttpException};class TceController extends Contro
             ]);
         }
         if ($request->isPost) {
-            $model->uraian = json_encode($_POST['TemplateChecklistEvaluasiDetail']['details'], JSON_UNESCAPED_UNICODE);
+            $model->uraian = json_encode($_POST['TemplateChecklistEvaluasiDetail']['details'], JSON_UNESCAPED_SLASHES);
             $model->save();
             return $this->redirect('index');
         }
