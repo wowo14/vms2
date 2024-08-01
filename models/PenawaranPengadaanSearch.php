@@ -25,7 +25,7 @@ class PenawaranPengadaanSearch extends PenawaranPengadaan{
         if (!$this->validate()) {
             return $dataProvider;
         }
-        $query->joinWith(['paketPengadaan pp']);
+        $query->joinWith(['paketpengadaan pp']);
         $query->joinWith(['vendor p']);
         $query->andFilterWhere([
             'id' => $this->id,

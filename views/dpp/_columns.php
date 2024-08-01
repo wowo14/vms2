@@ -83,25 +83,25 @@ return [
         },
         'visibleButtons'=>[
             'penugasan'=>function($d){
-                return isset($d->paketPengadaan) && !$d->paketpengadaan->pemenang;
+                return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
             'delete'=>function($d){
-                return isset($d->paketPengadaan) && !$d->paketpengadaan->pemenang;
+                return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
             'update'=>function($d){
-                return isset($d->paketPengadaan) && !$d->paketpengadaan->pemenang;
+                return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
             'reject'=>function($d){
-                return isset($d->paketPengadaan) && !$d->paketpengadaan->pemenang;
+                return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
             'ceklistadmin'=>function($d){
-                return isset($d->paketPengadaan) && !$d->paketpengadaan->pemenang;
+                return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
             'printceklistadmin'=>function($d){
-                return isset($d->paketPengadaan) && !$d->paketpengadaan->pemenang;
+                return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
             'formreview'=>function($d){
-                return isset($d->paketPengadaan) && !$d->paketpengadaan->pemenang;
+                return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             }
         ],
         'buttons' => [

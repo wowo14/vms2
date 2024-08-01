@@ -40,7 +40,7 @@ class PenawaranPengadaan extends \yii\db\ActiveRecord
             'updated_at' => 'Updated At',
         ];
     }
-    public function getPaketPengadaan(){
+    public function getPaketpengadaan(){
         return $this->hasOne(PaketPengadaan::class, ['id' => 'paket_id'])->cache(self::cachetime(), self::settagdep('tag_paketpengadaan'));
     }
     public function getAllpaketpengadaan(){

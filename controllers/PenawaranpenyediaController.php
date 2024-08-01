@@ -147,7 +147,7 @@ use yii\helpers\Html;class PenawaranpenyediaController extends Controller {
     public function actionDelete($id) {
         $request = Yii::$app->request;
         $model=$this->findModel($id);
-        if($model->paketPengadaan->pemenang){
+        if($model->paketpengadaan->pemenang){
                 Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
                 return $this->redirect('index');
             }
@@ -164,7 +164,7 @@ use yii\helpers\Html;class PenawaranpenyediaController extends Controller {
         $pks = explode(',', $request->post('pks'));
         foreach ($pks as $pk) {
             $model = $this->findModel($pk);
-            if($model->paketPengadaan->pemenang){
+            if($model->paketpengadaan->pemenang){
                 Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
                 return $this->redirect('index');
             }

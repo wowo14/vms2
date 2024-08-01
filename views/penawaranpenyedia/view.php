@@ -11,7 +11,7 @@ AppAsset::register($this);
         <?= DetailView::widget([
             'model' => $model,
             'attributes' => [
-                ['attribute' => 'paket_id', 'value' => $model->paketPengadaan->nomornamapaket ?? ''],
+                ['attribute' => 'paket_id', 'value' => $model->paketpengadaan->nomornamapaket ?? ''],
                 ['attribute' => 'penyedia_id', 'value' => $model->vendor->nama_perusahaan ?? ''],
                 'nomor',
                 'kode',

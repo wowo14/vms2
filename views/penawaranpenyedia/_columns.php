@@ -16,7 +16,7 @@ return [
     [
         'class' => '\kartik\grid\DataColumn',
         'attribute' => 'paket_id',
-        'value' => 'paketPengadaan.nomornamapaket',
+        'value' => 'paketpengadaan.nomornamapaket',
         'filterType' => GridView::FILTER_SELECT2,
         'filter' => \app\models\PaketPengadaan::collectAll()->pluck('nama_paket', 'id')->toArray(),
         'filterWidgetOptions' => [
@@ -87,10 +87,10 @@ return [
         ],
         'visibleButtons'=>[
             'update'=>function($d){
-                return isset($d->paketPengadaan) && !$d->paketPengadaan->pemenang;
+                return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
             'delete'=>function($d){
-                return isset($d->paketPengadaan) && !$d->paketPengadaan->pemenang;
+                return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
         ],
         'viewOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success'],

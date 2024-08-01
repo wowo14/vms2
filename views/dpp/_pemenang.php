@@ -17,7 +17,7 @@ echo GridView::widget([
             'value' => function ($model, $key) {
                 return ($key == 0) ? \Yii::$app->formatter->asCurrency($model->nilai_penawaran) .
                     ' ' . Html::tag('i', ' ', ['class' => 'fa fa-star', 'style' => 'color:gold']).
-                    ' '.(!$model->paketPengadaan->pemenang?Html::a('Tetapkan', ['/dpp/pemenang?idvendor=' . $model->vendor->id. '&idpaket=' . $model->paket_id], ['class' => 'btn btn-primary']):'')
+                    ' '.(!$model->paketpengadaan->pemenang?Html::a('Tetapkan', ['/dpp/pemenang?idvendor=' . $model->vendor->id. '&idpaket=' . $model->paket_id], ['class' => 'btn btn-primary']):'')
                     : \Yii::$app->formatter->asCurrency($model->nilai_penawaran);
             }
         ],
