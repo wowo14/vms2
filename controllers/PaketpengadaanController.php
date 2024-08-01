@@ -439,10 +439,10 @@ class PaketpengadaanController extends Controller {
         $pks = explode(',', $request->post('pks'));
         foreach ($pks as $pk) {
             $model = $this->findModel($pk);
-            if($model->pemenang){
-                Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada pemenang');
-                return $this->redirect('index');
-            }
+            // if($model->pemenang){
+            //     Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada pemenang');
+            //     return $this->redirect('index');
+            // }
             $model->unlinkAll('details', true);
             $model->delete();
         }
