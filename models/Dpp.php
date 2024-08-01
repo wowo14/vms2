@@ -34,6 +34,14 @@ class Dpp extends \yii\db\ActiveRecord {
             'kode' => 'Kode Paket/kode pemesanan'
         ];
     }
+    public function getNomordpp() {
+        if($this->nomor_dpp == null) {
+           return $this->nomor_dpp = 'DPP-'.date('Ymd').' - '.$this->paketpengadaan->nomor;
+        }
+        else{
+            return $this->nomor_dpp;
+        }
+    }
     public function beforeSave($insert) {
         if ($insert) {
             $this->created_by = Yii::$app->user->identity->id;

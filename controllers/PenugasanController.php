@@ -55,11 +55,10 @@ class PenugasanController extends Controller
                 ->joinWith(['paketpengadaan pp']);
         if ($iddpp !== null) {
             $query->andWhere(['dpp.id' => $iddpp]);
+            $model->dpp_id=$iddpp;
         }
         $data=[
-            'dpp'=> ArrayHelper::map(
-                        $query->asArray()->all(),
-                'id','nomor_dpp'),
+            'dpp'=> ArrayHelper::map($query->all(),'id','nomordpp'),
             'pejabat'=>$model::getAllpetugas(),
             'admin'=>$model::getAlladmin(),
         ];

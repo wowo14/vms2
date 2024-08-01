@@ -3,7 +3,6 @@ use kartik\date\DatePicker;
 use kartik\select2\Select2;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\Html;
-
 ?>
 <div class="penugasan-pemilihanpenyedia-form">
     <?php $form = ActiveForm::begin([
@@ -14,14 +13,19 @@ use yii\helpers\Html;
             'labelOptions' => ['class' => 'col-sm-3 control-label right'],
         ],
     ]); ?>
+    <?php
+    if(count($data['dpp'])>1):
+    ?>
           <?= $form->field($model, 'dpp_id')->widget(Select2::class,[
               'data' => $data['dpp'],
-              'options' => ['placeholder' => 'Pilih DPP'],
+            //'options' => ['placeholder' => 'Pilih DPP'],
               'pluginOptions' => ['allowClear' => true],
           ]) ?>
+        <?php endif;?>
       <?= $form->field($model, 'nomor_tugas')->textInput(['maxlength' => true]) ?>
       <?= $form->field($model, 'tanggal_tugas')->widget(DatePicker::class, [
                     'pluginOptions' => [
+                        'autoclose' => true,
                         'format' => 'yyyy-mm-dd',
                     ],
                 ]) ?>
