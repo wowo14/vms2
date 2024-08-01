@@ -42,7 +42,7 @@
     "swoole-foundation/yii2-swoole-extension": "dev-master"
   },
   "require-dev": {
-    "yiisoft/yii2-gii": "~2.1.0",
+    "yiisoft/yii2-gii": ">=2.2.2",
     "yiisoft/yii2-debug": "~2.1.0",
     "kartik-v/yii2-mpdf": "dev-master",
     "biladina/yii2-ajaxcrud-bs4": "~2.0",
