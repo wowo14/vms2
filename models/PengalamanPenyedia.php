@@ -1,9 +1,6 @@
 <?php
-
 namespace app\models;
-
 use Yii;
-
 class PengalamanPenyedia extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
     public static function tableName() {

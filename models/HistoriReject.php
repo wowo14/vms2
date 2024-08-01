@@ -1,5 +1,6 @@
 <?php
 namespace app\models;
+use Yii;
 class HistoriReject extends \yii\db\ActiveRecord
 {
     use GeneralModelsTrait;
