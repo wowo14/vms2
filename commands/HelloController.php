@@ -137,9 +137,16 @@ class HelloController extends Controller {
             // 'setting',
             'validasi_kualifikasi_penyedia',
             'validasi_kualifikasi_penyedia_detail',
-            // 'attachment',
+            'attachment',
+            'penawaran_pengadaan',
+            'rincian_penawaran',
+            'histori_reject',
+            'paket_pengadaan',
+            'paket_pengadaan_details',
+            'penugasan_pemilihanpenyedia',
+            'persetujuan_pengadaan',
             'review_dpp',
-            // 'dpp',
+            'dpp',
         ];
         // $db->createCommand('SET FOREIGN_KEY_CHECKS = 0;')->execute();
         foreach ($tables as $table) {
