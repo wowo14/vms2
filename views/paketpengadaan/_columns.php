@@ -60,21 +60,21 @@ return [
         'template' => ' {lampiran} {kirimulang} {view} {update} {delete}',
         'vAlign' => 'middle',
         'visibleButtons'=>[
-            // 'delete'=>function($d){
-            //     return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;// || !$d->alasan_reject;
-            // },
-            // 'update'=>function($d){
-            //     return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
-            // },
-            // 'lampiran'=>function($d){
-            //     return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
-            // },
-            // 'ceklistadmin'=>function($d){
-            //     return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
-            // },
-            // 'printceklistadmin'=>function($d){
-            //     return (isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang) && $d->addition;
-            // },
+            'delete'=>function($d){
+                return !$d->paketpengadaan->pemenang;
+            },
+            'update'=>function($d){
+                return !$d->paketpengadaan->pemenang;
+            },
+            'lampiran'=>function($d){
+                return !$d->paketpengadaan->pemenang;
+            },
+            'ceklistadmin'=>function($d){
+                return !$d->paketpengadaan->pemenang;
+            },
+            'printceklistadmin'=>function($d){
+                return !$d->paketpengadaan->pemenang && $d->addition;
+            },
         ],
         'urlCreator' => function ($action, $model, $key, $index) {
             return Url::to([$action, 'id' => $key]);
