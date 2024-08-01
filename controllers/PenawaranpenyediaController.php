@@ -146,7 +146,12 @@ use yii\helpers\Html;class PenawaranpenyediaController extends Controller {
     }
     public function actionDelete($id) {
         $request = Yii::$app->request;
-        $this->findModel($id)->delete();
+        $model=$this->findModel($id);
+        if($model->paketPengadaan->pemenang){
+                Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
+                return $this->redirect('index');
+            }
+        $model->delete();
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return ['forceClose' => true, 'forceReload' => '#crud-datatable-pjax'];
@@ -159,6 +164,10 @@ use yii\helpers\Html;class PenawaranpenyediaController extends Controller {
         $pks = explode(',', $request->post('pks'));
         foreach ($pks as $pk) {
             $model = $this->findModel($pk);
+            if($model->paketPengadaan->pemenang){
+                Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
+                return $this->redirect('index');
+            }
             $model->delete();
         }
         if ($request->isAjax) {

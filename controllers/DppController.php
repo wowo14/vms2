@@ -1,13 +1,11 @@
 <?php
 namespace app\controllers;
-use app\models\Unit;
-use app\models\{HistoriReject,ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails, PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia};
+use app\models\{Unit,HistoriReject,ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails, PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia};
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
-use yii\web\BadRequestHttpException;
-use yii\web\{Response, NotFoundHttpException};
+use yii\web\{BadRequestHttpException,Response, NotFoundHttpException};
 class DppController extends Controller {
     private $_pageSize = 1;
     public function behaviors() {
@@ -454,7 +452,13 @@ class DppController extends Controller {
     }
     public function actionDelete($id) {
         $request = Yii::$app->request;
-        $this->findModel($id)->delete();
+        $model=$this->findModel($id);
+        if($model->paketpengadaan->pemenang){
+                Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
+                return $this->redirect('index');
+            }
+        $model->unlinkAll('reviews',true);
+        $model->delete();
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return ['forceClose' => true, 'forceReload' => '#crud-datatable-pjax'];
@@ -467,6 +471,11 @@ class DppController extends Controller {
         $pks = explode(',', $request->post('pks'));
         foreach ($pks as $pk) {
             $model = $this->findModel($pk);
+            if($model->paketpengadaan->pemenang){
+                Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
+                return $this->redirect('index');
+            }
+            $model->unlinkAll('reviews',true);
             $model->delete();
         }
         if ($request->isAjax) {
