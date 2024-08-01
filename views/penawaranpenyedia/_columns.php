@@ -87,10 +87,10 @@ return [
         ],
         'visibleButtons'=>[
             'update'=>function($d){
-                return !$d->paketPengadaan->pemenang;
+                return !$d->paketPengadaan->pemenang??'';
             },
             'delete'=>function($d){
-                return !$d->paketPengadaan->pemenang;
+                return !$d->paketPengadaan->pemenang??'';
             },
         ],
         'viewOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success'],
