@@ -61,19 +61,19 @@ return [
         'vAlign' => 'middle',
         'visibleButtons'=>[
             'delete'=>function($d){
-                return !$d->pemenang??'' ;// || !$d->alasan_reject;
+                return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;// || !$d->alasan_reject;
             },
             'update'=>function($d){
-                return !$d->pemenang??'';
+                return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
             'lampiran'=>function($d){
-                return !$d->pemenang??'';
+                return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
             'ceklistadmin'=>function($d){
-                return !$d->pemenang??'';
+                return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
             'printceklistadmin'=>function($d){
-                return (!$d->pemenang??'') && $d->addition;
+                return (isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang) && $d->addition;
             },
         ],
         'urlCreator' => function ($action, $model, $key, $index) {

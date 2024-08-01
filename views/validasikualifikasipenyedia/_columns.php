@@ -81,13 +81,13 @@ return [
         },
         'visibleButtons'=>[
             'assestment'=>function($d){
-                return !$d->paketpengadaan->pemenang??'';
+                return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
             'delete'=>function($d){
-                return !$d->paketpengadaan->pemenang??'';
+                return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
             'update'=>function($d){
-                return !$d->paketpengadaan->pemenang??'';
+                return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
         ],
         'buttons' => [

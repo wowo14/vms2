@@ -83,25 +83,25 @@ return [
         },
         'visibleButtons'=>[
             'penugasan'=>function($d){
-                return !$d->paketpengadaan->pemenang??'';
+                return isset($d->paketPengadaan) && !$d->paketpengadaan->pemenang;
             },
             'delete'=>function($d){
-                return !$d->paketpengadaan->pemenang??'';
+                return isset($d->paketPengadaan) && !$d->paketpengadaan->pemenang;
             },
             'update'=>function($d){
-                return !$d->paketpengadaan->pemenang??'';
+                return isset($d->paketPengadaan) && !$d->paketpengadaan->pemenang;
             },
             'reject'=>function($d){
-                return !$d->paketpengadaan->pemenang??'';
+                return isset($d->paketPengadaan) && !$d->paketpengadaan->pemenang;
             },
             'ceklistadmin'=>function($d){
-                return !$d->paketpengadaan->pemenang??'';
+                return isset($d->paketPengadaan) && !$d->paketpengadaan->pemenang;
             },
             'printceklistadmin'=>function($d){
-                return !$d->paketpengadaan->pemenang??'';
+                return isset($d->paketPengadaan) && !$d->paketpengadaan->pemenang;
             },
             'formreview'=>function($d){
-                return !$d->paketpengadaan->pemenang??'';
+                return isset($d->paketPengadaan) && !$d->paketpengadaan->pemenang;
             }
         ],
         'buttons' => [
