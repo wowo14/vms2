@@ -1,8 +1,7 @@
 <?php
 namespace app\controllers;
 use Yii;
-use app\models\PenawaranPengadaan;
-use app\models\PenawaranPengadaanSearch;
+use app\models\{PenawaranPengadaan,PenawaranPengadaanSearch};
 use yii\web\{Response, NotFoundHttpException};
 use yii\filters\VerbFilter;
 use yii\helpers\Html;class PenawaranpenyediaController extends Controller {

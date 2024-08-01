@@ -68,7 +68,7 @@ class PaketpengadaanController extends Controller {
                     move_uploaded_file($fileTmpName, $destination);
                     if (in_array($extension, ['png', 'jpg', 'jpeg', 'gif'])) {
                         // Yii::$app->tools->resizeImageToMaxSize($destination, 512 * 1024);
-                        $newFilename=Yii::$app->tools->convertavif($destination, Yii::getAlias('@uploads'), 90);
+                        $newFilename=Yii::$app->tools->convertavif($destination);
                     }
                     $attachment = new Attachment();
                     $attachment->name = $newFilename;

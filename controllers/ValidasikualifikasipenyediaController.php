@@ -519,6 +519,7 @@ class ValidasikualifikasipenyediaController extends Controller {
                 'vendor_id' => $id,
                 'paket_pengadaan_id' => $paket_id
             ]),$callback=true);
+            return $this->redirect(['viewvalidasipenyedia', 'id' => $id,'paket_id'=>$paket_id]);
         }
         $penawaran = PenawaranPengadaan::collectAll(['penyedia_id' => $id,'paket_id'=>$paket_id]);
         if (!$penawaran) {

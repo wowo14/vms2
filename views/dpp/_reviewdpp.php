@@ -18,9 +18,9 @@ use yii\helpers\Html;
 <h5 style="text-align: center"><b>REVIEW DOKUMEN PERSIAPAN PENGADAAN OLEH PEJABAT PENGADAAN</b></h5>
 <table width="100%">
     <tr>
-        <td width="20%">Bidang/Bagian</td>
+        <td width="30%">Bidang/Bagian</td>
         <td width="1%;">:</td>
-        <td width="79%"><?= $model->unit->unit ?? '' ?></td>
+        <td width="69%"><?= $model->unit->unit ?? '' ?></td>
     </tr>
     <tr>
         <td>Nama Paket / Jenis Kegiatan</td>
@@ -91,7 +91,7 @@ Tanggapan PPK atas dikembalikan DPP :<br>
             <u>( <?= $model->pejabat->nama??'' ?> )</u><br>
             NIP. <?= $model->pejabat->nip??'' ?>
         </td>
-        <td width="50%" style="text-align:center">Gresik, <?= $template->tgl_dikembalikan ? date('d F Y', strtotime($template->tgl_dikembalikan)) : ' ...... ' ?><br>
+        <td width="50%" style="text-align:center">Gresik, <?= ($template->tgl_dikembalikan!=="" || $template->tgl_dikembalikan!==null) ? date('d F Y', strtotime($template->tgl_dikembalikan??'0 days')) : ' ...... ' ?><br>
             (Pejabat Pembuat Komitmen)<br>
             <br>
             <br>

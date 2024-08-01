@@ -187,7 +187,10 @@ class Tools extends Widget
         }
     }
   }
-  public function convertavif($imageFile,$targetDir,$quality = 90){
+  public function convertavif($imageFile,$targetDir=null,$quality = 90){
+    if ($targetDir === null) {
+        $targetDir = Yii::getAlias('@uploads');
+    }
     $image = Image::make($imageFile);
     $fileName = pathinfo($imageFile, PATHINFO_FILENAME);
     $targetFilePath = $targetDir . DIRECTORY_SEPARATOR . $fileName . '.avif';

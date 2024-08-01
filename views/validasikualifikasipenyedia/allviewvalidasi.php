@@ -1,14 +1,13 @@
 <?php
-
 use yii\bootstrap4\Tabs;
 use yii\grid\GridView;
 use yii\helpers\{Html, Url};
-
 echo GridView::widget([
     'id' => 'crud-datatable',
     'dataProvider' => new yii\data\ArrayDataProvider([
         'allModels' => $penawaran->unique('penyedia_id')->toArray(), 'pagination' => false
     ]),
+    'summary' => false,
     'columns' => [
         [
             'class' => 'yii\grid\SerialColumn',

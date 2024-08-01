@@ -29,7 +29,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             'kode_kegiatan' => 'Kode Kegiatan',
             'kode_rekening' => 'Kode Rekening',
             'ppkom' => 'Ppkom',
-            'pagu' => 'Pagu',
+            'pagu' => 'Pagu Paket',
             'metode_pengadaan' => 'Metode Pengadaan', //EPL,PL,E-Purchasing,
             'kategori_pengadaan' => 'Kategori Pengadaan', //barang/jasa, konstruksi, konsultansi
             'created_by' => 'Created By',
