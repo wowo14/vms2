@@ -1,10 +1,10 @@
 <?php
 namespace app\controllers;
-use app\models\{Unit,HistoriReject,ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails, PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia};
+use app\models\{PenugasanPemilihanpenyedia,Unit,HistoriReject,ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails, PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia};
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
-use yii\helpers\Html;
+use yii\helpers\{ArrayHelper,Html};
 use yii\web\{BadRequestHttpException,Response, NotFoundHttpException};
 class DppController extends Controller {
     private $_pageSize = 1;
@@ -260,10 +260,24 @@ class DppController extends Controller {
                 $model->save();
             }
             $dataPaket=$model::collectAll(['approval_by' => null,'pemenang'=>null,'id'=>$model->id])->pluck('nomornamapaket', 'id')->toArray();
-            return $this->render('/paketpengadaan/_checklistadmin', ['model'=>$model,'dataPaket'=>$dataPaket,'temp'=>$temp,'title'=>$title]);
+            //penugasan
+            $query = Dpp::where(['is', 'pp.pemenang', null])
+                    ->joinWith(['paketpengadaan pp']);
+            if ($id !== null) {
+                $query->andWhere(['dpp.id' => $id]);
+            }
+            $datapenugasan=[
+                'dpp'=> ArrayHelper::map($query->all(),'id','nomordpp'),
+                'pejabat'=>$model::getAllpetugas(),
+                'admin'=>$model::getAlladmin(),
+            ];
+            //endpenugasan
+            return $this->render('ceklistadmin', [
+                'datapenugasan' => $datapenugasan,'modelpenugasan'=>PenugasanPemilihanpenyedia::first(['dpp_id'=>$dpp->id]),
+                'dpp'=>$dpp,'model'=>$model,'dataPaket'=>$dataPaket,'temp'=>$temp,'title'=>$title]);
         }
         if($request->isPost){
-            $template = $request->post('PaketPengadaan')['template'];
+            $template = $request->post('CeklistModel')['template'];
             $pure1 = collect($template)->map(function ($e)use($model) {
                 foreach ($e as $key => $value) {
                     $e[$key] = $model->getPurifier($value);
@@ -274,11 +288,23 @@ class DppController extends Controller {
                 return $e;
             });
             $model->addition=json_encode([
-                'unit'=>$_POST['PaketPengadaan']['unit'],
-                'id'=>$_POST['PaketPengadaan']['id'],
+                'unit'=>$_POST['CeklistModel']['unit'],
+                'id'=>$_POST['CeklistModel']['paket_id'],
                 'template'=>$pure1
             ],JSON_UNESCAPED_SLASHES);
             $model->save();
+            $dpp->nomor_dpp=$_POST['CeklistModel']['nomor_dpp'];
+            $dpp->bidang_bagian=$_POST['CeklistModel']['unit'];
+            $dpp->pejabat_pengadaan=$_POST['CeklistModel']['pejabat'];
+            $dpp->admin_pengadaan=$_POST['CeklistModel']['admin'];
+            $dpp->save();
+            $modelpenugasan = PenugasanPemilihanpenyedia::where(['dpp_id'=>$dpp->id])->one()??new PenugasanPemilihanpenyedia();
+            $modelpenugasan->dpp_id=$dpp->id;
+            $modelpenugasan->tanggal_tugas=$_POST['CeklistModel']['tanggal_tugas'];
+            $modelpenugasan->nomor_tugas=$_POST['CeklistModel']['nomor_tugas'];
+            $modelpenugasan->pejabat=$_POST['CeklistModel']['pejabat'];
+            $modelpenugasan->admin=$_POST['CeklistModel']['admin'];
+            $modelpenugasan->save();
             Yii::$app->session->setFlash('success', 'Kelengkapan DPP Berhasil Ditambahkan');
             return $this->redirect(['/dpp/index']);
         }
@@ -464,7 +490,10 @@ class DppController extends Controller {
                 Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
                 return $this->redirect('index');
             }
+        $model->paketpengadaan->addition=null;
+        $model->paketpengadaan->save();
         $model->unlinkAll('reviews',true);
+        $model->unlinkAll('penugasan',true);
         $model->delete();
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -482,7 +511,10 @@ class DppController extends Controller {
                 Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
                 return $this->redirect('index');
             }
+            $model->paketpengadaan->addition=null;
+            $model->paketpengadaan->save();
             $model->unlinkAll('reviews',true);
+            $model->unlinkAll('penugasan',true);
             $model->delete();
         }
         if ($request->isAjax) {

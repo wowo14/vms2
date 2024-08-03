@@ -76,15 +76,15 @@ return [
         'class' => 'kartik\grid\ActionColumn',
         'dropdown' => false,
         'noWrap' => 'true',
-        'template' => '{penugasan} {reject} {approve} {ceklistadmin} {printceklistadmin} {reviewdpp} {formreview} {view} {update} {delete}',
+        'template' => '{reject} {approve} {ceklistadmin} {printceklistadmin} {reviewdpp} {formreview} {view} {update} {delete}',
         'vAlign' => 'middle',
         'urlCreator' => function ($action, $model, $key, $index) {
             return Url::to([$action, 'id' => $key]);
         },
         'visibleButtons'=>[
-            'penugasan'=>function($d){
-                return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
-            },
+            // 'penugasan'=>function($d){
+            //     return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
+            // },
             'delete'=>function($d){
                 return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
@@ -105,13 +105,13 @@ return [
             }
         ],
         'buttons' => [
-            'penugasan' => function ($url, $model, $key) {
-                return Html::a(
-                    '<span class="fa fa-flag"></span>',
-                    $url,
-                    ['class' => 'btn btn-sm btn-outline-info', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote', 'title' => 'Penugasan', 'data-toggle' => 'tooltip']
-                );
-            },
+            // 'penugasan' => function ($url, $model, $key) {
+            //     return Html::a(
+            //         '<span class="fa fa-flag"></span>',
+            //         $url,
+            //         ['class' => 'btn btn-sm btn-outline-info', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote', 'title' => 'Penugasan', 'data-toggle' => 'tooltip']
+            //     );
+            // },
             'approve' => function ($url, $model, $key) {
                 return Html::a(
                     '<span class="fa fa-check-double"></span>',

@@ -3,11 +3,13 @@ use kartik\date\DatePicker;
 use kartik\select2\Select2;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\Html;
+$modelaction=$model->isNewRecord?'/penugasan/create?iddpp='.$iddpp:'/penugasan/update?id='.$model->id;
 ?>
 <div class="penugasan-pemilihanpenyedia-form">
     <?php $form = ActiveForm::begin([
         'id'=>'penugasan-pemilihanpenyedia-form',
         'enableAjaxValidation' => false,
+        'action'=>$modelaction,
         'fieldConfig' => [
             'template' => "<div class='row'>{label}\n<div class='col-sm-9'>{input}\n{error}</div></div>",
             'labelOptions' => ['class' => 'col-sm-3 control-label right'],

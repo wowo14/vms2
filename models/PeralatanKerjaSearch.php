@@ -3,8 +3,8 @@ namespace app\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Peralatankerja;
-class PeralatanKerjaSearch extends Peralatankerja{
+use app\models\PeralatanKerja;
+class PeralatanKerjaSearch extends PeralatanKerja{
     public function rules()
     {
         return [
@@ -18,7 +18,7 @@ class PeralatanKerjaSearch extends Peralatankerja{
     }
     public function search($params,$where=null)
     {
-        $query = Peralatankerja::find()->cache(self::cachetime(), self::settagdep('tag_peralatankerja'))->where($where);
+        $query = PeralatanKerja::find()->cache(self::cachetime(), self::settagdep('tag_peralatankerja'))->where($where);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
         ]);
