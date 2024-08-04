@@ -41,13 +41,6 @@ class DppController extends Controller {
         }
     }
     public function actionIndex() {
-        // $query = Dpp::where(['is', 'pp.pemenang', null])
-        //         ->joinWith(['paketpengadaan pp']);
-        // // if ($iddpp !== null) {
-        //     $query->andWhere(['dpp.id' =>2]);
-        // // }
-        // print_r($query->one()->nomordpp);
-        // die;
         $searchModel = new DppSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [

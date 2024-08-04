@@ -2,11 +2,12 @@
 use app\assets\AppAsset;
 use app\widgets\FilePreview;
 use kartik\date\DatePicker;
+use kartik\select2\Select2;
 use kartik\switchinput\SwitchInput;
 use unclead\multipleinput\MultipleInput;
 use unclead\multipleinput\MultipleInputColumn;
-use yii2ajaxcrud\ajaxcrud\CrudAsset;
 // use yii\bootstrap4\ActiveForm;
+use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii\bootstrap4\Modal;
 use yii\helpers\Html;
 use yii\web\View;
@@ -46,9 +47,9 @@ jQuery(function ($) {
     <h5>REVIEW DOKUMEN PERSIAPAN PENGADAAN OLEH PEJABAT PENGADAAN</h5>
     <table width="100%">
         <tr>
-            <td width="20%">Bidang/Bagian</td>
+            <td width="30%">Bidang/Bagian</td>
             <td width="1%;">:</td>
-            <td width="79%"><?= $model->unit->unit ?? '' ?></td>
+            <td width="69%"><?= $model->unit->unit ?? '' ?></td>
         </tr>
         <tr>
             <td>Nama Paket / Jenis Kegiatan</td>
@@ -128,7 +129,14 @@ jQuery(function ($) {
         ?>
     </div></div>
     Kesimpulan :<br>
-    <?= $form->field($reviews, 'kesimpulan') ?>
+    <?= $form->field($reviews, 'kesimpulan')->widget(Select2::class,[
+        'data' => [
+            'lanjutkan' => 'Lanjutkan',
+            'ditolak' => 'Ditolak'
+        ],
+        'options' => ['placeholder' => 'Pilih kesimpulan'],
+        'pluginOptions' => ['allowClear' => true],
+    ]) ?>
     <?= $form->field($reviews, 'tgl_dikembalikan')->widget(DatePicker::class, [
         'pluginOptions' => [
             'format' => 'yyyy-mm-dd',

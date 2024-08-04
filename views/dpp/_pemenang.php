@@ -11,7 +11,7 @@ echo GridView::widget([
         [
             'class' => 'yii\grid\SerialColumn',
         ],
-        ['attribute' => 'penyedia_id', 'value' => fn ($model) => $model->vendor->nama_perusahaan ?? ''],
+        ['attribute' => 'penyedia_id', 'header' => 'Penyedia','value' => fn ($model) => $model->vendor->nama_perusahaan ?? ''],
         [
             'attribute' => 'nilai_penawaran', 'format' => 'html',
             'value' => function ($model, $key) {
