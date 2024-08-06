@@ -5,7 +5,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
     public $oldrecord;
     public $statusPengadaan;
-    // public $unit;
+    public $unit;
     public static function tableName() {
         return 'paket_pengadaan';
     }
