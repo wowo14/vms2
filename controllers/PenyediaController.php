@@ -121,6 +121,7 @@ use yii\web\{Response, NotFoundHttpException};class PenyediaController extends C
                     'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
                         Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote'])
                 ];
+                // return $this->goBack(Yii::$app->request->referrer);
             } else {
                 return [
                     'title' => Yii::t('yii2-ajaxcrud', 'Update') . " Penyedia #" . $id,

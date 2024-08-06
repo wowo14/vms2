@@ -18,7 +18,7 @@ AppAsset::register($this);
                 'tanggal_mendaftar',
                 'ip_client',
                 'masa_berlaku',
-                'nilai_penawaran',
+                ['attribute'=>'nilai_penawaran','value'=>\Yii::$app->formatter->asCurrency($model->nilai_penawaran)],
                 'lampiran_penawaran:ntext',
                 'lampiran_penawaran_harga:ntext',
                 'penilaian',

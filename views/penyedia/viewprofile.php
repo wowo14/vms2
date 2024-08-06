@@ -103,3 +103,16 @@ use yii\widgets\Pjax;
         ?>
     </div>
 </div>
+<?php Modal::begin([
+    "id" => $model->hash,
+    "footer" => "",
+    "clientOptions" => [
+        "tabindex" => false,
+        "backdrop" => "static",
+        "keyboard" => true,
+    ],
+    "options" => [
+        "tabindex" => true
+    ]
+]) ?>
+<?php Modal::end(); ?>

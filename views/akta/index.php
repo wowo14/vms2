@@ -4,11 +4,11 @@ use yii\helpers\Html;
 use yii\bootstrap4\Modal;
 use kartik\grid\GridView;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
-use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;$idmodal = $searchModel->hash;
+use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
+$idmodal = $searchModel->hash;
 $this->title = 'Akta Penyedia';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
-
 ?>
 <div class="akta-penyedia-index">
     <div id="ajaxCrudDatatable">

@@ -1,9 +1,6 @@
 <?php
-
 use kartik\grid\GridView;
-use yii\helpers\Html;
-use yii\helpers\Url;
-
+use yii\helpers\{Html,Url};
 return [
     [
         'class' => 'kartik\grid\CheckboxColumn',
@@ -12,6 +9,15 @@ return [
     [
         'class' => 'kartik\grid\SerialColumn',
         'width' => '30px',
+    ],
+    'ExpandRowColumn' =>
+    [
+        'class' => '\kartik\grid\ExpandRowColumn',
+        'value' => function ($model, $key, $index, $column) {
+            return GridView::ROW_COLLAPSED;
+        },
+        'detailUrl' => Url::to(['/penawaranpenyedia/detailnego']),
+        'hiddenFromExport' => true
     ],
     [
         'class' => '\kartik\grid\DataColumn',
@@ -41,7 +47,11 @@ return [
     ],
     [
         'class' => '\kartik\grid\DataColumn',
-        'attribute' => 'kode',
+        'attribute' => 'kode','format'=>'raw',
+        'value' => fn ($d) =>Html::a($d->kode, ['/penawaranpenyedia/nego', 'id' => $d->id],
+            ['role' => 'modal-remote','data-pjax' => '1','data-target'=>'#'.$idmodal,'title' => Yii::t('yii2-ajaxcrud', 'Nego'),
+                    'aria-label' => Yii::t('yii2-ajaxcrud', 'Nego'),]
+        )?? ''
     ],
     [
         'class' => '\kartik\grid\DataColumn',

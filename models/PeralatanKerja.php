@@ -43,9 +43,11 @@ class PeralatanKerja extends \yii\db\ActiveRecord
         if ($insert) {
             $this->created_by = Yii::$app->user->identity->id;
             $this->created_at = date('Y-m-d H:i:s', time());
+            $this->file=!empty($this->file) ? $this->upload($this->file, 'file_alat_' . $this->penyedia_id . '_' . time()) : '';
         } else {
             $this->updated_by = Yii::$app->user->identity->id;
             $this->updated_at = date('Y-m-d H:i:s', time());
+            $this->file=!empty($this->file) ? $this->upload($this->file, 'file_alat_' . $this->penyedia_id . '_' . time()) : $this->file;
         }
         return parent::beforeSave($insert);
     }

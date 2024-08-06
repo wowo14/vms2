@@ -1,8 +1,7 @@
 <?php
 namespace app\controllers;
 use Yii;
-use app\models\StaffAhli;
-use app\models\StaffAhliSearch;
+use app\models\{StaffAhli,StaffAhliSearch};
 use yii\web\{Response, NotFoundHttpException};
 use yii\filters\VerbFilter;
 use yii\helpers\Html;class StaffahliController extends Controller {

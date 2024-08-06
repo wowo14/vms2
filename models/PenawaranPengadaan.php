@@ -4,6 +4,7 @@ use Yii;
 class PenawaranPengadaan extends \yii\db\ActiveRecord
 {
     use GeneralModelsTrait;
+    public $isPemenang;
     public static function tableName()
     {
         return 'penawaran_pengadaan';
@@ -40,8 +41,16 @@ class PenawaranPengadaan extends \yii\db\ActiveRecord
             'updated_at' => 'Updated At',
         ];
     }
+    public function getPenawaranpenyedia(){
+        if(!$this->pemenang){
+            return $this->kode.'||'.$this->paketpengadaan->nomornamapaket.'||'.$this->vendor->nama_perusahaan.'||'.\Yii::$app->formatter->asCurrency($this->nilai_penawaran);
+        }
+    }
     public function getPaketpengadaan(){
         return $this->hasOne(PaketPengadaan::class, ['id' => 'paket_id'])->cache(self::cachetime(), self::settagdep('tag_paketpengadaan'));
+    }
+    public function getPemenang(){
+        return $isPemenang=$this->paketpengadaan->pemenang?true:false;
     }
     public function getAllpaketpengadaan(){
         return PaketPengadaan::where(['not',['nomor'=>null] ])->all();

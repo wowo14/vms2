@@ -1,10 +1,12 @@
 <?php
 namespace app\controllers;
+use app\models\{Negosiasi,PenawaranPengadaan,PenawaranPengadaanSearch};
 use Yii;
-use app\models\{PenawaranPengadaan,PenawaranPengadaanSearch};
-use yii\web\{Response, NotFoundHttpException};
+use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
-use yii\helpers\Html;class PenawaranpenyediaController extends Controller {
+use yii\helpers\{ArrayHelper,Html};
+use yii\web\{Response, NotFoundHttpException};
+class PenawaranpenyediaController extends Controller {
     public function behaviors() {
         return [
             'verbs' => [
@@ -40,6 +42,40 @@ use yii\helpers\Html;class PenawaranpenyediaController extends Controller {
             return $this->render('view', [
                 'model' => $model = $this->findModel($id),
             ]);
+        }
+    }
+    public function actionDetailnego() {
+        if (isset($_POST['expandRowKey'])) {
+            $model = $this->findModel($_POST['expandRowKey']);
+            $query = Negosiasi::where(['penawaran_id' => $model->id]);
+            $model = new ActiveDataProvider([
+                'query' => $query,
+                // 'sort' => false,
+            ]);
+            $model->pagination = false;
+            return $this->renderAjax('/penawaranpenyedia/_detailnego', ['dataProvider' => $model]);
+        } else {
+            return '<div class="alert alert-danger">No data found</div>';
+        }
+    }
+    public function actionNego($id){
+        $request = Yii::$app->request;
+        $model = new Negosiasi();
+        $penawaran=$this->findModel($id);
+        if ($request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            if ($request->isGet) {
+                return [
+                    'title' => "Nego Penawaran #" . $penawaran->paketpengadaan->nomornamapaket,
+                    'content' => $this->renderAjax('_frm_nego', ['model' => $model,'penawaran'=>$penawaran]),
+                    'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
+                        Html::button(Yii::t('yii2-ajaxcrud', 'Create'), ['class' => 'btn btn-primary', 'type' => 'submit'])
+                ];
+            }
+            if($model->load($request->post()) && $model->save()){
+                Yii::$app->session->setFlash('success', 'sukses input nilai nego');
+                return $this->redirect('index');
+            }
         }
     }
     public function actionCreate() {

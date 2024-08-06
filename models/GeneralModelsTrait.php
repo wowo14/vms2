@@ -2,6 +2,7 @@
 namespace app\models;
 use Yii;
 use yii\caching\TagDependency;
+use yii\db\Expression;
 use yii\helpers\{ArrayHelper, BaseStringHelper, HtmlPurifier};
 trait GeneralModelsTrait {
     public static function settingType($type) {
@@ -274,5 +275,17 @@ trait GeneralModelsTrait {
     }
     public function getPurifier($value){
         return HtmlPurifier::process($value);
+    }
+    public function getDbCurrentTimestamp(){
+        switch (Yii::$app->db->driverName) {
+            case 'mysql':
+                return new Expression('NOW()');
+            case 'pgsql':
+                return new Expression('NOW()');
+            case 'sqlite':
+                return date('Y-m-d H:i:s', time());
+            default:
+                throw new \Exception('Your database is not supported!');
+        }
     }
 }

@@ -5,6 +5,7 @@ use Yii;
 use yii\db\Expression;
 class Pengurusperusahaan extends Contacts
 {
+    use GeneralModelsTrait;
     public function rules()
     {
         return [
@@ -47,16 +48,22 @@ class Pengurusperusahaan extends Contacts
         } else {
             //update password login
             if (!empty($this->password)) {
-                $user = User::findOne($this->user_id);
-                $user->setPassword($this->password);
-                $user->save(false);
+                $user = User::findOne(['email'=>$this->email]);
+                if($user){
+                    $user->setPassword($this->password);
+                    $user->save(false);
+                }else{
+                    //create new users
+                    $this->user_id = $this->signup()->id;
+                    $this->is_vendor = 1;
+                }
             }
         }
         if ($insert && $this->hasAttribute('created_at') && $this->hasAttribute('created_by')) {
-            $this->created_at = new Expression('NOW()');
+            $this->created_at = $this->getbCurrentTimestamp();
             $this->created_by = Yii::$app->user->id ? Yii::$app->user->identity->id : '';
         } elseif (!$insert && $this->hasAttribute('updated_at') && $this->hasAttribute('updated_by')) {
-            $this->updated_at = new Expression('NOW()');
+            $this->updated_at = $this->getDbCurrentTimestamp();
             $this->updated_by = Yii::$app->user->id ? Yii::$app->user->identity->id : '';
         }
         return parent::beforeSave($insert);
