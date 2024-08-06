@@ -19,7 +19,7 @@ use yii\widgets\DetailView;
             'updated_at:ntext',
             ['attribute' => 'created_by', 'value' => $model->usercreated->username ?? ''],
             ['attribute' => 'updated_by', 'value' => $model->userupdated->username ?? ''],
-            'nilai_kontrak',
+            ['attribute'=>'nilai_kontrak', 'value' => Yii::$app->formatter->asCurrency($model->nilai_kontrak)],
             'file:ntext',
         ],
     ]) ?>

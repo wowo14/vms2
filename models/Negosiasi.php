@@ -15,14 +15,27 @@ class Negosiasi extends \yii\db\ActiveRecord
             [['penawaran_id', 'accept', 'created_by'], 'integer'],
             [['ammount'], 'number'],
             [['created_at'], 'safe'],
+            [['ammount'], 'validateAmmount'],
         ];
+    }
+    public function validateAmmount($attribute, $params, $validator){
+        $previousValue = self::last(['penawaran_id' => $this->penawaran_id])->ammount??PenawaranPengadaan::last(['id' => $this->penawaran_id])->nilai_penawaran;
+        if ($previousValue !== null) {
+            if ($this->$attribute >= $previousValue) {
+                $this->addError($attribute, Yii::t('yii', "{$attribute} must be lower than previous value.".$previousValue));
+                return false;
+            }
+        } else {
+            Yii::error('No previous record found', __METHOD__);
+        }
+        return true;
     }
     public function attributeLabels()
     {
         return [
             'id' => 'ID',
             'penawaran_id' => 'Penawaran ID',
-            'ammount' => 'Ammount',
+            'ammount' => 'Nilai Negosiasi',
             'accept' => 'Accept',
             'created_by' => 'Created By',
             'created_at' => 'Created At',

@@ -140,17 +140,17 @@ class NegoController extends Controller
             }
         }
     }
-    // public function actionDelete($id)
-    // {
-    //     $request = Yii::$app->request;
-    //     $this->findModel($id)->delete();
-    //     if($request->isAjax){
-    //         Yii::$app->response->format = Response::FORMAT_JSON;
-    //         return ['forceClose'=>true,'forceReload'=>'#crud-datatable-pjax'];
-    //     }else{
-    //         return $this->redirect(['index']);
-    //     }
-    // }
+    public function actionDelete($id)
+    {
+        $request = Yii::$app->request;
+        $this->findModel($id)->delete();
+        if($request->isAjax){
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ['forceClose'=>true,'forceReload'=>'#crud-datatable-pjax'];
+        }else{
+            return $this->redirect(['index']);
+        }
+    }
     // public function actionBulkdelete()
     // {
     //     $request = Yii::$app->request;

@@ -16,9 +16,16 @@ class PenyediaSearch extends Penyedia{
     {
         return Model::scenarios();
     }
-    public function search($params)
+    public function search($params,$where=null)
     {
-        $query = Penyedia::find()->cache(self::cachetime(), self::settagdep('tag_penyedia'));
+        if(Yii::$app->tools->isVendor()){
+            if(is_array($where)){
+                $where=array_merge($where,['id' => Yii::$app->session->get('companygroup')]);
+            }else{
+                $where = ['id' => Yii::$app->session->get('companygroup')];
+            }
+        }
+        $query = Penyedia::where($where);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
         ]);

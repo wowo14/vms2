@@ -18,7 +18,14 @@ class IjinusahaSearch extends Ijinusaha {
         return Model::scenarios();
     }
     public function search($params, $where = null) {
-        $query = Ijinusaha::find()->cache(self::cachetime(), self::settagdep('tag_ijinusaha'))->where($where);
+        if(Yii::$app->tools->isVendor()){
+            if(is_array($where)){
+                $where=array_merge($where,['penyedia_id' => Yii::$app->session->get('companygroup')]);
+            }else{
+                $where = ['penyedia_id' => Yii::$app->session->get('companygroup')];
+            }
+        }
+        $query = Ijinusaha::where($where);
         $dataProvider = new ActiveDataProvider([
             'query' => $query, 'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
         ]);

@@ -5,8 +5,7 @@ use yii\widgets\DetailView;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
-            'penyedia_id',
+            ['attribute'=>'penyedia_id', 'value' => $model->vendor->nama_perusahaan],
             'nama_alat:ntext',
             'jumlah',
             'kapasitas:ntext',

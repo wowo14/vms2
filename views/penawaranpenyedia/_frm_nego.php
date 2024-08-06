@@ -57,7 +57,7 @@ use yii\helpers\Html;
         ],
     ]); ?>
     <?= $form->field($model, 'penawaran_id')->hiddenInput(['value' => $penawaran->id, 'readonly' => 'readonly'])->label(false) ?>
-      <?= $form->field($model, 'ammount')->textInput(['placeholder'=>'Masukkan Jumlah Penawaran']) ?>
+      <?= $form->field($model, 'ammount')->textInput(['placeholder'=>'Masukkan Jumlah Penawaran','type'=>'number']) ?>
       <?php if($this->context->isVendor()):?>
       <?= $form->field($model, 'accept')->widget(SwitchInput::class,[
           'pluginOptions' => [

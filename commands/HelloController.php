@@ -1,6 +1,7 @@
 <?php
 namespace app\commands;
 use app\Controllers\DppController;
+use app\models\Contacts;
 use app\models\Dpp;
 use app\models\PaketPengadaan;
 use app\models\PaketPengadaanDetails;
@@ -8,69 +9,22 @@ use app\models\PenawaranPengadaan;
 use app\models\Sertipikat;
 use app\models\TemplateChecklistEvaluasi;
 use app\models\TemplateChecklistEvaluasiDetail;
+use app\models\User;
 use app\models\ValidasiKualifikasiPenyedia;
 use app\models\ValidasiKualifikasiPenyediaDetail;
 use Yii;
 use yii\console\Controller;
+use yii\db\Expression;
 
 class HelloController extends Controller {
-    public function actionGen1($id,$paket_id) {
-        $templates = TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->all();
-        $kualifikasi = ValidasiKualifikasiPenyedia::findAll(['penyedia_id' => $id,'paket_pengadaan_id'=>$paket_id]);
-        if (!$kualifikasi) {
-            // throw new NotFoundHttpException('Petugas Belom Memvalidasi Kualifikasi Penyedia');
-            //auto generate dokumen kualifikasi
-            /*
-            Ceklist_Evaluasi_Administrasi
-            Ceklist_Evaluasi_Kesimpulan
-            Ceklist_Evaluasi_Negosiasi
-            Ceklist_Evaluasi_Penawaran
-            Ceklist_Evaluasi_Teknis
-            */
-            foreach($templates as $tmp){
-                if($tmp->jenis_evaluasi!=='Kesimpulan'){
-                    $params=[
-                        'penyedia_id'=>$id,
-                        'paket_pengadaan_id'=>$paket_id,
-                        'keperluan'=>$tmp->jenis_evaluasi,
-                        'template'=>$tmp->id,
-                        'is_active'=>1,
-                    ];
-                    $model=new ValidasiKualifikasiPenyedia();
-                    $model->attributes=$params;
-                    $model->save();
-                    if ($tmp->id) {
-                        $hasil = [];
-                        $collect = $tmp;
-                        if ($collect->element) {
-                            $ar_element = explode(',', $collect->element);
-                        }
-                        foreach (json_decode($collect->detail->uraian, true) as $v) {
-                            $c = ['uraian' => $v['uraian']];
-                            if ($collect->element) {
-                                foreach ($ar_element as $element) {
-                                    if ($element) {
-                                        $c[$element] = '';
-                                    }
-                                }
-                            }
-                            $hasil[] = $c;
-                        }
-                        $detail = new ValidasiKualifikasiPenyediaDetail();
-                        $detail->header_id = $model->id;
-                        $detail->hasil = json_encode($hasil);
-                        $detail->save(false);
-                    }
-                }
-            }
-            // print_r($params);
-            // print_r($templates);
-            $this->actionGeneratekesimpulan($this->hashurl([
-                'vendor_id' => $id,
-                'paket_pengadaan_id' => $paket_id
-            ]));
-            print_r('auto generate dokumen kualifikasi');
-        }
+    public function actionTest() {
+        $model=collect(PenawaranPengadaan::where(['paket_id' => 2, 'penyedia_id' =>1])
+        ->select(new Expression('paket_id,penyedia_id,coalesce(negosiasi.ammount, nilai_penawaran) as nilai_penawaran,nilai_penawaran as _nilai_penawaran'))
+        ->joinWith('negosiasi')->asArray()
+        ->one())->map(function($e){
+            return $e;
+        })->toArray();
+        print_r($model);
     }
     public function actionHitung() { // hitung pada paket pengadaan mana?
         $r = ValidasiKualifikasiPenyedia::getCalculated(1);
@@ -90,30 +44,6 @@ class HelloController extends Controller {
         echo "\n";
         Yii::error('hello world');
         die;
-        $params=['paket_pengadaan_id' => 1];
-        $tmp = TemplateChecklistEvaluasi::where(['template' => 'Ceklist_Evaluasi_Kesimpulan'])->one();
-        $lolos = ValidasiKualifikasiPenyedia::find()->joinWith('detail')
-            ->where(['template' => $tmp->id, 'paket_pengadaan_id' => $params['paket_pengadaan_id']])->asArray()->all();
-        $filtered = collect($lolos)->where('detail.hasil', '[{"uraian":"Catatan Oleh Pejabat Pengadaan","komentar":"Lolos Administrasi Validasi Dokumen","sesuai":""}]');
-        $mapPenawaran = $filtered->map(function ($e) {
-        //     return Dpp::where(['paket_id'=>$e['paket_pengadaan_id']])->one();
-            return PenawaranPengadaan::where(['paket_id' => $e['paket_pengadaan_id'], 'penyedia_id' => $e['penyedia_id']])->one();
-        })->sortBy('nilai_penawaran')->first();//->values()->all();// nilai penawaran terendah
-        print_r($mapPenawaran);
-        // print_r($filtered); *ops23Tms#
-        // $hasil = [];
-        // $collect = TemplateChecklistEvaluasi::findOne(1);
-        // $ar_element = explode(',', $collect->element);
-        // foreach (json_decode($collect->detail->uraian, true) as $v) {
-        //     $c = ['uraian' => $v['uraian']];
-        //     foreach ($ar_element as $element) {
-        //         if ($element) {
-        //             $c[$element] = '';
-        //         }
-        //     }
-        //     $hasil[] = $c;
-        // }
-        // print_r($hasil);
     }
     public function actionSeed() {
     }
@@ -139,6 +69,7 @@ class HelloController extends Controller {
             'validasi_kualifikasi_penyedia_detail',
             'attachment',
             'penawaran_pengadaan',
+            'negosiasi',
             'rincian_penawaran',
             'histori_reject',
             'paket_pengadaan',
@@ -147,7 +78,22 @@ class HelloController extends Controller {
             'persetujuan_pengadaan',
             'review_dpp',
             'dpp',
+            'dok_akta_penyedia',
+            'dok_ijinusaha',
+            'pengalaman_penyedia',
+            'peralatan_kerja',
+            'staff_ahli'
         ];
+        // unlink all files in folder web/uploads
+        $dir = Yii::getAlias('@uploads');
+        if (is_dir($dir)) {
+            $files = glob($dir . '/*');
+            foreach ($files as $file) {
+                if (is_file($file)) {
+                    unlink($file);
+                }
+            }
+        }
         // $db->createCommand('SET FOREIGN_KEY_CHECKS = 0;')->execute();
         foreach ($tables as $table) {
             echo "Dropping table: $table\n";

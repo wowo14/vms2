@@ -1,12 +1,9 @@
 <?php
-
 namespace app\models;
-
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\AktaPenyedia;
-
 class AktaPenyediaSearch extends AktaPenyedia {
     public function rules() {
         return [
@@ -18,6 +15,13 @@ class AktaPenyediaSearch extends AktaPenyedia {
         return Model::scenarios();
     }
     public function search($params, $where = null) {
+        if(Yii::$app->tools->isVendor()){
+            if(is_array($where)){
+                $where=array_merge($where,['penyedia_id' => Yii::$app->session->get('companygroup')]);
+            }else{
+                $where = ['penyedia_id' => Yii::$app->session->get('companygroup')];
+            }
+        }
         $query = AktaPenyedia::find()->cache(self::cachetime(), self::settagdep('tag_aktapenyedia'))->where($where);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

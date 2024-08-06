@@ -18,7 +18,7 @@ $dpp=collect($dpp)->pluck('paketpengadaans')->flatten()->pluck('nomornamapaket',
         ],
     ]); ?>
       <?= $form->field($model, 'penyedia_id')->widget(Select2::class,[
-            'data'=>Penyedia::collectAll()->pluck('nama_perusahaan','id')->toArray(),
+            'data'=>Penyedia::collectAll(['active'=>1])->pluck('nama_perusahaan','id')->toArray(),
             'options' => ['placeholder' => 'Pilih Penyedia...'],
             'pluginOptions' => [
                 'allowClear' => true

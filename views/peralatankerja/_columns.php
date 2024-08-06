@@ -15,7 +15,7 @@ use yii\helpers\Url;return [
         'attribute' => 'penyedia_id',
         'value' => 'vendor.nama_perusahaan',
         'filterType' => GridView::FILTER_SELECT2,
-        'filter' => \app\models\Penyedia::collectAll(['active' => 1])->pluck('nama_perusahaan', 'id')->toArray(),
+        'filter' => $searchModel->vendors->pluck('nama_perusahaan', 'id')->toArray(),
         'filterWidgetOptions' => [
             'pluginOptions' => ['allowClear' => true],
         ],
@@ -44,7 +44,7 @@ use yii\helpers\Url;return [
         'template' => '{view} {update} {delete}',
         'vAlign' => 'middle',
         'urlCreator' => function ($action, $model, $key, $index) {
-            return Url::to(['peralatankerja' . $action, 'id' => $key]);
+            return Url::to(['/peralatankerja/' . $action, 'id' => $key]);
         },
         'viewOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success'],
         'updateOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Update'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-primary'],

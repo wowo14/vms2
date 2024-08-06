@@ -1,9 +1,12 @@
 <?php
+use app\models\PenawaranPengadaan;
+use yii2ajaxcrud\ajaxcrud\CrudAsset;
+use yii\bootstrap4\Modal;
 use yii\grid\GridView;
 use yii\helpers\{url,Html};
-use yii2ajaxcrud\ajaxcrud\CrudAsset;
 $this->title = 'Penawaran Pengadaan';
 $this->params['breadcrumbs'][] = $this->title;
+$mdl=new PenawaranPengadaan();
 CrudAsset::register($this);
 ?>
 <div class="penawaran-pengadaan-index">
@@ -11,13 +14,17 @@ CrudAsset::register($this);
         <?= GridView::widget([
             'id' => 'crud-datatable',
             'dataProvider' =>new yii\data\ArrayDataProvider(['allModels' => $model->toArray(), 'pagination' => false]),
+            'summary' => false,
             'columns' => [
                 [
                     'class' => 'yii\grid\SerialColumn',
                 ],
                 [
-                    'attribute' => 'penyedia_id','format'=>'raw','header'=>'Penyedia',
-                    'value' => fn ($d) => Html::a($d->vendor->nama_perusahaan,Url::to('/penyedia/view?id='.$d->penyedia_id))??''
+                    'attribute' => 'penyedia_id','format'=>'raw','header'=>'Penyedia/Negosiasi',
+                    'value' => fn ($d) => Html::a($d->vendor->nama_perusahaan,Url::to('/penawaranpenyedia/nego?id='.$d->id),[
+                        'data-pjax' => 1,'role' => 'modal-remote','data-target'=>'#'.$d->hash
+                    ])??''
+                    // 'value' => fn ($d) => Html::a($d->vendor->nama_perusahaan,Url::to('/penyedia/view?id='.$d->penyedia_id))??''
                 ],
                 'tanggal_mendaftar',
                 'ip_client',
@@ -44,3 +51,16 @@ CrudAsset::register($this);
         ]) ?>
     </div>
 </div>
+<?php Modal::begin([
+    "id" => $mdl->hash,'size' => 'modal-xl',
+    "footer" => "",
+    "clientOptions" => [
+        "tabindex" => false,
+        "backdrop" => "static",
+        "keyboard" => true,
+    ],
+    "options" => [
+        "tabindex" => false
+    ]
+])?>
+<?php Modal::end(); ?>

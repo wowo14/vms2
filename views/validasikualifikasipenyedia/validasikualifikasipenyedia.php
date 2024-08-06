@@ -10,6 +10,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'id' => 'crud-datatable',
             'dataProvider' => new yii\data\ArrayDataProvider([
                 'allModels' => $model->unique('penyedia_id')->toArray(), 'pagination' => false]),
+            'summary' => false,
             'columns' => [
                 [
                     'class' => 'yii\grid\SerialColumn',

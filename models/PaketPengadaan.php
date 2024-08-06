@@ -104,6 +104,9 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     public function getSubmitedpenawaran() {
         return $this->hasMany(PenawaranPengadaan::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_penawaranpengadaan'));
     }
+    public function getPenawaranpenyedia(){
+        return $this->hasOne(PenawaranPengadaan::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_penawaranpengadaan'));
+    }
     public function getPejabatppkom() {
         return $this->hasOne(Pegawai::class, ['id' => 'ppkom'])->cache(self::cachetime(), self::settagdep('tag_pegawai'));
     }

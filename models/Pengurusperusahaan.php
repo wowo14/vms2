@@ -48,7 +48,7 @@ class Pengurusperusahaan extends Contacts
         } else {
             //update password login
             if (!empty($this->password)) {
-                $user = User::findOne(['email'=>$this->email]);
+                $user = User::findOne(['email'=>$this->email,'id'=>$this->user_id]);
                 if($user){
                     $user->setPassword($this->password);
                     $user->save(false);

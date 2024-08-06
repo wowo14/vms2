@@ -1,5 +1,6 @@
 <?php
 namespace app\models;
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
@@ -15,9 +16,16 @@ class PenawaranPengadaanSearch extends PenawaranPengadaan{
     {
         return Model::scenarios();
     }
-    public function search($params)
+    public function search($params,$where=null)
     {
-        $query = PenawaranPengadaan::find()->cache(self::cachetime(), self::settagdep('tag_penawaranpengadaan'));
+        if(Yii::$app->tools->isVendor()){
+            if(is_array($where)){
+                $where=array_merge($where,['penyedia_id' => Yii::$app->session->get('companygroup')]);
+            }else{
+                $where = ['penyedia_id' => Yii::$app->session->get('companygroup')];
+            }
+        }
+        $query = PenawaranPengadaan::where($where);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);

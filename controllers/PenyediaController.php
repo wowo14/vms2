@@ -21,6 +21,10 @@ use yii\web\{Response, NotFoundHttpException};class PenyediaController extends C
         if (empty($companyId) || is_null($companyId)) {
             return $this->redirect(['/site/logout']);
         }
+        $model=$this->findModel($companyId);
+        if(!$model->incompanygrouporadmin){
+            throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
+        }
         return $this->render('viewprofile', [
             'model' => $this->findModel($companyId),
             'p' => new PengalamanPenyediaSearch(),
@@ -41,19 +45,23 @@ use yii\web\{Response, NotFoundHttpException};class PenyediaController extends C
     }
     public function actionView($id) {
         $request = Yii::$app->request;
+        $model = $this->findModel($id);
+        if(!$model->incompanygrouporadmin){
+            throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
+        }
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return [
                 'title' => "Penyedia #" . $id,
                 'content' => $this->renderAjax('view', [
-                    'model' => $model = $this->findModel($id),
+                    'model' => $model,
                 ]),
                 'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
                     Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote'])
             ];
         } else {
             return $this->render('view', [
-                'model' => $model = $this->findModel($id),
+                'model' => $model,
             ]);
         }
     }
@@ -100,6 +108,9 @@ use yii\web\{Response, NotFoundHttpException};class PenyediaController extends C
     public function actionUpdate($id) {
         $request = Yii::$app->request;
         $model = $this->findModel($id);
+        if(!$model->incompanygrouporadmin){
+            throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
+        }
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             if ($request->isGet) {
@@ -144,7 +155,11 @@ use yii\web\{Response, NotFoundHttpException};class PenyediaController extends C
     }
     public function actionDelete($id) {
         $request = Yii::$app->request;
-        $this->findModel($id)->delete();
+        $model=$this->findModel($id);
+        if(!$model->incompanygrouporadmin){
+            throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
+        }
+        $model->delete();
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return ['forceClose' => true, 'forceReload' => '#crud-datatable-pjax'];
@@ -157,6 +172,9 @@ use yii\web\{Response, NotFoundHttpException};class PenyediaController extends C
         $pks = explode(',', $request->post('pks'));
         foreach ($pks as $pk) {
             $model = $this->findModel($pk);
+            if(!$model->incompanygrouporadmin){
+                continue;// throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
+            }
             $model->delete();
         }
         if ($request->isAjax) {

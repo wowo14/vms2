@@ -55,6 +55,9 @@ class PenawaranPengadaan extends \yii\db\ActiveRecord
     public function getAllpaketpengadaan(){
         return PaketPengadaan::where(['not',['nomor'=>null] ])->all();
     }
+    public function getNegosiasi(){
+        return $this->hasOne(Negosiasi::class, ['penawaran_id' => 'id'])->orderBy(['ammount' => SORT_ASC]);
+    }
     public function autoDeleteFile() {
         $filePath = Yii::getAlias('@uploads') . $this->lampiran_penawaran;
         if (file_exists($filePath) && !empty($this->lampiran_penawaran)) {

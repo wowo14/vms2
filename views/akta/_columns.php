@@ -16,7 +16,7 @@ return [
         'attribute' => 'penyedia_id',
         'value' => 'vendor.nama_perusahaan',
         'filterType' => GridView::FILTER_SELECT2,
-        'filter' => \app\models\Penyedia::collectAll(['active' => 1])->pluck('nama_perusahaan', 'id')->toArray(),
+        'filter' => $searchModel->vendors->pluck('nama_perusahaan', 'id')->toArray(),
         'filterWidgetOptions' => [
             'pluginOptions' => ['allowClear' => true],
         ],

@@ -21,7 +21,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Dpp', 'url' => ['/dpp/index']];
                     'options' => ['id' => 'dpp' . $model->hash],
                 ],
                 [
-                    'label' => 'Peserta',
+                    'label' => 'Peserta/Penawaran/Negosiasi',
                     'content' =>$this->render('//penawaranpenyedia/allpenawaran', [
                         'model'=> PenawaranPengadaan::collectAll(['paket_id'=>$model->paket_id]),
                     ]),

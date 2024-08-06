@@ -5,8 +5,8 @@ echo GridView::widget([
     'id' => 'crud-datatable',
     'dataProvider' => new yii\data\ArrayDataProvider([
         'allModels' => $model, 'pagination' => false,
-        // 'showPageSummary' => false,
     ]),
+    'summary' => false,
     'columns' => [
         [
             'class' => 'yii\grid\SerialColumn',

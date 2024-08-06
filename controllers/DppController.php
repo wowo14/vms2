@@ -3,6 +3,7 @@ namespace app\controllers;
 use app\models\{PenugasanPemilihanpenyedia,Unit,HistoriReject,ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails, PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia};
 use Yii;
 use yii\data\ActiveDataProvider;
+use yii\db\Expression;
 use yii\filters\VerbFilter;
 use yii\helpers\{ArrayHelper,Html};
 use yii\web\{BadRequestHttpException,Response, NotFoundHttpException};
@@ -20,8 +21,14 @@ class DppController extends Controller {
         ];
     }
     public function actionPemenang($idvendor,$idpaket){// id vendor
-        $model = Dpp::where(['paket_id'=>$idpaket])->one();
+        $model = Dpp::last(['paket_id'=>$idpaket]);
+        if(!$model::isAdmin()){
+            throw new BadRequestHttpException('Unauthorized access');
+        }
         $model->paketpengadaan->pemenang=$idvendor;
+
+        $model->paketpengadaan->penawaranpenyedia->negosiasi->accept=1;
+        $model->paketpengadaan->penawaranpenyedia->negosiasi->save();
         $model->paketpengadaan->save();
         Yii::$app->session->setFlash('success', 'Pemenang berhasil diterapkan');
         return $this->goBack(Yii::$app->request->referrer ?: ['//dpp/index']);
@@ -54,15 +61,33 @@ class DppController extends Controller {
             'model' => $model
         ]);
     }
-    public function actionListpemenang($params) { //[paket_pengadaan_id]
-        $tmp = TemplateChecklistEvaluasi::where(['template' => 'Ceklist_Evaluasi_Kesimpulan'])->one();
-        $lolos = ValidasiKualifikasiPenyedia::find()->joinWith('detail')
-            ->where(['template' => $tmp->id, 'paket_pengadaan_id' => $params['paket_pengadaan_id']])->asArray()->all();
-        $filtered = collect($lolos)->where('detail.hasil', '[{"uraian":"Catatan Oleh Pejabat Pengadaan","komentar":"Lolos Administrasi Validasi Dokumen","sesuai":""}]');
-        $mapPenawaran = $filtered->map(function ($e) {
-            return PenawaranPengadaan::where(['paket_id' => $e['paket_pengadaan_id'], 'penyedia_id' => $e['penyedia_id']])->one();
-        })->sortBy('nilai_penawaran')->values()->all();// nilai penawaran terendah
-        return $mapPenawaran;
+    public function actionListpemenang($params)
+    {
+        $tmp = TemplateChecklistEvaluasi::last(['template' => 'Ceklist_Evaluasi_Kesimpulan']);
+        if (!$tmp) {
+            return [];
+        }
+        $lolos = ValidasiKualifikasiPenyedia::where(['template' => $tmp->id, 'paket_pengadaan_id' => $params['paket_pengadaan_id']])
+            ->joinWith('detail')
+            ->asArray()
+            ->all();
+        $filtered = array_filter($lolos, function ($item) {
+            return $item['detail']['hasil'] === '[{"uraian":"Catatan Oleh Pejabat Pengadaan","komentar":"Lolos Administrasi Validasi Dokumen","sesuai":""}]';
+        });
+        $mapPenawaran = array_map(function ($e) {
+            return PenawaranPengadaan::find()
+                ->where(['paket_id' => $e['paket_pengadaan_id'], 'penyedia_id' => $e['penyedia_id']])
+                ->select(['paket_id','penyedia_id',
+                    new Expression('COALESCE(negosiasi.ammount, nilai_penawaran) as nilai_penawaran'),
+                    'nilai_penawaran as _nilai_penawaran'
+                ])
+                ->joinWith('negosiasi')
+                ->one();
+        }, $filtered);
+        usort($mapPenawaran, function ($a, $b) {
+            return $a['nilai_penawaran'] <=> $b['nilai_penawaran'];
+        });
+        return array_values($mapPenawaran);
     }
     public function actionView($id) {
         $request = Yii::$app->request;

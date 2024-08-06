@@ -16,10 +16,14 @@ class PengurusperusahaanSearch extends Pengurusperusahaan {
         return Model::scenarios();
     }
     public function search($params, $where = null) {
-        $query = Pengurusperusahaan::find()->cache(
-            self::cachetime(),
-            self::settagdep('tag_pengurusperusahaan')
-        )->where($where);
+        if(Yii::$app->tools->isVendor()){
+            if(is_array($where)){
+                $where=array_merge($where,['penyedia_id' => Yii::$app->session->get('companygroup')]);
+            }else{
+                $where = ['penyedia_id' => Yii::$app->session->get('companygroup')];
+            }
+        }
+        $query = Pengurusperusahaan::where($where);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
@@ -54,9 +58,6 @@ class PengurusperusahaanSearch extends Pengurusperusahaan {
             ->andFilterWhere(['like', 'created_at', $this->created_at])
             ->andFilterWhere(['like', 'updated_at', $this->updated_at])
             ->andFilterWhere(['like', 'password', $this->password]);
-        // $cmd = $query->createCommand()->sql;
-        // print_r($cmd);
-        // die;
         return $dataProvider;
     }
 }

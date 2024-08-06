@@ -158,6 +158,9 @@ trait GeneralModelsTrait {
         return Yii::$app->tools->isVendor();
     }
     public function getVendors() {
+        if($this->getIsVendor()){
+            return Penyedia::collectAll(['active'=>1,'id'=>Yii::$app->session->get('companygroup')]);
+        }
         return Penyedia::collectAll(['active' => 1]);
     }
     public function getCoacode() {

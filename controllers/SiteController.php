@@ -1,5 +1,6 @@
 <?php
 namespace app\controllers;
+use app\models\User;
 use app\models\{LoginForm, ContactForm};
 use app\widgets\ImageConverter;
 use Yii;
@@ -61,6 +62,8 @@ class SiteController extends Controller
     }
     public function actionIndex()
     {
+        $user=Yii::$app->user->identity;
+        print_r($user->uservendor);
         if (empty(Yii::$app->session->get('userData'))) {
             return $this->actionLogout();
         }
@@ -75,15 +78,11 @@ class SiteController extends Controller
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             $rawUser = Yii::$app->user->identity;
-            // $peg=Pegawai::findOne(['id_user'=>$rawUser->id]);
             $userData = collect($rawUser)->toArray();
+            $user=User::findOne(['id'=>$userData['id']]);
             $userDataroles = collect($rawUser->roles)->pluck('item_name', 'item_name')->toArray();
-            // if($peg){
-            //     $userData=array_merge($userData,['petugas'=>$peg->id]);
-            // }
-            // $userData=array_merge($userData,['hak_akses' => array_values($userDataroles)[0]]);
-            Yii::$app->session->set('roles', $userDataroles);
-            Yii::$app->session->set('userData', $userData);
+                Yii::$app->session->set('roles', $userDataroles);
+                Yii::$app->session->set('userData', $userData);
             if (array_key_exists('vendor', $userDataroles)) {
                 Yii::$app->session->set('companygroup', $rawUser->uservendor->penyedia_id);
             }
@@ -98,10 +97,8 @@ class SiteController extends Controller
     {
         $sourceDir = Yii::getAlias('@app/web/uploads');
         $targetDir = Yii::getAlias('@app/web/uploads/avif');
-
         $converter = new ImageConverter();
         $converter->convertImagesToAvif($sourceDir, $targetDir);
-
         return 'Images have been converted to AVIF format.';
     }
     public function actionLogout()

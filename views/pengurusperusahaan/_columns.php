@@ -2,7 +2,6 @@
 
 use kartik\grid\GridView;
 use yii\helpers\{Url, Html};
-
 return [
     [
         'class' => 'kartik\grid\CheckboxColumn',
@@ -41,7 +40,7 @@ return [
         'attribute' => 'vendor',
         'value' => 'vendor.nama_perusahaan',
         'filterType' => GridView::FILTER_SELECT2,
-        'filter' => \app\models\Penyedia::collectAll(['active' => 1])->pluck('nama_perusahaan', 'nama_perusahaan')->toArray(),
+        'filter' => $searchModel->vendors->pluck('nama_perusahaan','id')->toArray(),
         'filterWidgetOptions' => [
             'pluginOptions' => ['allowClear' => true],
         ],
