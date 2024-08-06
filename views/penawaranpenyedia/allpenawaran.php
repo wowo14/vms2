@@ -5,7 +5,6 @@ use yii2ajaxcrud\ajaxcrud\CrudAsset;
 $this->title = 'Penawaran Pengadaan';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
-
 ?>
 <div class="penawaran-pengadaan-index">
     <div id="ajaxCrudDatatable">

@@ -1,5 +1,6 @@
 <?php
 use app\assets\AppAsset;
+use app\models\Unit;
 use app\widgets\FilePreview;
 use kartik\date\DatePicker;
 use kartik\depdrop\DepDrop;
@@ -150,6 +151,12 @@ $datakodeprogram = $model->isNewRecord ? \app\models\ProgramKegiatan::optionprog
                     }
             }",
         ],
+    ]) ?>
+    <?= $form->field($model, 'unit')->widget(Select2::class, [
+        'data' => Unit::collectAll()->pluck('unit', 'id')->toArray(),
+        'options' => [
+            'placeholder' => 'Pilih Unit',
+        ]
     ]) ?>
     <?= $form->field($model, 'ppkom')->widget(Select2::class, [
         'data' => $model::optionppkom(),

@@ -5,11 +5,11 @@ use yii\bootstrap4\{Collapse, Tabs, Modal};
 <div class="row">
     <div class="col-md-12">
         <?php
-        $qparam= Yii::$app->request->queryParams;
-        $penawaranparams= $qparam;
-        $penawaranparams['PenawaranPengadaanSearch']['paket_id'] = $model->paketpengadaan->nomor;
-        $evaluasipenyediaparams= $qparam;
-        $evaluasipenyediaparams['ValidasiKualifikasiPenyediaSearch']['paket_pengadaan_id'] = $model->paketpengadaan->nomor;
+        // $qparam= Yii::$app->request->queryParams;
+        // $penawaranparams= $qparam;
+        // $penawaranparams['PenawaranPengadaanSearch']['paket_id'] = $model->paketpengadaan->nomor;
+        // $evaluasipenyediaparams= $qparam;
+        // $evaluasipenyediaparams['ValidasiKualifikasiPenyediaSearch']['paket_pengadaan_id'] = $model->paketpengadaan->nomor;
         echo Tabs::widget([
             'items' => [
                 [

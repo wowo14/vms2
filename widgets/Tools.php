@@ -156,7 +156,7 @@ class Tools extends Widget
           file_put_contents($filePath, $binaryData);
           if (in_array($extension, ['png', 'jpg', 'jpeg', 'gif'])) {
               // $this->resizeImageToMaxSize($filePath, 512 * 1024);
-              $fileName=$this->convertavif($filePath);
+              $filename=$this->convertavif($filePath);
           }
           return $filename;
       } else {
@@ -187,7 +187,7 @@ class Tools extends Widget
         }
     }
   }
-  public function convertavif($imageFile,$targetDir=null,$quality = 90){
+  public function convertavif($imageFile,$targetDir=null,$quality = 50){
     if ($targetDir === null) {
         $targetDir = Yii::getAlias('@uploads');
     }

@@ -41,12 +41,12 @@ foreach ($model->reorderArray(array_keys($temp[0]),$template) as $item) {
         'name' => trim($item),
         'title' => $title,
         'type' =>'checkbox',// SwitchInput::class,
-        'options' => [
-            'pluginOptions' => [
-                'size' => 'mini',
-                'onText' => 'Ya', 'offText' => 'Tidak'
-            ]
-        ]
+        // 'options' => [
+        //     'pluginOptions' => [
+        //         'size' => 'mini',
+        //         'onText' => 'Ya', 'offText' => 'Tidak'
+        //     ]
+        // ]
     ] : [
         'name' => trim($item),
         'title' => $title,

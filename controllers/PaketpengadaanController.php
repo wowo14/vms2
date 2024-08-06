@@ -111,6 +111,7 @@ class PaketpengadaanController extends Controller {
             }
             $dpp = new Dpp;
             $dpp->paket_id = $model->id;
+            $dpp->bidang_bagian = $model->unit??'';
             if ($dpp->save()) {
                 Yii::$app->session->setFlash('success', 'Paket Pengadaan ' . $model->nama_paket . ' Berhasil ajukan DPP');
             } else {

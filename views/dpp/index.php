@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'id' => 'crud-datatable',
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
-            'pjax' => true,
+            'pjax' => false,
             'columns' => require(__DIR__ . '/_columns.php'),
             'toolbar' => [
                 [

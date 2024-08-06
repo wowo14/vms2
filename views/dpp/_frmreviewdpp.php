@@ -96,14 +96,14 @@ jQuery(function ($) {
             [
                 'name' => 'sesuai',
                 'title' => 'Sesuai',
-                'type' => SwitchInput::class,
-                'options' => [
-                    'pluginOptions' => [
-                        'required' => true,
-                        'size' => 'mini',
-                        'onText' => 'Ya', 'offText' => 'Tidak'
-                    ]
-                ]
+                'type' => 'checkbox',//SwitchInput::class,
+                // 'options' => [
+                //     'pluginOptions' => [
+                //         'required' => true,
+                //         'size' => 'mini',
+                //         'onText' => 'Ya', 'offText' => 'Tidak'
+                //     ]
+                // ]
             ],
             [
                 'name' => 'keterangan',

@@ -14,14 +14,14 @@ foreach (array_keys($aa) as $item) {
     $col[] = $trimmedKey === 'Sesuai' ? [
         'name' => trim($item),
         'title' => $title,
-        'type' => SwitchInput::class,
-        'options' => [
-            'pluginOptions' => [
-                'required' => true,
-                'size' => 'mini',
-                'onText' => 'Ya', 'offText' => 'Tidak'
-            ]
-        ]
+        'type' => 'checkbox',//SwitchInput::class,
+        // 'options' => [
+        //     'pluginOptions' => [
+        //         'required' => true,
+        //         'size' => 'mini',
+        //         'onText' => 'Ya', 'offText' => 'Tidak'
+        //     ]
+        // ]
     ] : [
         'name' => trim($item),
         'title' => $title,

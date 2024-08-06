@@ -2,6 +2,9 @@
 use yii\bootstrap4\Tabs;
 use yii\grid\GridView;
 use yii\helpers\{Html, Url};
+$this->title = 'Validasi kualifikasi Penyedia';
+$this->params['breadcrumbs'][] = ['label' => 'Proses Dpp', 'url' => ['/dpp/tab?id='.$kualifikasi[0]->paketpengadaan->dpp->id]];
+$this->params['breadcrumbs'][] = $this->title;
 echo GridView::widget([
     'id' => 'crud-datatable',
     'dataProvider' => new yii\data\ArrayDataProvider([

@@ -5,17 +5,17 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
     public $oldrecord;
     public $statusPengadaan;
-    public $unit;
+    // public $unit;
     public static function tableName() {
         return 'paket_pengadaan';
     }
     public function rules() {
         return [
-            [['nomor', 'tanggal_paket', 'nama_paket'], 'required'],
+            [['nomor', 'tanggal_paket', 'nama_paket','tahun_anggaran','kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom','unit','pagu','metode_pengadaan','kategori_pengadaan'], 'required'],
             [['tanggal_paket', 'tanggal_reject', 'alasan_reject','addition'], 'string'],
             [['pagu'], 'number'],
             [['nama_paket'], 'unique'],
-            [['created_by', 'tahun_anggaran', 'approval_by'], 'integer'],
+            [['created_by', 'tahun_anggaran', 'approval_by','unit'], 'integer'],
             [['nomor', 'kategori_pengadaan', 'nama_paket', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'metode_pengadaan'], 'string', 'max' => 255],
         ];
     }
@@ -39,6 +39,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             'tanggal_reject' => 'Tanggal Reject', //not null ditolak
             'pemenang'=>'Pemenang', // id vendor pemenang
             'addition'=>'Addition', // kolom tambahan
+            'unit' => 'Unit / Bidang / Bagian',
         ];
     }
     public function getListpaketoutstanding() {
@@ -49,6 +50,9 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     }
     public function getDetails() {
         return $this->hasMany(PaketPengadaanDetails::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_paketpengadaandetails'));
+    }
+    public function getUnitnya(){
+        return $this->hasOne(Unit::class, ['id' => 'unit'])->cache(self::cachetime(), self::settagdep('tag_unit'));
     }
     public function afterFind() {
         $this->oldrecord = clone $this;
