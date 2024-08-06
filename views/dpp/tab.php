@@ -1,6 +1,7 @@
 <?php
 use app\models\PenawaranPengadaan;
 use yii\bootstrap4\{Collapse, Tabs, Modal};
+$this->params['breadcrumbs'][] = ['label' => 'Dpp', 'url' => ['/dpp/index']];
 ?>
 <div class="row">
     <div class="col-md-12">
