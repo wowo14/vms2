@@ -18,12 +18,7 @@ use yii\db\Expression;
 
 class HelloController extends Controller {
     public function actionTest() {
-        $model=collect(PenawaranPengadaan::where(['paket_id' => 2, 'penyedia_id' =>1])
-        ->select(new Expression('paket_id,penyedia_id,coalesce(negosiasi.ammount, nilai_penawaran) as nilai_penawaran,nilai_penawaran as _nilai_penawaran'))
-        ->joinWith('negosiasi')->asArray()
-        ->one())->map(function($e){
-            return $e;
-        })->toArray();
+        $model = TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->orderBy('jenis_evaluasi')->asArray()->all();
         print_r($model);
     }
     public function actionHitung() { // hitung pada paket pengadaan mana?

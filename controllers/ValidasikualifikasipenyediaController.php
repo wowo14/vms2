@@ -480,7 +480,7 @@ class ValidasikualifikasipenyediaController extends Controller {
         return ['models'=>$aa,'columns'=>$col];
     }
     public function actionViewvalidasipenyedia($id,$paket_id) {
-        $templates = TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->all();
+        $templates = TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->orderBy('jenis_evaluasi')->all();
         $kualifikasi = ValidasiKualifikasiPenyedia::findAll(['penyedia_id' => $id,'paket_pengadaan_id'=>$paket_id]);
         if (!$kualifikasi) {
             // throw new NotFoundHttpException('Petugas Belom Memvalidasi Kualifikasi Penyedia');
@@ -489,7 +489,7 @@ class ValidasikualifikasipenyediaController extends Controller {
             Ceklist_Evaluasi_Administrasi || Ceklist_Evaluasi_Kesimpulan || Ceklist_Evaluasi_Negosiasi || Ceklist_Evaluasi_Penawaran || Ceklist_Evaluasi_Teknis
             */
             foreach($templates as $tmp){
-                if($tmp->jenis_evaluasi!=='Kesimpulan'){
+                if($tmp->template!=='Ceklist_Evaluasi_Kesimpulan'){
                     $params=[
                         'penyedia_id'=>$id,
                         'paket_pengadaan_id'=>$paket_id,
@@ -578,7 +578,7 @@ class ValidasikualifikasipenyediaController extends Controller {
             } else {
                 $content .= 'Alasan Tidak Lulus <br> Persyaratan Tidak Lengkap';
             }
-            if ($e->jenis_evaluasi == 'Kesimpulan' && !empty($rr)) {
+            if ($e->template == 'Ceklist_Evaluasi_Kesimpulan' && !empty($rr)) {
                 $col = array_keys($rr[0]);
                 $index = array_search('sesuai', $col);
                 if ($index !== false) {

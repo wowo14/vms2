@@ -21,18 +21,18 @@ $this->params['breadcrumbs'][] = ['label' => 'Dpp', 'url' => ['/dpp/index']];
                     'options' => ['id' => 'dpp' . $model->hash],
                 ],
                 [
-                    'label' => 'Peserta/Penawaran/Negosiasi',
-                    'content' =>$this->render('//penawaranpenyedia/allpenawaran', [
-                        'model'=> PenawaranPengadaan::collectAll(['paket_id'=>$model->paket_id]),
-                    ]),
-                    'options' => ['id' => 'peserta' . $model->hash],
-                ],
-                [
                     'label' => 'Evaluasi',
                     'content' =>$this->render('//validasikualifikasipenyedia/validasikualifikasipenyedia', [
                         'model' => PenawaranPengadaan::collectAll(['paket_id' => $model->paket_id]),
                     ]),
                     'options' => ['id' => 'evaluasi' . $model->hash],
+                ],
+                [
+                    'label' => 'Peserta/Penawaran/Negosiasi',
+                    'content' =>$this->render('//penawaranpenyedia/allpenawaran', [
+                        'model'=> PenawaranPengadaan::collectAll(['paket_id'=>$model->paket_id]),
+                    ]),
+                    'options' => ['id' => 'peserta' . $model->hash],
                 ],
                 [
                     'label' => 'Pemenang',

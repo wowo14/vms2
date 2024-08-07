@@ -1,12 +1,11 @@
 <?php
-use app\models\PenawaranPengadaan;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii\bootstrap4\Modal;
 use yii\grid\GridView;
 use yii\helpers\{url,Html};
 $this->title = 'Penawaran Pengadaan';
 $this->params['breadcrumbs'][] = $this->title;
-$mdl=new PenawaranPengadaan();
+$mdl=$model[0];
 CrudAsset::register($this);
 ?>
 <div class="penawaran-pengadaan-index">
