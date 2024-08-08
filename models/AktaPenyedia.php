@@ -40,9 +40,6 @@ class AktaPenyedia extends \yii\db\ActiveRecord {
     public function init() {
         parent::init();
         $this->on(self::EVENT_AFTER_DELETE, [$this, 'autoDeleteFile']);
-        if(!$this->incompanygrouporadmin){
-            // throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
-        }
     }
     public function beforeSave($insert) {
         if ($insert) {

@@ -57,8 +57,9 @@ class DppController extends Controller {
     }
     public function actionTab($id) {
         $model = $this->findModel($id);
+        $penawaran=PenawaranPengadaan::collectAll(['paket_id' => $model->paket_id]);
         return $this->render('tab', [
-            'model' => $model
+            'model' => $model,'penawaran'=>$penawaran
         ]);
     }
     public function actionListpemenang($params)

@@ -17,8 +17,8 @@ class Pegawai extends \yii\db\ActiveRecord {
             [['nama'], 'string', 'max' => 250],
             [['alamat', 'hak_akses', 'password'], 'string', 'max' => 255],
             ['telp', 'match', 'pattern' => '/^[0-9]{8,15}$/',],
-            ['nik', 'match', 'pattern' => '/^[0-9]{8,16}$/',],
-            ['nip', 'match', 'pattern' => '/^[0-9]{8,16}$/',],
+            // ['nik', 'match', 'pattern' => '/^[0-9]{8,16}$/',],
+            // ['nip', 'match', 'pattern' => '/^[0-9]{8,16}$/',],
             [['status'], 'string', 'max' => 1],
             [['username'], 'string', 'max' => 50],
         ];

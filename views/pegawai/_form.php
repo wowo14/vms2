@@ -1,8 +1,9 @@
 <?php
 use kartik\select2\Select2;
 use kartik\switchinput\SwitchInput;
+use kartik\typeahead\Typeahead;
 use yii\bootstrap4\ActiveForm;
-use yii\helpers\{Html, ArrayHelper};
+use yii\helpers\{Html, ArrayHelper,Url};
 $js = <<<JS
 function extractKtp(nik){
     $.ajax({url: '/pemohon/ktp',type: 'POST',
@@ -17,6 +18,13 @@ function extractKtp(nik){
             extractKtp(inputValue);
         }
     });
+
+    $('#pegawai-nama').on('select2:select', function (e) {
+        var data = e.params.data;
+        $('#pegawai-nik').val(data.nik);
+        $('#pegawai-nip').val(data.nip);
+    });
+
 JS;
 $this->registerJs($js);
 ?>
@@ -31,7 +39,22 @@ $this->registerJs($js);
     ]); ?>
     <?= $form->field($model, 'nik')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'nip')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'nama')->textInput(['maxlength' => true]) ?>
+    <?=$form->field($model, 'nama')->widget(Select2::class, [
+    'options' => ['placeholder' => 'Cari atau tambah nama...'],
+    'pluginOptions' => [
+        'tags' => true,
+        'tokenSeparators' => [',', ' '],
+        // 'maximumInputLength' => 100,
+        'ajax' => [
+            'url' => Url::to(['/pegawai/nama']),
+            'dataType' => 'json',
+            'data' => new \yii\web\JsExpression('function(params) { return {q:params.term}; }'),
+            'processResults' => new \yii\web\JsExpression('function(data) {
+                return {results: data.results};
+            }'),
+        ],
+    ],
+    ])?>
     <?= $form->field($model, 'alamat')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'telp')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'status')->widget(SwitchInput::class, [

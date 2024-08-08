@@ -7,12 +7,13 @@ class AppAsset extends AssetBundle
     public $baseUrl = '@web';
     public $css = [
         'css/site.css',
+        'https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css',
     ];
     public $js = [
         'js/autoNumeric.js',
         'js/app.js',
         // 'js/pdf.min.js',
-        // 'https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js',
+        'https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js',
         'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js',
         'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js',
     ];

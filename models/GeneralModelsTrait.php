@@ -23,7 +23,7 @@ trait GeneralModelsTrait {
     public static function optionsSettingtype($type, $callback) { //example $model::optionsSettingtype(string 'type', string|array|function);
         $settings = Setting::type($type);
         if ($callback instanceof \Closure) {
-            Yii::error('callbak closure');
+            // Yii::error('callbak closure');
             return collect($settings)->map($callback)->toArray();
         } elseif (is_array($callback)) {
             // Yii::error('callbak isarray');

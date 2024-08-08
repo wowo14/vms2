@@ -1,10 +1,11 @@
 <?php
 namespace app\controllers;
+use app\models\{Contacts,Pegawai, PegawaiSearch};
 use Yii;
-use app\models\{Pegawai, PegawaiSearch};
-use yii\web\{NotFoundHttpException, Response};
 use yii\filters\VerbFilter;
-use yii\helpers\Html;class PegawaiController extends Controller {
+use yii\helpers\Html;
+use yii\web\{NotFoundHttpException, Response};
+class PegawaiController extends Controller {
     public function behaviors() {
         return [
             'verbs' => [
@@ -23,6 +24,104 @@ use yii\helpers\Html;class PegawaiController extends Controller {
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+    }
+    public function actionTes(){
+        $model=new Contacts();
+        $request=Yii::$app->request;
+        if($request->isPost){
+            $model->load($request->post());
+            print_r($model);
+        }else{
+            return $this->render('_dialog', [
+                'model' => $model
+            ]);
+        }
+    }
+    public function actionList_datatable() // datatables server side
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $query = Contacts::where(['is_active' => 1]);
+        $columns=['id','nama'];
+        $query->select($columns);
+        $totalCount = $query->count();
+        $page = Yii::$app->request->get('start', 0);
+        $pageSize = Yii::$app->request->get('length', 10);
+        $order = [];
+        if (Yii::$app->request->get('order', []) !== []) {
+            $orderColumn = Yii::$app->request->get('order')[0]['column'];
+            $orderDir = Yii::$app->request->get('order')[0]['dir'];
+            $orderColumns = Yii::$app->request->get('columns');
+            $orderColumnName = $orderColumns[$orderColumn]['data'];
+            $order[$orderColumnName] = ($orderDir === 'asc') ? SORT_ASC : SORT_DESC;
+        }
+        $query->orderBy($order);
+        $searchValue = Yii::$app->request->get('search')['value']??null;
+        if (!empty($searchValue)) {
+            $query->andWhere(['or',
+                ['like', 'id', $searchValue],
+                ['like', 'nama', $searchValue]
+            ]);
+        }
+        $filteredCount = $query->count();
+        $query->offset($page)->limit($pageSize);
+        $contacts = $query->asArray()->all();
+        return [
+            'draw' => Yii::$app->request->get('draw'),
+            'recordsTotal' => $totalCount,
+            'recordsFiltered' => $filteredCount,
+            'data' => $contacts,
+        ];
+    }
+    public function actionListpegawai_datatable() // datatables server side
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $query = Pegawai::find();
+        $columns=['id','nik'];
+        $query->select($columns);
+        $totalCount = $query->count();
+        $page = Yii::$app->request->get('start', 0);
+        $pageSize = Yii::$app->request->get('length', 10);
+        $order = [];
+        if (Yii::$app->request->get('order', []) !== []) {
+            $orderColumn = Yii::$app->request->get('order')[0]['column'];
+            $orderDir = Yii::$app->request->get('order')[0]['dir'];
+            $orderColumns = Yii::$app->request->get('columns');
+            $orderColumnName = $orderColumns[$orderColumn]['data'];
+            $order[$orderColumnName] = ($orderDir === 'asc') ? SORT_ASC : SORT_DESC;
+        }
+        $query->orderBy($order);
+        $searchValue = Yii::$app->request->get('search')['value'] ?? null;
+        if (!empty($searchValue)) {
+            $query->andWhere(['or',
+                ['like', 'id', $searchValue],
+                ['like', 'nik', $searchValue]
+            ]);
+        }
+        $filteredCount = $query->count();
+        $query->offset($page)->limit($pageSize);
+        $contacts = $query->asArray()->all();
+        return [
+            'draw' => Yii::$app->request->get('draw'),
+            'recordsTotal' => $totalCount,
+            'recordsFiltered' => $filteredCount,
+            'data' => $contacts,
+        ];
+    }
+    public function actionNama($q = null)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $out = [];
+        if (!is_null($q)) {
+            $query = Contacts::where(['like', 'nama', $q])
+                ->asArray()
+                // ->limit(20)
+                ->orderBy(['nama' => SORT_ASC])
+                ->all();
+            foreach ($query as $contact) {
+                $out[] = ['id' => $contact['id'],'nik'=>$contact['nik'],'nip'=>$contact['nip'], 'text' => $contact['nama']];
+            }
+        }
+        return ['results' => $out];
     }
     public function actionView($id) {
         $request = Yii::$app->request;

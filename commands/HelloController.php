@@ -17,10 +17,7 @@ use yii\console\Controller;
 use yii\db\Expression;
 
 class HelloController extends Controller {
-    public function actionTest() {
-        $model = TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->orderBy('jenis_evaluasi')->asArray()->all();
-        print_r($model);
-    }
+    
     public function actionHitung() { // hitung pada paket pengadaan mana?
         $r = ValidasiKualifikasiPenyedia::getCalculated(1);
         $r = collect($r)->where('penyedia_id', 1)->where('paket_pengadaan_id', 1)->first();
