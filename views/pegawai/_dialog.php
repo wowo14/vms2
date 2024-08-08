@@ -1,8 +1,10 @@
 <?php
 use app\assets\AppAsset;
 use app\widgets\DynamicDataTableWidget;
+use app\widgets\DynamicDTCWidget;
 use yii\helpers\{Url,Html};
 use yii\widgets\ActiveForm;
+
 AppAsset::register($this);
 $this->title = 'Input with Data Modal';
 ?>
@@ -28,7 +30,7 @@ $this->title = 'Input with Data Modal';
         // 'filterFields' => [ 'nama'],
         'multiple' => true,
     ]) ?>
-    <?= $form->field($model, 'nik')->widget(DynamicDataTableWidget::class, [
+    <?= $form->field($model, 'nik')->widget(DynamicDTCWidget::class, [
         'options'=>[
             'title'=>'data pegawai',
         ],
