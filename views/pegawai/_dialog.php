@@ -16,23 +16,27 @@ $this->title = 'Input with Data Modal';
         ],
     ]); ?>
     <?= $form->field($model, 'nama')->widget(DynamicDataTableWidget::class, [
-        'id'=>'input-with-modal-nama',
+        'options'=>[
+            'title'=>'data Contact',
+        ],
         'ajaxUrl' => Url::to(['/pegawai/list_datatable']),
         'columns' => [
-            // ['data' => 'id', 'title' => 'ID'],
+            ['data' => 'id', 'title' => 'ID'],
             ['data' => 'nama', 'title' => 'Nama'],
         ],
-        'filterFields' => [ 'nama'],
-        'multiple' => false,
+        // 'filterFields' => [ 'nama'],
+        'multiple' => true,
     ]) ?>
-    <?= $form->field($model, 'nip')->widget(DynamicDataTableWidget::class, [
-        'id'=>'input-with-modal-nip',
+    <?= $form->field($model, 'nik')->widget(DynamicDataTableWidget::class, [
+        'options'=>[
+            'title'=>'data pegawai',
+        ],
         'ajaxUrl' => Url::to(['/pegawai/listpegawai_datatable']),
         'columns' => [
-            // ['data' => 'id', 'title' => 'ID'],
+            ['data' => 'id', 'title' => 'ID'],
             ['data' => 'nik', 'title' => 'NIK'],
         ],
-        'filterFields' => [ 'nik'],
+        // 'filterFields' => [ 'nik'],
         'multiple' => false,
     ]) ?>
     <?= Html::submitButton('Submit', ['class' => 'btn btn-primary',]);?>
