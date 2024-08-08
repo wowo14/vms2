@@ -4,7 +4,6 @@ use app\widgets\DynamicDataTableWidget;
 use app\widgets\DynamicDTCWidget;
 use yii\helpers\{Url,Html};
 use yii\widgets\ActiveForm;
-
 AppAsset::register($this);
 $this->title = 'Input with Data Modal';
 ?>
@@ -28,6 +27,10 @@ $this->title = 'Input with Data Modal';
             ['data' => 'nama', 'title' => 'Nama'],
         ],
         // 'filterFields' => [ 'nama'],
+        'defaultOrder' => [
+            [0, 'asc'],
+            [1, 'asc'],
+        ],
         'multiple' => true,
     ]) ?>
     <?= $form->field($model, 'nik')->widget(DynamicDTCWidget::class, [
@@ -36,10 +39,15 @@ $this->title = 'Input with Data Modal';
         ],
         'ajaxUrl' => Url::to(['/pegawai/listpegawai_datatable']),
         'columns' => [
+            // col 0 is checkbox
             ['data' => 'id', 'title' => 'ID'],
             ['data' => 'nik', 'title' => 'NIK'],
         ],
         // 'filterFields' => [ 'nik'],
+        'defaultOrder' => [
+            [1, 'asc'],
+            [2, 'asc'],
+        ],
         'multiple' => false,
     ]) ?>
     <?= Html::submitButton('Submit', ['class' => 'btn btn-primary',]);?>

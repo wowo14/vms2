@@ -10,6 +10,7 @@ class DynamicDTCWidget extends InputWidget
     public $filterFields = [];
     public $multiple = false;
     public $authToken = null;
+    public $defaultOrder = [[1, 'asc']];
     public function run()
     {
         return $this->renderInput() . $this->renderModal();
@@ -41,6 +42,7 @@ class DynamicDTCWidget extends InputWidget
             ]);
         }
         $initFunctionName = 'inittb' . $this->id;
+        $defaultOrderJson = json_encode($this->defaultOrder);
         $js = <<<JS
         var table;
         $('#{$this->options['id']}').on('click', function() {
@@ -67,24 +69,30 @@ class DynamicDTCWidget extends InputWidget
                     },
                     dataSrc: 'data'
                 },
-                columns: $columnsJson,
-                destroy: true,
-                columnDefs: [{
-                    targets: 0,
-                    orderable: false,
-                    searchable: false,
-                    render: function(data, type, full, meta) {
-                        return '<input type="checkbox" class="row-select" value="' + full[Object.keys(full)[1]] + '">';
+                columns: [
+                    {
+                        data: null,
+                        orderable: false,
+                        searchable: false,
+                        render: function(data, type, full, meta) {
+                            return '<input type="checkbox" class="row-select" value="' + full[Object.keys(full)[1]] + '">';
+                        },
+                        title: '<input type="checkbox" id="checkAll"> Select All'
                     }
-                }]
+                ].concat($columnsJson),
+                order: $defaultOrderJson,
+                destroy: true
             });
-            // Toggle checkbox on row click
             $('#$tableId tbody').on('click', 'tr', function() {
                 var checkbox = $(this).find('.row-select');
                 var isChecked = checkbox.prop('checked');
                 checkbox.prop('checked', !isChecked);
-                // Optionally, highlight the row on click
                 $(this).toggleClass('selected', !isChecked);
+            });
+            $('#checkAll').on('click', function() {
+                var isChecked = $(this).is(':checked');
+                $('#$tableId tbody input.row-select').prop('checked', isChecked);
+                $('#$tableId tbody tr').toggleClass('selected', isChecked);
             });
             $('#apply-filters-{$this->id}').on('click', function() {
                 table.ajax.reload();

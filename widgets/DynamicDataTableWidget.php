@@ -10,6 +10,7 @@ class DynamicDataTableWidget extends InputWidget
     public $filterFields = [];
     public $multiple = false;
     public $authToken = null;
+    public $defaultOrder = [[1, 'asc']];
     public function run(){
         return $this->renderInput() . $this->renderModal();
     }
@@ -40,6 +41,7 @@ class DynamicDataTableWidget extends InputWidget
             ]);
         }
         $initFunctionName = 'inittb' . $this->id;
+        $defaultOrderJson = json_encode($this->defaultOrder);
         $js = <<<JS
         var table;
         $('#{$this->options['id']}').on('click', function() {
@@ -67,6 +69,7 @@ class DynamicDataTableWidget extends InputWidget
                     dataSrc: 'data'
                 },
                 columns: $columnsJson,
+                order: $defaultOrderJson,
                 destroy: true, // Allows reinitializing the table on modal open
                 select: $multiple ? { style: 'multi' } : true
             });
