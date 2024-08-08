@@ -1,48 +1,11 @@
 <?php
 namespace app\widgets;
-use yii\widgets\InputWidget;
-use yii\helpers\Html;
-use yii\bootstrap4\Modal;
-class DynamicDataTableWidget extends InputWidget
+class DynamicDataTableWidget extends BaseDynamicDataTableWidget
 {
-    public $ajaxUrl;
-    public $columns = [];
-    public $filterFields = [];
-    public $multiple = false;
-    public $authToken = null;
-    public $defaultOrder = [[1, 'asc']];
-    public function run(){
-        return $this->renderInput() . $this->renderModal();
-    }
-    protected function renderInput(){
-        $inputId = $this->options['id'];
-        $inputName = $this->attribute;
-        return Html::activeTextInput($this->model, $this->attribute, [
-            'readonly' => true,
-            'value' => $this->value,
-            'id' => $inputId,
-            'class' => 'form-control'
-        ]);
-    }
-    protected function renderModal()
+    protected function getJs($modalId, $tableId, $columnsJson, $ajaxUrl, $authToken, $multiple, $defaultOrderJson)
     {
-        $modalId = 'data-modal-' . $this->id;
-        $tableId = 'data-table-' . $this->id;
-        $columnsJson = json_encode($this->columns);
-        $ajaxUrl = $this->ajaxUrl;
-        $authToken = $this->authToken ? json_encode($this->authToken) : 'null';
-        $multiple = $this->multiple ? 'true' : 'false';
-        $filters = '';
-        foreach ($this->filterFields as $field) {
-            $filters .= Html::input('text', $field, '', [
-                'class' => 'form-control filter-input',
-                'placeholder' => $field,
-                'name' => $field
-            ]);
-        }
         $initFunctionName = 'inittb' . $this->id;
-        $defaultOrderJson = json_encode($this->defaultOrder);
-        $js = <<<JS
+        return <<<JS
         var table;
         $('#{$this->options['id']}').on('click', function() {
             $('#$modalId').modal('show')
@@ -70,7 +33,7 @@ class DynamicDataTableWidget extends InputWidget
                 },
                 columns: $columnsJson,
                 order: $defaultOrderJson,
-                destroy: true, // Allows reinitializing the table on modal open
+                destroy: true,
                 select: $multiple ? { style: 'multi' } : true
             });
             $('#$tableId tbody').on('click', 'tr', function() {
@@ -98,16 +61,5 @@ class DynamicDataTableWidget extends InputWidget
             $('#$modalId').modal('hide');
         });
         JS;
-        $this->view->registerJs($js);
-        ob_start();
-        Modal::begin([
-            'id' => $modalId,
-            'size' => Modal::SIZE_LARGE,
-            'title' => $this->options['title'] ?? '',
-            'footer' => Html::button('Apply', ['class' => 'btn btn-primary', 'id' => 'apply-selection-' . $this->id]),
-        ]);
-        echo '<div class="modal-body">' . $filters . '</div>';
-        Modal::end();
-        return ob_get_clean();
     }
 }
