@@ -9,6 +9,7 @@ class DynamicDataTableWidget extends InputWidget
     public $columns = [];
     public $filterFields = [];
     public $multiple = false;
+    public $authToken = null;
     public function run(){
         return $this->renderInput() . $this->renderModal();
     }
@@ -28,6 +29,7 @@ class DynamicDataTableWidget extends InputWidget
         $tableId = 'data-table-' . $this->id;
         $columnsJson = json_encode($this->columns);
         $ajaxUrl = $this->ajaxUrl;
+        $authToken = $this->authToken ? json_encode($this->authToken) : 'null';
         $multiple = $this->multiple ? 'true' : 'false';
         $filters = '';
         foreach ($this->filterFields as $field) {
@@ -52,6 +54,11 @@ class DynamicDataTableWidget extends InputWidget
                 serverSide: true,
                 ajax: {
                     url: '$ajaxUrl',
+                    beforeSend: function (request) {
+                        if ($authToken) {
+                            request.setRequestHeader("Authorization", "Bearer " + $authToken);
+                        }
+                    },
                     data: function(d) {
                         $('.filter-input').each(function() {
                             d[$(this).attr('name')] = $(this).val();
@@ -93,7 +100,7 @@ class DynamicDataTableWidget extends InputWidget
         Modal::begin([
             'id' => $modalId,
             'size' => Modal::SIZE_LARGE,
-            'title' => $this->options['title']??'',
+            'title' => $this->options['title'] ?? '',
             'footer' => Html::button('Apply', ['class' => 'btn btn-primary', 'id' => 'apply-selection-' . $this->id]),
         ]);
         echo '<div class="modal-body">' . $filters . '</div>';

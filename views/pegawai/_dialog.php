@@ -19,6 +19,7 @@ $this->title = 'Input with Data Modal';
         'options'=>[
             'title'=>'data Contact',
         ],
+        'authToken'=>'dsas123',
         'ajaxUrl' => Url::to(['/pegawai/list_datatable']),
         'columns' => [
             ['data' => 'id', 'title' => 'ID'],
