@@ -3,8 +3,7 @@ namespace app\widgets;
 use yii\widgets\InputWidget;
 use yii\helpers\Html;
 use yii\bootstrap4\Modal;
-abstract class BaseDynamicDataTableWidget extends InputWidget
-{
+abstract class BaseDynamicDataTableWidget extends InputWidget{
     public $ajaxUrl;
     public $columns = [];
     public $filterFields = [];
@@ -19,7 +18,7 @@ abstract class BaseDynamicDataTableWidget extends InputWidget
     {
         $inputId = $this->options['id'];
         return Html::activeTextInput($this->model, $this->attribute, [
-            'readonly' => true,
+            'readonly' => $this->options['readonly']??true,
             'value' => $this->value,
             'id' => $inputId,
             'class' => 'form-control'

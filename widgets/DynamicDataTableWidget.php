@@ -45,6 +45,7 @@ class DynamicDataTableWidget extends BaseDynamicDataTableWidget
                     var selectedData = table.row(this).data();
                     $('#{$this->options['id']}').val(selectedData[Object.keys(selectedData)[1]]);
                     $('#$modalId').modal('hide');
+                    $('#{$this->options['id']}').trigger('change');
                 }
             });
             $('#apply-filters-{$this->id}').on('click', function() {
@@ -59,6 +60,7 @@ class DynamicDataTableWidget extends BaseDynamicDataTableWidget
             $('#{$this->options['id']}').val(selectedValues.join(', '));
             $('#{$this->options['id']}-hidden').val(selectedValues.join(', '));
             $('#$modalId').modal('hide');
+            $('#{$this->options['id']}').trigger('change');
         });
         JS;
     }

@@ -41,7 +41,8 @@ $this->title = 'Input with Data Modal';
         'columns' => [
             // col 0 is checkbox
             ['data' => 'id', 'title' => 'ID'],
-            ['data' => 'nik', 'title' => 'NIK'],
+            // ['data' => 'nik', 'title' => 'NIK'],
+            ['data' => 'nama', 'title' => 'Nama'],
         ],
         // 'filterFields' => [ 'nik'],
         'defaultOrder' => [

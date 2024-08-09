@@ -76,7 +76,7 @@ class PegawaiController extends Controller {
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $query = Pegawai::find();
-        $columns=['id','nik'];
+        $columns=['id','nik','nama'];
         $query->select($columns);
         $totalCount = $query->count();
         $page = Yii::$app->request->get('start', 0);

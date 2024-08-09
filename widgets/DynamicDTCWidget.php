@@ -39,11 +39,19 @@ class DynamicDTCWidget extends BaseDynamicDataTableWidget
                         render: function(data, type, full, meta) {
                             return '<input type="checkbox" class="row-select" value="' + full[Object.keys(full)[1]] + '">';
                         },
-                        title: '<input type="checkbox" id="checkAll"> Select All'
+                        width: '10%',
+                        title: '<input type="checkbox" id="checkAll"> All '
                     }
                 ].concat($columnsJson),
                 order: $defaultOrderJson,
                 destroy: true
+            });
+            $('input.row-select').on('click', function() {//test
+                console.log(this);
+                var checkbox=$(this);
+                var isChecked = checkbox.is(':checked');
+                checkbox.prop('checked', !isChecked);
+                $(this).closest('tr').toggleClass('selected', !isChecked);
             });
             $('#$tableId tbody').on('click', 'tr', function() {
                 var checkbox = $(this).find('.row-select');
@@ -68,6 +76,7 @@ class DynamicDTCWidget extends BaseDynamicDataTableWidget
             $('#{$this->options['id']}').val(selectedValues.join(', '));
             $('#{$this->options['id']}-hidden').val(selectedValues.join(', '));
             $('#$modalId').modal('hide');
+            $('#{$this->options['id']}').trigger('change');
         });
         JS;
     }
