@@ -19,37 +19,38 @@ $this->title = 'Input with Data Modal';
     <?= $form->field($model, 'nama')->widget(DynamicDataTableWidget::class, [
         'options'=>[
             'title'=>'data Contact',
+            'authToken'=>'dsas123',
+            'ajaxUrl' => Url::to(['/pegawai/list_datatable']),
+            'columns' => [
+                ['data' => 'id', 'title' => 'ID'],
+                ['data' => 'nama', 'title' => 'Nama'],
+            ],
+            // 'filterFields' => [ 'nama'],
+            // 'defaultOrder' => [
+            //     [0, 'asc'],
+            //     [1, 'asc'],
+            // ],
+            'multiple' => true,
         ],
-        'authToken'=>'dsas123',
-        'ajaxUrl' => Url::to(['/pegawai/list_datatable']),
-        'columns' => [
-            ['data' => 'id', 'title' => 'ID'],
-            ['data' => 'nama', 'title' => 'Nama'],
-        ],
-        // 'filterFields' => [ 'nama'],
-        'defaultOrder' => [
-            [0, 'asc'],
-            [1, 'asc'],
-        ],
-        'multiple' => true,
     ]) ?>
     <?= $form->field($model, 'nik')->widget(DynamicDTCWidget::class, [
         'options'=>[
             'title'=>'data pegawai',
+            'ajaxUrl' => Url::to(['/pegawai/listpegawai_datatable']),
+            'columns' => [
+                // col 0 is checkbox
+                ['data' => 'id', 'title' => 'ID'],
+                ['data' => 'nik', 'title' => 'NIK'],
+                ['data' => 'nama', 'title' => 'Nama'],
+            ],
+            // 'filterFields' => [ 'nik'],
+            // 'defaultOrder' => [
+            //     [1, 'asc'],
+            //     [2, 'asc'],
+            // ],
+            'multiple' => false,
+            'columnTarget' => 2,//column index
         ],
-        'ajaxUrl' => Url::to(['/pegawai/listpegawai_datatable']),
-        'columns' => [
-            // col 0 is checkbox
-            ['data' => 'id', 'title' => 'ID'],
-            // ['data' => 'nik', 'title' => 'NIK'],
-            ['data' => 'nama', 'title' => 'Nama'],
-        ],
-        // 'filterFields' => [ 'nik'],
-        'defaultOrder' => [
-            [1, 'asc'],
-            [2, 'asc'],
-        ],
-        'multiple' => false,
     ]) ?>
     <?= Html::submitButton('Submit', ['class' => 'btn btn-primary',]);?>
     <?php ActiveForm::end(); ?>

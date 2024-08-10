@@ -2,8 +2,15 @@
 namespace app\widgets;
 class DynamicDTCWidget extends BaseDynamicDataTableWidget
 {
-    protected function getJs($modalId, $tableId, $columnsJson, $ajaxUrl, $authToken, $multiple, $defaultOrderJson)
-    {
+    protected function getJs($params){
+       $modalId='data-modal-' . $this->id;
+        $tableId='data-table-' . $this->id;
+        $columnsJson=$params['columnsJson'];
+        $ajaxUrl=$params['ajaxUrl'];
+        $authToken=$params['authToken'];
+        $multiple=$params['multiple'];
+        $defaultOrderJson=$params['defaultOrderJson'];
+        $columnTarget = $params['columnTarget'];
         $initFunctionName = 'inittb' . $this->id;
         return <<<JS
         var table;
@@ -37,7 +44,7 @@ class DynamicDTCWidget extends BaseDynamicDataTableWidget
                         orderable: false,
                         searchable: false,
                         render: function(data, type, full, meta) {
-                            return '<input type="checkbox" class="row-select" value="' + full[Object.keys(full)[1]] + '">';
+                            return '<input type="checkbox" class="row-select" value="' + full[Object.keys(full)[$columnTarget]] + '">';
                         },
                         width: '10%',
                         title: '<input type="checkbox" id="checkAll"> All '
@@ -46,19 +53,12 @@ class DynamicDTCWidget extends BaseDynamicDataTableWidget
                 order: $defaultOrderJson,
                 destroy: true
             });
-            $('input.row-select').on('click', function() {//test
-                console.log(this);
-                var checkbox=$(this);
-                var isChecked = checkbox.is(':checked');
-                checkbox.prop('checked', !isChecked);
-                $(this).closest('tr').toggleClass('selected', !isChecked);
-            });
-            $('#$tableId tbody').on('click', 'tr', function() {
-                var checkbox = $(this).find('.row-select');
-                var isChecked = checkbox.prop('checked');
-                checkbox.prop('checked', !isChecked);
-                $(this).toggleClass('selected', !isChecked);
-            });
+            // $('#$tableId tbody').on('click', 'tr', function() {
+            //     var checkbox = $(this).find('.row-select');
+            //     var isChecked = checkbox.prop('checked');
+            //     checkbox.prop('checked', !isChecked);
+            //     $(this).toggleClass('selected', !isChecked);
+            // });
             $('#checkAll').on('click', function() {
                 var isChecked = $(this).is(':checked');
                 $('#$tableId tbody input.row-select').prop('checked', isChecked);

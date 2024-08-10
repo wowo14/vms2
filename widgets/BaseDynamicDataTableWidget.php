@@ -4,14 +4,21 @@ use yii\widgets\InputWidget;
 use yii\helpers\Html;
 use yii\bootstrap4\Modal;
 abstract class BaseDynamicDataTableWidget extends InputWidget{
-    public $ajaxUrl;
-    public $columns = [];
+    public $params;
     public $filterFields = [];
-    public $multiple = false;
     public $authToken = null;
-    public $defaultOrder = [[1, 'asc']];
     public function run()
     {
+        $this->authToken=$this->options['authToken']??null;
+        $this->params=[
+            'columnsJson' => json_encode($this->options['columns']),
+            'ajaxUrl' => $this->options['ajaxUrl'],
+            'authToken' => $this->authToken ? json_encode($this->authToken) : 'null',
+            'multiple' => $this->options['multiple']?'true':'false',
+            'defaultOrderJson' => json_encode($this->options['defaultOrder']??[1, 'asc']),
+            'columnTarget' => json_encode($this->options['columnTarget']??1),
+        ];
+        $this->filterFields = $this->options['filterFields']??[];
         return $this->renderInput() . $this->renderModal();
     }
     protected function renderInput()
@@ -26,19 +33,12 @@ abstract class BaseDynamicDataTableWidget extends InputWidget{
     }
     protected function renderModal()
     {
-        $modalId = 'data-modal-' . $this->id;
-        $tableId = 'data-table-' . $this->id;
-        $columnsJson = json_encode($this->columns);
-        $ajaxUrl = $this->ajaxUrl;
-        $authToken = $this->authToken ? json_encode($this->authToken) : 'null';
-        $multiple = $this->multiple ? 'true' : 'false';
         $filters = $this->renderFilters();
-        $defaultOrderJson = json_encode($this->defaultOrder);
-        $js = $this->getJs($modalId, $tableId, $columnsJson, $ajaxUrl, $authToken, $multiple, $defaultOrderJson);
+        $js = $this->getJs($this->params);
         $this->view->registerJs($js);
         ob_start();
         Modal::begin([
-            'id' => $modalId,
+            'id' => 'data-modal-' . $this->id,
             'size' => Modal::SIZE_LARGE,
             'title' => $this->options['title'] ?? '',
             'footer' => Html::button('Apply', ['class' => 'btn btn-primary', 'id' => 'apply-selection-' . $this->id]),
@@ -59,5 +59,15 @@ abstract class BaseDynamicDataTableWidget extends InputWidget{
         }
         return $filters;
     }
-    protected abstract function getJs($modalId, $tableId, $columnsJson, $ajaxUrl, $authToken, $multiple, $defaultOrderJson);
+    /*
+     * $params[] = [
+        'columnsJson' => $columnsJson,
+        'ajaxUrl' => $ajaxUrl,
+        'authToken' => $authToken,
+        'multiple' => $multiple,
+        'defaultOrderJson' => $defaultOrderJson,
+        'columnTarget' => $columnTarget
+     ]
+     */
+    protected abstract function getJs($params);
 }

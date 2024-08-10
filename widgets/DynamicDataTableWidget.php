@@ -2,8 +2,15 @@
 namespace app\widgets;
 class DynamicDataTableWidget extends BaseDynamicDataTableWidget
 {
-    protected function getJs($modalId, $tableId, $columnsJson, $ajaxUrl, $authToken, $multiple, $defaultOrderJson)
-    {
+    protected function getJs($params){
+        $modalId='data-modal-' . $this->id;
+        $tableId='data-table-' . $this->id;
+        $columnsJson=$params['columnsJson'];
+        $ajaxUrl=$params['ajaxUrl'];
+        $authToken=$params['authToken'];
+        $multiple=$params['multiple'];
+        $defaultOrderJson=$params['defaultOrderJson'];
+        $columnTarget = $params['columnTarget'];
         $initFunctionName = 'inittb' . $this->id;
         return <<<JS
         var table;
@@ -43,7 +50,7 @@ class DynamicDataTableWidget extends BaseDynamicDataTableWidget
                     table.$('tr.selected').removeClass('selected');
                     $(this).addClass('selected');
                     var selectedData = table.row(this).data();
-                    $('#{$this->options['id']}').val(selectedData[Object.keys(selectedData)[1]]);
+                    $('#{$this->options['id']}').val(selectedData[Object.keys(selectedData)[$columnTarget]]);
                     $('#$modalId').modal('hide');
                     $('#{$this->options['id']}').trigger('change');
                 }
