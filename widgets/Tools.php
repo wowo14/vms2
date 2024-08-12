@@ -155,8 +155,8 @@ class Tools extends Widget
           $filePath = Yii::getAlias('@uploads') . $filename;
           file_put_contents($filePath, $binaryData);
           if (in_array($extension, ['png', 'jpg', 'jpeg', 'gif'])) {
-              // $this->resizeImageToMaxSize($filePath, 512 * 1024);
-              $filename=$this->convertavif($filePath);
+              $this->resizeImageToMaxSize($filePath, 512 * 1024);
+              // $filename=$this->convertavif($filePath);
           }
           return $filename;
       } else {
