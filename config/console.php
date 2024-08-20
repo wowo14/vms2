@@ -10,6 +10,7 @@ return [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
         '@console'   => '@runtime',
+        '@uploads' => '@app/web/uploads/',
     ],
     'controllerMap' => [
         // 'migrate' => [

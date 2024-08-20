@@ -6,11 +6,11 @@ $texttitle=json_encode("DATA PENGADAAN BARANG/JASA RSUD IBNU SINA KABUPATEN GRES
 foreach($params['metode'] as $key => $value){
     $dashmetode[]=['name'=>$value['metode_pengadaan'],'y'=>$value['jml']];
 }
-$dashmetode=json_encode($dashmetode,JSON_NUMERIC_CHECK);
+$dashmetode=json_encode($dashmetode??[],JSON_NUMERIC_CHECK);
 foreach($params['kategori'] as $key => $value){
     $dashkategori[]=['name'=>$value['kategori_pengadaan'],'y'=>$value['jml']];
 }
-$dashkategori=json_encode($dashkategori,JSON_NUMERIC_CHECK);
+$dashkategori=json_encode($dashkategori??[],JSON_NUMERIC_CHECK);
 $JS=<<<JS
 Highcharts.chart('dahsboardpertahun', {
     chart: {
@@ -144,6 +144,7 @@ $this->registerJs($JS);
 echo '<table class="table table-responsive">';
 echo '<tr><th>No</th><th>Metode</th><th>Tahun</th><th>Jumlah</th><th>Pagu</th><th>%</th></tr>';
 $totalmetode=array_sum(array_column($params['metode'],'ammount'))??0;
+if($totalmetode>0){
 foreach($params['metode'] as $key => &$row){
     echo '<tr><td>'.($key+1).'</td>
     <td>'.$row['metode_pengadaan'].'</td>
@@ -159,6 +160,7 @@ echo '<tfoot><tr>
     <td>'.\Yii::$app->formatter->asPercent($totalmetode/$totalmetode).'</td>
     </tr>
     </tfoot>';
+}
 echo '</table>';
 ?></div>
 
@@ -174,6 +176,7 @@ echo '</table>';
 echo '<table class="table table-responsive">';
 echo '<tr><th>No</th><th>Kategori</th><th>Tahun</th><th>Jumlah</th><th>Pagu</th><th>%</th></tr>';
 $totalkategori=array_sum(array_column($params['kategori'],'ammount'))??0;
+if($totalkategori>0){
 foreach($params['kategori'] as $key => $row){
     echo '<tr><td>'.($key+1).'</td>
     <td>'.$row['kategori_pengadaan'].'</td>
@@ -189,6 +192,7 @@ echo '<tfoot><tr>
     <td>'.\Yii::$app->formatter->asPercent($totalkategori/$totalkategori).'</td>
     </tr>
     </tfoot>';
+}
 echo '</table>';
 ?>
 </div>
