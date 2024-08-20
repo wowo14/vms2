@@ -30,7 +30,7 @@ class PegawaiController extends Controller {
         $request=Yii::$app->request;
         if($request->isPost){
             $model->load($request->post());
-            print_r($model);
+            // print_r($model);
         }else{
             return $this->render('_dialog', [
                 'model' => $model
@@ -118,7 +118,7 @@ class PegawaiController extends Controller {
                 ->orderBy(['nama' => SORT_ASC])
                 ->all();
             foreach ($query as $contact) {
-                $out[] = ['id' => $contact['id'],'nik'=>$contact['nik'],'nip'=>$contact['nip'], 'text' => $contact['nama']];
+                $out[] = ['id' => $contact['nama'],'nik'=>$contact['nik'],'nip'=>$contact['nip'], 'text' => $contact['nama']];
             }
         }
         return ['results' => $out];

@@ -1,13 +1,12 @@
 <?php
 namespace app\controllers;
-use app\models\User;
-use app\models\{LoginForm, ContactForm};
+use app\models\{User,LoginForm, ContactForm,PaketPengadaan};
 use app\widgets\ImageConverter;
 use Yii;
+use yii\db\Expression;
 use yii\filters\{AccessControl, VerbFilter};
 use yii\helpers\{Url, Html, ArrayHelper, Json};
-use yii\web\{ Response};
-
+use yii\web\{Response};
 class SiteController extends Controller
 {
     public function behaviors()
@@ -63,11 +62,11 @@ class SiteController extends Controller
     public function actionIndex()
     {
         $user=Yii::$app->user->identity;
-        print_r($user->uservendor);
         if (empty(Yii::$app->session->get('userData'))) {
             return $this->actionLogout();
         }
-        return $this->render('index');
+        return $this->redirect('/site/dashboard');
+        // return $this->render('index');
     }
     public function actionLogin()
     {
@@ -136,5 +135,37 @@ class SiteController extends Controller
             }
         }
         return ['output' => $out, 'selected' => $selected];
+    }
+    public function actionDashboard(){
+        $query=PaketPengadaan::where(['not',['id'=>null]]);
+        $q=clone $query;
+        $paket=collect($q->all());
+        $paketselesai=$paket->whereNotNull('pemenang');
+        $paketbelom=$paket->whereNull('pemenang');
+        $paketperiode=$paket->whereBetween('tanggal_paket',['2022-01-01','2025-12-31']);
+        $allpaketpertahun=$q
+        ->select(['count(*) as jml',new Expression("strftime('%Y',tanggal_paket) as year")])
+        ->groupBy("year")
+        ->asArray()
+        ->all();
+        $metode=$q->select(['metode_pengadaan','sum(pagu) as ammount','count(*) as jml',new Expression("strftime('%Y',tanggal_paket) as year")])
+            ->groupBy(["year","metode_pengadaan"])
+            ->asArray()
+            ->all();
+        $kategori=$q->select(['kategori_pengadaan','sum(pagu) as ammount','count(*) as jml',new Expression("strftime('%Y',tanggal_paket) as year")])
+                ->groupBy(["year","kategori_pengadaan"])
+                ->asArray()
+                ->all();
+        $params=[
+            'years'=>collect($allpaketpertahun)->pluck('year')->toArray(),
+            'yearData'=>collect($allpaketpertahun)->pluck('jml')->toArray(),
+            'paketselesai'=>$paketselesai->count(),
+            'paketbelom'=>$paketbelom->count(),
+            'metode'=>$metode,
+            'kategori'=>$kategori,
+        ];
+        return $this->render('_dashboard',[
+            'params'=>$params
+        ]);
     }
 }
