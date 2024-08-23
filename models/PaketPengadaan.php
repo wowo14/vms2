@@ -5,14 +5,13 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
     public $oldrecord;
     public $statusPengadaan;
-    public $unit;
     public static function tableName() {
         return 'paket_pengadaan';
     }
     public function rules() {
         return [
-            [['nomor', 'tanggal_paket', 'nama_paket','tahun_anggaran','kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom','unit','pagu','metode_pengadaan','kategori_pengadaan'], 'required'],
-            [['tanggal_paket', 'tanggal_reject', 'alasan_reject','addition'], 'string'],
+            [['nomor', 'tanggal_paket','tanggal_dpp','tanggal_persetujuan','nomor_persetujuan', 'nama_paket','tahun_anggaran','kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom','unit','pagu','metode_pengadaan','kategori_pengadaan'], 'required'],
+            [['tanggal_paket','tanggal_reject', 'alasan_reject','addition'], 'string'],
             [['pagu'], 'number'],
             [['nama_paket'], 'unique'],
             [['created_by', 'tahun_anggaran', 'approval_by','unit'], 'integer'],
@@ -22,7 +21,10 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     public function attributeLabels() {
         return [
             'id' => 'ID',
-            'nomor' => 'Nomor',
+            'nomor' => 'Nomor DPP',
+            'nomor_persetujuan'=>'Nomor Persetujuan',
+            'tanggal_dpp' => 'Tanggal DPP',
+            'tanggal_persetujuan' => 'Tanggal Persetujuan',
             'tanggal_paket' => 'Tanggal Paket',
             'nama_paket' => 'Nama Paket',
             'kode_program' => 'Kode Program',
@@ -39,7 +41,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             'tanggal_reject' => 'Tanggal Reject', //not null ditolak
             'pemenang'=>'Pemenang', // id vendor pemenang
             'addition'=>'Addition', // kolom tambahan
-            'unit' => 'Unit / Bidang / Bagian',
+            'unit' => 'Unit_Bidang_Bagian',
         ];
     }
     public function getListpaketoutstanding() {

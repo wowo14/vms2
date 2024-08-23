@@ -8,8 +8,8 @@ class PaketPengadaanSearch extends PaketPengadaan{
     public function rules()
     {
         return [
-            [['id', 'created_by', 'tahun_anggaran', 'approval_by'], 'integer'],
-            [['nomor', 'kategori_pengadaan','addition','tanggal_paket', 'tanggal_reject','alasan_reject', 'nama_paket', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'metode_pengadaan'], 'safe'],
+            [['id', 'created_by', 'unit','tahun_anggaran', 'approval_by'], 'integer'],
+            [['nomor', 'tanggal_dpp','tanggal_persetujuan','nomor_persetujuan','kategori_pengadaan','addition','tanggal_paket', 'tanggal_reject','alasan_reject', 'nama_paket', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'metode_pengadaan'], 'safe'],
             [['pagu'], 'number'],
         ];
     }

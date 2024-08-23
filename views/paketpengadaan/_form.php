@@ -42,7 +42,27 @@ $datakodeprogram = $model->isNewRecord ? \app\models\ProgramKegiatan::optionprog
             'labelOptions' => ['class' => 'col-sm-3 col-md-3 control-label text-sm-left text-md-right'],
         ],
     ]); ?>
-    <?= $form->field($model, 'nomor')->textInput() ?>
+    <div class="row">
+    <div class="col-md-7">
+        <?= $form->field($model, 'nomor')->textInput() ?>
+        <?= $form->field($model, 'nomor_persetujuan')->textInput() ?>
+        <?= $form->field($model, 'nama_paket')->textArea() ?>
+    </div>
+    <div class="col-md-5">
+        <?= $form->field($model, 'tanggal_dpp')->widget(DatePicker::class, [
+        'pluginOptions' => [
+            'format' => 'yyyy-mm-dd',
+            'todayHighlight' => true,
+            'autoclose' => true
+        ],
+    ])?>
+        <?= $form->field($model, 'tanggal_persetujuan')->widget(DatePicker::class, [
+        'pluginOptions' => [
+            'format' => 'yyyy-mm-dd',
+            'todayHighlight' => true,
+            'autoclose' => true
+        ],
+    ])?>
     <?= $form->field($model, 'tanggal_paket')->widget(DatePicker::class, [
         'pluginOptions' => [
             'format' => 'yyyy-mm-dd',
@@ -50,7 +70,8 @@ $datakodeprogram = $model->isNewRecord ? \app\models\ProgramKegiatan::optionprog
             'autoclose' => true
         ],
     ]) ?>
-    <?= $form->field($model, 'nama_paket')->textArea() ?>
+    </div>
+    </div>
     <?= $form->field($model, 'tahun_anggaran')->widget(Select2::class, [
         'data' => $model::optiontahunanggaran(),
         'options' => [

@@ -11,10 +11,18 @@ class CeklistModel extends Model
     public $admin;
     public $paket_id;
     public $template;
+    public $nomor_persetujuan;
+    public $tanggal_persetujuan;
     public function rules()
     {
         return [
-            [['nomor_dpp', 'nomor_tugas', 'tanggal_tugas','pejabat','admin','paket_id','unit'], 'safe'],
+            [['nomor_dpp','nomor_persetujuan', 'nomor_tugas', 'tanggal_tugas','pejabat','admin','paket_id','unit'], 'safe'],
+        ];
+    }
+     public function attributeLabels() {
+        return [
+            'pejabat' => 'Pejabat Pengadaan',
+            'admin'=>'Admin Pengadaan',
         ];
     }
 }

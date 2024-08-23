@@ -26,7 +26,6 @@ class DppController extends Controller {
             throw new BadRequestHttpException('Unauthorized access');
         }
         $model->paketpengadaan->pemenang=$idvendor;
-
         $model->paketpengadaan->penawaranpenyedia->negosiasi->accept=1;
         $model->paketpengadaan->penawaranpenyedia->negosiasi->save();
         $model->paketpengadaan->save();
@@ -58,9 +57,14 @@ class DppController extends Controller {
     public function actionTab($id) {
         $model = $this->findModel($id);
         $penawaran=PenawaranPengadaan::collectAll(['paket_id' => $model->paket_id]);
-        return $this->render('tab', [
-            'model' => $model,'penawaran'=>$penawaran
-        ]);
+        if(count($penawaran->toArray())>0){
+            return $this->render('tab', [
+                'model' => $model,'penawaran'=>$penawaran
+            ]);
+        }else{
+            Yii::$app->session->setFlash('warning', 'Tidak ada penawaran yang tersedia');
+            return $this->redirect('index');
+        }
     }
     public function actionListpemenang($params)
     {
