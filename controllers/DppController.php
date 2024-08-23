@@ -338,7 +338,7 @@ class DppController extends Controller {
         $title='Ceklist Kelengkapan DPP';
         $chief=\app\models\Pegawai::findOne($dpp::profile('kepalapengadaan'));
         $data=[
-            'unit'=>Unit::findOne(json_decode($model->addition,true)['unit'])->unit,
+            'unit'=>Unit::findOne(json_decode($model->addition,true)['unit']??$model->unit)->unit,
             'paket'=>$model->nama_paket,
             'details'=>collect(json_decode($model->addition,true)['template'])->map(function ($e) {
                 if(key_exists('sesuai',$e)){
