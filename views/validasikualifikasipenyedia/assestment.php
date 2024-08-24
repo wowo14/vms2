@@ -28,10 +28,11 @@ foreach (array_keys($aa) as $item) {
         'type' => 'textArea'
     ];
 }
-$rr=collect($rr)->map(function($el){
-    $el['sesuai'] = $el['sesuai'] == 'ya' ? '1' : '0';
-    return $el;
-})->toArray();
+// print_r($rr);
+// $rr=collect($rr)->map(function($el){
+//     $el['sesuai'] = $el['sesuai'] == '1' ? '1' : '0';
+//     return $el;
+// })->toArray();
 if ($model->jenisevaluasi->jenis_evaluasi == 'Kesimpulan') {
     $key = array_search('sesuai', array_column($col, 'name'));
     if ($key !== false) {

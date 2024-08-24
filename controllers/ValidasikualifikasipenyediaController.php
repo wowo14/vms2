@@ -170,11 +170,11 @@ class ValidasikualifikasipenyediaController extends Controller {
                 return $e;
             });
             $pure = $pure1->map(function ($e) { // switchinput
-                if (isset($e['sesuai'])) {
-                    $e['sesuai'] = 'ya';
-                } else {
-                    $e['sesuai'] = '';
-                }
+                // if (isset($e['sesuai'])) {
+                //     $e['sesuai'] = 'ya';
+                // } else {
+                //     $e['sesuai'] = '';
+                // }
                 if (array_key_exists('sesuai', $e)) {
                     $sesuaiValue = $e['sesuai'] ?? '';
                     unset($e['sesuai']);
@@ -186,7 +186,7 @@ class ValidasikualifikasipenyediaController extends Controller {
             ValidasiKualifikasiPenyediaDetail::updateAll([
                 'hasil' => json_encode($pure),
             ], ['header_id' => $id]);
-            $parent = ValidasiKualifikasiPenyedia::findOne(['id' => $id]);
+            $parent = $model;//ValidasiKualifikasiPenyedia::findOne(['id' => $id]);
             $tmp = TemplateChecklistEvaluasi::where(['template' => 'Ceklist_Evaluasi_Kesimpulan'])->one();
             if (!$tmp) {
                 throw new NotFoundHttpException('Template Ceklist_Evaluasi_Kesimpulan not found');
@@ -203,10 +203,6 @@ class ValidasikualifikasipenyediaController extends Controller {
             ]),$callback=true);
             Yii::$app->session->setFlash('success', 'Data Assestment Berhasil disimpan');
             return $this->redirect(Yii::$app->request->referrer);
-            // if($partial){
-            // }else{
-            //     return $this->redirect('index');
-            // }
         }
     }
     public function actionView($id) {
@@ -460,7 +456,8 @@ class ValidasikualifikasipenyediaController extends Controller {
         $count = $total = 0;
         foreach ($aa as $c) {
             if (key_exists('sesuai', $c)) {
-                if ($c['sesuai'] == 'ya') {
+                if ($c['sesuai'] == '1') {
+                // if ($c['sesuai'] == 'ya') {
                     $count++;
                 }
             }
@@ -551,7 +548,8 @@ class ValidasikualifikasipenyediaController extends Controller {
                 $count = $total = 0;
                 foreach ($rr as $c) {
                     if (array_key_exists('sesuai', $c)) {
-                        if ($c['sesuai'] == 'ya') {
+                        if ($c['sesuai'] == '1') {
+                        // if ($c['sesuai'] == 'ya') {
                             $count++;
                         }
                     }
@@ -566,11 +564,11 @@ class ValidasikualifikasipenyediaController extends Controller {
                     $col = array_keys($rr[0]);
                     $content .= \yii\grid\GridView::widget([
                         'dataProvider' => new \yii\data\ArrayDataProvider([
-                            'allModels' => $rr,
-                            // 'allModels' => collect($rr)->map(function($el){
-                            //                 $el['sesuai'] = $el['sesuai'] == 'ya' ? '1' : '0';
-                            //                 return $el;
-                            //             })->toArray()
+                            // 'allModels' => $rr,
+                            'allModels' => collect($rr)->map(function($el){
+                                            $el['sesuai'] = $el['sesuai'] == '1' ? 'Ya' : 'Tidak';
+                                            return $el;
+                                        })->toArray()
                         ]),
                         'columns' => $col
                     ]);

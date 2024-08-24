@@ -46,7 +46,8 @@ class ValidasiKualifikasiPenyediaDetail extends \yii\db\ActiveRecord {
         if ($cek !== null) {
             $raw= json_decode($cek->hasil, true);
             $count = collect($raw)->filter(function ($e) {
-                return isset($e['sesuai']) && $e['sesuai'] == 'ya';
+                return isset($e['sesuai']) && $e['sesuai'] == '1';
+                // return isset($e['sesuai']) && $e['sesuai'] == 'ya';
             })->count();
             $total= collect($raw)->count();
             self::updateAll(['total_sesuai' => $count,'total_element'=>$total], ['header_id' => $header_id]);
