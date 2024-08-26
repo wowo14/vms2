@@ -49,6 +49,11 @@ $this->params['breadcrumbs'][] = $this->title;
             'filterModel' => $searchModel,
             'pjax' => true,
             'columns' => require(__DIR__ . '/_columns.php'),
+            'rowOptions' => function ($model) {
+                if ($model->paketpengadaan->pemenang) {
+                    return ['class' => 'bg-primary'];
+                }
+            },
             'toolbar' => [
                 [
                     'content' =>

@@ -65,12 +65,14 @@ CATATAN:<br>
             <br>
             <br>
             <br>
+            <br>
             <u>( <?=$data['kepalapengadaan']??' . . . . . . . . . . . '?> )</u><br>
             NIP. <?=$data['nipkepalapengadaan']??''?>
         </td>
         <td width="34%" style="text-align:center">
             Yang Menerima,<br>
             (Admin Pengadaan Barang/Jasa)<br>
+            <br>
             <br>
             <br>
             <br>
@@ -84,8 +86,8 @@ CATATAN:<br>
             <br>
             <br>
             <br>
-            <u>( . . . . . . . . . . . )</u><br>
-            NIP.
+            <u>( <?=$data['kurir']??'. . . . . . . . . . . '?> )</u><br>
+            NIP. <?=$data['nipkurir']??''?>
         </td>
     </tr>
 </table>

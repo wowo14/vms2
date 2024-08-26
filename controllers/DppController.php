@@ -338,8 +338,8 @@ class DppController extends Controller {
         $title='Ceklist Kelengkapan DPP';
         $chief=\app\models\Pegawai::findOne($dpp::profile('kepalapengadaan'));
         $data=[
-            'unit'=>Unit::findOne(json_decode($model->addition,true)['unit']??$model->unit)->unit,
-            'paket'=>$model->nama_paket,
+            'unit'=>Unit::findOne(json_decode($model->addition,true)['unit']??$model->unit)->unit??'',
+            'paket'=>$model->nama_paket??'',
             'details'=>collect(json_decode($model->addition,true)['template'])->map(function ($e) {
                 if(key_exists('sesuai',$e)){
                     $e['sesuai'] = $e['sesuai'] == 1 ? 'Ya' : 'Tidak';
@@ -350,10 +350,12 @@ class DppController extends Controller {
             })->toArray(),
             'logogresik'=>Yii::getAlias('@webroot/images/logogresik.png', true),
             'logors'=>Yii::getAlias('@webroot/images/logors.png', true),
-            'kepalapengadaan'=>$chief->nama,
-            'nipkepalapengadaan'=>$chief->nip,
-            'admin'=>$dpp->staffadmin->nama,
-            'nipadmin'=>$dpp->staffadmin->nip,
+            'kepalapengadaan'=>$chief->nama??'',
+            'nipkepalapengadaan'=>$chief->nip??'',
+            'admin'=>$dpp->staffadmin->nama??'',
+            'nipadmin'=>$dpp->staffadmin->nip??'',
+            'kurir'=>$model->kurirnya->nama??'',
+            'nipkurir'=>$model->kurirnya->nip??'',
         ];
         $cetakan=$this->renderPartial('/paketpengadaan/_printceklistadmin', ['data'=>$data,'model'=>$model,'title'=>$title]);
         $pdf=Yii::$app->pdf;

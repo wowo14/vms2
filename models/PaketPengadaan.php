@@ -94,6 +94,9 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         Dpp::invalidatecache('tag_' . Dpp::getModelname());
         return parent::beforeSave($insert);
     }
+    public function getKurirnya(){
+        return $this->hasOne(Pegawai::class,['id_user'=>'created_by'])->cache(self::cachetime(), self::settagdep('tag_pegawai'));
+    }
     public function getAttachments() {
         return $this->hasMany(Attachment::class, ['user_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_attachment'));
     }

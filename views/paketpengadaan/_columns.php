@@ -59,6 +59,11 @@ return [
         'noWrap' => 'true',
         'template' => ' {lampiran} {kirimulang} {view} {update} {delete}',
         'vAlign' => 'middle',
+        'contentOptions'=>function ($model, $key, $index, $column) {
+            if($model->pemenang || $model->alasan_reject || $model->dpp){
+                return ['style' => 'background-color: white;'];
+            }
+        },
         'visibleButtons'=>[
             'delete'=>function($d){
                 return !$d->pemenang;

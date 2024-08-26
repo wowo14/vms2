@@ -5,7 +5,8 @@ use mdm\admin\components\Helper;
 use yii2ajaxcrud\ajaxcrud\{CrudAsset,BulkButtonWidget};
 use yii\bootstrap4\Modal;
 use yii\helpers\{Html,Url};
-$idmodal = $searchModel->hash;$this->title = 'Paket Pengadaan';
+$idmodal = $searchModel->hash;
+$this->title = 'Paket Pengadaan';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
 AppAsset::register($this);
@@ -21,6 +22,12 @@ AppAsset::register($this);
             'rowOptions' => function ($model) {
                 if ($model->alasan_reject) {
                     return ['class' => 'bg-orange'];
+                } elseif ($model->dpp) {
+                    return ['class' => 'bg-success'];
+                } elseif ($model->pemenang) {
+                    return ['class' => 'bg-primary'];
+                } else {
+                    return ['class' => 'bg-default'];
                 }
             },
             'toolbar' => [
@@ -74,7 +81,7 @@ AppAsset::register($this);
                 'heading' => '<i class="fa fa-list"></i> <b>' . $this->title . '</b>',
                 'before' => (Helper::checkRoute($this->context->uniqueId . '/dpp') ? BulkButtonWidget::widget([
                     'buttons' => Html::a(
-                        '<i class="fa fa-flag"></i>&nbsp; ' . Yii::t('yii2-ajaxcrud', 'Buat DPP'),
+                        '<i class="fa fa-flag"></i>&nbsp; ' . Yii::t('yii2-ajaxcrud', 'Kirim DPP'),
                         ["/paketpengadaan/dpp"],
                         [
                             'class' => 'btn btn-danger btn-xs',
@@ -83,10 +90,10 @@ AppAsset::register($this);
                             'data-confirm' => false,
                             'data-method' => false,
                             'data-request-method' => 'post',
-                            'data-confirm-title' => Yii::t('yii2-ajaxcrud', 'Buat DPP'),
-                            'data-confirm-message' => 'Ajukan Paket Pengadaan Ke DPP',
+                            'data-confirm-title' => Yii::t('yii2-ajaxcrud', 'Kirim DPP'),
+                            'data-confirm-message' => 'Ajukan Paket Pengadaan Ke Menu DPP',
                             'data-toggle' => 'tooltip',
-                            'data-original-title' => Yii::t('yii2-ajaxcrud', 'Buat DPP'),
+                            'data-original-title' => Yii::t('yii2-ajaxcrud', 'Kirim DPP'),
                         ]
                     ),
                 ]) : ''),

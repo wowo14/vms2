@@ -76,8 +76,13 @@ return [
         'class' => 'kartik\grid\ActionColumn',
         'dropdown' => false,
         'noWrap' => 'true',
-        'template' => '{reject} {approve} {ceklistadmin} {printceklistadmin} {reviewdpp} {formreview} {view} {update} {delete}',
+        'template' => '{reject} {approve} {ceklistadmin} {printceklistadmin} {formreview} {reviewdpp} {view} {update} {delete}',
         'vAlign' => 'middle',
+        'contentOptions'=>function ($model, $key, $index, $column) {
+            if ($model->paketpengadaan->pemenang) {
+                return ['style' => 'background-color: white;'];
+            }
+        },
         'urlCreator' => function ($action, $model, $key, $index) {
             return Url::to([$action, 'id' => $key]);
         },
@@ -97,9 +102,9 @@ return [
             'ceklistadmin'=>function($d){
                 return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
-            'printceklistadmin'=>function($d){
-                return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
-            },
+            // 'printceklistadmin'=>function($d){
+            //     return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
+            // },
             'formreview'=>function($d){
                 return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             }

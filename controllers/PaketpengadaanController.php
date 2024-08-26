@@ -343,7 +343,9 @@ class PaketpengadaanController extends Controller {
             'kepalapengadaan'=>null,
             'nipkepalapengadaan'=>'',
             'admin'=>null,
-            'nipadmin'=>''
+            'nipadmin'=>'',
+            'kurir'=>$model->kurirnya->nama,
+            'nipkurir'=>$model->kurirnya->nip,
         ];
         $cetakan=$this->renderPartial('_printceklistadmin', ['data'=>$data,
         'model'=>$model,'title'=>$title]);
