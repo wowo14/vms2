@@ -4,8 +4,7 @@ use app\widgets\FilePreview;
 use kartik\date\DatePicker;
 use kartik\select2\Select2;
 use kartik\switchinput\SwitchInput;
-use unclead\multipleinput\MultipleInput;
-use unclead\multipleinput\MultipleInputColumn;
+use unclead\multipleinput\{MultipleInput,MultipleInputColumn};
 // use yii\bootstrap4\ActiveForm;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii\bootstrap4\Modal;
@@ -69,10 +68,11 @@ jQuery(function ($) {
         }
     } else {
         $rr = collect($template)->map(function ($e, $index) {
-            $r = ['id' => $index, 'uraian' => $e, 'sesuai' => '1', 'keterangan' => ''];
+            $r = ['id' => $index, 'uraian' => $e, 'sesuai' => '0', 'keterangan' => ''];
             return $r;
         });
     }
+    // print_r($rr);
     ?>
     <?= $form->field($reviews, 'uraian')->widget(MultipleInput::class, [
         'id' => 'doklampiran',
@@ -92,6 +92,7 @@ jQuery(function ($) {
             [
                 'name' => 'uraian',
                 'title' => 'Uraian',
+                'type'=>'textarea',
             ],
             [
                 'name' => 'sesuai',
