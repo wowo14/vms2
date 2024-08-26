@@ -27,7 +27,7 @@ if(key_exists('template', $additions)){
 }
 $mdl=new CeklistModel();
 $mdl->nomor_dpp=$dpp->nomor_dpp??'';
-$mdl->nomor_tugas=$modelpenugasan->nomor_tugas??'';
+$mdl->nomor_tugas=$modelpenugasan->nomor_tugas??$nomortugas;
 $mdl->tanggal_tugas=$modelpenugasan->tanggal_tugas??'';
 $mdl->pejabat=$modelpenugasan->pejabat??'';
 $mdl->admin=$modelpenugasan->admin??'';

@@ -1,6 +1,6 @@
 <?php
 namespace app\controllers;
-use app\models\{PenugasanPemilihanpenyedia,Unit,HistoriReject,ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails, PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia};
+use app\models\{Setting,PenugasanPemilihanpenyedia,Unit,HistoriReject,ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails, PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia};
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
@@ -260,6 +260,7 @@ class DppController extends Controller {
         $title="Kelengkapan DPP";
         $dpp=$this->findModel($id);
         $model=$dpp->paketpengadaan; //model paketpengadaan
+        $set=Setting::where(['type'=>'sequence','param'=>'nomortugas','active'=>1])->one();
         if($request->isGet){
             $temp = TemplateChecklistEvaluasi::where(['like', 'template', 'Ceklist_Kelengkapan_DPP'])->one();
             if ($temp) {
@@ -295,8 +296,11 @@ class DppController extends Controller {
                 'admin'=>$model::getAlladmin(),
             ];
             //endpenugasan
+            //auto generate
+            $nomortugas=(int)$set->value+1;
             return $this->render('ceklistadmin', [
-                'datapenugasan' => $datapenugasan,'modelpenugasan'=>PenugasanPemilihanpenyedia::first(['dpp_id'=>$dpp->id]),
+                'datapenugasan' => $datapenugasan,'nomortugas'=>$nomortugas,
+                'modelpenugasan'=>PenugasanPemilihanpenyedia::first(['dpp_id'=>$dpp->id]),
                 'dpp'=>$dpp,'model'=>$model,'dataPaket'=>$dataPaket,'temp'=>$temp,'title'=>$title]);
         }
         if($request->isPost){
@@ -328,6 +332,8 @@ class DppController extends Controller {
             $modelpenugasan->pejabat=$_POST['CeklistModel']['pejabat'];
             $modelpenugasan->admin=$_POST['CeklistModel']['admin'];
             $modelpenugasan->save();
+            $set->value=$_POST['CeklistModel']['nomor_tugas'];
+            $set->save();
             Yii::$app->session->setFlash('success', 'Kelengkapan DPP Berhasil Ditambahkan');
             return $this->redirect(['/dpp/index']);
         }
