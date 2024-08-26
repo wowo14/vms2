@@ -77,39 +77,39 @@ $this->params['breadcrumbs'][] = $this->title;
             'panel' => [
                 'type' => 'default',
                 'heading' => '<i class="fa fa-list"></i> <b>' . $this->title . '</b>',
-                'before' => (BulkButtonWidget::widget([
-                    'buttons' => (Helper::checkRoute($this->context->uniqueId . '/assign') ? Html::a(
-                        '<i class="fa fa-flag"></i>&nbsp; ' . Yii::t('yii2-ajaxcrud', ' Assign Petugas '),
-                        ["/dpp/assign"],
-                        [
-                            'class' => 'btn btn-primary btn-xs',
-                            'role' => 'modal-remote-bulk',
-                            'data-target' => '#' . $idmodal,
-                            'data-confirm' => false,
-                            'data-method' => false,
-                            'data-request-method' => 'post',
-                            'data-confirm-title' => Yii::t('yii2-ajaxcrud', 'Assign Pejabat Pengadaan'),
-                            'data-confirm-message' => $searchModel::formassignpetugas(),
-                            'data-toggle' => 'tooltip',
-                            'data-original-title' => Yii::t('yii2-ajaxcrud', 'Assign Petugas'),
-                        ]
-                    ) : '') . ' ' . (Helper::checkRoute($this->context->uniqueId . '/assignadmin') ? Html::a(
-                        '<i class="fa fa-flag"></i>&nbsp; ' . Yii::t('yii2-ajaxcrud', ' Assign Admin'),
-                        ["/dpp/assignadmin"],
-                        [
-                            'class' => 'btn btn-warning btn-xs',
-                            'role' => 'modal-remote-bulk',
-                            'data-target' => '#' . $idmodal,
-                            'data-confirm' => false,
-                            'data-method' => false,
-                            'data-request-method' => 'post',
-                            'data-confirm-title' => Yii::t('yii2-ajaxcrud', 'Assign Admin Pengadaan'),
-                            'data-confirm-message' => $searchModel::formassignadmin(),
-                            'data-toggle' => 'tooltip',
-                            'data-original-title' => Yii::t('yii2-ajaxcrud', 'Assign Admin Pengadaan'),
-                        ]
-                    ) : '')
-                ])),
+                // 'before' => (BulkButtonWidget::widget([
+                //     'buttons' => (Helper::checkRoute($this->context->uniqueId . '/assign') ? Html::a(
+                //         '<i class="fa fa-flag"></i>&nbsp; ' . Yii::t('yii2-ajaxcrud', ' Assign Petugas '),
+                //         ["/dpp/assign"],
+                //         [
+                //             'class' => 'btn btn-primary btn-xs',
+                //             'role' => 'modal-remote-bulk',
+                //             'data-target' => '#' . $idmodal,
+                //             'data-confirm' => false,
+                //             'data-method' => false,
+                //             'data-request-method' => 'post',
+                //             'data-confirm-title' => Yii::t('yii2-ajaxcrud', 'Assign Pejabat Pengadaan'),
+                //             'data-confirm-message' => $searchModel::formassignpetugas(),
+                //             'data-toggle' => 'tooltip',
+                //             'data-original-title' => Yii::t('yii2-ajaxcrud', 'Assign Petugas'),
+                //         ]
+                //     ) : '') . ' ' . (Helper::checkRoute($this->context->uniqueId . '/assignadmin') ? Html::a(
+                //         '<i class="fa fa-flag"></i>&nbsp; ' . Yii::t('yii2-ajaxcrud', ' Assign Admin'),
+                //         ["/dpp/assignadmin"],
+                //         [
+                //             'class' => 'btn btn-warning btn-xs',
+                //             'role' => 'modal-remote-bulk',
+                //             'data-target' => '#' . $idmodal,
+                //             'data-confirm' => false,
+                //             'data-method' => false,
+                //             'data-request-method' => 'post',
+                //             'data-confirm-title' => Yii::t('yii2-ajaxcrud', 'Assign Admin Pengadaan'),
+                //             'data-confirm-message' => $searchModel::formassignadmin(),
+                //             'data-toggle' => 'tooltip',
+                //             'data-original-title' => Yii::t('yii2-ajaxcrud', 'Assign Admin Pengadaan'),
+                //         ]
+                //     ) : '')
+                // ])),
                 'after' => BulkButtonWidget::widget([
                     'buttons' => Html::a(
                         '<i class="fa fa-trash"></i>&nbsp; ' . Yii::t('yii2-ajaxcrud', 'Delete All'),
