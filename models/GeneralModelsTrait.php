@@ -20,6 +20,9 @@ trait GeneralModelsTrait {
     public static function isStaff() {
         return (ArrayHelper::keyExists('staffAdmin', Yii::$app->session->get('roles'))) ? true : false;
     }
+    public static function isStaffpp() {
+        return (ArrayHelper::keyExists('staffpp', Yii::$app->session->get('roles'))) ? true : false;
+    }
     public static function optionsSettingtype($type, $callback) { //example $model::optionsSettingtype(string 'type', string|array|function);
         $settings = Setting::type($type);
         if ($callback instanceof \Closure) {
@@ -99,7 +102,7 @@ trait GeneralModelsTrait {
         return collect(Pegawai::where('id_user<>""')->all())->where('hak_akses', 'PP')->pluck('nama', 'id')->toArray();
     }
     public static function getAlladmin() {
-        return collect(Pegawai::where('id_user<>""')->all())->where('hak_akses', 'staffAdmin')->pluck('nama', 'id')->toArray();
+        return collect(Pegawai::where('id_user<>""')->all())->where('hak_akses', 'staffpp')->pluck('nama', 'id')->toArray();
     }
     public static function optionppkom() {
         return collect(Pegawai::where('id_user<>""')->all())->where('hak_akses', 'PPK')->pluck('nama', 'id')->toArray();
