@@ -98,3 +98,6 @@ a.desc:after {
 .right {
     text-align: right;
 }
+.bg-link{
+    color: white !important;
+}

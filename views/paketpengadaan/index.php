@@ -113,7 +113,11 @@ AppAsset::register($this);
                         ]
                     ),
                 ]) .
-                    '<div class="clearfix"></div>',
+                    'Legend:
+                    <span class="bg-orange p-1 m-0">Reject</span>
+                    <span class="bg-success p-1 m-0">On Progress</span>
+                    <span class="bg-primary p-1 m-0">Selesai</span>
+                    <div class="clearfix"></div>',
             ]
         ]) ?>
     </div>

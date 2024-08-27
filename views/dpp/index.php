@@ -14,33 +14,6 @@ CrudAsset::register($this);
 $this->title = 'Dpp';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<?php
-// DataTables::widget([
-//     'dataProvider' => $dataProvider,
-//     'filterModel' => $searchModel,
-//     'columns' => [
-//         'id',
-//         'nomor_dpp',
-//         'tanggal_dpp',
-//         [
-//             'attribute' => 'bidang_bagian',
-//             'value' => fn ($d) => $d->unit->unit ?? ''
-//         ],
-//         ['attribute' => 'paket_id', 'value' => fn ($d) => $d->paketpengadaan->nomornamapaket ?? ''],
-//         'status_review',
-//     ],
-//     'clientOptions' => [
-//         "lengthMenu" => [[20, -1], [20, Yii::t('app', "All")]],
-//         "info" => false,
-//         "responsive" => true,
-//         "dom" => 'lfTrtip',
-//         "tableTools" => [
-//             //empty for load button assets
-//         ],
-//         'buttons'   => ['copy', 'excel', 'pdf'],
-//     ],
-// ]);
-?>
 <div class="dpp-index">
     <div id="ajaxCrudDatatable">
         <?= GridView::widget([
@@ -126,7 +99,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         ]
                     ),
                 ]) .
-                    '<div class="clearfix"></div>',
+                    'Legend:
+                    <span class="bg-primary p-1 m-0 text-white">Selesai</span>
+                    <div class="clearfix"></div>',
             ]
         ]) ?>
     </div>

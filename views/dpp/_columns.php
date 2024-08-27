@@ -22,8 +22,9 @@ return [
     [
         'class' => '\kartik\grid\DataColumn',
         'attribute' => 'nomor_dpp', 'format' => 'raw',
+        'contentOptions'=>['class' => 'text-center'],
         'value' => fn ($d) =>
-        Html::a($d->nomor_dpp, ['/dpp/tab', 'id' => $d->id])
+        Html::a($d->nomor_dpp, ['/dpp/tab', 'id' => $d->id],['class'=>'bg-white'])
             ?? ''
     ],
     [

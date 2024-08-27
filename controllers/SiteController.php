@@ -137,9 +137,10 @@ class SiteController extends Controller
         return ['output' => $out, 'selected' => $selected];
     }
     public function actionDashboard(){
-        $query=PaketPengadaan::where(['not',['id'=>null]]);
+        $query=PaketPengadaan::where(['not',['paket_pengadaan.id'=>null]]);
         $q=clone $query;
-        $paket=collect($q->all());
+        $q2=clone $query;
+        $paket=collect($query->all());
         $paketselesai=$paket->whereNotNull('pemenang');
         $paketbelom=$paket->whereNull('pemenang');
         $paketperiode=$paket->whereBetween('tanggal_paket',['2022-01-01','2025-12-31']);
@@ -156,13 +157,22 @@ class SiteController extends Controller
                 ->groupBy(["year","kategori_pengadaan"])
                 ->asArray()
                 ->all();
+        $bypp=$q2->joinWith(['dpp','dpp.pejabat p'])
+        ->select(['p.nama as pejabat_pengadaan','sum(paket_pengadaan.pagu) as ammount','count(*) as jml',new Expression("strftime('%Y',paket_pengadaan.tanggal_paket) as year")])
+        ->asArray()->all();
+        $byadmin=$q2->joinWith(['dpp d2','dpp.staffadmin s'])
+        ->select(['s.nama as admin_pengadaan','sum(paket_pengadaan.pagu) as ammount','count(*) as jml',new Expression("strftime('%Y',paket_pengadaan.tanggal_paket) as year")])
+        ->asArray()->all();
         $params=[
             'years'=>collect($allpaketpertahun)->pluck('year')->toArray(),
             'yearData'=>collect($allpaketpertahun)->pluck('jml')->toArray(),
             'paketselesai'=>$paketselesai->count(),
             'paketbelom'=>$paketbelom->count(),
+            'totalpagu'=>$paket->sum('pagu'),
             'metode'=>$metode,
             'kategori'=>$kategori,
+            'bypp'=>$bypp,
+            'byadmin'=>$byadmin,
         ];
         return $this->render('_dashboard',[
             'params'=>$params

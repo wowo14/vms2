@@ -33,6 +33,15 @@ class DppSearch extends Dpp{
         $query->joinWith(['reviews r']);
         $query->joinWith(['pejabat p2']);
         $query->joinWith(['staffadmin s']);
+        if(self::isStaff()){
+            $query->andWhere(['s.id_user' => Yii::$app->user->identity->id]);
+        }
+        if(self::isPP()){
+            $query->andWhere(['p2.id_user' => Yii::$app->user->identity->id]);
+        }
+        if(self::isStaff()){
+            $query->andWhere(['p.created_by' => Yii::$app->user->identity->id]);
+        }
         $query->andFilterWhere([
             'id' => $this->id,
             'created_at' => $this->created_at,

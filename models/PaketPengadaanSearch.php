@@ -20,6 +20,9 @@ class PaketPengadaanSearch extends PaketPengadaan{
     public function search($params)
     {
         $query = PaketPengadaan::find()->cache(self::cachetime(),self::settagdep('tag_paketpengadaan'));
+        if(self::isStaff()){
+            $query->andWhere(['created_by' => Yii::$app->user->identity->id]);
+        }
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
