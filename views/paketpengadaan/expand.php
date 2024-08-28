@@ -20,37 +20,44 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'class' => '\kartik\grid\DataColumn',
+                'attribute' => 'qty',
+            ],
+            [
+                'class' => '\kartik\grid\DataColumn',
                 'attribute' => 'volume',
             ],
             [
                 'class' => '\kartik\grid\DataColumn',
                 'attribute' => 'satuan',
             ],
+            // [
+            //     'class' => '\kartik\grid\DataColumn',
+            //     'attribute' => 'durasi',
+            // ],
+            // [
+            //     'class' => '\kartik\grid\DataColumn',
+            //     'attribute' => 'informasi_harga',
+            //     'format'=>'currency',
+            // ],
             [
                 'class' => '\kartik\grid\DataColumn',
-                'attribute' => 'durasi',
-            ],
-            [
-                'class' => '\kartik\grid\DataColumn',
-                'attribute' => 'harga',
+                'attribute' => 'hps_satuan',
                 'format'=>'currency',
             ],
+            // 'sumber_informasi',
             [
-                'class' => '\kartik\grid\DataColumn',
-                'attribute' => 'informasi_harga',
-                'format'=>'currency',
+                'attribute'=>'penawaran',
+                'format'=>'currency'
             ],
             [
-                'class' => '\kartik\grid\DataColumn',
-                'attribute' => 'hps',
-                'format'=>'currency',
+                'attribute'=>'negosiasi',
+                'format'=>'currency'
             ],
             [
-                'attribute' => 'jumlah',
-                'format' => 'html',
-                'contentOptions' => ['class' => 'auto unitsum', 'style' => 'text-align:right;'],
-                'value' => function ($d) {
-                    return $d->volume*$d->hps;
+                'attribute'=>'totalhps',
+                'format'=>'raw',
+                'value'=>function($d){
+                    return $d->qty*$d->volume*$d->hps_satuan;
                 },
                 'pageSummary' => true,
                 'pageSummaryOptions' => ['class' => 'auto unitsum', 'style' => 'text-align:right;'],
@@ -58,7 +65,30 @@ $this->params['breadcrumbs'][] = $this->title;
                     return Yii::$app->formatter->asCurrency(array_sum(($data)));
                 },
             ],
-            'sumber_informasi'
+            [
+                'attribute'=>'totalpenawaran',
+                'format'=>'raw',
+                'value'=>function($d){
+                    return $d->qty*$d->volume*$d->penawaran;
+                },
+                'pageSummary' => true,
+                'pageSummaryOptions' => ['class' => 'auto unitsum', 'style' => 'text-align:right;'],
+                'pageSummaryFunc' => function ($data) {
+                    return Yii::$app->formatter->asCurrency(array_sum(($data)));
+                },
+            ],
+            [
+                'attribute'=>'totalnegosiasi',
+                'format'=>'raw',
+                'value'=>function($d){
+                    return $d->qty*$d->volume*$d->negosiasi;
+                },
+                'pageSummary' => true,
+                'pageSummaryOptions' => ['class' => 'auto unitsum', 'style' => 'text-align:right;'],
+                'pageSummaryFunc' => function ($data) {
+                    return Yii::$app->formatter->asCurrency(array_sum(($data)));
+                },
+            ],
         ],
     ]);
     ?>
