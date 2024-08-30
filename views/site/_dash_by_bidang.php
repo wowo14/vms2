@@ -53,7 +53,23 @@ $this->registerJs($js);
 <div class="dash-bybidang col-md-6">
     Dashboard Bidang / Bagian
 <?php
-$years = array_unique(array_column($params['bybidang'], 'year'));
+use app\widgets\PivotReport;
+$data = [
+    ['year' => '2022', 'category' => 'Electronics','qty'=>20, 'sales' => 1000],
+    ['year' => '2022', 'category' => 'Clothing', 'qty'=>22,'sales' => 1500],
+    ['year' => '2023', 'category' => 'Electronics', 'qty'=>2,'sales' => 2000],
+    ['year' => '2023', 'category' => 'Clothing', 'qty'=>4,'sales' => 2500],
+    ['year' => '2024', 'category' => 'Electronics','qty'=>3, 'sales' => 3000],
+    ['year' => '2024', 'category' => 'Clothing','qty'=>5, 'sales' => 3500],
+];
+$xColName = 'year'; // X-axis will be 'year'
+$yColName = 'bidang_bagian'; // Y-axis will be 'category'
+$totalColName = 'jml'; // The value to aggregate will be 'sales'
+$pivotReport = new PivotReport($xColName, $yColName, $totalColName, $params['bybidang']);
+// $pivotReport = new PivotReport($xColName, $yColName, $totalColName, $data);
+$options = ['class' => 'pivot-table']; // You can add a class for styling
+$pivotReport->generateHtml($options);
+/*$years = array_unique(array_column($params['bybidang'], 'year'));
 sort($years); // Sort years to display them in order
 $pivotData = [];
 foreach ($params['bybidang'] as $row) {
@@ -103,6 +119,7 @@ if ($totalByBidang > 0) {
     echo '</tr></tfoot>';
 }
 echo '</table>';
+*/
 ?>
 </div>
 <div class="col-md-6">

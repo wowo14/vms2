@@ -39,8 +39,7 @@
     "kartik-v/yii2-widget-depdrop": "1.0.x-dev",
     "kartik-v/yii2-widget-fileinput": "1.1.x-dev",
     "intervention/image": "^2.6",
-    "swoole-foundation/yii2-swoole-extension": "dev-master",
-    "spacebarz51/pivot-report": "^1.1"
+    "swoole-foundation/yii2-swoole-extension": "dev-master"
   },
   "require-dev": {
     "yiisoft/yii2-gii": ">=2.2.2",
