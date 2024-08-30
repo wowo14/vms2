@@ -54,24 +54,53 @@ $this->registerJs($js);
     Dashboard Kategori Pengadaan
 <?php
 echo '<table class="table table-responsive">';
-echo '<tr><th>No</th><th>Kategori</th><th>Tahun</th><th>Jumlah</th><th>Pagu</th><th>%</th></tr>';
-$totalkategori=array_sum(array_column($params['kategori'],'ammount'))??0;
-if($totalkategori>0){
-foreach($params['kategori'] as $key => $row){
-    echo '<tr><td>'.($key+1).'</td>
-    <td>'.$row['kategori_pengadaan'].'</td>
-    <td>'.$row['year'].'</td>
-    <td>'.$row['jml'].'</td>
-    <td>'.\Yii::$app->formatter->asCurrency($row['ammount']).'</td>
-    <td>'.\Yii::$app->formatter->asPercent($row['ammount']/$totalkategori).'</td>
-    </tr>';
+echo '<tr><th>No</th><th>Kategori</th>';
+// Dynamically generate year columns
+$years = array_unique(array_column($params['kategori'], 'year'));
+sort($years);
+foreach ($years as $year) {
+    echo '<th>' . $year . '</th>';
 }
-echo '<tfoot><tr>
-    <td colspan="4">Total</td>
-    <td>'.\Yii::$app->formatter->asCurrency($totalkategori).'</td>
-    <td>'.\Yii::$app->formatter->asPercent($totalkategori/$totalkategori).'</td>
-    </tr>
-    </tfoot>';
+echo '<th>Total Jumlah</th><th>Total Pagu</th><th>%</th></tr>';
+$totalkategori = array_sum(array_column($params['kategori'], 'ammount')) ?? 0;
+$categories = [];
+foreach ($params['kategori'] as $row) {
+    $kategori = $row['kategori_pengadaan'];
+    $year = $row['year'];
+    if (!isset($categories[$kategori])) {
+        $categories[$kategori] = [
+            'kategori_pengadaan' => $kategori,
+            'total_jml' => 0,
+            'total_pagu' => 0,
+            'years' => array_fill_keys($years, ['jml' => 0, 'ammount' => 0]),
+        ];
+    }
+    $categories[$kategori]['years'][$year] = [
+        'jml' => $row['jml'],
+        'ammount' => $row['ammount'],
+    ];
+    $categories[$kategori]['total_jml'] += $row['jml'];
+    $categories[$kategori]['total_pagu'] += $row['ammount'];
+}
+if ($totalkategori > 0) {
+    $no = 1;
+    foreach ($categories as $kategori => $data) {
+        echo '<tr><td>' . $no++ . '</td>';
+        echo '<td>' . $kategori . '</td>';
+        foreach ($years as $year) {
+            echo '<td>' . $data['years'][$year]['jml'] . '</td>';
+        }
+        echo '<td>' . $data['total_jml'] . '</td>';
+        echo '<td>' . \Yii::$app->formatter->asCurrency($data['total_pagu']) . '</td>';
+        echo '<td>' . \Yii::$app->formatter->asPercent($data['total_pagu'] / $totalkategori) . '</td>';
+        echo '</tr>';
+    }
+    echo '<tfoot><tr>';
+    echo '<td colspan="' . (count($years) + 2) . '">Total</td>';
+    echo '<td>' . array_sum(array_column($categories, 'total_jml')) . '</td>';
+    echo '<td>' . \Yii::$app->formatter->asCurrency($totalkategori) . '</td>';
+    echo '<td>' . \Yii::$app->formatter->asPercent(1) . '</td>';
+    echo '</tr></tfoot>';
 }
 echo '</table>';
 ?>

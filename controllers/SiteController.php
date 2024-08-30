@@ -136,46 +136,54 @@ class SiteController extends Controller
         }
         return ['output' => $out, 'selected' => $selected];
     }
-    public function actionDashboard(){
-        $query=PaketPengadaan::where(['not',['paket_pengadaan.id'=>null]]);
-        $q=clone $query;
-        $q2=clone $query;
-        $paket=collect($query->all());
-        $paketselesai=$paket->whereNotNull('pemenang');
-        $paketbelom=$paket->whereNull('pemenang');
-        $paketperiode=$paket->whereBetween('tanggal_paket',['2022-01-01','2025-12-31']);
-        $allpaketpertahun=$q
-        ->select(['count(*) as jml',new Expression("strftime('%Y',tanggal_paket) as year")])
-        ->groupBy("year")
+    public function actionDashboard() {
+    $masterQuery = PaketPengadaan::where(['not', ['paket_pengadaan.id' => null]])
+        ->joinWith(['dpp d', 'dpp.pejabat p', 'dpp.staffadmin s', 'dpp.unit u'])
+        ->select([
+            new Expression("strftime('%Y', paket_pengadaan.tanggal_paket) as year"),
+            'paket_pengadaan.metode_pengadaan',
+            'paket_pengadaan.kategori_pengadaan',
+            'paket_pengadaan.pagu',
+            'p.nama as pejabat_pengadaan',
+            's.nama as admin_pengadaan',
+            'u.unit as bidang_bagian',
+            'paket_pengadaan.pemenang'
+        ])
+        ->andWhere(['not', ['d.bidang_bagian' => null]])
         ->asArray()
         ->all();
-        $metode=$q->select(['metode_pengadaan','sum(pagu) as ammount','count(*) as jml',new Expression("strftime('%Y',tanggal_paket) as year")])
-            ->groupBy(["year","metode_pengadaan"])
-            ->asArray()
-            ->all();
-        $kategori=$q->select(['kategori_pengadaan','sum(pagu) as ammount','count(*) as jml',new Expression("strftime('%Y',tanggal_paket) as year")])
-                ->groupBy(["year","kategori_pengadaan"])
-                ->asArray()
-                ->all();
-        $bypp=$q2->joinWith(['dpp','dpp.pejabat p'])
-        ->select(['p.nama as pejabat_pengadaan','sum(paket_pengadaan.pagu) as ammount','count(*) as jml',new Expression("strftime('%Y',paket_pengadaan.tanggal_paket) as year")])
-        ->asArray()->all();
-        $byadmin=$q2->joinWith(['dpp d2','dpp.staffadmin s'])
-        ->select(['s.nama as admin_pengadaan','sum(paket_pengadaan.pagu) as ammount','count(*) as jml',new Expression("strftime('%Y',paket_pengadaan.tanggal_paket) as year")])
-        ->asArray()->all();
-        $params=[
-            'years'=>collect($allpaketpertahun)->pluck('year')->toArray(),
-            'yearData'=>collect($allpaketpertahun)->pluck('jml')->toArray(),
-            'paketselesai'=>$paketselesai->count(),
-            'paketbelom'=>$paketbelom->count(),
-            'totalpagu'=>$paket->sum('pagu'),
-            'metode'=>$metode,
-            'kategori'=>$kategori,
-            'bypp'=>$bypp,
-            'byadmin'=>$byadmin,
-        ];
-        return $this->render('_dashboard',[
-            'params'=>$params
-        ]);
-    }
+    $collection = collect($masterQuery);
+    $groupedData = function ($field) use ($collection) {
+        return $collection->groupBy(function ($item) use ($field) {
+            return $item['year'] . '-' . $item[$field];
+        })
+        ->map(function ($group, $key) use ($field) {
+            list($year, $value) = explode('-', $key);
+            return [
+                'year' => $year,
+                $field => $value,
+                'jml' => $group->count(),
+                'ammount' => $group->sum('pagu'),
+            ];
+        })
+        ->values()
+        ->toArray();
+    };
+    $params = [
+        'years' => $collection->unique('year')->pluck('year')->toArray(),
+        'yearData' => $collection->groupBy('year')->map(function($e){
+            $d['jml']=$e->count();
+            return $d;
+        })->pluck('jml')->toArray(),
+        'paketselesai' => $collection->whereNotNull('pemenang')->count(),
+        'paketbelom' => $collection->whereNull('pemenang')->count(),
+        'totalpagu' => $collection->sum('pagu'),
+        'metode' => $groupedData('metode_pengadaan'),
+        'kategori' => $groupedData('kategori_pengadaan'),
+        'bypp' => $groupedData('pejabat_pengadaan'),
+        'byadmin' => $groupedData('admin_pengadaan'),
+        'bybidang' => $groupedData('bidang_bagian'),
+    ];
+    return $this->render('_dashboard', ['params' => $params]);
+}
 }

@@ -79,3 +79,4 @@ include('_dash_by_metode.php');
 include('_dash_by_kategori.php');
 include('_dash_by_pp.php');
 include('_dash_by_admin.php');
+include('_dash_by_bidang.php');
