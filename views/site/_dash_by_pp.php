@@ -53,24 +53,32 @@ $this->registerJs($js);
 <div class="dash-bypp col-md-6">
     Dashboard Pejabat Pengadaan
 <?php
-echo '<table class="table table-responsive">';
-echo '<tr><th>No</th><th>Pejabat Pengadaan</th><th>Tahun</th><th>Jumlah</th></tr>';
-$totalbypp=array_sum(array_column($params['bypp'],'jml'))??0;
-if($totalbypp>0){
-foreach($params['bypp'] as $key => $row){
-    echo '<tr><td>'.($key+1).'</td>
-    <td>'.$row['pejabat_pengadaan'].'</td>
-    <td>'.$row['year'].'</td>
-    <td>'.$row['jml'].'</td>
-    </tr>';
-}
-echo '<tfoot><tr>
-    <td colspan="3">Total</td>
-    <td>'.($totalbypp).'</td>
-    </tr>
-    </tfoot>';
-}
-echo '</table>';
+use app\widgets\PivotReport;
+$titles='Pejabat Pengadaan';
+$xColName = 'year'; // X-axis will be 'year'
+$yColName = 'pejabat_pengadaan'; // Y-axis will be 'category'
+$totalColName ='jml'; // The value to aggregate will be 'sales'
+$pivotReport = new PivotReport($titles,$xColName, $yColName, $totalColName, $params['bypp']);
+$options = ['class' => 'table table-responsive'];
+$pivotReport->generateHtml($options);
+// echo '<table class="table table-responsive">';
+// echo '<tr><th>No</th><th>Pejabat Pengadaan</th><th>Tahun</th><th>Jumlah</th></tr>';
+// $totalbypp=array_sum(array_column($params['bypp'],'jml'))??0;
+// if($totalbypp>0){
+// foreach($params['bypp'] as $key => $row){
+//     echo '<tr><td>'.($key+1).'</td>
+//     <td>'.$row['pejabat_pengadaan'].'</td>
+//     <td>'.$row['year'].'</td>
+//     <td>'.$row['jml'].'</td>
+//     </tr>';
+// }
+// echo '<tfoot><tr>
+//     <td colspan="3">Total</td>
+//     <td>'.($totalbypp).'</td>
+//     </tr>
+//     </tfoot>';
+// }
+// echo '</table>';
 ?>
 </div>
 <div class="col-md-6">

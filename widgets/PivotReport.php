@@ -3,6 +3,7 @@ namespace app\widgets;
 use yii\base\Widget;
 class PivotReport extends Widget
 {
+    public $titles;
     public $xColName;
     public $yColName;
     public $totalColName;
@@ -16,8 +17,9 @@ class PivotReport extends Widget
      * @param $totalColName
      * @param $data
      */
-    public function __construct(string $xColName, string $yColName, string $totalColName, array $data)
+    public function __construct(string $titles,string $xColName, string $yColName, string $totalColName, array $data)
     {
+        $this->titles = $titles;
         $this->xColName = $xColName;
         $this->yColName = $yColName;
         $this->totalColName = $totalColName;
@@ -38,7 +40,7 @@ class PivotReport extends Widget
                 return $data[$this->totalColName];
             }
         }
-        return '';
+        return 0;
     }
     /**
      * To get total for X
@@ -81,23 +83,24 @@ class PivotReport extends Widget
     public function generateHtml($options)
     {
         ?>
-        <table border="1" class="<?= $options['class'] ?>">
+        <table border="0" class="<?= $options['class'] ?>">
             <tr>
-                <th>&nbsp;</th>
+                <th>#</th>
+                <th><?=$this->titles?></th>
                 <?php foreach ($this->colXData as $xValue) : ?>
                     <?= '<th class="header">' . $xValue . '</th>' ?>
                 <?php endforeach; ?>
                 <th>Total</th>
             </tr>
-            <?php foreach ($this->colYData as $yValue) : ?>
-                <?= '<tr><td>' . $yValue . '</td>' ?>
+            <?php foreach ($this->colYData as $k=>$yValue) : ?>
+                <?= '<tr><td>' . ($k+1) . '</td><td>' . $yValue . '</td>' ?>
                 <?php foreach ($this->colXData as $xValue) : ?>
-                    <?= '<td class="data">' . $this->getData($xValue, $yValue) . '</td>' ?>
+                    <?= '<td class="data">' . $this->getData($xValue, $yValue). '</td>' ?>
                 <?php endforeach; ?>
                 <?= '<td class="data">' . $this->totalY($yValue) . '</td></tr>' ?>
             <?php endforeach; ?>
             <tr>
-                <th>Total</th>
+                <th colspan="2">Total</th>
                 <?php foreach ($this->colXData as $xValue) : ?>
                     <th class="data"><?= $this->totalX($xValue) ?></th>
                 <?php endforeach; ?>
