@@ -55,7 +55,6 @@ $this->registerJs($js);
 <?php
 echo '<table class="table table-responsive">';
 echo '<tr><th>No</th><th>Kategori</th>';
-// Dynamically generate year columns
 $years = array_unique(array_column($params['kategori'], 'year'));
 sort($years);
 foreach ($years as $year) {

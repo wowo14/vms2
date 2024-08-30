@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
 use Yii;
+use yii\db\Expression;
 class PaketPengadaan extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
     public $oldrecord;
@@ -129,5 +130,23 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     }
     public function getHistorirejects(){
         return $this->hasMany(HistoriReject::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_historireject'));
+    }
+    public static function Dashboard(){
+        return self::where(['not', ['paket_pengadaan.id' => null]])
+            ->joinWith(['dpp d', 'dpp.pejabat p', 'dpp.staffadmin s', 'dpp.unit u'])
+            ->select([
+                new Expression("strftime('%Y', paket_pengadaan.tanggal_paket) as year"),
+                'paket_pengadaan.metode_pengadaan',
+                'paket_pengadaan.kategori_pengadaan',
+                'paket_pengadaan.pagu',
+                'p.nama as pejabat_pengadaan',
+                's.nama as admin_pengadaan',
+                'u.unit as bidang_bagian',
+                'paket_pengadaan.pemenang'
+            ])
+            ->andWhere(['not', ['d.bidang_bagian' => null]])
+            ->orderBy('year','id')
+            ->asArray()
+            ->all();
     }
 }
