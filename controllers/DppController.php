@@ -1,6 +1,6 @@
 <?php
 namespace app\controllers;
-use app\models\{Setting,PenugasanPemilihanpenyedia,Unit,HistoriReject,ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails, PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia};
+use app\models\{Setting,Negosiasi,PenugasanPemilihanpenyedia,Unit,HistoriReject,ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails, PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia};
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
@@ -26,8 +26,21 @@ class DppController extends Controller {
             throw new BadRequestHttpException('Unauthorized access');
         }
         $model->paketpengadaan->pemenang=$idvendor;
-        $model->paketpengadaan->penawaranpenyedia->negosiasi->accept=1;
-        $model->paketpengadaan->penawaranpenyedia->negosiasi->save();
+        $pn1=$model->paketpengadaan->penawaranpenyedia;
+        if($pn1){
+            if($pn1->negosiasi){
+                $pn1->negosiasi->accept=1;
+                $pn1->negosiasi->save();
+            }else{
+                $negosiasi=new Negosiasi();
+                $negosiasi->ammount=$pn1->nilai_penawaran;
+                $negosiasi->penawaran_id=$pn1->id;
+                $negosiasi->accept=1;
+                $negosiasi->save();
+            }
+        }else{
+            throw new NotFoundHttpException('Penawaran penyedia tidak ditemukan');
+        }
         $model->paketpengadaan->save();
         Yii::$app->session->setFlash('success', 'Pemenang berhasil diterapkan');
         return $this->goBack(Yii::$app->request->referrer ?: ['//dpp/index']);
