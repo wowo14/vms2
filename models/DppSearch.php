@@ -37,7 +37,9 @@ class DppSearch extends Dpp{
             $query->andWhere(['s.id_user' => Yii::$app->user->identity->id]);
         }
         if(self::isPP()){
-            $query->andWhere(['p2.id_user' => Yii::$app->user->identity->id]);
+            if(!Yii::$app->user->identity->id==3){
+                $query->andWhere(['p2.id_user' => Yii::$app->user->identity->id]);
+            }
         }
         if(self::isStaff()){
             $query->andWhere(['p.created_by' => Yii::$app->user->identity->id]);

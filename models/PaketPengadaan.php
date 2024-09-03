@@ -136,6 +136,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             ->joinWith(['dpp d', 'dpp.pejabat p', 'dpp.staffadmin s', 'dpp.unit u'])
             ->select([
                 new Expression("strftime('%Y', paket_pengadaan.tanggal_paket) as year"),
+                new Expression("strftime('%n', paket_pengadaan.tanggal_paket) as month"),
                 'paket_pengadaan.metode_pengadaan',
                 'paket_pengadaan.kategori_pengadaan',
                 'paket_pengadaan.pagu',
@@ -148,5 +149,21 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             ->orderBy('year','id')
             ->asArray()
             ->all();
+    }
+    public function groupedData($field, $collection) {// part of dashboard
+        return $collection->groupBy(function ($item) use ($field) {
+            return $item['year'] . '-' . $item[$field];
+        })
+        ->map(function ($group, $key) use ($field) {
+            list($year, $value) = explode('-', $key);
+            return [
+                'year' => $year,
+                $field => $value,
+                'jml' => $group->count(),
+                'ammount' => $group->sum('pagu'),
+            ];
+        })
+        ->values()
+        ->toArray();
     }
 }

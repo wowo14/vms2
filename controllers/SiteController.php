@@ -138,38 +138,18 @@ class SiteController extends Controller
     }
     public function actionDashboard() {
         $collection = collect(PaketPengadaan::Dashboard());
-        $groupedData = function ($field) use ($collection) {
-            return $collection->groupBy(function ($item) use ($field) {
-                return $item['year'] . '-' . $item[$field];
-            })
-            ->map(function ($group, $key) use ($field) {
-                list($year, $value) = explode('-', $key);
-                return [
-                    'year' => $year,
-                    $field => $value,
-                    'jml' => $group->count(),
-                    'ammount' => $group->sum('pagu'),
-                ];
-            })
-            ->values()
-            ->toArray();
-        };
-        // $yy=$collection->groupBy('year')->map(function($item,$key){
-        //     $d['year']=$key;
-        //     $d['jml']=$item->count();
-        //     return $d;
-        // })->values()->toArray();
+        $model=new PaketPengadaan();
         $params = [
             'years' => $collection->unique('year')->pluck('year')->toArray(),
             'yearData' => $collection->groupBy('year')->map->count()->values()->toArray(),
             'paketselesai' => $collection->whereNotNull('pemenang')->count(),
             'paketbelom' => $collection->whereNull('pemenang')->count(),
             'totalpagu' => $collection->sum('pagu'),
-            'metode' => $groupedData('metode_pengadaan'),
-            'kategori' => $groupedData('kategori_pengadaan'),
-            'bypp' => $groupedData('pejabat_pengadaan'),
-            'byadmin' => $groupedData('admin_pengadaan'),
-            'bybidang' => $groupedData('bidang_bagian'),
+            'metode' => $model->groupedData('metode_pengadaan',$collection),
+            'kategori' => $model->groupedData('kategori_pengadaan',$collection),
+            'bypp' => $model->groupedData('pejabat_pengadaan',$collection),
+            'byadmin' => $model->groupedData('admin_pengadaan',$collection),
+            'bybidang' => $model->groupedData('bidang_bagian',$collection),
         ];
         return $this->render('_dashboard', ['params' => $params]);
     }
