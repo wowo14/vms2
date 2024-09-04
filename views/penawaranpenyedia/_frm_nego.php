@@ -1,10 +1,14 @@
 <?php
 use app\models\Negosiasi;
+use app\models\PaketPengadaanDetails;
 use kartik\select2\Select2;
 use kartik\switchinput\SwitchInput;
 use yii\bootstrap4\ActiveForm;
+use yii\data\ActiveDataProvider;
 use yii\grid\GridView;
-use yii\helpers\Html;
+use kartik\grid\GridView as KartikGridView;
+use yii\helpers\{Html,Url};
+$paketpengadaan=$penawaran->paketpengadaan;
 ?>
 <table class="table table-bordered table-striped table-hover">
         <tr>
@@ -46,6 +50,22 @@ use yii\helpers\Html;
         ]
     ]
 ]);?>
+<?php
+if(count($paketpengadaan->details) > 0){
+    $dataProviderdetails = new ActiveDataProvider([
+            'query' => PaketPengadaanDetails::find()->where(['paket_id' => $paketpengadaan->id]),
+        ]);
+        echo KartikGridView::widget([
+        'dataProvider' => $dataProviderdetails,
+        'pjax' => true,
+        'showPageSummary' => true,
+        'tableOptions' => ['class' => 'new_expand'],
+        'id' => 'detailspaket',
+        'responsiveWrap' => false,
+        'columns' => require(Yii::getAlias('@app/views/paketpengadaan/_column_details.php')),
+    ]);
+}
+?>
 </div>
 <div class="negosiasi-form">
     <?php $form = ActiveForm::begin([

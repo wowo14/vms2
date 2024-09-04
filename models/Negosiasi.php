@@ -14,7 +14,7 @@ class Negosiasi extends \yii\db\ActiveRecord
             [['penawaran_id', 'ammount'], 'required'],
             [['penawaran_id', 'accept', 'created_by'], 'integer'],
             [['ammount'], 'number'],
-            [['created_at'], 'safe'],
+            [['created_at','details'], 'safe'],
             [['ammount'], 'validateAmmount'],
         ];
     }
@@ -37,6 +37,7 @@ class Negosiasi extends \yii\db\ActiveRecord
             'penawaran_id' => 'Penawaran ID',
             'ammount' => 'Nilai Negosiasi',
             'accept' => 'Accept',
+            'details'=>'Details',
             'created_by' => 'Created By',
             'created_at' => 'Created At',
         ];

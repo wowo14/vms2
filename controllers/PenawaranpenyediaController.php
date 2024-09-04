@@ -70,6 +70,7 @@ class PenawaranpenyediaController extends Controller {
         $request = Yii::$app->request;
         $model = new Negosiasi();
         $penawaran=$this->findModel($id);
+        // $paketpengadaan=$penawaran->paketpengadaan;
         // if(!$penawaran->incompanygrouporadmin){
         //     throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
         // }
@@ -87,7 +88,8 @@ class PenawaranpenyediaController extends Controller {
                         Html::button(Yii::t('yii2-ajaxcrud', 'Create'), ['class' => 'btn btn-primary', 'type' => 'submit'])
                 ];
             }
-            if($model->load($request->post()) && $model->save()){
+            if($model->load($request->post()) ){
+                $model->save();
                 Yii::$app->session->setFlash('success', 'sukses input nilai nego');
                 return $this->redirect('index');
             }else{

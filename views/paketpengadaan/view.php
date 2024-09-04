@@ -1,5 +1,8 @@
 <?php
+use app\models\PaketPengadaanDetails;
 use app\widgets\FilePreview;
+use kartik\grid\GridView;
+use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 ?>
@@ -30,6 +33,22 @@ use yii\widgets\DetailView;
                     'tanggal_reject:ntext',
                 ],
             ]) ?>
+            <?php
+            if(!empty($model->details)){
+                $dataProviderdetails = new ActiveDataProvider([
+                    'query' => PaketPengadaanDetails::find()->where(['paket_id' => $model->id]),
+                ]);
+                echo GridView::widget([
+                'dataProvider' => $dataProviderdetails,
+                'responsiveWrap' => false,
+                'pjax' => true,
+                'showPageSummary' => true,
+                'tableOptions' => ['class' => 'new_expand'],
+                'id' => 'details1',
+                'columns' => require('_column_details.php'),
+            ]);
+            }
+            ?>
         </div>
     </div>
     <div class="col-md-6">
