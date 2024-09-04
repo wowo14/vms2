@@ -137,8 +137,8 @@ class SiteController extends Controller
         return ['output' => $out, 'selected' => $selected];
     }
     public function actionDashboard() {
-        $collection = collect(PaketPengadaan::Dashboard());
         $model=new PaketPengadaan();
+        $collection = collect($model::Dashboard());
         $params = [
             'years' => $collection->unique('year')->pluck('year')->toArray(),
             'yearData' => $collection->groupBy('year')->map->count()->values()->toArray(),

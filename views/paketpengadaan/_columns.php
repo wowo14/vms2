@@ -57,7 +57,7 @@ return [
         'class' => 'kartik\grid\ActionColumn',
         'dropdown' => false,
         'noWrap' => 'true',
-        'template' => ' {lampiran} {kirimulang} {view} {update} {delete}',
+        'template' => ' {lampiran} {kirimulang} {import-product} {view} {update} {delete}',
         'vAlign' => 'middle',
         'contentOptions'=>function ($model, $key, $index, $column) {
             if($model->pemenang || $model->alasan_reject || $model->dpp){
@@ -74,6 +74,9 @@ return [
             'lampiran'=>function($d){
                 return !$d->pemenang;
             },
+            'import-product'=>function($d){
+                return !$d->pemenang;
+            },  
             'ceklistadmin'=>function($d){
                 return !$d->pemenang;
             },
@@ -101,6 +104,12 @@ return [
                 return Html::a('<span class="fa fa-paperclip"></span>', $url, [
                     'title' => Yii::t('yii2-ajaxcrud', 'Lampiran'),
                     'data-pjax' => '0', 'class' => 'btn btn-sm btn-outline-warning'
+                ]);
+            },
+            'import-product' => function ($url, $model, $key) {
+                return Html::a('<span class="fa fa-paperclip"></span>', $url, [
+                    'title' => Yii::t('yii2-ajaxcrud', 'Upload Produk'),
+                    'data-pjax' => '0', 'class' => 'btn btn-sm btn-outline-primary'
                 ]);
             },
             'kirimulang' => function ($url, $model, $key) {

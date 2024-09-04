@@ -22,9 +22,9 @@ class DppController extends Controller {
     }
     public function actionPemenang($idvendor,$idpaket){// id vendor
         $model = Dpp::last(['paket_id'=>$idpaket]);
-        if(!$model::isAdmin()){
-            throw new BadRequestHttpException('Unauthorized access');
-        }
+        // if(!$model::isAdmin()){
+        //     throw new BadRequestHttpException('Unauthorized access');
+        // }
         $model->paketpengadaan->pemenang=$idvendor;
         $pn1=$model->paketpengadaan->penawaranpenyedia;
         if($pn1){
@@ -79,8 +79,7 @@ class DppController extends Controller {
             return $this->redirect('index');
         }
     }
-    public function actionListpemenang($params)
-    {
+    public function actionListpemenang($params){
         $tmp = TemplateChecklistEvaluasi::last(['template' => 'Ceklist_Evaluasi_Kesimpulan']);
         if (!$tmp) {
             return [];
@@ -133,10 +132,7 @@ class DppController extends Controller {
         $pks = explode(',', $request->post('pks'));
         foreach ($pks as $pk) {
             $model = $this->findModel($pk);
-            if ($model::isAdmin()) {
-                $model->pejabat_pengadaan = $request->post('pejabat_pengadaan');
-                $model->save(false);
-            } elseif ($model) {
+            if ($model) {
                 $model->pejabat_pengadaan = $request->post('pejabat_pengadaan');
                 $model->save(false);
             } else {
@@ -165,10 +161,7 @@ class DppController extends Controller {
         $pks = explode(',', $request->post('pks'));
         foreach ($pks as $pk) {
             $model = $this->findModel($pk);
-            if ($model::isAdmin()) {
-                $model->admin_pengadaan = $request->post('admin_pengadaan');
-                $model->save(false);
-            } elseif ($model) {
+            if ($model) {
                 $model->admin_pengadaan = $request->post('admin_pengadaan');
                 $model->save(false);
             } else {

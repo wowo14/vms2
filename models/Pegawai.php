@@ -88,7 +88,7 @@ class Pegawai extends \yii\db\ActiveRecord {
                     $olditems[] = $this->oldrecord->hak_akses;
                     $assign = new Assignment($user->id);
                     $assign->revoke($olditems);
-                    sleep(2);
+                    sleep(1);
                     $assign->assign($items);
                 }
             }

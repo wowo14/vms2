@@ -30,9 +30,9 @@ class PenawaranpenyediaController extends Controller {
     public function actionView($id) {
         $request = Yii::$app->request;
         $model = $this->findModel($id);
-        if(!$model->incompanygrouporadmin){
-            throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
-        }
+        // if(!$model->incompanygrouporadmin){
+        //     throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
+        // }
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return [
@@ -52,9 +52,9 @@ class PenawaranpenyediaController extends Controller {
     public function actionDetailnego() {
         if (isset($_POST['expandRowKey'])) {
             $model = $this->findModel($_POST['expandRowKey']);
-            if(!$model->incompanygrouporadmin){
-                throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
-            }
+            // if(!$model->incompanygrouporadmin){
+            //     throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
+            // }
             $query = Negosiasi::where(['penawaran_id' => $model->id]);
             $model = new ActiveDataProvider([
                 'query' => $query,
@@ -70,9 +70,9 @@ class PenawaranpenyediaController extends Controller {
         $request = Yii::$app->request;
         $model = new Negosiasi();
         $penawaran=$this->findModel($id);
-        if(!$penawaran->incompanygrouporadmin){
-            throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
-        }
+        // if(!$penawaran->incompanygrouporadmin){
+        //     throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
+        // }
         if($penawaran->paketpengadaan->pemenang){
             Yii::$app->session->setFlash('warning', 'Pemenang sudah ditentukan');
             return $this->redirect('index');
@@ -145,9 +145,9 @@ class PenawaranpenyediaController extends Controller {
     public function actionUpdate($id) {
         $request = Yii::$app->request;
         $model = $this->findModel($id);
-        if(!$model->incompanygrouporadmin){
-            throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
-        }
+        // if(!$model->incompanygrouporadmin){
+        //     throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
+        // }
         if($model->paketpengadaan->pemenang){
             throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'Pemenang sudah ditentukan'));
         }
@@ -211,9 +211,9 @@ class PenawaranpenyediaController extends Controller {
     public function actionDelete($id) {
         $request = Yii::$app->request;
         $model=$this->findModel($id);
-        if(!$model->incompanygrouporadmin){
-            throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
-        }
+        // if(!$model->incompanygrouporadmin){
+        //     throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
+        // }
         if($model->paketpengadaan->pemenang){
                 Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
                 return $this->redirect('index');
@@ -231,9 +231,9 @@ class PenawaranpenyediaController extends Controller {
         $pks = explode(',', $request->post('pks'));
         foreach ($pks as $pk) {
             $model = $this->findModel($pk);
-            if(!$model->incompanygrouporadmin){
-                continue;
-            }
+            // if(!$model->incompanygrouporadmin){
+            //     continue;
+            // }
             if($model->paketpengadaan->pemenang){
                 Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
                 return $this->redirect('index');

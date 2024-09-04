@@ -46,7 +46,8 @@ use yii\helpers\Html;class PengalamanController extends Controller {
     public function actionCreate() {
         $request = Yii::$app->request;
         $model = new PengalamanPenyedia();
-        if ($request->isAjax) {            Yii::$app->response->format = Response::FORMAT_JSON;
+        if ($request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
             if ($request->isGet) {
                 return [
                     'title' => Yii::t('yii2-ajaxcrud', 'Create New') . " PengalamanPenyedia",

@@ -43,15 +43,18 @@ $this->params['breadcrumbs'][] = $this->title;
                 'class' => '\kartik\grid\DataColumn',
                 'attribute' => 'hps_satuan',
                 'format'=>'currency',
+                'contentOptions'=>['class'=>'text-right']
             ],
             // 'sumber_informasi',
             [
                 'attribute'=>'penawaran',
-                'format'=>'currency'
+                'format'=>'currency',
+                'contentOptions'=>['class'=>'text-right']
             ],
             [
                 'attribute'=>'negosiasi',
-                'format'=>'currency'
+                'format'=>'currency',
+                'contentOptions'=>['class'=>'text-right']
             ],
             [
                 'attribute'=>'totalhps',
@@ -59,6 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value'=>function($d){
                     return $d->qty*$d->volume*$d->hps_satuan;
                 },
+                'contentOptions'=>['class'=>'text-right'],
                 'pageSummary' => true,
                 'pageSummaryOptions' => ['class' => 'auto unitsum', 'style' => 'text-align:right;'],
                 'pageSummaryFunc' => function ($data) {
@@ -71,6 +75,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value'=>function($d){
                     return $d->qty*$d->volume*$d->penawaran;
                 },
+                'contentOptions'=>['class'=>'text-right'],
                 'pageSummary' => true,
                 'pageSummaryOptions' => ['class' => 'auto unitsum', 'style' => 'text-align:right;'],
                 'pageSummaryFunc' => function ($data) {
@@ -83,6 +88,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value'=>function($d){
                     return $d->qty*$d->volume*$d->negosiasi;
                 },
+                'contentOptions'=>['class'=>'text-right'],
                 'pageSummary' => true,
                 'pageSummaryOptions' => ['class' => 'auto unitsum', 'style' => 'text-align:right;'],
                 'pageSummaryFunc' => function ($data) {
