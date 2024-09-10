@@ -23,9 +23,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'pjax' => true,
             'columns' => require(__DIR__ . '/_columns.php'),
             'rowOptions' => function ($model) {
-                if ($model->paketpengadaan->pemenang) {
+                if (isset($model->paketpengadaan) && $model->paketpengadaan->pemenang) {
                     return ['class' => 'bg-primary'];
                 }
+                return []; // return an empty array if the condition is not met
             },
             'toolbar' => [
                 [
