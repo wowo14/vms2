@@ -38,4 +38,7 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
             'sumber_informasi' => 'Sumber Informasi',
         ];
     }
+    public function getPaketpengadaan(){
+        return $this->hasOne(PaketPengadaan::className(), ['id' => 'paket_id']);
+    }
 }

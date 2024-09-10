@@ -80,9 +80,10 @@ return [
         'template' => '{reject} {approve} {ceklistadmin} {printceklistadmin} {formreview} {reviewdpp} {view} {update} {delete}',
         'vAlign' => 'middle',
         'contentOptions'=>function ($model, $key, $index, $column) {
-            if ($model->paketpengadaan->pemenang) {
+            if (isset($model->paketpengadaan) && $model->paketpengadaan->pemenang) {
                 return ['style' => 'background-color: white;'];
             }
+            return []; // return an empty array if the condition is not met
         },
         'urlCreator' => function ($action, $model, $key, $index) {
             return Url::to([$action, 'id' => $key]);

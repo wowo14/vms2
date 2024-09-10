@@ -1,4 +1,7 @@
 <?php
+use yii\bootstrap4\Modal;
+use yii\helpers\Html;
+$idmodelnego="negodetails";
 return [
                     ['class' => 'kartik\grid\SerialColumn'],
                     [
@@ -30,8 +33,11 @@ return [
                     ],
                     [
                         'attribute'=>'negosiasi',
-                        'format'=>'currency',
-                        'contentOptions'=>['class'=>'text-right']
+                        'format'=>'raw',
+                        'contentOptions'=>['class'=>'text-right'],
+                        'value'=>function($d)use($idmodelnego){
+                            return Html::a($d->negosiasi??'#',['/paketpengadaan/negoproduk','id'=>$d->id],['role' => 'modal-remote','data-pjax' => '0','data-target'=>'#'.$idmodelnego,'title' => Yii::t('yii2-ajaxcrud', 'Nego')]);
+                        },
                     ],
                     [
                         'attribute'=>'totalhps',
@@ -73,3 +79,17 @@ return [
                         },
                     ],
                 ];
+Modal::begin([
+    "id" => $idmodelnego,
+    "footer" => "",
+    "size" => "modal-xl",
+    "clientOptions" => [
+        "tabindex" => false,
+        "backdrop" => "static",
+        "keyboard" => true,
+        "focus" => true,
+    ],
+    "options" => [
+        "tabindex" => true
+    ]
+    ]);

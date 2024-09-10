@@ -193,84 +193,49 @@ class PaketpengadaanController extends Controller {
             return $this->render('_import_product', ['model' => $model]);
         }
     }
-    // public function actionImport() {
-    //     if (isset($_POST)) {
-    //         if (!empty($_FILES)) {
-    //             $tempFile = $_FILES['PaketPengadaan']['tmp_name']['file'];
-    //             $fileTypes = array('xls', 'xlsx');
-    //             $fileParts = pathinfo($_FILES['PaketPengadaan']['name']['file']);
-    //             if (in_array(@$fileParts['extension'], $fileTypes)) {
-    //                 $fileType = \PhpOffice\PhpSpreadsheet\IOFactory::identify($tempFile);
-    //                 $objPHPExcelReader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($fileType);
-    //                 $spreadsheet = $objPHPExcelReader->load($tempFile);
-    //                 // $worksheet = $spreadsheet->getActiveSheet();
-    //                 // $highestRow = $worksheet->getHighestRow();
-    //                 $inserted = 0;
-    //                 $errorCount = 0;
-    //                 $parentSheet = $spreadsheet->getSheetByName('parent'); // Assuming Sheet1 is the first sheet
-    //                 // $parentSheet = $spreadsheet->getSheet(0); // Assuming Sheet1 is the first sheet
-    //                 $highestRowParent = $parentSheet->getHighestRow();
-    //                 for ($row = 2; $row <= $highestRowParent; ++$row) {
-    //                     $parentModel = new PaketPengadaan;
-    //                     $parentModel->nomor = $parentSheet->getCellByColumnAndRow(2, $row)->getValue();//nomor dpp
-    //                     $parentModel->nomor_persetujuan = $parentSheet->getCellByColumnAndRow(3, $row)->getValue();
-    //                     $parentModel->tanggal_dpp = $parentSheet->getCellByColumnAndRow(4, $row)->getValue();
-    //                     $parentModel->tanggal_persetujuan = $parentSheet->getCellByColumnAndRow(5, $row)->getValue();
-    //                     $parentModel->tanggal_paket = $parentSheet->getCellByColumnAndRow(6, $row)->getValue();
-    //                     $parentModel->nama_paket = $parentSheet->getCellByColumnAndRow(7, $row)->getValue();
-    //                     $parentModel->kode_program = $parentSheet->getCellByColumnAndRow(8, $row)->getValue();
-    //                     $parentModel->kode_kegiatan = $parentSheet->getCellByColumnAndRow(9, $row)->getValue();
-    //                     $parentModel->kode_rekening = $parentSheet->getCellByColumnAndRow(10, $row)->getValue();
-    //                     $parentModel->ppkom = $parentSheet->getCellByColumnAndRow(11, $row)->getValue();
-    //                     $parentModel->pagu = $parentSheet->getCellByColumnAndRow(12, $row)->getValue();
-    //                     $parentModel->metode_pengadaan = $parentSheet->getCellByColumnAndRow(13, $row)->getValue();
-    //                     $parentModel->kategori_pengadaan = $parentSheet->getCellByColumnAndRow(14, $row)->getValue();
-    //                     $parentModel->tahun_anggaran = $parentSheet->getCellByColumnAndRow(15, $row)->getValue();
-    //                     $parentModel->unit = $parentSheet->getCellByColumnAndRow(16, $row)->getValue();
-    //                     if ($parentModel->save(false)) {
-    //                         $childSheet = $spreadsheet->getSheetByName('child1'); // Assuming Sheet2 is the second sheet
-    //                         if($childSheet){
-    //                             $highestRowChild = $childSheet->getHighestRow();
-    //                             for ($childRow = 2; $childRow <= $highestRowChild; ++$childRow) {
-    //                                 $childModel = new PaketPengadaanDetails;
-    //                                 $childModel->paket_id = $parentModel->id;
-    //                                 $childModel->nama_produk = $childSheet->getCellByColumnAndRow(2, $childRow)->getValue();
-    //                                 $childModel->volume = $childSheet->getCellByColumnAndRow(3, $childRow)->getValue();
-    //                                 $childModel->satuan = $childSheet->getCellByColumnAndRow(4, $childRow)->getValue();
-    //                                 $childModel->durasi = $childSheet->getCellByColumnAndRow(5, $childRow)->getValue();
-    //                                 $childModel->harga = $childSheet->getCellByColumnAndRow(6, $childRow)->getValue();
-    //                                 $childModel->informasi_harga = $childSheet->getCellByColumnAndRow(7, $childRow)->getValue();
-    //                                 $childModel->hps_satuan = $childSheet->getCellByColumnAndRow(8, $childRow)->getValue();
-    //                                 $childModel->sumber_informasi = $childSheet->getCellByColumnAndRow(9, $childRow)->getValue();
-    //                                 $childModel->save(false);
-    //                                 $inserted++;
-    //                             }
-    //                         }
-    //                         $childSheet3 = $spreadsheet->getSheetByName('child2'); // Assuming Sheet3 is the second sheet
-    //                         if($childSheet3){
-    //                             $highestRowChild3 = $childSheet3->getHighestRow();
-    //                             for ($childRow = 2; $childRow <= $highestRowChild3; ++$childRow) {
-    //                                 $childModel = new PaketPengadaanDetails;
-    //                                 $childModel->paket_id = $parentModel->id;
-    //                                 $childModel->nama_produk = $childSheet3->getCellByColumnAndRow(2, $childRow)->getValue();
-    //                                 $childModel->qty = $childSheet3->getCellByColumnAndRow(3, $childRow)->getValue();
-    //                                 $childModel->volume = $childSheet3->getCellByColumnAndRow(4, $childRow)->getValue();
-    //                                 $childModel->satuan = $childSheet3->getCellByColumnAndRow(5, $childRow)->getValue();
-    //                                 $childModel->hps_satuan = $childSheet3->getCellByColumnAndRow(6, $childRow)->getValue();
-    //                                 $childModel->save(false);
-    //                                 $inserted++;
-    //                             }
-    //                         }
-    //                     }
-    //                 }
-    //                 Yii::$app->session->setFlash('success', ($inserted) . ' row inserted');
-    //             } else {
-    //                 Yii::$app->session->setFlash('warning', "Wrong file type (xlsx, xls) only");
-    //             }
-    //         }
-    //         return $this->redirect(['index']);
-    //     }
-    // }
+    public function actionNegoproduk($id){
+        $paketdetails=PaketPengadaanDetails::findOne(['id' => $id]);
+        $request=Yii::$app->request;
+        if(!$paketdetails){
+            throw new NotFoundHttpException('Produk yang ditawarkan tidak ditemukan.');
+        }
+        $penawaran=$paketdetails->paketpengadaan->penawaranpenyedia;
+        if(!$penawaran){
+            throw new NotFoundHttpException('Paket pengadaan penawaran tidak ditemukan.');
+        }
+        if ($request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            if($paketdetails->load($request->post()) ){
+                $paketdetails->save();
+                Yii::$app->session->setFlash('success', 'sukses input nilai nego');
+                return $this->redirect('index');
+            }else{
+                return [
+                    'title' => "Nego produk #" . $paketdetails->nama_produk,
+                    'content' => $this->renderAjax('_frm_negoproduk', ['model' => $paketdetails,'penawaran'=>$penawaran]),
+                    'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
+                        Html::button(Yii::t('yii2-ajaxcrud', 'Create'), ['class' => 'btn btn-primary', 'type' => 'submit'])
+                ];
+            }
+        }else{
+            if($request->isPost){
+                if($paketdetails->load($request->post()) ){
+                    // $paketdetails->save();
+
+                    $negodetails=$penawaran->negosiasi??new Negosiasi();
+                    $negodetails->penawaran_id=$penawaran->id;
+                    $negodetails->ammount='';//PR
+                    $negodetails->details=json_encode($paketdetails->attributes,JSON_UNESCAPED_SLASHES);
+                    // $negodetails->save();
+
+                    Yii::$app->session->setFlash('success', 'sukses input nilai nego');
+                    return $this->redirect('index');
+                }
+            }else{
+                return $this->render('_frm_negoproduk', ['model' => $paketdetails,'penawaran'=>$penawaran]);
+            }
+        }
+    }
     public function actionIndex() {
         $searchModel = new PaketPengadaanSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);

@@ -58,6 +58,15 @@ AppAsset::register($this);
                     ) : '',
                     'options' => ['id' => 'filelampiranpenawaranharga' . $model->hash],
                 ],
+                [
+                    'label' => 'Negosiasi',
+                    'content' => $model->lampiran_penawaran_harga ? Html::a(
+                        "Negosiasi",
+                        Yii::getAlias('@web/uploads/') . $model->lampiran_penawaran_harga,
+                        ['target' => '_blank']
+                    ) : 'tab Negosiasi',
+                    'options' => ['id' => 'negosiasi' . $model->hash],
+                ],
             ]
         ]);
         ?>
