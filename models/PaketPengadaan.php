@@ -152,10 +152,10 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     }
     public function groupedData($field, $collection) {// part of dashboard
         return $collection->groupBy(function ($item) use ($field) {
-            return $item['year'] . '-' . $item[$field];
+            return $item['year'] . '#' . $item[$field];
         })
         ->map(function ($group, $key) use ($field) {
-            list($year, $value) = explode('-', $key);
+            list($year, $value) = explode('#', $key);
             return [
                 'year' => $year,
                 $field => $value,
