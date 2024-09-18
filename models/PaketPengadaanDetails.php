@@ -16,7 +16,7 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
         return [
             [['paket_id', 'qty','volume'], 'integer'],
             [['nama_produk', 'qty','volume', 'satuan'], 'required'],
-            [['harga','hps_satuan','penawaran','negosiasi', 'informasi_harga'], 'number'],
+            [['hps_satuan','penawaran','negosiasi', 'informasi_harga'], 'number'],
             [['nama_produk', 'satuan', 'durasi', 'sumber_informasi'], 'string', 'max' => 255],
         ];
     }
@@ -33,7 +33,7 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
             'penawaran'=>'Penawaran',
             'negosiasi'=>'Negosiasi',
             'durasi' => 'Durasi',
-            'harga' => 'Harga',
+            // 'harga' => 'Harga',
             'informasi_harga' => 'Informasi Harga',
             'sumber_informasi' => 'Sumber Informasi',
         ];

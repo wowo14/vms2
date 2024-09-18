@@ -23,9 +23,10 @@ AppAsset::register($this);
                 if ($model->alasan_reject) {
                     return ['class' => 'bg-orange'];
                 } elseif ($model->dpp) {
+                    if ($model->pemenang) {
+                        return ['class' => 'bg-primary'];
+                    }
                     return ['class' => 'bg-success'];
-                } elseif ($model->pemenang) {
-                    return ['class' => 'bg-primary'];
                 } else {
                     return ['class' => 'bg-default'];
                 }
@@ -122,6 +123,21 @@ AppAsset::register($this);
         ]) ?>
     </div>
 </div>
+<?php Modal::begin([
+    "id" => 'negodetails',
+    "footer" => "",
+    "size" => "modal-xl",
+    "clientOptions" => [
+        "tabindex" => false,
+        "backdrop" => "static",
+        "keyboard" => true,
+        "focus" => true,
+    ],
+    "options" => [
+        "tabindex" => true
+    ]
+]) ?>
+<?php Modal::end(); ?>
 <?php Modal::begin([
     "id" => $idmodal,
     "footer" => "",

@@ -173,18 +173,29 @@ class PaketpengadaanController extends Controller {
                     if($existDetails){
                         PaketPengadaanDetails::deleteAll(['paket_id' => $model->id]);
                     }
+                    $adata=[];
                     for ($childRow = 2; $childRow <= $highestRow; ++$childRow) {
-                        $childModel = new PaketPengadaanDetails;
-                        $childModel->paket_id = $model->id;
-                        $childModel->nama_produk = $parentSheet->getCellByColumnAndRow(2, $childRow)->getValue();
-                        $childModel->qty = $parentSheet->getCellByColumnAndRow(3, $childRow)->getValue();
-                        $childModel->volume = $parentSheet->getCellByColumnAndRow(4, $childRow)->getValue();
-                        $childModel->satuan = $parentSheet->getCellByColumnAndRow(5, $childRow)->getValue();
-                        $childModel->hps_satuan = $parentSheet->getCellByColumnAndRow(6, $childRow)->getValue();
-                        $childModel->penawaran = $parentSheet->getCellByColumnAndRow(7, $childRow)->getValue();
-                        $childModel->save(false);
                         $inserted++;
+                        $adata[]=[
+                            'paket_id' => $model->id,
+                            'nama_produk' => $parentSheet->getCellByColumnAndRow(2, $childRow)->getValue(),
+                            'qty' => $parentSheet->getCellByColumnAndRow(3, $childRow)->getValue(),
+                            'volume' => $parentSheet->getCellByColumnAndRow(4, $childRow)->getValue(),
+                            'satuan' => $parentSheet->getCellByColumnAndRow(5, $childRow)->getValue(),
+                            'hps_satuan' => $parentSheet->getCellByColumnAndRow(6, $childRow)->getValue(),
+                            'penawaran' => $parentSheet->getCellByColumnAndRow(7, $childRow)->getValue(),
+                        ];
                     }
+                    Yii::$app->db->createCommand()
+                    ->batchInsert(
+                        'paket_pengadaan_details',
+                        ['paket_id', 'nama_produk', 'qty', 'volume', 'satuan', 'hps_satuan', 'penawaran'],
+                        $adata
+                    )
+                    ->execute();
+                    //cache flush
+                    $model::invalidatecache('tag_' . $model::getModelname());
+                    PaketPengadaanDetails::invalidatecache('tag_' . PaketPengadaanDetails::getModelname());
                     Yii::$app->session->setFlash('success', ($inserted) . ' row inserted');
                     return $this->redirect('index');
                 }
@@ -221,13 +232,11 @@ class PaketpengadaanController extends Controller {
             if($request->isPost){
                 if($paketdetails->load($request->post()) ){
                     // $paketdetails->save();
-
                     $negodetails=$penawaran->negosiasi??new Negosiasi();
                     $negodetails->penawaran_id=$penawaran->id;
                     $negodetails->ammount='';//PR
                     $negodetails->details=json_encode($paketdetails->attributes,JSON_UNESCAPED_SLASHES);
                     // $negodetails->save();
-
                     Yii::$app->session->setFlash('success', 'sukses input nilai nego');
                     return $this->redirect('index');
                 }
