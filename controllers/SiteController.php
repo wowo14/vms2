@@ -207,9 +207,8 @@ class SiteController extends Controller
             return $this->redirect(['site/backup-restore']);
         }
         if (file_exists($filePath) && copy($filePath, $dbFile)) {
-            // clear cache and clear cache schema
             Yii::$app->cache->flush();
-            // Yii::$app->cache->schema->flush();
+            Yii::$app->db->schema->refresh();
             Yii::$app->session->setFlash('success', 'Database has been restored from backup.');
         } else {
             Yii::$app->session->setFlash('error', 'Failed to restore the database.');
