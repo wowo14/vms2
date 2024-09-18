@@ -186,13 +186,15 @@ class PaketpengadaanController extends Controller {
                             'penawaran' => $parentSheet->getCellByColumnAndRow(7, $childRow)->getValue(),
                         ];
                     }
-                    Yii::$app->db->createCommand()
-                    ->batchInsert(
-                        'paket_pengadaan_details',
-                        ['paket_id', 'nama_produk', 'qty', 'volume', 'satuan', 'hps_satuan', 'penawaran'],
-                        $adata
-                    )
-                    ->execute();
+                    if (!empty($adata)) {
+                        Yii::$app->db->createCommand()
+                        ->batchInsert(
+                            'paket_pengadaan_details',
+                            ['paket_id', 'nama_produk', 'qty', 'volume', 'satuan', 'hps_satuan', 'penawaran'],
+                            $adata
+                        )
+                        ->execute();
+                    }
                     //cache flush
                     $model::invalidatecache('tag_' . $model::getModelname());
                     PaketPengadaanDetails::invalidatecache('tag_' . PaketPengadaanDetails::getModelname());
@@ -218,6 +220,24 @@ class PaketpengadaanController extends Controller {
             Yii::$app->response->format = Response::FORMAT_JSON;
             if($paketdetails->load($request->post()) ){
                 $paketdetails->save();
+                // save to negosiasi
+                $nego=new Negosiasi();
+                $nego->penawaran_id=$penawaran->id;
+                $nego->ammount=$paketdetails->sum('negosiasi');
+                $nego->detail=json_encode(
+                    [
+                        'paket_id' => $paketdetails->paket_id,
+                        'nama_produk'=>$paketdetails->nama_produk,
+                        'volume'=>$paketdetails->volume,
+                        'qty'=>$paketdetails->qty,
+                        'satuan'=>$paketdetails->satuan,
+                        'hps_satuan'=>$paketdetails->hps_satuan,
+                        'penawaran'=>$paketdetails->penawaran,
+                        'negosiasi'=>$paketdetails->negosiasi,
+                    ],JSON_UNESCAPED_SLASHES
+                );
+                $nego->accept='';
+                $nego->save();
                 Yii::$app->session->setFlash('success', 'sukses input nilai nego');
                 return $this->redirect('index');
             }else{

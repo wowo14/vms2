@@ -12,7 +12,7 @@ class Negosiasi extends \yii\db\ActiveRecord
     {
         return [
             [['penawaran_id', 'ammount'], 'required'],
-            [['penawaran_id', 'accept', 'created_by'], 'integer'],
+            [['penawaran_id', 'accept','pp_accept','penyedia_accept', 'created_by'], 'integer'],
             [['ammount'], 'number'],
             [['created_at','details'], 'safe'],
             [['ammount'], 'validateAmmount'],
@@ -37,6 +37,8 @@ class Negosiasi extends \yii\db\ActiveRecord
             'penawaran_id' => 'Penawaran ID',
             'ammount' => 'Nilai Negosiasi',
             'accept' => 'Accept',
+            'penyedia_accept'=>'Penyedia Accept',
+            'pp_accept'=>'PP Accept',
             'details'=>'Details',
             'created_by' => 'Created By',
             'created_at' => 'Created At',
@@ -46,7 +48,7 @@ class Negosiasi extends \yii\db\ActiveRecord
         return $this->hasOne(PenawaranPengadaan::class, ['id' => 'penawaran_id'])->cache(self::cachetime(), self::settagdep('tag_penawaranpengadaan'));
     }
     public function beforeSave($insert){
-        
+
         return parent::beforeSave($insert);
     }
 }

@@ -8,7 +8,7 @@ class NegosiasiSearch extends Negosiasi{
     public function rules()
     {
         return [
-            [['id', 'penawaran_id', 'accept', 'created_by'], 'integer'],
+            [['id', 'penawaran_id', 'accept','pp_accept','penyedia_accept', 'created_by'], 'integer'],
             [['ammount'], 'number'],
             [['created_at'], 'safe'],
         ];

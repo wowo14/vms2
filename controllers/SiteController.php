@@ -1,12 +1,12 @@
 <?php
 namespace app\controllers;
-use app\models\{User,LoginForm, ContactForm,PaketPengadaan};
+use app\models\{BackupUpload,User,LoginForm, ContactForm,PaketPengadaan};
 use app\widgets\ImageConverter;
 use Yii;
 use yii\db\Expression;
 use yii\filters\{AccessControl, VerbFilter};
-use yii\helpers\{Url, Html, ArrayHelper, Json};
-use yii\web\{Response};
+use yii\helpers\{FileHelper,Url, Html, ArrayHelper, Json};
+use yii\web\{Response,UploadedFile};
 class SiteController extends Controller
 {
     public function behaviors()
@@ -152,5 +152,96 @@ class SiteController extends Controller
             'bybidang' => $model->groupedData('bidang_bagian',$collection),
         ];
         return $this->render('_dashboard', ['params' => $params]);
+    }
+    public function actionBackup()
+    {
+        $dbPath = Yii::$app->db->dsn;
+        preg_match('/sqlite:(.*)/', $dbPath, $matches);
+        if (isset($matches[1])) {
+            $dbFile = Yii::getAlias($matches[1]);
+        } else {
+            Yii::$app->session->setFlash('error', 'Failed to determine the database file path.');
+            return $this->redirect(['site/backup-restore']);
+        }
+        $backupDir = Yii::getAlias('@runtime/backups/');
+        FileHelper::createDirectory($backupDir);
+        $backupFile = $backupDir . 'backup_' . date('Ymd_His') . '.sqlite3';
+        if (copy($dbFile, $backupFile)) {
+            Yii::$app->session->setFlash('success', 'Database has been backed up successfully.');
+        } else {
+            Yii::$app->session->setFlash('error', 'Failed to backup the database.');
+        }
+        return $this->redirect(['site/backup-restore']);
+    }
+    public function actionBackupRestore(){
+        $backupDir = Yii::getAlias('@runtime/backups/');
+        if (!file_exists($backupDir)) {
+            FileHelper::createDirectory($backupDir);
+        }
+        $files = FileHelper::findFiles($backupDir, ['only' => ['*.sqlite3'], 'recursive' => false]);
+        $model = new BackupUpload();
+        return $this->render('backup_restore', [
+            'files' => $files,
+            'model' => $model,
+        ]);
+    }
+    public function actionDownloadBackup($fileName){
+        $backupDir = Yii::getAlias('@runtime/backups/');
+        $filePath = $backupDir . $fileName;
+        if (file_exists($filePath)) {
+            return Yii::$app->response->sendFile($filePath);
+        } else {
+            Yii::$app->session->setFlash('error', 'Backup file not found.');
+            return $this->redirect(['site/backup-restore']);
+        }
+    }
+    public function actionRestoreBackup($fileName){
+        $backupDir = Yii::getAlias('@runtime/backups/');
+        $filePath = $backupDir . $fileName;
+        $dbPath = Yii::$app->db->dsn;
+        preg_match('/sqlite:(.*)/', $dbPath, $matches);
+        if (isset($matches[1])) {
+            $dbFile = Yii::getAlias($matches[1]);
+        } else {
+            Yii::$app->session->setFlash('error', 'Failed to determine the database file path.');
+            return $this->redirect(['site/backup-restore']);
+        }
+        if (file_exists($filePath) && copy($filePath, $dbFile)) {
+            // clear cache and clear cache schema
+            Yii::$app->cache->flush();
+            // Yii::$app->cache->schema->flush();
+            Yii::$app->session->setFlash('success', 'Database has been restored from backup.');
+        } else {
+            Yii::$app->session->setFlash('error', 'Failed to restore the database.');
+        }
+        return $this->redirect(['site/backup-restore']);
+    }
+    public function actionDeleteBackup($fileName){
+        $backupDir = Yii::getAlias('@runtime/backups/');
+        $filePath = $backupDir . $fileName;
+        if (file_exists($filePath)) {
+            if (unlink($filePath)) {
+                Yii::$app->session->setFlash('success', 'Backup file has been deleted successfully.');
+            } else {
+                Yii::$app->session->setFlash('error', 'Failed to delete the backup file.');
+            }
+        } else {
+            Yii::$app->session->setFlash('error', 'Backup file not found.');
+        }
+        return $this->redirect(['site/backup-restore']);
+    }
+    public function actionUploadBackup(){
+        $model = new BackupUpload();
+        if (Yii::$app->request->isPost) {
+            $model->backupFile = UploadedFile::getInstance($model, 'backupFile');
+            if ($model->validate()) {
+                $backupDir = Yii::getAlias('@runtime/backups/');
+                $uploadedFile = $backupDir . $model->backupFile->baseName . '.' . $model->backupFile->extension;
+                $model->backupFile->saveAs($uploadedFile);
+                Yii::$app->session->setFlash('success', 'Backup file uploaded successfully.');
+                return $this->redirect(['site/backup-restore']);
+            }
+        }
+        return $this->redirect(['site/backup-restore']);
     }
 }
