@@ -31,13 +31,7 @@ class TemplateChecklistEvaluasi extends \yii\db\ActiveRecord
         ];
     }
     public function beforeSave($insert) {
-        if ($insert) {
-            $this->created_by = Yii::$app->user->identity->id;
-            $this->created_at = date('Y-m-d H:i:s', time());
-        } else {
-            $this->updated_by = Yii::$app->user->identity->id;
-            $this->updated_at = date('Y-m-d H:i:s', time());
-        }
+       
         return parent::beforeSave($insert);
     }
     public function beforeDelete() {

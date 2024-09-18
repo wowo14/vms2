@@ -50,13 +50,7 @@ class Attachment extends \yii\db\ActiveRecord {
         return true;
     }
     public function beforeSave($insert) {
-        if ($this->isNewRecord) {
-            $this->created_at = time();
-            $this->created_by = Yii::$app->user->identity->id;
-        } else {
-            $this->updated_at = time();
-            $this->updated_by = Yii::$app->user->identity->id;
-        }
+       
         return parent::beforeSave($insert);
     }
 }

@@ -59,13 +59,7 @@ class Pengurusperusahaan extends Contacts
                 }
             }
         }
-        if ($insert && $this->hasAttribute('created_at') && $this->hasAttribute('created_by')) {
-            $this->created_at = $this->getbCurrentTimestamp();
-            $this->created_by = Yii::$app->user->id ? Yii::$app->user->identity->id : '';
-        } elseif (!$insert && $this->hasAttribute('updated_at') && $this->hasAttribute('updated_by')) {
-            $this->updated_at = $this->getDbCurrentTimestamp();
-            $this->updated_by = Yii::$app->user->id ? Yii::$app->user->identity->id : '';
-        }
+       
         return parent::beforeSave($insert);
     }
     public function signup() //vendor signup users

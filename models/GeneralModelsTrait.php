@@ -297,4 +297,19 @@ trait GeneralModelsTrait {
     public function getMonths(){
         return array(1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember');
     }
+    public function behaviors(){
+        return [
+            'timestamp' => [
+                'class' => 'yii\behaviors\TimestampBehavior',
+                'createdAtAttribute' => $this->hasAttribute('created_at') ? 'created_at' : null,
+                'updatedAtAttribute' => $this->hasAttribute('updated_at') ? 'updated_at' : null,
+                'value' => date('Y-m-d H:i:s', time()),
+            ],
+            'blameable' => [
+                'class' => 'yii\behaviors\BlameableBehavior',
+                'createdByAttribute' => $this->hasAttribute('created_by') ? 'created_by' : null,
+                'updatedByAttribute' => $this->hasAttribute('updated_by') ? 'updated_by' : null,
+            ],
+        ];
+    }
 }

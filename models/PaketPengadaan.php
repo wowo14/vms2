@@ -63,7 +63,6 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     }
     public function beforeSave($insert) {
         if ($insert) {
-            $this->created_by = Yii::$app->user->identity->id;
             $this->tanggal_paket = date('Y-m-d H:i:s', time());
             $exist = self::where(['nama_paket' => $this->nama_paket])->exists();
             if ($exist) {

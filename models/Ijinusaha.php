@@ -54,13 +54,7 @@ class Ijinusaha extends \yii\db\ActiveRecord
         } else {
             $this->file_ijinusaha = self::isBase64Encoded($this->file_ijinusaha) ? $this->upload($this->file_ijinusaha, 'file_ijinusaha_' . $this->penyedia_id . '_' . $this->nomor_ijinusaha . '_' . time()) : $this->file_ijinusaha;
         }
-        if ($insert) {
-            $this->created_by = Yii::$app->user->identity->id;
-            $this->created_at = date('Y-m-d H:i:s', time());
-        } else {
-            $this->updated_by = Yii::$app->user->identity->id;
-            $this->updated_at = date('Y-m-d H:i:s', time());
-        }
+        
         return parent::beforeSave($insert);
     }
     public function getJenis() {

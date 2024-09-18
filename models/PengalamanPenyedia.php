@@ -54,13 +54,6 @@ class PengalamanPenyedia extends \yii\db\ActiveRecord {
         } else {
             $this->file = self::isBase64Encoded($this->file) ? $this->upload($this->file, 'file_' . $this->penyedia_id . '_' . time()) : $this->file;
         }
-        if ($insert) {
-            $this->created_by = Yii::$app->user->identity->id;
-            $this->created_at = date('Y-m-d H:i:s', time());
-        } else {
-            $this->updated_by = Yii::$app->user->identity->id;
-            $this->updated_at = date('Y-m-d H:i:s', time());
-        }
         return parent::beforeSave($insert);
     }
 }

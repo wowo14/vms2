@@ -47,13 +47,7 @@ class AktaPenyedia extends \yii\db\ActiveRecord {
         } else {
             $this->file_akta = self::isBase64Encoded($this->file_akta) ? $this->upload($this->file_akta, 'file_akta_' . $this->penyedia_id . '_' . time()) : $this->file_akta;
         }
-        if ($insert) {
-            $this->created_by = Yii::$app->user->identity->id;
-            $this->created_at = date('Y-m-d H:i:s', time());
-        } else {
-            $this->updated_by = Yii::$app->user->identity->id;
-            $this->updated_at = date('Y-m-d H:i:s', time());
-        }
+        
         return parent::beforeSave($insert);
     }
 }

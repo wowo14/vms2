@@ -44,13 +44,6 @@ class ReviewDpp extends \yii\db\ActiveRecord {
     }
     public function beforeSave($insert) {
         if ($insert) {
-            $this->created_by = Yii::$app->user->identity->id;
-            $this->created_at = date('Y-m-d H:i:s', time());
-        } else {
-            $this->updated_by = Yii::$app->user->identity->id;
-            $this->updated_at = date('Y-m-d H:i:s', time());
-        }
-        if ($insert) {
             $this->file_tanggapan = !empty($this->file_tanggapan) && self::isBase64Encoded($this->file_tanggapan) ? $this->upload($this->file_tanggapan, 'file_tanggapan' . '_' . time()) : '';
         } else {
             $this->file_tanggapan = !empty($this->file_tanggapan) && self::isBase64Encoded($this->file_tanggapan) ? $this->upload($this->file_tanggapan, 'file_tanggapan' . '_' . time()) : $this->file_tanggapan;
