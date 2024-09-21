@@ -21,6 +21,7 @@ $this->title = 'Upload produk pada paket : ' . $model->nomor;
             <div class="panel-heading"></div>
             <div class="panel-body">
                 <?php
+                echo 'Download Template Excel : '.Html::a('here', ['/uploads/contoh-import-produk.xlsx'], ['target' => '_blank']).'<br><br>';
                 echo '<label class="control-label">Upload Document</label>';
                 echo FileInput::widget([
                     'name' => 'produk',
