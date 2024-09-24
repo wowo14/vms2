@@ -153,6 +153,15 @@ class SiteController extends Controller
         ];
         return $this->render('_dashboard', ['params' => $params]);
     }
+    public function actionNotif(){
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $model=new PaketPengadaan();
+        $paketbaru=collect($model::notifpaketbaru());
+        $params = [
+            'paketbaru'=>$paketbaru->count(),
+        ];
+        return $params;
+    }
     public function actionBackup()
     {
         $dbPath = Yii::$app->db->dsn;

@@ -22,7 +22,7 @@ use yii\widgets\DetailView;
                     ['attribute' => 'kode_kegiatan', 'value' => $model->kode_kegiatan . ' || ' . $model->kegiatannya->desc ?? ''],
                     ['attribute' => 'kode_rekening', 'value' => $model->kode_rekening . ' || ' . $model->rekeningnya->rekening ?? ''],
                     ['attribute' => 'ppkom', 'value' => $model->pejabatppkom->nama ?? ''],
-                    'pagu',
+                    'pagu:currency',
                     'metode_pengadaan:ntext',
                     'kategori_pengadaan:ntext',
                     ['attribute' => 'created_by', 'value' => $model->usercreated->username ?? ''],

@@ -3,58 +3,8 @@ $this->title='Dashboard';
 $this->registerJsFile('https://code.highcharts.com/highcharts.js',['depends'=>['app\assets\AppAsset']]);
 $yearData=json_encode($params['yearData'],JSON_NUMERIC_CHECK);
 $years=json_encode($params['years'],JSON_NUMERIC_CHECK);
-$bypp=json_encode($params['metode'],JSON_NUMERIC_CHECK);
 $texttitle=json_encode("DATA PENGADAAN BARANG/JASA RSUD IBNU SINA KABUPATEN GRESIK PERIODE ".reset($params['years'])." s/d ".end($params['years']),JSON_NUMERIC_CHECK);
 $JS=<<<JS
-
-// const pivot = new WebDataRocks({
-//   container: "#bymetode",
-//   toolbar: false,
-//   report: {
-//     dataSource: {
-//       data: $bypp
-//     },
-//     "slice": {
-//         "rows": [
-//             {
-//                 "uniqueName": "metode_pengadaan"
-//             }
-//         ],
-//         "columns": [
-//             {
-//                 "uniqueName": "year"
-//             },
-//             {
-//                 "uniqueName": "Measures"
-//             }
-//         ],
-//         "measures": [
-//             {
-//                 "uniqueName": "jml",
-//                 "aggregation": "sum"
-//             },
-//             {
-//                 "uniqueName": "ammount",
-//                 "aggregation": "sum",
-//                 "format": "64dhbcr6"
-//             }
-//         ]
-//     },
-//     "formats": [
-//         {
-//             "name": "64dhbcr6",
-//             "thousandsSeparator": ".",
-//             "decimalSeparator": ",",
-//             "currencySymbol": "Rp. ",
-//             "currencySymbolAlign": "left",
-//             "nullValue": "",
-//             "textAlign": "right",
-//             "isPercent": false
-//         }
-//     ],
-//   }
-// });
-
 Highcharts.chart('dahsboardpertahun', {
     chart: {
         type: 'column'
@@ -97,7 +47,6 @@ $this->registerJs($JS);
         <!-- <div id="bymetode"></div> -->
     </div>
     <div class="col-md-6">
-
     </div>
 </div>
 <link href="https://cdn.webdatarocks.com/latest/webdatarocks.min.css" rel="stylesheet"/>

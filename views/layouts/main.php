@@ -12,7 +12,15 @@ $this->registerCssFile('https://fonts.googleapis.com/css?family=Source+Sans+Pro:
 $assetDir = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/adminlte/dist');
 $publishedRes = Yii::$app->assetManager->publish('@vendor/hail812/yii2-adminlte3/src/web/js');
 $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\hail812\adminlte3\assets\AdminLteAsset']);
+$base = Url::home(true);
+$soundpath = $base . 'uploads/notif.mp3';
+$this->registerJs('
+const baseurl="'.$base.'";
+', yii\web\View::POS_HEAD);
 $js=<<< JS
+$(document).ready(function() {
+var notif1=0;
+var totalnotif1=0;
     $(".toast").toast('show');
     $(".alert").animate({opacity: 1.0}, 5000).fadeOut("slow");
     document.onkeyup = KeyCheck;
@@ -25,8 +33,36 @@ $js=<<< JS
             $("button[data-dismiss]").click();
         }
     }
+    function notifbaru(){
+        $.ajax({
+            url:baseurl+"site/notif",
+            method:"GET",
+            dataType:"json",
+            success:function(data){
+                $("#count_notifbaru").html(data.paketbaru);
+                if(notif1!=data.paketbaru){
+                    totalnotif1+=data.paketbaru;
+                    }
+                notif1=data.paketbaru;
+            }
+        })
+    }
+    function play(){
+        var audio = document.createElement("audio");
+        audio.src = "' . $soundpath . '";
+        audio.autoplay = true;
+        audio.play();
+    }
+    setInterval(function(){
+        notifbaru();
+        if(totalnotif1!=notif1){
+            // play();
+            totalnotif1=notif1;
+        }
+    },6600);
+});
 JS;
-$this->registerJs($js, yii\web\View::POS_READY);
+$this->registerJs($js, yii\web\View::POS_END);
 $this->registerCssFile('/css/site.css');
 ?>
 <?php $this->beginPage() ?>

@@ -149,6 +149,13 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             ->asArray()
             ->all();
     }
+    public static function notifpaketbaru(){
+        return self::where(['not',['paket_pengadaan.id'=>null]])
+        ->joinWith('dpp d')
+        ->andWhere(['is','d.paket_id',null])
+        ->orderBy('id','desc')
+        ->asArray()->all();
+    }
     public function groupedData($field, $collection) {// part of dashboard
         return $collection->groupBy(function ($item) use ($field) {
             return $item['year'] . '#' . $item[$field];
