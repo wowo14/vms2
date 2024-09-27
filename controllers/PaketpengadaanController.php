@@ -205,6 +205,7 @@ class PaketpengadaanController extends Controller {
             Yii::$app->response->format = Response::FORMAT_JSON;
             if($paketdetails->load($request->post()) ){
                 $paketdetails->save();
+
                     $nego = $penawaran->negosiasi ?? new Negosiasi();
                     $nego->penawaran_id = $penawaran->id;
                     $nego->ammount = PaketPengadaanDetails::sumNegosiasi($paketdetails->paket_id);
@@ -227,7 +228,9 @@ class PaketpengadaanController extends Controller {
                     $merged = array_merge($oldnegodetail, [$newdetail]);
                     // Update nego detail
                     $nego->detail = json_encode($merged, JSON_UNESCAPED_SLASHES);
-                    $nego->accept = ''; // Reset accept if necessary
+                    $nego->pp_accept=$_POST['Negosiasi']['pp_accept'] ?? '';
+                    $nego->penyedia_accept=$_POST['Negosiasi']['penyedia_accept'] ?? '';
+                    $nego->accept = ($nego->penyedia_accept == 1 && $nego->pp_accept == 1) ? 1 : null;
                     $nego->save(false);
                     Yii::$app->session->setFlash('success', 'Sukses input nilai nego');
                     $this->redirect($referrer);
@@ -271,7 +274,9 @@ class PaketpengadaanController extends Controller {
                     $merged = array_merge($oldnegodetail, [$newdetail]);
                     // Update nego detail
                     $nego->detail = json_encode($merged, JSON_UNESCAPED_SLASHES);
-                    $nego->accept = ''; // Reset accept if necessary
+                    $nego->pp_accept=$_POST['Negosiasi']['pp_accept'] ?? '';
+                    $nego->penyedia_accept=$_POST['Negosiasi']['penyedia_accept'] ?? '';
+                    $nego->accept = ($nego->penyedia_accept == 1 && $nego->pp_accept == 1) ? 1 : null;
                     $nego->save(false);
                     Yii::$app->session->setFlash('success', 'Sukses input nilai nego');
                     return $this->redirect($referrer);

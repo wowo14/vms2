@@ -139,12 +139,8 @@ class HelloController extends Controller {
         }
     }
     public function actionTes2(){
-        $paketdetails=\app\models\PaketPengadaanDetails::findAll(['id' =>50]);
-        if(!$paketdetails){
-            throw new \yii\web\NotFoundHttpException('Data tidak ditemukan.');
-        }else{
-            $sum=PaketPengadaanDetails::sumNegosiasi($paketdetails[0]->paket_id);
-            print_r($sum);
-        }
+        $formattedAmount = 'Rp 2.440.000,00';
+       $res=(new \app\widgets\Tools)->reverseCurrency($formattedAmount);
+       print_r($res);
     }
 }

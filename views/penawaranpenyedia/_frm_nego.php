@@ -10,6 +10,7 @@ use yii\data\ActiveDataProvider;
 use yii\grid\GridView;
 use yii\helpers\{Html,Url};
 $paketpengadaan=$penawaran->paketpengadaan;
+// $negosiasi=$paketpengadaan->penawaranpenyedia->negosiasi;
 ?>
 <table class="table table-bordered table-striped table-hover">
         <tr>
@@ -82,7 +83,7 @@ if(!$paketpengadaan->details):?>
     <?= $form->field($model, 'penawaran_id')->hiddenInput(['value' => $penawaran->id, 'readonly' => 'readonly'])->label(false) ?>
       <?= $form->field($model, 'ammount')->textInput(['placeholder'=>'Masukkan Jumlah Penawaran','type'=>'number']) ?>
       <?php if($this->context->isVendor()):?>
-      <?= $form->field($model, 'accept')->widget(SwitchInput::class,[
+      <?= $form->field($model, 'peneydia_accept')->widget(SwitchInput::class,[
           'pluginOptions' => [
               'onText' => 'Ya',
               'offText' => 'Tidak',

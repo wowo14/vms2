@@ -45,6 +45,23 @@ class Tools extends Widget
   {
     return ($val>0)?Yii::$app->formatter->asCurrency($val, 'Rp.'):'';
   }
+  public function reverseCurrency($formattedAmount){ // asumsi currency indonesia
+    // Yii::error(json_encode($formattedAmount));
+     $rawAmount = str_replace("\u{00a0}", ' ', $formattedAmount);
+    if (strpos($formattedAmount, 'Rp') !== false) {
+      $rawAmount = str_replace(['Rp', ' '], '', $rawAmount);
+    }
+    $rawAmount = str_replace('.', '', $rawAmount);
+    $rawAmount = str_replace(',', '.', $rawAmount);
+    return (float) $rawAmount;
+  }
+  public function sumCurrency($data){
+    $dd=collect($data)->map(function($e){
+        $d=$this->reverseCurrency(($e));
+        return $d;
+    })->toArray();
+    return Yii::$app->formatter->asCurrency(array_sum($dd));
+  }
   public function toRoman($number)
   {
     $map = ['M' => 1000, 'CM' => 900, 'D' => 500, 'CD' => 400, 'C' => 100, 'XC' => 90, 'L' => 50, 'XL' => 40, 'X' => 10, 'IX' => 9, 'V' => 5, 'IV' => 4, 'I' => 1];

@@ -23,4 +23,7 @@ class Controller extends C{
     public function isVendor(){
         return Yii::$app->tools->isVendor();
     }
+    public function isAdmin(){
+        return Yii::$app->tools->isAdmin();
+    }
 }

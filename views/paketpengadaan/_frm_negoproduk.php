@@ -14,6 +14,7 @@ if(!$negodetails){
     // redirect back
     return Yii::$app->getResponse()->redirect(['index']);
 }
+$negosiasi=$negodetails[0]->paketpengadaan->penawaranpenyedia->negosiasi;
 ?>
 <table class="table table-bordered table-striped table-hover">
         <tr>
@@ -64,40 +65,40 @@ if(!$negodetails){
             'format'=>'raw',
             'contentOptions'=>['class'=>'text-right'],
             'value'=>function($d)use($idmodal){
-                return Html::a($d->negosiasi??'#',['/paketpengadaan/negoproduk','id'=>$d['id']],['role' => 'modal-remote','data-target' => '#' . $idmodal,'data-pjax' => '0','data-target'=>'#nego','title' => Yii::t('yii2-ajaxcrud', 'Nego')]);
+                return Html::a(Yii::$app->formatter->asCurrency($d->negosiasi)??'#',['/paketpengadaan/negoproduk','id'=>$d['id']],['role' => 'modal-remote','data-target' => '#' . $idmodal,'data-pjax' => '0','data-target'=>'#nego','title' => Yii::t('yii2-ajaxcrud', 'Nego')]);
             },
         ],
         [
             'attribute'=>'totalhps',
             'format'=>'raw',
-            'value'=>fn($d)=>($d['qty']??1)*($d['volume']??1)*$d['hps_satuan'],
+            'value'=>fn($d)=>Yii::$app->formatter->asCurrency(($d['qty']??1)*($d['volume']??1)*$d['hps_satuan']),
             'contentOptions'=>['class'=>'text-right'],
             'pageSummary' => true,
             'pageSummaryOptions' => ['class' => 'auto unitsum', 'style' => 'text-align:right;'],
             'pageSummaryFunc' => function ($data) {
-                return Yii::$app->formatter->asCurrency(array_sum(($data)));
+                return Yii::$app->tools->sumCurrency($data);
             },
         ],
         [
             'attribute'=>'totalpenawaran',
             'format'=>'raw',
-            'value'=>fn($d)=>($d['qty']??1)*($d['volume']??1)*$d['penawaran'],
+            'value'=>fn($d)=>Yii::$app->formatter->asCurrency(($d['qty']??1)*($d['volume']??1)*$d['penawaran']),
             'contentOptions'=>['class'=>'text-right'],
             'pageSummary' => true,
             'pageSummaryOptions' => ['class' => 'auto unitsum', 'style' => 'text-align:right;'],
             'pageSummaryFunc' => function ($data) {
-                return Yii::$app->formatter->asCurrency(array_sum(($data)));
+                return Yii::$app->tools->sumCurrency($data);
             },
         ],
         [
             'attribute'=>'totalnegosiasi',
             'format'=>'raw',
-            'value'=>fn($d)=>($d['qty']??1)*($d['volume']??1)*$d['negosiasi'],
+            'value'=>fn($d)=>Yii::$app->formatter->asCurrency(($d['qty']??1)*($d['volume']??1)*$d['negosiasi']),
             'contentOptions'=>['class'=>'text-right'],
             'pageSummary' => true,
             'pageSummaryOptions' => ['class' => 'auto unitsum', 'style' => 'text-align:right;'],
             'pageSummaryFunc' => function ($data) {
-                return Yii::$app->formatter->asCurrency(array_sum(($data)));
+                return Yii::$app->tools->sumCurrency($data);
             },
         ],
     ]
@@ -113,6 +114,14 @@ if(!$negodetails){
         ],
     ]); ?>
       <?= $form->field($model, 'negosiasi')->textInput(['placeholder'=>'Masukkan Jumlah Penawaran','type'=>'number']) ?>
+      <?php if($this->context->isAdmin()):?>
+      <?= $form->field($negosiasi, 'pp_accept')->widget(SwitchInput::class,[
+          'pluginOptions' => [
+              'onText' => 'Ya',
+              'offText' => 'Tidak',
+          ]
+      ]) ?>
+      <?php endif; ?>
       <?php if($this->context->isVendor()):?>
       <?= $form->field($model, 'accept')->widget(SwitchInput::class,[
           'pluginOptions' => [
