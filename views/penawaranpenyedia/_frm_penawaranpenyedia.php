@@ -8,11 +8,10 @@ use yii\bootstrap4\ActiveForm;
 use yii\bootstrap4\Modal;
 use yii\data\ActiveDataProvider;
 use yii\helpers\{Html,Url};
-$idmodal="negodetails";
+$idmodal="frmpenawaranpenyedia";
 // $negodet=Negosiasi::findOne(['penawaran_id' => $penawaran->id]);
 // if($negodet){
-//     $negoid=json_decode($negodet->detail,true);
-//     $negodetails=PaketPengadaanDetails::where(['id' => $negoid['id']])->all();
+//     $negodetails=json_decode($negodet->details,true);
 // }else{
 //     $negodetails=PaketPengadaanDetails::where(['id' => $model->id])->all();
 // }
@@ -36,11 +35,6 @@ $negodetails=PaketPengadaanDetails::where(['id' => $model->id])->all();
             'class' => 'yii\grid\SerialColumn',
             'header'=>'Nego Ke'
         ],
-        // [
-        //     'attribute'=>'id',
-        //     'label'=>'Paket Pengadaan',
-        //     'value'=>fn($d)=>$d->penawaran->paketpengadaan->nomor??''
-        // ],
         [
             'attribute'=>'nama_produk',
         ],
@@ -64,21 +58,24 @@ $negodetails=PaketPengadaanDetails::where(['id' => $model->id])->all();
         ],
         [
             'attribute'=>'penawaran',
-            'format'=>'currency',
-            'contentOptions'=>['class'=>'text-right']
+            'format'=>'raw',
+            'contentOptions'=>['class'=>'text-right'],
+            'value'=>function($d)use($idmodal){
+                return Html::a($d->penawaran??'#',['/paketpengadaan/postpenawaran','id'=>$d->id],['role' => 'modal-remote','data-target' => '#' . $idmodal,'data-pjax' => '0','data-target'=>'#nego','title' => Yii::t('yii2-ajaxcrud', 'Penawaran')]);
+            },
         ],
         [
             'attribute'=>'negosiasi',
             'format'=>'raw',
             'contentOptions'=>['class'=>'text-right'],
-            'value'=>function($d)use($idmodal){
-                return Html::a($d->negosiasi??'#',['/paketpengadaan/negoproduk','id'=>$d['id']],['role' => 'modal-remote','data-target' => '#' . $idmodal,'data-pjax' => '0','data-target'=>'#nego','title' => Yii::t('yii2-ajaxcrud', 'Nego')]);
-            },
+            // 'value'=>function($d)use($idmodal){
+            //     return Html::a($d->negosiasi??'#',['/paketpengadaan/negoproduk','id'=>$d->id],['role' => 'modal-remote','data-target' => '#' . $idmodal,'data-pjax' => '0','data-target'=>'#nego','title' => Yii::t('yii2-ajaxcrud', 'Nego')]);
+            // },
         ],
         [
             'attribute'=>'totalhps',
             'format'=>'raw',
-            'value'=>fn($d)=>($d['qty']??1)*($d['volume']??1)*$d['hps_satuan'],
+            'value'=>fn($d)=>($d->qty??1)*($d->volume??1)*$d->hps_satuan,
             'contentOptions'=>['class'=>'text-right'],
             'pageSummary' => true,
             'pageSummaryOptions' => ['class' => 'auto unitsum', 'style' => 'text-align:right;'],
@@ -89,7 +86,7 @@ $negodetails=PaketPengadaanDetails::where(['id' => $model->id])->all();
         [
             'attribute'=>'totalpenawaran',
             'format'=>'raw',
-            'value'=>fn($d)=>($d['qty']??1)*($d['volume']??1)*$d['penawaran'],
+            'value'=>fn($d)=>($d->qty??1)*($d->volume??1)*$d->penawaran,
             'contentOptions'=>['class'=>'text-right'],
             'pageSummary' => true,
             'pageSummaryOptions' => ['class' => 'auto unitsum', 'style' => 'text-align:right;'],
@@ -100,7 +97,7 @@ $negodetails=PaketPengadaanDetails::where(['id' => $model->id])->all();
         [
             'attribute'=>'totalnegosiasi',
             'format'=>'raw',
-            'value'=>fn($d)=>($d['qty']??1)*($d['volume']??1)*$d['negosiasi'],
+            'value'=>fn($d)=>($d->qty??1)*($d->volume??1)*$d->negosiasi,
             'contentOptions'=>['class'=>'text-right'],
             'pageSummary' => true,
             'pageSummaryOptions' => ['class' => 'auto unitsum', 'style' => 'text-align:right;'],
@@ -111,24 +108,16 @@ $negodetails=PaketPengadaanDetails::where(['id' => $model->id])->all();
     ]
 ]);?>
 </div>
-<div class="negosiasi-form">
+<div class="penawaran-form">
     <?php $form = ActiveForm::begin([
-        'id'=>'negosiasi-form',
+        'id'=>'penawaran-form',
         'enableAjaxValidation' => false,
         'fieldConfig' => [
             'template' => "<div class='row'>{label}\n<div class='col-sm-9'>{input}\n{error}</div></div>",
             'labelOptions' => ['class' => 'col-sm-3 control-label right'],
         ],
     ]); ?>
-      <?= $form->field($model, 'negosiasi')->textInput(['placeholder'=>'Masukkan Jumlah Penawaran','type'=>'number']) ?>
-      <?php if($this->context->isVendor()):?>
-      <?= $form->field($model, 'accept')->widget(SwitchInput::class,[
-          'pluginOptions' => [
-              'onText' => 'Ya',
-              'offText' => 'Tidak',
-          ]
-      ]) ?>
-      <?php endif; ?>
+    <?= $form->field($model, 'penawaran')->textInput(['placeholder'=>'Masukkan Jumlah Penawaran','type'=>'number']) ?>
     <?php if (!Yii::$app->request->isAjax){ ?>
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

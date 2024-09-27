@@ -66,3 +66,18 @@ echo Tabs::widget([
     ]
 ])?>
 <?php Modal::end(); ?>
+<?php Modal::begin([
+    "id" => 'negodetails',
+    "footer" => "",
+    "size" => "modal-xl",
+    "clientOptions" => [
+        "tabindex" => false,
+        "backdrop" => "static",
+        "keyboard" => true,
+        "focus" => true,
+    ],
+    "options" => [
+        "tabindex" => true
+    ]
+]) ?>
+<?php Modal::end(); ?>

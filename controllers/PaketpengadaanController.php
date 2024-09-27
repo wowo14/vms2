@@ -1,27 +1,11 @@
 <?php
 namespace app\controllers;
-use app\models\{Unit,TemplateChecklistEvaluasi,Attachment, Dpp, PaketPengadaanDetails, PaketPengadaanSearch, PaketPengadaan};
+use app\models\{Negosiasi,Unit,TemplateChecklistEvaluasi,Attachment, Dpp, PaketPengadaanDetails, PaketPengadaanSearch, PaketPengadaan};
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\helpers\{ArrayHelper,Html};
-use yii\web\{ServerErrorHttpException, Response, NotFoundHttpException};/**
- A Evaluasi Administrasi
-T Evaluasi Teknis
-ST Skor Teknis
-P Penawaran
-PT Penawaran Terkoreksi
-HN Hasil Negosiasi
-SH Skor Harga
-SA Skor Akhir
-B Pembuktian Kualifikasi
-K Evaluasi Kualifikasi
-SK Skor Kualifikasi
-SB Skor Pembuktian
-H Evaluasi Harga/Biaya
-P Pemenang
-PK Pemenang Berkontrak
- */
+use yii\web\{ServerErrorHttpException, Response, NotFoundHttpException};
 class PaketpengadaanController extends Controller {
     public function behaviors() {
         return [
@@ -223,19 +207,43 @@ class PaketpengadaanController extends Controller {
                 // save to negosiasi
                 $nego=$penawaran->negosiasi??new Negosiasi();
                 $nego->penawaran_id=$penawaran->id;
-                $nego->ammount=$paketdetails->sum('negosiasi');
-                $nego->detail=json_encode(
-                    [
+                $nego->ammount=PaketPengadaanDetails::sumNegosiasi($paketdetails->paket_id);
+                if($nego->detail){
+                    // merger old details with new
+                    $oldnegodetail=json_decode($nego->detail??[],true);
+                    $merger=array_merge($oldnegodetail,[
+                        'id' => $paketdetails->id,
                         'paket_id' => $paketdetails->paket_id,
                         'nama_produk'=>$paketdetails->nama_produk,
-                        'volume'=>$paketdetails->volume,
-                        'qty'=>$paketdetails->qty,
+                        'volume'=>$paketdetails->volume??1,
+                        'qty'=>$paketdetails->qty??1,
                         'satuan'=>$paketdetails->satuan,
                         'hps_satuan'=>$paketdetails->hps_satuan,
                         'penawaran'=>$paketdetails->penawaran,
                         'negosiasi'=>$paketdetails->negosiasi,
-                    ],JSON_UNESCAPED_SLASHES
-                );
+                        'durasi'=>$paketdetails->durasi??'',
+                        'informasi_harga'=>$paketdetails->informasi_harga??'',
+                        'sumber_informasi'=>$paketdetails->sumber_informasi??''
+                    ]);
+                    $nego->detail=json_encode($merger,JSON_UNESCAPED_SLASHES);
+                }else{
+                    $nego->detail=json_encode(
+                        [
+                            'id' => $paketdetails->id,
+                            'paket_id' => $paketdetails->paket_id,
+                            'nama_produk'=>$paketdetails->nama_produk,
+                            'volume'=>$paketdetails->volume??1,
+                            'qty'=>$paketdetails->qty??1,
+                            'satuan'=>$paketdetails->satuan,
+                            'hps_satuan'=>$paketdetails->hps_satuan,
+                            'penawaran'=>$paketdetails->penawaran,
+                            'negosiasi'=>$paketdetails->negosiasi,
+                            'durasi'=>$paketdetails->durasi??'',
+                            'informasi_harga'=>$paketdetails->informasi_harga??'',
+                            'sumber_informasi'=>$paketdetails->sumber_informasi??''
+                        ],JSON_UNESCAPED_SLASHES
+                    );
+                }
                 $nego->accept='';
                 $nego->save();
                 Yii::$app->session->setFlash('success', 'sukses input nilai nego');
@@ -255,19 +263,43 @@ class PaketpengadaanController extends Controller {
                     // save to negosiasi
                     $nego=$penawaran->negosiasi??new Negosiasi();
                     $nego->penawaran_id=$penawaran->id;
-                    $nego->ammount=$paketdetails->sum('negosiasi');
-                    $nego->detail=json_encode(
-                        [
+                    $nego->ammount=PaketPengadaanDetails::sumNegosiasi($paketdetails->paket_id);
+                    if($nego->detail){
+                        // merger old details with new
+                        $oldnegodetail=json_decode($nego->detail??[],true);
+                        $merger=array_merge($oldnegodetail,[
+                            'id' => $paketdetails->id,
                             'paket_id' => $paketdetails->paket_id,
                             'nama_produk'=>$paketdetails->nama_produk,
-                            'volume'=>$paketdetails->volume,
-                            'qty'=>$paketdetails->qty,
+                            'volume'=>$paketdetails->volume??1,
+                            'qty'=>$paketdetails->qty??1,
                             'satuan'=>$paketdetails->satuan,
                             'hps_satuan'=>$paketdetails->hps_satuan,
                             'penawaran'=>$paketdetails->penawaran,
                             'negosiasi'=>$paketdetails->negosiasi,
-                        ],JSON_UNESCAPED_SLASHES
-                    );
+                            'durasi'=>$paketdetails->durasi??'',
+                            'informasi_harga'=>$paketdetails->informasi_harga??'',
+                            'sumber_informasi'=>$paketdetails->sumber_informasi??''
+                        ]);
+                        $nego->detail=json_encode($merger,JSON_UNESCAPED_SLASHES);
+                    }else{
+                        $nego->detail=json_encode(
+                            [
+                                'id' => $paketdetails->id,
+                                'paket_id' => $paketdetails->paket_id,
+                                'nama_produk'=>$paketdetails->nama_produk,
+                                'volume'=>$paketdetails->volume??1,
+                                'qty'=>$paketdetails->qty??1,
+                                'satuan'=>$paketdetails->satuan,
+                                'hps_satuan'=>$paketdetails->hps_satuan,
+                                'penawaran'=>$paketdetails->penawaran,
+                                'negosiasi'=>$paketdetails->negosiasi,
+                                'durasi'=>$paketdetails->durasi??'',
+                                'informasi_harga'=>$paketdetails->informasi_harga??'',
+                                'sumber_informasi'=>$paketdetails->sumber_informasi??''
+                            ],JSON_UNESCAPED_SLASHES
+                        );
+                    }
                     $nego->accept='';
                     $nego->save();
                     Yii::$app->session->setFlash('success', 'sukses input nilai nego');
@@ -285,6 +317,34 @@ class PaketpengadaanController extends Controller {
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+    }
+    public function actionPostpenawaran($id){
+        $request = Yii::$app->request;
+        $paketdetails=PaketPengadaanDetails::findOne($id);
+        if(!$paketdetails){
+            throw new NotFoundHttpException('Data tidak ditemukan.');
+        }
+        if ($request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            if($paketdetails->load($request->post()) && $paketdetails->save()){
+                Yii::$app->session->setFlash('success', 'sukses input penawaran');
+                return $this->redirect('index');
+            }else{
+                return [
+                    'title' => 'Form Penawaran',
+                    'content' => $this->renderAjax('//penawaranpenyedia/_frm_penawaranpenyedia', [
+                        'model' => $paketdetails,
+                        'penawaran'=>$paketdetails->paketpengadaan->penawaranpenyedia,
+                    ]),
+                    'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
+                        Html::button(Yii::t('yii2-ajaxcrud', 'Save'), ['class' => 'btn btn-primary', 'type' => 'submit'])
+                ];
+            }
+        }else{
+            if($request->isPost){
+            }else{
+            }
+        }
     }
     public function actionView($id) {
         $request = Yii::$app->request;

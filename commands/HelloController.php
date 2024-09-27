@@ -138,4 +138,13 @@ class HelloController extends Controller {
             Yii::$app->db->createCommand()->insert('setting', ['active' => 1, 'type' => 'jenis_peralihan', 'value' => $value])->execute();
         }
     }
+    public function actionTes2(){
+        $paketdetails=\app\models\PaketPengadaanDetails::findAll(['id' =>50]);
+        if(!$paketdetails){
+            throw new \yii\web\NotFoundHttpException('Data tidak ditemukan.');
+        }else{
+            $sum=PaketPengadaanDetails::sumNegosiasi($paketdetails[0]->paket_id);
+            print_r($sum);
+        }
+    }
 }

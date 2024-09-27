@@ -15,7 +15,7 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
     {
         return [
             [['paket_id', 'qty','volume'], 'integer'],
-            [['nama_produk', 'qty','volume', 'satuan'], 'required'],
+            [['nama_produk', 'volume', 'satuan'], 'required'],
             [['hps_satuan','penawaran','negosiasi', 'informasi_harga'], 'number'],
             [['nama_produk', 'satuan', 'durasi', 'sumber_informasi'], 'string', 'max' => 255],
         ];
@@ -40,5 +40,17 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
     }
     public function getPaketpengadaan(){
         return $this->hasOne(PaketPengadaan::className(), ['id' => 'paket_id']);
+    }
+    public static function sumNegosiasi($paket_id){
+        $model = PaketPengadaanDetails::collectAll(['paket_id' => $paket_id]);
+        $model=$model->map(function($e){
+            $d['totalnegosiasi']=($e->qty??1)
+            *
+            ($e->volume??1)
+            *
+            ($e->negosiasi);
+            return $d;
+        });
+        return $model->sum('totalnegosiasi');
     }
 }

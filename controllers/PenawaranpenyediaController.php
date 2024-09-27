@@ -102,19 +102,6 @@ class PenawaranpenyediaController extends Controller {
             }
         }
     }
-    public function actionPostpenawaran(){
-        $request = Yii::$app->request;
-        if ($request->isAjax) {
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            if($request->isPost){
-
-            }
-        }else{
-            if($request->isPost){
-
-            }
-        }
-    }
     public function actionCreate() {
         $request = Yii::$app->request;
         $model = new PenawaranPengadaan();

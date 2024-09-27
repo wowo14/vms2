@@ -63,3 +63,33 @@ CrudAsset::register($this);
     ]
 ])?>
 <?php Modal::end(); ?>
+<?php Modal::begin([
+    "id" => 'negodetails',
+    "footer" => "",
+    "size" => "modal-xl",
+    "clientOptions" => [
+        "tabindex" => false,
+        "backdrop" => "static",
+        "keyboard" => true,
+        "focus" => true,
+    ],
+    "options" => [
+        "tabindex" => true
+    ]
+]) ?>
+<?php Modal::end(); ?>
+<?php Modal::begin([
+    "id" => 'frmpenawaranpenyedia',
+    "footer" => "",
+    "size" => "modal-xl",
+    "clientOptions" => [
+        "tabindex" => false,
+        "backdrop" => "static",
+        "keyboard" => true,
+        "focus" => true,
+    ],
+    "options" => [
+        "tabindex" => true
+    ]
+]) ?>
+<?php Modal::end(); ?>
