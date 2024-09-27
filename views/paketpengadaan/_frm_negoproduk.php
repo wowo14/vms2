@@ -9,14 +9,11 @@ use yii\bootstrap4\Modal;
 use yii\data\ActiveDataProvider;
 use yii\helpers\{Html,Url};
 $idmodal="negodetails";
-// $negodet=Negosiasi::findOne(['penawaran_id' => $penawaran->id]);
-// if($negodet){
-//     $negoid=json_decode($negodet->detail,true);
-//     $negodetails=PaketPengadaanDetails::where(['id' => $negoid['id']])->all();
-// }else{
-//     $negodetails=PaketPengadaanDetails::where(['id' => $model->id])->all();
-// }
 $negodetails=PaketPengadaanDetails::where(['id' => $model->id])->all();
+if(!$negodetails){
+    // redirect back
+    return Yii::$app->getResponse()->redirect(['index']);
+}
 ?>
 <table class="table table-bordered table-striped table-hover">
         <tr>
@@ -36,11 +33,6 @@ $negodetails=PaketPengadaanDetails::where(['id' => $model->id])->all();
             'class' => 'yii\grid\SerialColumn',
             'header'=>'Nego Ke'
         ],
-        // [
-        //     'attribute'=>'id',
-        //     'label'=>'Paket Pengadaan',
-        //     'value'=>fn($d)=>$d->penawaran->paketpengadaan->nomor??''
-        // ],
         [
             'attribute'=>'nama_produk',
         ],

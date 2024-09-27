@@ -193,6 +193,7 @@ class PaketpengadaanController extends Controller {
     public function actionNegoproduk($id){
         $paketdetails=PaketPengadaanDetails::findOne(['id' => $id]);
         $request=Yii::$app->request;
+        $referrer = $request->referrer;
         if(!$paketdetails){
             throw new NotFoundHttpException('Produk yang ditawarkan tidak ditemukan.');
         }
@@ -204,7 +205,6 @@ class PaketpengadaanController extends Controller {
             Yii::$app->response->format = Response::FORMAT_JSON;
             if($paketdetails->load($request->post()) ){
                 $paketdetails->save();
-                    // Save to negosiasi
                     $nego = $penawaran->negosiasi ?? new Negosiasi();
                     $nego->penawaran_id = $penawaran->id;
                     $nego->ammount = PaketPengadaanDetails::sumNegosiasi($paketdetails->paket_id);
@@ -228,9 +228,14 @@ class PaketpengadaanController extends Controller {
                     // Update nego detail
                     $nego->detail = json_encode($merged, JSON_UNESCAPED_SLASHES);
                     $nego->accept = ''; // Reset accept if necessary
-                    $nego->save();
+                    $nego->save(false);
                     Yii::$app->session->setFlash('success', 'Sukses input nilai nego');
-                    return $this->redirect('index');
+                    $this->redirect($referrer);
+                    return $this->asJson([
+                        'status' => 'success',
+                        'message' => 'Data saved successfully.',
+                        // 'redirect' => $referrer,
+                    ]);
             }else{
                 return [
                     'title' => "Nego produk #" . $paketdetails->nama_produk,
@@ -267,9 +272,9 @@ class PaketpengadaanController extends Controller {
                     // Update nego detail
                     $nego->detail = json_encode($merged, JSON_UNESCAPED_SLASHES);
                     $nego->accept = ''; // Reset accept if necessary
-                    $nego->save();
+                    $nego->save(false);
                     Yii::$app->session->setFlash('success', 'Sukses input nilai nego');
-                    return $this->redirect('index');
+                    return $this->redirect($referrer);
                 }
             }else{
                 return $this->render('_frm_negoproduk', ['model' => $paketdetails,'penawaran'=>$penawaran]);
@@ -294,7 +299,8 @@ class PaketpengadaanController extends Controller {
             Yii::$app->response->format = Response::FORMAT_JSON;
             if($paketdetails->load($request->post()) && $paketdetails->save()){
                 Yii::$app->session->setFlash('success', 'sukses input penawaran');
-                return $this->redirect('index');
+                $this->redirect($request->referrer);
+                return $this->asJson([]);
             }else{
                 return [
                     'title' => 'Form Penawaran',
@@ -412,7 +418,7 @@ class PaketpengadaanController extends Controller {
             ],JSON_UNESCAPED_SLASHES);
             $model->save();
             Yii::$app->session->setFlash('success', 'Kelengkapan DPP Berhasil Ditambahkan');
-            return $this->redirect('index');
+            return $this->redirect($request->referrer);
         }
     }
     public function actionPrintceklistadmin($id){
@@ -470,16 +476,7 @@ class PaketpengadaanController extends Controller {
         }
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
-            if ($request->isGet) {
-                return [
-                    'title' => Yii::t('yii2-ajaxcrud', 'Update') . " PaketPengadaan #" . $id,
-                    'content' => $this->renderAjax('update', [
-                        'model' => $model,
-                    ]),
-                    'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                        Html::button(Yii::t('yii2-ajaxcrud', 'Save'), ['class' => 'btn btn-primary', 'type' => 'submit'])
-                ];
-            } else if ($model->load($request->post()) && $model->save()) {
+            if ($model->load($request->post()) && $model->save()) {
                 if (!empty($_POST['ReviewDpp'])) {
                     $model->dpp->reviews->file_tanggapan = $_POST['ReviewDpp']['file_tanggapan'];
                     $model->dpp->reviews->tgl_dikembalikan = $_POST['ReviewDpp']['tgl_dikembalikan'];

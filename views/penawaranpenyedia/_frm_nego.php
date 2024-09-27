@@ -68,6 +68,8 @@ if(count($paketpengadaan->details) > 0){
 }
 ?>
 </div>
+<?php
+if(!$paketpengadaan->details):?>
 <div class="negosiasi-form">
     <?php $form = ActiveForm::begin([
         'id'=>'negosiasi-form',
@@ -94,3 +96,4 @@ if(count($paketpengadaan->details) > 0){
     <?php } ?>
     <?php ActiveForm::end(); ?>
 </div>
+<?php endif;?>

@@ -5,8 +5,7 @@ use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\helpers\{ArrayHelper,Html};
-use yii\web\ForbiddenHttpException;
-use yii\web\{Response, NotFoundHttpException};
+use yii\web\{ForbiddenHttpException,Response, NotFoundHttpException};
 class PenawaranpenyediaController extends Controller {
     public function behaviors() {
         return [
@@ -80,24 +79,26 @@ class PenawaranpenyediaController extends Controller {
         }
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
-            if ($request->isGet) {
-                return [
-                    'title' => "Nego Penawaran #" . $penawaran->paketpengadaan->nomornamapaket,
-                    'content' => $this->renderAjax('_frm_nego', ['model' => $model,'penawaran'=>$penawaran]),
-                    'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                        Html::button(Yii::t('yii2-ajaxcrud', 'Create'), ['class' => 'btn btn-primary', 'type' => 'submit'])
-                ];
-            }
             if($model->load($request->post()) ){
-                $model->save();
-                Yii::$app->session->setFlash('success', 'sukses input nilai nego');
-                return $this->redirect('index');
+                if($model->save()){
+                    $this->redirect($request->referrer);
+                    return $this->asJson([
+                        'success' => true,
+                        'message' => 'sukses input nilai nego',
+                    ]);
+                }else{
+                    return [
+                        'title' => 'Error Save',
+                        'content' => json_encode($model->getErrors()),
+                        'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal'])
+                    ];
+                }
             }else{
                 return [
                     'title' => "Nego Penawaran #" . $penawaran->paketpengadaan->nomornamapaket,
                     'content' => $this->renderAjax('_frm_nego', ['model' => $model,'penawaran'=>$penawaran]),
                     'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                        Html::button(Yii::t('yii2-ajaxcrud', 'Create'), ['class' => 'btn btn-primary', 'type' => 'submit'])
+                    (!$penawaran->paketpengadaan->details?Html::button(Yii::t('yii2-ajaxcrud', 'Create'), ['class' => 'btn btn-primary', 'type' => 'submit']):'')
                 ];
             }
         }
@@ -148,16 +149,7 @@ class PenawaranpenyediaController extends Controller {
         $oldlampiran_penawaran_harga = $model->lampiran_penawaran_harga;
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
-            if ($request->isGet) {
-                return [
-                    'title' => Yii::t('yii2-ajaxcrud', 'Update') . " PenawaranPengadaan #" . $id,
-                    'content' => $this->renderAjax('update', [
-                        'model' => $model,
-                    ]),
-                    'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                        Html::button(Yii::t('yii2-ajaxcrud', 'Save'), ['class' => 'btn btn-primary', 'type' => 'submit'])
-                ];
-            } else if ($model->load($request->post())) {
+            if ($model->load($request->post())) {
                 if (file_exists(Yii::getAlias('@uploads') . $oldlampiran_penawaran) && !empty($oldlampiran_penawaran) && ($model->isBase64Encoded($model->lampiran_penawaran))) {
                     unlink(Yii::getAlias('@uploads') . $oldlampiran_penawaran);
                 }
