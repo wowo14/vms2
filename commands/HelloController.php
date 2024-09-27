@@ -15,9 +15,7 @@ use app\models\ValidasiKualifikasiPenyediaDetail;
 use Yii;
 use yii\console\Controller;
 use yii\db\Expression;
-
 class HelloController extends Controller {
-    
     public function actionHitung() { // hitung pada paket pengadaan mana?
         $r = ValidasiKualifikasiPenyedia::getCalculated(1);
         $r = collect($r)->where('penyedia_id', 1)->where('paket_pengadaan_id', 1)->first();
@@ -43,12 +41,12 @@ class HelloController extends Controller {
         $db = \Yii::$app->db;
         $schema = $db->schema;
         $tables = $schema->getTableNames();
-        $db->createCommand('SET FOREIGN_KEY_CHECKS = 0;')->execute();
+        // $db->createCommand('SET FOREIGN_KEY_CHECKS = 0;')->execute();
         foreach ($tables as $table) {
             echo "Dropping table: $table\n";
             $db->createCommand()->dropTable($table)->execute();
         }
-        $db->createCommand('SET FOREIGN_KEY_CHECKS = 1;')->execute();
+        // $db->createCommand('SET FOREIGN_KEY_CHECKS = 1;')->execute();
         echo "All tables dropped successfully.\n";
     }
     public function actionTruncateTransaksi() {
@@ -95,6 +93,14 @@ class HelloController extends Controller {
             // $db->createCommand()->truncateTable($table)->execute();
         }
         // $db->createCommand('SET FOREIGN_KEY_CHECKS = 1;')->execute();
+        $query = "SELECT name FROM sqlite_master WHERE type = 'table' AND name GLOB '_*'";
+        $tables = $db->query($query);
+        foreach ($tables as $table) {
+            $tableName = $table['name'];
+            $dropQuery = "DROP TABLE IF EXISTS " . $tableName;
+            $db->exec($dropQuery);
+            echo "Dropped table: " . $tableName . "\n";
+        }
         echo "Truncate successfully.\n";
         // cache flush
         Yii::$app->cache->flush();

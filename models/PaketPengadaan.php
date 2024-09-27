@@ -132,19 +132,23 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     }
     public static function Dashboard(){
         return self::where(['not', ['paket_pengadaan.id' => null]])
-            ->joinWith(['dpp d', 'dpp.pejabat p', 'dpp.staffadmin s', 'dpp.unit u'])
+            ->joinWith(['dpp d','details pd','penawaranpenyedia.negosiasi n', 'dpp.pejabat p', 'dpp.staffadmin s', 'dpp.unit u'])
             ->select([
                 new Expression("strftime('%Y', paket_pengadaan.tanggal_paket) as year"),
-                new Expression("strftime('%n', paket_pengadaan.tanggal_paket) as month"),
+                new Expression("strftime('%m', paket_pengadaan.tanggal_paket) as month"),
                 'paket_pengadaan.metode_pengadaan',
                 'paket_pengadaan.kategori_pengadaan',
                 'paket_pengadaan.pagu',
                 'p.nama as pejabat_pengadaan',
                 's.nama as admin_pengadaan',
                 'u.unit as bidang_bagian',
+                new Expression("COALESCE(n.ammount, 0) AS hasilnego"),
+                new Expression("COALESCE(SUM(pd.hps_satuan), 0) AS hps"),
                 'paket_pengadaan.pemenang'
             ])
             ->andWhere(['not', ['d.bidang_bagian' => null]])
+            ->orWhere(['n.penyedia_accept' => 1,'n.pp_accept'=>1])
+            ->groupBy(['year','month','paket_pengadaan.id'])
             ->orderBy('year','id')
             ->asArray()
             ->all();

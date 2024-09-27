@@ -2,6 +2,8 @@
 namespace app\controllers;
 use app\models\PaketPengadaan;
 use app\models\ReportModel;
+use yii\helpers\VarDumper;
+
 class ReportController extends \yii\web\Controller
 {
     public function actionIndex()
@@ -11,20 +13,21 @@ class ReportController extends \yii\web\Controller
         $raw=collect($paketpengadaan::Dashboard());
         $request=\Yii::$app->request;
         if($request->isGet){
+            return $this->render('index',[
+                'model'=>$model,'raw'=>$raw,'paketpengadaan'=>$paketpengadaan
+            ]);
         }else if($model->load($request->post())){
             if($model->tahun && $model->kategori=='all'){
                 $query=$raw->where('year',$model->tahun)->toArray();
-                print_r($query);
+                VarDumper::dump($query,$depth = 10, $highlight = true);
             }
             if($model->tahun && $model->metode=='all'){
                 $query=$raw->where('year',$model->tahun)->toArray();
                 print_r($query);
             }
-            if($model->tahun && $model->bidang){}
-            if($model->tahun && $model->pejabat){}
+            // if($model->tahun && $model->bidang){}
+            // if($model->tahun && $model->pejabat){}
         }
-        return $this->render('index',[
-            'model'=>$model,'raw'=>$raw,'paketpengadaan'=>$paketpengadaan
-        ]);
+
     }
 }

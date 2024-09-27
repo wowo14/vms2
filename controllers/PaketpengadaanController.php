@@ -221,7 +221,7 @@ class PaketpengadaanController extends Controller {
             if($paketdetails->load($request->post()) ){
                 $paketdetails->save();
                 // save to negosiasi
-                $nego=new Negosiasi();
+                $nego=$penawaran->negosiasi??new Negosiasi();
                 $nego->penawaran_id=$penawaran->id;
                 $nego->ammount=$paketdetails->sum('negosiasi');
                 $nego->detail=json_encode(
@@ -251,12 +251,25 @@ class PaketpengadaanController extends Controller {
         }else{
             if($request->isPost){
                 if($paketdetails->load($request->post()) ){
-                    // $paketdetails->save();
-                    $negodetails=$penawaran->negosiasi??new Negosiasi();
-                    $negodetails->penawaran_id=$penawaran->id;
-                    $negodetails->ammount='';//PR
-                    $negodetails->details=json_encode($paketdetails->attributes,JSON_UNESCAPED_SLASHES);
-                    // $negodetails->save();
+                    $paketdetails->save();
+                    // save to negosiasi
+                    $nego=$penawaran->negosiasi??new Negosiasi();
+                    $nego->penawaran_id=$penawaran->id;
+                    $nego->ammount=$paketdetails->sum('negosiasi');
+                    $nego->detail=json_encode(
+                        [
+                            'paket_id' => $paketdetails->paket_id,
+                            'nama_produk'=>$paketdetails->nama_produk,
+                            'volume'=>$paketdetails->volume,
+                            'qty'=>$paketdetails->qty,
+                            'satuan'=>$paketdetails->satuan,
+                            'hps_satuan'=>$paketdetails->hps_satuan,
+                            'penawaran'=>$paketdetails->penawaran,
+                            'negosiasi'=>$paketdetails->negosiasi,
+                        ],JSON_UNESCAPED_SLASHES
+                    );
+                    $nego->accept='';
+                    $nego->save();
                     Yii::$app->session->setFlash('success', 'sukses input nilai nego');
                     return $this->redirect('index');
                 }

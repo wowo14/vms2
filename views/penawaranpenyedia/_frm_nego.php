@@ -1,12 +1,13 @@
 <?php
 use app\models\Negosiasi;
 use app\models\PaketPengadaanDetails;
+use kartik\grid\GridView as KartikGridView;
 use kartik\select2\Select2;
 use kartik\switchinput\SwitchInput;
 use yii\bootstrap4\ActiveForm;
+use yii\bootstrap4\Modal;
 use yii\data\ActiveDataProvider;
 use yii\grid\GridView;
-use kartik\grid\GridView as KartikGridView;
 use yii\helpers\{Html,Url};
 $paketpengadaan=$penawaran->paketpengadaan;
 ?>
