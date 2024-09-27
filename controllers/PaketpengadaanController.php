@@ -204,50 +204,33 @@ class PaketpengadaanController extends Controller {
             Yii::$app->response->format = Response::FORMAT_JSON;
             if($paketdetails->load($request->post()) ){
                 $paketdetails->save();
-                // save to negosiasi
-                $nego=$penawaran->negosiasi??new Negosiasi();
-                $nego->penawaran_id=$penawaran->id;
-                $nego->ammount=PaketPengadaanDetails::sumNegosiasi($paketdetails->paket_id);
-                if($nego->detail){
-                    // merger old details with new
-                    $oldnegodetail=json_decode($nego->detail??[],true);
-                    $merger=array_merge($oldnegodetail,[
+                    // Save to negosiasi
+                    $nego = $penawaran->negosiasi ?? new Negosiasi();
+                    $nego->penawaran_id = $penawaran->id;
+                    $nego->ammount = PaketPengadaanDetails::sumNegosiasi($paketdetails->paket_id);
+                    // Merge old details with new
+                    $oldnegodetail = json_decode($nego->detail, true) ?? []; // Ensure it's an array
+                    $newdetail = [
                         'id' => $paketdetails->id,
                         'paket_id' => $paketdetails->paket_id,
-                        'nama_produk'=>$paketdetails->nama_produk,
-                        'volume'=>$paketdetails->volume??1,
-                        'qty'=>$paketdetails->qty??1,
-                        'satuan'=>$paketdetails->satuan,
-                        'hps_satuan'=>$paketdetails->hps_satuan,
-                        'penawaran'=>$paketdetails->penawaran,
-                        'negosiasi'=>$paketdetails->negosiasi,
-                        'durasi'=>$paketdetails->durasi??'',
-                        'informasi_harga'=>$paketdetails->informasi_harga??'',
-                        'sumber_informasi'=>$paketdetails->sumber_informasi??''
-                    ]);
-                    $nego->detail=json_encode($merger,JSON_UNESCAPED_SLASHES);
-                }else{
-                    $nego->detail=json_encode(
-                        [
-                            'id' => $paketdetails->id,
-                            'paket_id' => $paketdetails->paket_id,
-                            'nama_produk'=>$paketdetails->nama_produk,
-                            'volume'=>$paketdetails->volume??1,
-                            'qty'=>$paketdetails->qty??1,
-                            'satuan'=>$paketdetails->satuan,
-                            'hps_satuan'=>$paketdetails->hps_satuan,
-                            'penawaran'=>$paketdetails->penawaran,
-                            'negosiasi'=>$paketdetails->negosiasi,
-                            'durasi'=>$paketdetails->durasi??'',
-                            'informasi_harga'=>$paketdetails->informasi_harga??'',
-                            'sumber_informasi'=>$paketdetails->sumber_informasi??''
-                        ],JSON_UNESCAPED_SLASHES
-                    );
-                }
-                $nego->accept='';
-                $nego->save();
-                Yii::$app->session->setFlash('success', 'sukses input nilai nego');
-                return $this->redirect('index');
+                        'nama_produk' => $paketdetails->nama_produk,
+                        'volume' => $paketdetails->volume ?? 1,
+                        'qty' => $paketdetails->qty ?? 1,
+                        'satuan' => $paketdetails->satuan,
+                        'hps_satuan' => $paketdetails->hps_satuan,
+                        'penawaran' => $paketdetails->penawaran,
+                        'negosiasi' => $paketdetails->negosiasi,
+                        'durasi' => $paketdetails->durasi ?? '',
+                        'informasi_harga' => $paketdetails->informasi_harga ?? '',
+                        'sumber_informasi' => $paketdetails->sumber_informasi ?? ''
+                    ];
+                    $merged = array_merge($oldnegodetail, [$newdetail]);
+                    // Update nego detail
+                    $nego->detail = json_encode($merged, JSON_UNESCAPED_SLASHES);
+                    $nego->accept = ''; // Reset accept if necessary
+                    $nego->save();
+                    Yii::$app->session->setFlash('success', 'Sukses input nilai nego');
+                    return $this->redirect('index');
             }else{
                 return [
                     'title' => "Nego produk #" . $paketdetails->nama_produk,
@@ -258,51 +241,34 @@ class PaketpengadaanController extends Controller {
             }
         }else{
             if($request->isPost){
-                if($paketdetails->load($request->post()) ){
+                if ($paketdetails->load($request->post())) {
                     $paketdetails->save();
-                    // save to negosiasi
-                    $nego=$penawaran->negosiasi??new Negosiasi();
-                    $nego->penawaran_id=$penawaran->id;
-                    $nego->ammount=PaketPengadaanDetails::sumNegosiasi($paketdetails->paket_id);
-                    if($nego->detail){
-                        // merger old details with new
-                        $oldnegodetail=json_decode($nego->detail??[],true);
-                        $merger=array_merge($oldnegodetail,[
-                            'id' => $paketdetails->id,
-                            'paket_id' => $paketdetails->paket_id,
-                            'nama_produk'=>$paketdetails->nama_produk,
-                            'volume'=>$paketdetails->volume??1,
-                            'qty'=>$paketdetails->qty??1,
-                            'satuan'=>$paketdetails->satuan,
-                            'hps_satuan'=>$paketdetails->hps_satuan,
-                            'penawaran'=>$paketdetails->penawaran,
-                            'negosiasi'=>$paketdetails->negosiasi,
-                            'durasi'=>$paketdetails->durasi??'',
-                            'informasi_harga'=>$paketdetails->informasi_harga??'',
-                            'sumber_informasi'=>$paketdetails->sumber_informasi??''
-                        ]);
-                        $nego->detail=json_encode($merger,JSON_UNESCAPED_SLASHES);
-                    }else{
-                        $nego->detail=json_encode(
-                            [
-                                'id' => $paketdetails->id,
-                                'paket_id' => $paketdetails->paket_id,
-                                'nama_produk'=>$paketdetails->nama_produk,
-                                'volume'=>$paketdetails->volume??1,
-                                'qty'=>$paketdetails->qty??1,
-                                'satuan'=>$paketdetails->satuan,
-                                'hps_satuan'=>$paketdetails->hps_satuan,
-                                'penawaran'=>$paketdetails->penawaran,
-                                'negosiasi'=>$paketdetails->negosiasi,
-                                'durasi'=>$paketdetails->durasi??'',
-                                'informasi_harga'=>$paketdetails->informasi_harga??'',
-                                'sumber_informasi'=>$paketdetails->sumber_informasi??''
-                            ],JSON_UNESCAPED_SLASHES
-                        );
-                    }
-                    $nego->accept='';
+                    // Save to negosiasi
+                    $nego = $penawaran->negosiasi ?? new Negosiasi();
+                    $nego->penawaran_id = $penawaran->id;
+                    $nego->ammount = PaketPengadaanDetails::sumNegosiasi($paketdetails->paket_id);
+                    // Merge old details with new
+                    $oldnegodetail = json_decode($nego->detail, true) ?? []; // Ensure it's an array
+                    $newdetail = [
+                        'id' => $paketdetails->id,
+                        'paket_id' => $paketdetails->paket_id,
+                        'nama_produk' => $paketdetails->nama_produk,
+                        'volume' => $paketdetails->volume ?? 1,
+                        'qty' => $paketdetails->qty ?? 1,
+                        'satuan' => $paketdetails->satuan,
+                        'hps_satuan' => $paketdetails->hps_satuan,
+                        'penawaran' => $paketdetails->penawaran,
+                        'negosiasi' => $paketdetails->negosiasi,
+                        'durasi' => $paketdetails->durasi ?? '',
+                        'informasi_harga' => $paketdetails->informasi_harga ?? '',
+                        'sumber_informasi' => $paketdetails->sumber_informasi ?? ''
+                    ];
+                    $merged = array_merge($oldnegodetail, [$newdetail]);
+                    // Update nego detail
+                    $nego->detail = json_encode($merged, JSON_UNESCAPED_SLASHES);
+                    $nego->accept = ''; // Reset accept if necessary
                     $nego->save();
-                    Yii::$app->session->setFlash('success', 'sukses input nilai nego');
+                    Yii::$app->session->setFlash('success', 'Sukses input nilai nego');
                     return $this->redirect('index');
                 }
             }else{
