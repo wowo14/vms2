@@ -15,6 +15,9 @@ if(!$negodetails){
     return Yii::$app->getResponse()->redirect(['index']);
 }
 $negosiasi=$negodetails[0]->paketpengadaan->penawaranpenyedia->negosiasi;
+if(!$negosiasi){
+    $negosiasi=new Negosiasi();
+}
 ?>
 <table class="table table-bordered table-striped table-hover">
         <tr>
