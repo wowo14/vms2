@@ -61,7 +61,7 @@ $negodetails=PaketPengadaanDetails::where(['id' => $model->id])->all();
             'format'=>'raw',
             'contentOptions'=>['class'=>'text-right'],
             'value'=>function($d)use($idmodal){
-                return Html::a(Yii::$app->formatter->asCurrency($d->penawaran)??'#',['/paketpengadaan/postpenawaran','id'=>$d->id],['role' => 'modal-remote','data-target' => '#' . $idmodal,'data-pjax' => '0','data-target'=>'#nego','title' => Yii::t('yii2-ajaxcrud', 'Penawaran')]);
+                return Html::a(Yii::$app->formatter->asCurrency($d->penawaran??0)??'#',['/paketpengadaan/postpenawaran','id'=>$d->id],['role' => 'modal-remote','data-target' => '#' . $idmodal,'data-pjax' => '0','data-target'=>'#nego','title' => Yii::t('yii2-ajaxcrud', 'Penawaran')]);
             },
         ],
         [
