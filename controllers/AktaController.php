@@ -47,16 +47,7 @@ use yii\helpers\Html;class AktaController extends Controller {
         $model = new AktaPenyedia();
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
-            if ($request->isGet) {
-                return [
-                    'title' => Yii::t('yii2-ajaxcrud', 'Create New') . " AktaPenyedia",
-                    'content' => $this->renderAjax('create', [
-                        'model' => $model,
-                    ]),
-                    'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                        Html::button(Yii::t('yii2-ajaxcrud', 'Create'), ['class' => 'btn btn-primary', 'type' => 'submit'])
-                ];
-            } else if ($model->load($request->post()) && $model->save()) {
+            if ($model->load($request->post()) && $model->save()) {
                 return [
                     'forceReload' => '#crud-datatable-pjax',
                     'title' => Yii::t('yii2-ajaxcrud', 'Create New') . " AktaPenyedia",
@@ -88,16 +79,7 @@ use yii\helpers\Html;class AktaController extends Controller {
         $oldfile = $model->file_akta;
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
-            if ($request->isGet) {
-                return [
-                    'title' => Yii::t('yii2-ajaxcrud', 'Update') . " AktaPenyedia #" . $id,
-                    'content' => $this->renderAjax('update', [
-                        'model' => $model,
-                    ]),
-                    'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                        Html::button(Yii::t('yii2-ajaxcrud', 'Save'), ['class' => 'btn btn-primary', 'type' => 'submit'])
-                ];
-            } else if ($model->load($request->post())) {
+            if ($model->load($request->post())) {
                 if (file_exists(Yii::getAlias('@uploads') . $oldfile) && !empty($oldfile) && ($model->isBase64Encoded($model->file_akta))) {
                     unlink(Yii::getAlias('@uploads') . $oldfile);
                 }

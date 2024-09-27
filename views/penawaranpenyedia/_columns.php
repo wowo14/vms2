@@ -49,8 +49,8 @@ return [
         'class' => '\kartik\grid\DataColumn',
         'attribute' => 'kode','format'=>'raw',
         'value' => fn ($d) =>Html::a($d->kode, ['/penawaranpenyedia/nego', 'id' => $d->id],
-            ['role' => 'modal-remote','data-pjax' => '1','data-target'=>'#'.$idmodal,'title' => Yii::t('yii2-ajaxcrud', 'Nego'),
-                    'aria-label' => Yii::t('yii2-ajaxcrud', 'Nego'),]
+            ['class'=>'bg-white','role' => 'modal-remote','data-pjax' => '1','data-target'=>'#'.$idmodal,'title' => Yii::t('yii2-ajaxcrud', 'Nego'),
+            'aria-label' => Yii::t('yii2-ajaxcrud', 'Nego'),]
         )?? ''
     ],
     [

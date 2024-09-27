@@ -102,21 +102,25 @@ class PenawaranpenyediaController extends Controller {
             }
         }
     }
+    public function actionPostpenawaran(){
+        $request = Yii::$app->request;
+        if ($request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            if($request->isPost){
+
+            }
+        }else{
+            if($request->isPost){
+
+            }
+        }
+    }
     public function actionCreate() {
         $request = Yii::$app->request;
         $model = new PenawaranPengadaan();
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
-            if ($request->isGet) {
-                return [
-                    'title' => Yii::t('yii2-ajaxcrud', 'Create New') . " PenawaranPengadaan",
-                    'content' => $this->renderAjax('create', [
-                        'model' => $model,
-                    ]),
-                    'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                        Html::button(Yii::t('yii2-ajaxcrud', 'Create'), ['class' => 'btn btn-primary', 'type' => 'submit'])
-                ];
-            } else if ($model->load($request->post()) && $model->save(false)) {
+            if ($model->load($request->post()) && $model->save(false)) {
                 return [
                     'forceReload' => '#crud-datatable-pjax',
                     'title' => Yii::t('yii2-ajaxcrud', 'Create New') . " PenawaranPengadaan",

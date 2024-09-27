@@ -47,16 +47,7 @@ use yii\helpers\Html;class IjinusahaController extends Controller {
         $request = Yii::$app->request;
         $model = new Ijinusaha();
         if ($request->isAjax) {            Yii::$app->response->format = Response::FORMAT_JSON;
-            if ($request->isGet) {
-                return [
-                    'title' => Yii::t('yii2-ajaxcrud', 'Create New') . " Ijinusaha",
-                    'content' => $this->renderAjax('create', [
-                        'model' => $model,
-                    ]),
-                    'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                        Html::button(Yii::t('yii2-ajaxcrud', 'Create'), ['class' => 'btn btn-primary', 'type' => 'submit'])
-                ];
-            } else if ($model->load($request->post()) && $model->save()) {
+            if ($model->load($request->post()) && $model->save()) {
                 return [
                     'forceReload' => '#crud-datatable-pjax',
                     'title' => Yii::t('yii2-ajaxcrud', 'Create New') . " Ijinusaha",
@@ -88,16 +79,7 @@ use yii\helpers\Html;class IjinusahaController extends Controller {
         $model = $this->findModel($id);
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
-            if ($request->isGet) {
-                return [
-                    'title' => Yii::t('yii2-ajaxcrud', 'Update') . " Ijinusaha #" . $id,
-                    'content' => $this->renderAjax('update', [
-                        'model' => $model,
-                    ]),
-                    'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                        Html::button(Yii::t('yii2-ajaxcrud', 'Save'), ['class' => 'btn btn-primary', 'type' => 'submit'])
-                ];
-            } else if ($model->load($request->post()) && $model->save()) {
+            if ($model->load($request->post()) && $model->save()) {
                 return [
                     'forceReload' => '#crud-datatable-pjax',
                     'title' => "Ijinusaha #" . $id,

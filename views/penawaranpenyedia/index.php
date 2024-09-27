@@ -17,6 +17,12 @@ CrudAsset::register($this);
             'filterModel' => $searchModel,
             'pjax' => true,
             'columns' => require(__DIR__ . '/_columns.php'),
+            'rowOptions' => function ($model) {
+                if (isset($model->pemenang) && $model->pemenang) {
+                    return ['class' => 'bg-primary'];
+                }
+                return []; // return an empty array if the condition is not met
+            },
             'toolbar' => [
                 [
                     'content' =>
@@ -57,7 +63,9 @@ CrudAsset::register($this);
                         ]
                     ),
                 ]) .
-                    '<div class="clearfix"></div>',
+                    'Legend:
+                    <span class="bg-primary p-1 m-0 text-white">Selesai</span>
+                    <div class="clearfix"></div>',
             ]
         ]) ?>
     </div>
