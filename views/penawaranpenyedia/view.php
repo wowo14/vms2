@@ -1,10 +1,13 @@
 <?php
 use app\assets\AppAsset;
 use app\widgets\FilePreview;
+use yii2ajaxcrud\ajaxcrud\CrudAsset;
+use yii\bootstrap4\Modal;
 use yii\bootstrap4\Tabs;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 AppAsset::register($this);
+CrudAsset::register($this);
 ?>
 <div class="row">
     <div class="col-md-6 penawaran-pengadaan-view">
@@ -60,11 +63,8 @@ AppAsset::register($this);
                 ],
                 [
                     'label' => 'Negosiasi',
-                    'content' => $model->lampiran_penawaran_harga ? Html::a(
-                        "Negosiasi",
-                        Yii::getAlias('@web/uploads/') . $model->lampiran_penawaran_harga,
-                        ['target' => '_blank']
-                    ) : 'tab Negosiasi',
+                    'content' => $this->render('_frm_nego',['model'=>new \app\models\Negosiasi(),
+                        'penawaran'=>$model,]),
                     'options' => ['id' => 'negosiasi' . $model->hash],
                 ],
             ]
@@ -72,3 +72,18 @@ AppAsset::register($this);
         ?>
     </div>
 </div>
+<?php Modal::begin([
+    "id" => 'negodetails',
+    "footer" => "",
+    "size" => "modal-xl",
+    "clientOptions" => [
+        "tabindex" => false,
+        "backdrop" => "static",
+        "keyboard" => true,
+        "focus" => true,
+    ],
+    "options" => [
+        "tabindex" => true
+    ]
+]) ?>
+<?php Modal::end(); ?>

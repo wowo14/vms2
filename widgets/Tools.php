@@ -100,6 +100,10 @@ class Tools extends Widget
     $role = $this->getcurrentroleuser();
     return (ArrayHelper::keyExists('admin', $role) || ArrayHelper::keyExists('operator', $role))?true:false;
   }
+  public function isAdminOrVendor(){
+    $role = $this->getcurrentroleuser();
+    return (ArrayHelper::keyExists('admin', $role) || ArrayHelper::keyExists('vendor', $role))?true:false;
+  }
   public function dow(){
     $hari = [1=>'Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
     setlocale(LC_ALL, 'id_ID');

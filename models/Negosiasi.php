@@ -51,4 +51,12 @@ class Negosiasi extends \yii\db\ActiveRecord
 
         return parent::beforeSave($insert);
     }
+    public function behavior(){
+        return [
+            'currency' => [
+                'class' => \app\widgets\CurrencyBehavior::class,
+                'attributes' => ['amount'],
+            ],
+        ];
+    }
 }

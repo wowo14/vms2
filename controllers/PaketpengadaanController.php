@@ -205,7 +205,6 @@ class PaketpengadaanController extends Controller {
             Yii::$app->response->format = Response::FORMAT_JSON;
             if($paketdetails->load($request->post()) ){
                 $paketdetails->save();
-
                     $nego = $penawaran->negosiasi ?? new Negosiasi();
                     $nego->penawaran_id = $penawaran->id;
                     $nego->ammount = PaketPengadaanDetails::sumNegosiasi($paketdetails->paket_id);
@@ -318,8 +317,11 @@ class PaketpengadaanController extends Controller {
                 ];
             }
         }else{
-            if($request->isPost){
+            if($paketdetails->load($request->post()) && $paketdetails->save()){
+                Yii::$app->session->setFlash('success', 'sukses input penawaran');
+                return $this->redirect($request->referrer);
             }else{
+                return $this->render('//penawaranpenyedia/_frm_penawaranpenyedia', ['model' => $paketdetails,'penawaran'=>$paketdetails->paketpengadaan->penawaranpenyedia]);
             }
         }
     }

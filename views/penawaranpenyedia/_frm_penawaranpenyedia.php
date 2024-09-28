@@ -8,7 +8,7 @@ use yii\bootstrap4\ActiveForm;
 use yii\bootstrap4\Modal;
 use yii\data\ActiveDataProvider;
 use yii\helpers\{Html,Url};
-$idmodal="frmpenawaranpenyedia";
+$idmodal="negodetails";
 // $negodet=Negosiasi::findOne(['penawaran_id' => $penawaran->id]);
 // if($negodet){
 //     $negodetails=json_decode($negodet->details,true);

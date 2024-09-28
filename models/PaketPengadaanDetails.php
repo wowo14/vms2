@@ -45,12 +45,20 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
         $model = PaketPengadaanDetails::collectAll(['paket_id' => $paket_id]);
         $model=$model->map(function($e){
             $d['totalnegosiasi']=($e->qty??1)
-            *
-            ($e->volume??1)
-            *
-            ($e->negosiasi);
+                *
+                ($e->volume??1)
+                *
+                ($e->negosiasi);
             return $d;
         });
         return $model->sum('totalnegosiasi');
+    }
+    public function behavior(){
+        return [
+            'currency' => [
+                'class' => \app\widgets\CurrencyBehavior::class,
+                'attributes' => ['negosiasi','penawaran'],
+            ],
+        ];
     }
 }

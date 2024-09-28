@@ -125,8 +125,8 @@ if(!$negosiasi){
           ]
       ]) ?>
       <?php endif; ?>
-      <?php if($this->context->isVendor()):?>
-      <?= $form->field($model, 'accept')->widget(SwitchInput::class,[
+      <?php if($this->context->isAdminOrVendor()):?>
+      <?= $form->field($negosiasi, 'penyedia_accept')->widget(SwitchInput::class,[
           'pluginOptions' => [
               'onText' => 'Ya',
               'offText' => 'Tidak',

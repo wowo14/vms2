@@ -56,6 +56,7 @@ $paketpengadaan=$penawaran->paketpengadaan;
 if(count($paketpengadaan->details) > 0){
     $dataProviderdetails = new ActiveDataProvider([
             'query' => PaketPengadaanDetails::find()->where(['paket_id' => $paketpengadaan->id]),
+            'pagination' => false
         ]);
         echo KartikGridView::widget([
         'dataProvider' => $dataProviderdetails,
