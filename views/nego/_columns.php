@@ -17,7 +17,7 @@ return [
     [
         'class'=>'\kartik\grid\DataColumn',
         'attribute'=>'ammount',
-        'value'=>fn($d)=>\Yii::$app->formatter->asCurrency($d->ammount),
+        // 'value'=>fn($d)=>\Yii::$app->formatter->asCurrency($d->ammount),
     ],
     [
         'class'=>'\kartik\grid\DataColumn',

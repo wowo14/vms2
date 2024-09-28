@@ -18,7 +18,7 @@ use yii\widgets\DetailView;
             ],
             [
                 'attribute'=>'ammount',
-                'value'=>fn($d)=>\Yii::$app->formatter->asCurrency($d->ammount)
+                // 'value'=>fn($d)=>\Yii::$app->formatter->asCurrency($d->ammount)
             ],
             'accept:boolean',
             [
