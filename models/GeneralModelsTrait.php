@@ -298,6 +298,10 @@ trait GeneralModelsTrait {
         return array(1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember');
     }
     public function behaviors(){
+        $currencyAttributes = ['ammount', 'penawaran', 'negosiasi'];
+        $validCurrencyAttributes = array_filter($currencyAttributes, function ($attribute) {
+            return $this->hasAttribute($attribute);
+        });
         return [
             'timestamp' => [
                 'class' => 'yii\behaviors\TimestampBehavior',
@@ -309,6 +313,10 @@ trait GeneralModelsTrait {
                 'class' => 'yii\behaviors\BlameableBehavior',
                 'createdByAttribute' => $this->hasAttribute('created_by') ? 'created_by' : null,
                 'updatedByAttribute' => $this->hasAttribute('updated_by') ? 'updated_by' : null,
+            ],
+            'currency' => [
+                'class' => \app\widgets\CurrencyBehavior::class,
+                'attributes' => $validCurrencyAttributes,
             ],
         ];
     }

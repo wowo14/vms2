@@ -48,15 +48,6 @@ class Negosiasi extends \yii\db\ActiveRecord
         return $this->hasOne(PenawaranPengadaan::class, ['id' => 'penawaran_id'])->cache(self::cachetime(), self::settagdep('tag_penawaranpengadaan'));
     }
     public function beforeSave($insert){
-
         return parent::beforeSave($insert);
-    }
-    public function behavior(){
-        return [
-            'currency' => [
-                'class' => \app\widgets\CurrencyBehavior::class,
-                'attributes' => ['amount'],
-            ],
-        ];
     }
 }

@@ -20,7 +20,7 @@ $negodetails=PaketPengadaanDetails::where(['id' => $model->id])->all();
 <table class="table table-bordered table-striped table-hover">
         <tr>
             <td>Penawaran Awal <?=$model->nama_produk?>:</td>
-            <td><?= \Yii::$app->formatter->asCurrency($model->penawaran) ?></td>
+            <td><?= ($model->penawaran) ?></td>
         </tr>
 </table>
 <div class="riwayatnego">
@@ -61,14 +61,14 @@ $negodetails=PaketPengadaanDetails::where(['id' => $model->id])->all();
             'format'=>'raw',
             'contentOptions'=>['class'=>'text-right'],
             'value'=>function($d)use($idmodal){
-                return Html::a(Yii::$app->formatter->asCurrency($d->penawaran??0)??'#',['/paketpengadaan/postpenawaran','id'=>$d->id],['role' => 'modal-remote','data-target' => '#' . $idmodal,'data-pjax' => '0','data-target'=>'#nego','title' => Yii::t('yii2-ajaxcrud', 'Penawaran')]);
+                return Html::a(($d->penawaran??0)??'#',['/paketpengadaan/postpenawaran','id'=>$d->id],['role' => 'modal-remote','data-target' => '#' . $idmodal,'data-pjax' => '0','data-target'=>'#nego','title' => Yii::t('yii2-ajaxcrud', 'Penawaran')]);
             },
         ],
         [
             'attribute'=>'negosiasi',
-            'format'=>'raw',
+            // 'format'=>'currency',
             'contentOptions'=>['class'=>'text-right'],
-            'value'=>fn($d)=>Yii::$app->formatter->asCurrency($d->negosiasi),
+            // 'value'=>fn($d)=>($d->negosiasi),
             // 'value'=>function($d)use($idmodal){
             //     return Html::a($d->negosiasi??'#',['/paketpengadaan/negoproduk','id'=>$d->id],['role' => 'modal-remote','data-target' => '#' . $idmodal,'data-pjax' => '0','data-target'=>'#nego','title' => Yii::t('yii2-ajaxcrud', 'Nego')]);
             // },
@@ -87,7 +87,7 @@ $negodetails=PaketPengadaanDetails::where(['id' => $model->id])->all();
         [
             'attribute'=>'totalpenawaran',
             'format'=>'raw',
-            'value'=>fn($d)=>Yii::$app->formatter->asCurrency(($d->qty??1)*($d->volume??1)*$d->penawaran),
+            'value'=>fn($d)=>Yii::$app->formatter->asCurrency(($d->qty??1)*($d->volume??1)*(Yii::$app->tools->reverseCurrency($d->penawaran))),
             'contentOptions'=>['class'=>'text-right'],
             'pageSummary' => true,
             'pageSummaryOptions' => ['class' => 'auto unitsum', 'style' => 'text-align:right;'],
@@ -98,7 +98,7 @@ $negodetails=PaketPengadaanDetails::where(['id' => $model->id])->all();
         [
             'attribute'=>'totalnegosiasi',
             'format'=>'raw',
-            'value'=>fn($d)=>Yii::$app->formatter->asCurrency(($d->qty??1)*($d->volume??1)*$d->negosiasi),
+            'value'=>fn($d)=>Yii::$app->formatter->asCurrency(($d->qty??1)*($d->volume??1)*(Yii::$app->tools->reverseCurrency($d->negosiasi))),
             'contentOptions'=>['class'=>'text-right'],
             'pageSummary' => true,
             'pageSummaryOptions' => ['class' => 'auto unitsum', 'style' => 'text-align:right;'],
@@ -118,7 +118,19 @@ $negodetails=PaketPengadaanDetails::where(['id' => $model->id])->all();
             'labelOptions' => ['class' => 'col-sm-3 control-label right'],
         ],
     ]); ?>
-    <?= $form->field($model, 'penawaran')->textInput(['placeholder'=>'Masukkan Jumlah Penawaran','type'=>'number']) ?>
+
+    <?= $form->field($model, 'penawaran')->widget(\yii\widgets\MaskedInput::class, [
+        'clientOptions' => [
+            'alias' => 'numeric',
+            'groupSeparator' => '.',
+            'radixPoint' => ',',
+            'autoGroup' => true,
+            'digits' => 2,
+            'digitsOptional' => false,
+            'prefix' => 'Rp ',
+            'rightAlign' => false,
+        ],
+    ]) ?>
     <?php if (!Yii::$app->request->isAjax){ ?>
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

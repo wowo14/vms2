@@ -15,7 +15,7 @@ $paketpengadaan=$penawaran->paketpengadaan;
 <table class="table table-bordered table-striped table-hover">
         <tr>
             <td>Penawaran Awal:</td>
-            <td><?= \Yii::$app->formatter->asCurrency($penawaran->nilai_penawaran) ?></td>
+            <td><?= Yii::$app->formatter->asCurrency($penawaran->nilai_penawaran) ?></td>
         </tr>
 </table>
 <div class="riwayatnego">
@@ -42,7 +42,7 @@ $paketpengadaan=$penawaran->paketpengadaan;
         ],
         [
             'attribute'=>'ammount',
-            'value'=>fn($d)=>\Yii::$app->formatter->asCurrency($d->ammount)
+            //'value'=>fn($d)=>($d->ammount)
         ],
         'created_at',
         ['attribute'=>'accept','value'=>fn($d)=>$d->accept?'Ya':'Tidak'],
@@ -82,7 +82,18 @@ if(!$paketpengadaan->details):?>
         ],
     ]); ?>
     <?= $form->field($model, 'penawaran_id')->hiddenInput(['value' => $penawaran->id, 'readonly' => 'readonly'])->label(false) ?>
-      <?= $form->field($model, 'ammount')->textInput(['placeholder'=>'Masukkan Jumlah Penawaran','type'=>'number']) ?>
+      <?= $form->field($model, 'ammount')->widget(\yii\widgets\MaskedInput::class, [
+        'clientOptions' => [
+            'alias' => 'numeric',
+            'groupSeparator' => '.',
+            'radixPoint' => ',',
+            'autoGroup' => true,
+            'digits' => 2,
+            'digitsOptional' => false,
+            'prefix' => 'Rp ',
+            'rightAlign' => false,
+        ],
+    ]) ?>
       <?php if($this->context->isVendor()):?>
       <?= $form->field($model, 'peneydia_accept')->widget(SwitchInput::class,[
           'pluginOptions' => [

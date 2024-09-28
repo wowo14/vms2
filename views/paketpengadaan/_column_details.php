@@ -31,7 +31,7 @@ return [
                         'format'=>'raw',
                         'contentOptions'=>['class'=>'text-right'],
                         'value'=>function($d)use($idmodelnego){
-                            return Html::a(Yii::$app->formatter->asCurrency($d->penawaran??0)??'#',['/paketpengadaan/postpenawaran','id'=>$d->id],['role' => 'modal-remote','data-pjax' => '0','data-target'=>'#'.$idmodelnego,'title' => Yii::t('yii2-ajaxcrud', 'Penawaran')]);
+                            return Html::a(($d->penawaran??0)??'#',['/paketpengadaan/postpenawaran','id'=>$d->id],['role' => 'modal-remote','data-pjax' => '0','data-target'=>'#'.$idmodelnego,'title' => Yii::t('yii2-ajaxcrud', 'Penawaran')]);
                         },
                     ],
                     [
@@ -39,7 +39,7 @@ return [
                         'format'=>'raw',
                         'contentOptions'=>['class'=>'text-right'],
                         'value'=>function($d)use($idmodelnego){
-                            return Html::a(Yii::$app->formatter->asCurrency($d->negosiasi??0)??'#',['/paketpengadaan/negoproduk','id'=>$d->id],['role' => 'modal-remote','data-pjax' => '0','data-target'=>'#'.$idmodelnego,'title' => Yii::t('yii2-ajaxcrud', 'Nego')]);
+                            return Html::a(($d->negosiasi??0)??'#',['/paketpengadaan/negoproduk','id'=>$d->id],['role' => 'modal-remote','data-pjax' => '0','data-target'=>'#'.$idmodelnego,'title' => Yii::t('yii2-ajaxcrud', 'Nego')]);
                         },
                     ],
                     [
@@ -56,7 +56,7 @@ return [
                     [
                         'attribute'=>'totalpenawaran',
                         'format'=>'raw',
-                        'value'=>fn($d)=>Yii::$app->formatter->asCurrency(($d->qty??1)*($d->volume??1)*$d->penawaran),
+                        'value'=>fn($d)=>Yii::$app->formatter->asCurrency(($d->qty??1)*($d->volume??1)*(Yii::$app->tools->reverseCurrency($d->penawaran))),
                         'contentOptions'=>['class'=>'text-right'],
                         'pageSummary' => true,
                         'pageSummaryOptions' => ['class' => 'auto unitsum', 'style' => 'text-align:right;'],
@@ -67,7 +67,7 @@ return [
                     [
                         'attribute'=>'totalnegosiasi',
                         'format'=>'raw',
-                        'value'=>fn($d)=>Yii::$app->formatter->asCurrency(($d->qty??1)*($d->volume??1)*$d->negosiasi),
+                        'value'=>fn($d)=>Yii::$app->formatter->asCurrency(($d->qty??1)*($d->volume??1)*(Yii::$app->tools->reverseCurrency($d->negosiasi))),
                         'contentOptions'=>['class'=>'text-right'],
                         'pageSummary' => true,
                         'pageSummaryOptions' => ['class' => 'auto unitsum', 'style' => 'text-align:right;'],

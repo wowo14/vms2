@@ -48,17 +48,9 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
                 *
                 ($e->volume??1)
                 *
-                ($e->negosiasi);
+                (Yii::$app->tools->reverseCurrency($e->negosiasi));
             return $d;
         });
         return $model->sum('totalnegosiasi');
-    }
-    public function behavior(){
-        return [
-            'currency' => [
-                'class' => \app\widgets\CurrencyBehavior::class,
-                'attributes' => ['negosiasi','penawaran'],
-            ],
-        ];
     }
 }

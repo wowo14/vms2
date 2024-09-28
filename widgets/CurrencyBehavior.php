@@ -2,6 +2,7 @@
 namespace app\widgets;
 use yii\base\Behavior;
 use yii\db\ActiveRecord;
+use Yii;
 class CurrencyBehavior extends Behavior
 {
     public $attributes = []; // Accepts multiple attributes
@@ -16,7 +17,7 @@ class CurrencyBehavior extends Behavior
     {
         foreach ($this->attributes as $attribute) {
             if (!empty($this->owner->$attribute)) {
-                // Convert currency to float (assuming Indonesian format)
+            // Yii::error('to float');
                 $this->owner->$attribute = $this->currencyToFloat($this->owner->$attribute);
             }
         }
@@ -24,15 +25,21 @@ class CurrencyBehavior extends Behavior
     public function formatCurrencyFromFloat()
     {
         foreach ($this->attributes as $attribute) {
-            if (!empty($this->owner->$attribute)) {
-                // Convert float back to currency format
-                $this->owner->$attribute = \Yii::$app->formatter->asCurrency($this->owner->$attribute);
+            $value = $this->owner->$attribute;
+            if (!empty($value) && is_numeric($value)) {
+                $floatValue = (float) $value;
+                if (is_finite($floatValue)) {
+                    // Yii::error($value);
+                    // Yii::error('to currency');
+                    $this->owner->$attribute = \Yii::$app->formatter->asCurrency($floatValue);
+                }
             }
         }
     }
     protected function currencyToFloat($currency)
     {
-        return \Yii::$app->tools->reverseCurrency($currency);
+        // Yii::error($currency);
+        return Yii::$app->tools->reverseCurrency($currency);
         // $normalized = preg_replace('/[Rp\s,.]/', '', $currency);
         // return (float) str_replace(',', '.', $normalized);
     }

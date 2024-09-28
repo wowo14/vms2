@@ -22,7 +22,7 @@ if(!$negosiasi){
 <table class="table table-bordered table-striped table-hover">
         <tr>
             <td>Penawaran Awal <?=$model->nama_produk?>:</td>
-            <td><?= \Yii::$app->formatter->asCurrency($model->penawaran) ?></td>
+            <td><?= ($model->penawaran) ?></td>
         </tr>
 </table>
 <div class="riwayatnego">
@@ -60,7 +60,7 @@ if(!$negosiasi){
         ],
         [
             'attribute'=>'penawaran',
-            'format'=>'currency',
+            //  'format'=>'currency',
             'contentOptions'=>['class'=>'text-right']
         ],
         [
@@ -68,7 +68,7 @@ if(!$negosiasi){
             'format'=>'raw',
             'contentOptions'=>['class'=>'text-right'],
             'value'=>function($d)use($idmodal){
-                return Html::a(Yii::$app->formatter->asCurrency($d->negosiasi)??'#',['/paketpengadaan/negoproduk','id'=>$d['id']],['role' => 'modal-remote','data-target' => '#' . $idmodal,'data-pjax' => '0','data-target'=>'#nego','title' => Yii::t('yii2-ajaxcrud', 'Nego')]);
+                return Html::a(($d->negosiasi)??'#',['/paketpengadaan/negoproduk','id'=>$d['id']],['role' => 'modal-remote','data-target' => '#' . $idmodal,'data-pjax' => '0','data-target'=>'#nego','title' => Yii::t('yii2-ajaxcrud', 'Nego')]);
             },
         ],
         [
@@ -85,7 +85,7 @@ if(!$negosiasi){
         [
             'attribute'=>'totalpenawaran',
             'format'=>'raw',
-            'value'=>fn($d)=>Yii::$app->formatter->asCurrency(($d['qty']??1)*($d['volume']??1)*$d['penawaran']),
+            'value'=>fn($d)=>Yii::$app->formatter->asCurrency(($d['qty']??1)*($d['volume']??1)*(Yii::$app->tools->reverseCurrency($d['penawaran']))),
             'contentOptions'=>['class'=>'text-right'],
             'pageSummary' => true,
             'pageSummaryOptions' => ['class' => 'auto unitsum', 'style' => 'text-align:right;'],
@@ -96,7 +96,7 @@ if(!$negosiasi){
         [
             'attribute'=>'totalnegosiasi',
             'format'=>'raw',
-            'value'=>fn($d)=>Yii::$app->formatter->asCurrency(($d['qty']??1)*($d['volume']??1)*$d['negosiasi']),
+            'value'=>fn($d)=>Yii::$app->formatter->asCurrency(($d['qty']??1)*($d['volume']??1)*(Yii::$app->tools->reverseCurrency($d['negosiasi']))),
             'contentOptions'=>['class'=>'text-right'],
             'pageSummary' => true,
             'pageSummaryOptions' => ['class' => 'auto unitsum', 'style' => 'text-align:right;'],
@@ -109,14 +109,25 @@ if(!$negosiasi){
 </div>
 <div class="negosiasi-form">
     <?php $form = ActiveForm::begin([
-        'id'=>'negosiasi-form',
-        'enableAjaxValidation' => false,
+        'id'=>'negosiasiproduk-form',
+        'enableAjaxValidation' => true,
         'fieldConfig' => [
             'template' => "<div class='row'>{label}\n<div class='col-sm-9'>{input}\n{error}</div></div>",
             'labelOptions' => ['class' => 'col-sm-3 control-label right'],
         ],
     ]); ?>
-      <?= $form->field($model, 'negosiasi')->textInput(['placeholder'=>'Masukkan Jumlah Penawaran','type'=>'number']) ?>
+      <?= $form->field($model, 'negosiasi')->widget(\yii\widgets\MaskedInput::class, [
+        'clientOptions' => [
+            'alias' => 'numeric',
+            'groupSeparator' => '.',
+            'radixPoint' => ',',
+            'autoGroup' => true,
+            'digits' => 2,
+            'digitsOptional' => false,
+            'prefix' => 'Rp ',
+            'rightAlign' => false,
+        ],
+    ]) ?>
       <?php if($this->context->isAdmin()):?>
       <?= $form->field($negosiasi, 'pp_accept')->widget(SwitchInput::class,[
           'pluginOptions' => [
