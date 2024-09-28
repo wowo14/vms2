@@ -37,6 +37,7 @@ use yii\widgets\DetailView;
             if(!empty($model->details)){
                 $dataProviderdetails = new ActiveDataProvider([
                     'query' => PaketPengadaanDetails::find()->where(['paket_id' => $model->id]),
+                    'pagination' => false
                 ]);
                 echo GridView::widget([
                 'dataProvider' => $dataProviderdetails,
