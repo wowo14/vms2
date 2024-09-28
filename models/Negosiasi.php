@@ -13,8 +13,8 @@ class Negosiasi extends \yii\db\ActiveRecord
         return [
             [['penawaran_id', 'ammount'], 'required'],
             [['penawaran_id', 'accept','pp_accept','penyedia_accept', 'created_by'], 'integer'],
-            [['ammount'], 'number'],
-            [['created_at','detail'], 'safe'],
+            // [['ammount'], 'number'],
+            [['created_at','ammount','detail'], 'safe'],
             [['ammount'], 'validateAmmount'],
         ];
     }

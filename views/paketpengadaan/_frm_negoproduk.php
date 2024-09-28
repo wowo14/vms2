@@ -110,7 +110,7 @@ if(!$negosiasi){
 <div class="negosiasi-form">
     <?php $form = ActiveForm::begin([
         'id'=>'negosiasiproduk-form',
-        'enableAjaxValidation' => true,
+        'enableAjaxValidation' => false,
         'fieldConfig' => [
             'template' => "<div class='row'>{label}\n<div class='col-sm-9'>{input}\n{error}</div></div>",
             'labelOptions' => ['class' => 'col-sm-3 control-label right'],

@@ -16,8 +16,9 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
         return [
             [['paket_id', 'qty','volume'], 'integer'],
             [['nama_produk', 'volume', 'satuan'], 'required'],
-            [['hps_satuan','penawaran','negosiasi', 'informasi_harga'], 'number'],
+            [['hps_satuan', 'informasi_harga'], 'number'],
             [['nama_produk', 'satuan', 'durasi', 'sumber_informasi'], 'string', 'max' => 255],
+            [['penawaran','negosiasi'],'safe'],
         ];
     }
     public function attributeLabels()
