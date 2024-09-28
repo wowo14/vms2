@@ -12,20 +12,24 @@ class FilePreview extends Widget {
         $view = $this->getView();
         AppAsset::register($view, ['position' => \yii\web\View::POS_BEGIN]);
         $file = Yii::getAlias('@web/uploads/') . $this->model->{$this->attribute};
+        if (!file_exists(Yii::getAlias('@uploads/') . $this->model->{$this->attribute})) {
+            echo 'File not found';
+            return;
+        }
         $extension = pathinfo($file, PATHINFO_EXTENSION);
         if ($extension === 'pdf') {
             $containerId = md5($this->model->{$this->attribute}); // Generate unique container ID
             echo "<div id=\"$containerId\" style=\"width:100%\" height=\"600\"></div>";
             $jsScript = $this->generatePdfViewerScript($file, $containerId); // Pass container ID
             $view->registerJs($jsScript, \yii\web\View::POS_END);
-        } elseif (in_array($extension, ['jpg', 'jpeg', 'png', 'gif','avif','webp'])) {
+        } elseif (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'avif', 'webp'])) {
             echo Html::a(
-                Html::img(Url::to([$file]), array_merge(['width' => '100%', 'height' => 'auto','class'=>'img-fluid'], $this->options)),
+                Html::img(Url::to($file), array_merge(['width' => '100%', 'height' => 'auto', 'class' => 'img-fluid'], $this->options)),
                 Url::to($file),
                 ['target' => '_blank']
             );
         } else {
-            echo 'File not found / Unsupported file type';
+            echo 'Unsupported file type';
         }
     }
     private function generatePdfViewerScript($file, $containerId) {
