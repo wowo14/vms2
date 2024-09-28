@@ -18,6 +18,22 @@ $negosiasi=$negodetails[0]->paketpengadaan->penawaranpenyedia->negosiasi;
 if(!$negosiasi){
     $negosiasi=new Negosiasi();
 }
+$js=<<<JS
+$(document).ready(function() {
+function reverseCurrency(value) {
+  value = value.replace(/Rp\s?/g, "");
+  value = value.replace(/\./g, "");
+  value = value.replace(",", ".");
+  return parseFloat(value);
+}
+    $('#paketpengadaandetails-negosiasi').on('blur', function() {
+        const formattedCurrency = $(this).val();
+        const rawAmount = reverseCurrency(formattedCurrency);
+        console.log('Raw Amount:', rawAmount);
+    });
+});
+JS;
+$this->registerJs($js, yii\web\View::POS_END);
 ?>
 <table class="table table-bordered table-striped table-hover">
         <tr>

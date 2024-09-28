@@ -93,7 +93,6 @@
     vMin: "-10000000000000",
   });
   $(".auto").css("text-align", "right");
-  
 })(jQuery);
 function setupImagePreview(inputElement, imagePreviewElement, targetElement) {
   // also pdf
@@ -136,6 +135,12 @@ function setid(el, target) {
   newArr = dd.split("-");
   newArr[3] = target;
   return newArr.join("-");
+}
+function reverseCurrency(value) {
+  value = value.replace(/Rp\s?/g, "");
+  value = value.replace(/\./g, "");
+  value = value.replace(",", ".");
+  return parseFloat(value);
 }
 // Call the function with the specific elements
 // setupImagePreview($("#imageInput"), $("#imagePreview"), $("#file_akta"));
