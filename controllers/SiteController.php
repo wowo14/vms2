@@ -129,7 +129,7 @@ class SiteController extends Controller
                         break;
                 }
                 foreach ($data as $i => $account) {
-                    $out[] = ['id' => $account['id'], 'name' => $account['name']];
+                    $out[] = ['id' => $account['id'], 'name' => $account['nama']];
                     $selected = ($i == 0) ? $account['id'] : $selected;
                 }
             }

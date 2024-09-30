@@ -11,7 +11,7 @@ class Apiregion extends Widget
     private $runtimePath;
     public function __construct(){
       $this->runtimePath= Yii::getAlias('@runtime');
-      $this->regionApi='https://www.emsifa.com/api-wilayah-indonesia/api/';
+      $this->regionApi= 'https://raw.githubusercontent.com/ibnux/data-indonesia/master/';
     }
     public function curlWithCache($url,$method=null){
         return (new Tools)->curlWithCache($url,$method);
@@ -30,10 +30,10 @@ class Apiregion extends Widget
     }
     private function getEndpoint($type, $id = null){
         $endpoints = [
-            'propinsi' => 'provinces.json',
-            'kabupaten' => "regencies/$id.json",
-            'kecamatan' => "districts/$id.json",
-            'kelurahan' => "villages/$id.json",
+            'propinsi' => 'provinsi.json',
+            'kabupaten' => "kabupaten/$id.json",
+            'kecamatan' => "kecamatan/$id.json",
+            'kelurahan' => "kelurahan/$id.json",
         ];
         return $endpoints[$type] ?? '';
     }
@@ -46,7 +46,10 @@ class Apiregion extends Widget
                 $e['nama'] = @$r['nama'];
                 $e['kode_provinsi'] = @$r['provinsi'];
                 $e['kode_kabupaten'] = @$r['kota'];
-                $e['kode_kecamatan'] = @$r['kecamatan'] . '0';
+                $e['kode_kecamatan'] = @$r['kecamatan'];
+                $e['nama_provinsi']=$this->getRegionName('propinsi', $e['kode_provinsi']);
+                $e['nama_kabupaten']=$this->getRegionName('kabupaten', $e['kode_kabupaten'], $e['kode_provinsi']);
+                $e['nama_kecamatan']=$this->getRegionName('kecamatan', $e['kode_kecamatan'], $e['kode_kabupaten']);
                 $e['jk'] = @$r['jk'];
                 $e['tglLahir'] = @$r['tglLahir'];
                 return $e;
@@ -56,6 +59,12 @@ class Apiregion extends Widget
         } else {
             return (new Tools)->extractKTPInfo($nik);
         }
+    }
+    public function getRegionName($type, $code, $parentCode = null) {
+        $data = $this->getData($type, $parentCode);
+        return collect($data)->filter(
+            fn ($el) => $el['id'] == $code
+        )->pluck('nama')->first();//name
     }
     public function c1($url, $cacheDuration = 3600, $method = 'GET', $postData = null, $authUsername = null, $authPassword = null)
     {

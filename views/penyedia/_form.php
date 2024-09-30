@@ -38,7 +38,7 @@ JS;
     <?= $form->field($model, 'nama_perusahaan')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'alamat_perusahaan')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'propinsi')->widget(Select2::class, [
-        'data' => ArrayHelper::map(Yii::$app->regions->getData('propinsi'), 'id', 'name'),
+        'data' => ArrayHelper::map(Yii::$app->regions->getData('propinsi'), 'id', 'nama'),
         'options' => ['placeholder' => 'Select propinsi penyedia'],
         'pluginOptions' => [
             'allowClear' => true

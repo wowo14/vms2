@@ -55,24 +55,28 @@ trait GeneralModelsTrait {
             $r = Yii::$app->regions->getData('kabupaten', $this->propinsi);
             return collect($r)->filter(
                 fn ($el) => $el['id'] == $this->kota
-            )->pluck('name', 'id')->toArray();
+            )->pluck('nama', 'id')->toArray();
         }
     }
     public function getKabupaten() {
         if ($this->hasAttribute('propinsi') && $this->hasAttribute('kota')) {
-            return ($this->getRegionName('kabupaten', $this->kota, $this->propinsi)) ?? '';
+            return (Yii::$app->regions->getRegionName('kabupaten', $this->kota, $this->propinsi)) ?? '';
         }
     }
     public function getPropinsi() {
         if ($this->hasAttribute('propinsi')) {
-            return ($this->getRegionName('propinsi', $this->propinsi)) ?? '';
+            return (Yii::$app->regions->getRegionName('propinsi', $this->propinsi)) ?? '';
         }
     }
-    public function getRegionName($type, $code, $parentCode = null) {
-        $data = Yii::$app->regions->getData($type, $parentCode);
-        return collect($data)->filter(
-            fn ($el) => $el['id'] == $code
-        )->pluck('name')->first(); //name
+    public function getKecamatan() {
+        if ($this->hasAttribute('kode_kecamatan')) {
+        return (Yii::$app->regions->getRegionName('kecamatan', $this->kode_kecamatan, $this->kota))??'';
+        }
+    }
+    public function getKelurahan() {
+        if ($this->hasAttribute('kode_kelurahan')) {
+        return (Yii::$app->regions->getRegionName('kelurahan', $this->kode_kelurahan, $this->kode_kecamatan))??'';
+        }
     }
     public function getIncompanygrouporadmin() { // boolean
         if ($this->getIsVendor()) {
