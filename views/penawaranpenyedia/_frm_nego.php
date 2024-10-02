@@ -92,6 +92,7 @@ if(!$paketpengadaan->details):?>
             'digitsOptional' => false,
             'prefix' => 'Rp ',
             'rightAlign' => false,
+            'removeMaskOnSubmit' => true,
         ],
     ]) ?>
       <?php if($this->context->isVendor()):?>

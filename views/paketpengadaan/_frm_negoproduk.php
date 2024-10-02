@@ -142,6 +142,7 @@ $this->registerJs($js, yii\web\View::POS_END);
             'digitsOptional' => false,
             'prefix' => 'Rp ',
             'rightAlign' => false,
+            'removeMaskOnSubmit' => true,
         ],
     ]) ?>
       <?php if($this->context->isAdmin()):?>

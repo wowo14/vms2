@@ -129,6 +129,7 @@ $negodetails=PaketPengadaanDetails::where(['id' => $model->id])->all();
             'digitsOptional' => false,
             'prefix' => 'Rp ',
             'rightAlign' => false,
+            'removeMaskOnSubmit' => true,
         ],
     ]) ?>
     <?php if (!Yii::$app->request->isAjax){ ?>
