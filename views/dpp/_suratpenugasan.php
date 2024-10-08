@@ -59,7 +59,7 @@ Berdasarkan Surat Persetujuan Pengadaan Barang/Jasa :
     <tr>
         <td>Tanggal</td>
         <td>:</td>
-        <td><?=$data['tanggalpersetujuan']?></td>
+        <td><?=Yii::$app->formatter->asDate($data['tanggalpersetujuan'], 'php:d F Y')?></td>
     </tr>
     <tr>
         <td>Perihal</td>
@@ -78,7 +78,7 @@ Serta Dokumen Persiapan Pengadaan (DPP):
     <tr>
         <td>Tanggal</td>
         <td>:</td>
-        <td><?=$data['tanggaldpp']?></td>
+        <td><?=Yii::$app->formatter->asDate($data['tanggaldpp'], 'php:d F Y')?></td>
     </tr>
     <tr>
         <td>Dari Bidang/Bagian</td>

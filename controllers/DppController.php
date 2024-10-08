@@ -250,7 +250,15 @@ class DppController extends Controller {
         $pdf->cssFile = '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css';
         return $pdf->render();
     }
-    public function actionCetaklampiran(){}
+    public function actionCetaklampiran($id){
+        $dpp=$this->findModel($id);
+        $paketpengadaan=$dpp->paketpengadaan;
+        $title='Cetak Lampiran Pengadaan Paket <br>'.$paketpengadaan->nama_paket;
+        $pdf=Yii::$app->pdf;
+        $pdf->content=$this->renderPartial('_cetaklampiran', ['title'=>$title,'paketpengadaan'=>$paketpengadaan]);
+        $pdf->cssFile = '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css';
+        return $pdf->render();
+    }
     public function actionAssignadmin() {
         $request = Yii::$app->request;
         $pks = explode(',', $request->post('pks'));

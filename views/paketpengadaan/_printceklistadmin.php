@@ -87,7 +87,7 @@ CATATAN:<br>
             NIP. <?=$data['nipadmin']??''?>
         </td>
         <td width="33%" style="text-align:center">
-            Gresik, <?=date('d F Y', strtotime($model->tanggal_paket??date('Y-m-d')))?>,<br>
+            Gresik, <?=Yii::$app->formatter->asDate(($model->tanggal_paket??date('Y-m-d')),'php:l, d F Y')?>,<br>
             Yang Menyerahkan,<br>
             <br>
             <br>

@@ -65,7 +65,7 @@ Kesimpulan:<br>
     <tr>
         <td width="33%"></td>
         <td width="33%"></td>
-        <td style="text-align: center;" width="33%">Gresik, <?= date('d F Y', strtotime($model->created_at??'')) ?><br>
+        <td style="text-align: center;" width="33%">Gresik, <?= Yii::$app->formatter->asDate(($model->created_at??date('Y-m-d')),'php:d F Y') ?><br>
             (Pejabat Pengadaan Barang/Jasa)
             <br>
             <br>
@@ -91,7 +91,7 @@ Tanggapan PPK atas dikembalikan DPP :<br>
             <u>( <?= $model->pejabat->nama??'' ?> )</u><br>
             NIP. <?= $model->pejabat->nip??'' ?>
         </td>
-        <td width="50%" style="text-align:center">Gresik, <?= ($template->tgl_dikembalikan!=="" || $template->tgl_dikembalikan!==null) ? date('d F Y', strtotime($template->tgl_dikembalikan??'0 days')) : ' ...... ' ?><br>
+        <td width="50%" style="text-align:center">Gresik, <?= ($template->tgl_dikembalikan!=="" || $template->tgl_dikembalikan!==null) ? Yii::$app->formatter->asDate(($template->tgl_dikembalikan??date('Y-m-d')),'php:d F Y') : ' ...... ' ?><br>
             (Pejabat Pembuat Komitmen)<br>
             <br>
             <br>
