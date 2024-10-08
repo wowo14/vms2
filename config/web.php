@@ -133,6 +133,7 @@ $config = [
             'decimalSeparator' => ',',
             'thousandSeparator' => '.',
             'currencyCode' => 'IDR',
+            'timeZone' => 'Asia/Jakarta',
         ],
         'messageformater' => [
             'class' => 'yii\i18n\MessageFormatter',

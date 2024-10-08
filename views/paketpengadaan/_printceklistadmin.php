@@ -16,7 +16,14 @@ use yii\helpers\{Html};
     </tr>
 </table>
 <hr>
-<h5 style="text-align: center;">CHECK LIST DOKUMEN KELENGKAPAN DPP</h5>
+<table border='0' width="100%">
+    <tr>
+        <td style="text-align:center">
+            <h4 style="text-align: center;">CHECK LIST DOKUMEN KELENGKAPAN DPP</h4>
+    </td>
+    </tr>
+</table>
+<br>
 <table width="100%">
     <tr>
         <td width="35%">Bidang / Bagian</td>
@@ -56,7 +63,6 @@ use yii\helpers\{Html};
 CATATAN:<br>
 *) Paket akan diproses setelah berkas lengkap
 <br>
-
 <table border='0' width="100%">
     <tr>
         <td width="33%" style="text-align:center">

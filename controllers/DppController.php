@@ -156,6 +156,101 @@ class DppController extends Controller {
            return $result = $anotherController->actionCreate($iddpp=$id);
         }
     }
+    public function actionCombinedreport($id){
+        $dpp = $this->findModel($id);
+        $model = $dpp->paketpengadaan;
+        $chief = \app\models\Pegawai::findOne($dpp::profile('kepalapengadaan'));
+        $dataCeklist = [
+            'unit' => Unit::findOne(json_decode($model->addition, true)['unit'] ?? $model->unit)->unit ?? '',
+            'paket' => $model->nama_paket ?? '',
+            'details' => collect(json_decode($model->addition, true)['template'])->map(function ($e) {
+                $e['sesuai'] = isset($e['sesuai']) && $e['sesuai'] == 1 ? 'Ya' : 'Tidak';
+                return $e;
+            })->toArray(),
+            'logogresik' => Yii::getAlias('@webroot/images/logogresik.png', true),
+            'logors' => Yii::getAlias('@webroot/images/logors.png', true),
+            'kepalapengadaan' => $chief->nama ?? '',
+            'nipkepalapengadaan' => $chief->nip ?? '',
+            'admin' => $dpp->staffadmin->nama ?? '',
+            'nipadmin' => $dpp->staffadmin->nip ?? '',
+            'kurir' => $model->kurirnya->nama ?? '',
+            'nipkurir' => $model->kurirnya->nip ?? '',
+        ];
+        $content1 = $this->renderPartial('/paketpengadaan/_printceklistadmin', [
+            'data' => $dataCeklist,
+            'model' => $model,
+            'title' => 'Ceklist Kelengkapan DPP'
+        ]);
+        // Data for second report (Cetak Penugasan)
+        $penugasan = $dpp->penugasan;
+        $paketpengadaan = $dpp->paketpengadaan;
+        $dataPenugasan = [
+            'nomor_tugas' => $penugasan->nomor_tugas ?? '',
+            'nomorpersetujuan' => $paketpengadaan->nomor_persetujuan ?? '',
+            'tanggalpersetujuan' => $paketpengadaan->tanggal_persetujuan ?? '',
+            'perihal' => $paketpengadaan->nama_paket ?? '',
+            'nomordpp' => $paketpengadaan->nomor ?? '',
+            'tanggaldpp' => $paketpengadaan->tanggal_dpp ?? '',
+            'bidang' => $paketpengadaan->unitnya->unit ?? '',
+            'paketpengadaan' => $paketpengadaan->nama_paket ?? '',
+            'logogresik' => Yii::getAlias('@webroot/images/logogresik.png', true),
+            'logors' =>Yii::getAlias('@webroot/images/logors.png', true),
+            'kepalapengadaan' => $chief->nama ?? '',
+            'nipkepalapengadaan' => $chief->nip ?? '',
+            'admin' => $dpp->staffadmin->nama ?? '',
+            'pejabat' => $dpp->pejabat->nama ?? ''
+        ];
+        $content2 = $this->renderPartial('_suratpenugasan', [
+            'data' => $dataPenugasan,
+            'model' => $dpp
+        ]);
+        $pdf = Yii::$app->pdf;
+        $pdf->orientation = 'L';  // Landscape orientation
+         $combinedContent = "
+            <table style='width:100%;'>
+                <tr>
+                    <td style='width:50%; vertical-align:top;'>
+                        $content2
+                    </td>
+                    <td style='width:50%; vertical-align:top;'>
+                        $content1
+                    </td>
+                </tr>
+            </table>
+        ";
+        $pdf->content = $combinedContent;
+        $pdf->cssFile = '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css';
+        // Render the final PDF
+        return $pdf->render();
+    }
+    public function actionCetakpenugasan($id){
+        $dpp=$this->findModel($id);
+        $penugasan=$dpp->penugasan;
+        $paketpengadaan=$dpp->paketpengadaan;
+        $chief=\app\models\Pegawai::findOne($dpp::profile('kepalapengadaan'));
+        $data=[
+            'nomor_tugas'=>$penugasan->nomor_tugas??'',
+            'nomorpersetujuan'=>$paketpengadaan->nomor_persetujuan??'',
+            'tanggalpersetujuan'=>$paketpengadaan->tanggal_persetujuan??'',
+            'perihal'=>$paketpengadaan->nama_paket??'',
+            'nomordpp'=>$paketpengadaan->nomor??'',
+            'tanggaldpp'=>$paketpengadaan->tanggal_dpp??'',
+            'bidang'=>$paketpengadaan->unitnya->unit??'',
+            'paketpengadaan'=>$paketpengadaan->nama_paket??'',
+            'logogresik'=>Yii::getAlias('@webroot/images/logogresik.png', true),
+            'logors'=>Yii::getAlias('@webroot/images/logors.png', true),
+            'kepalapengadaan'=>$chief->nama??'',
+            'nipkepalapengadaan'=>$chief->nip??'',
+            'admin'=>$dpp->staffadmin->nama??'',
+            'pejabat'=>$dpp->pejabat->nama??'',
+        ];
+        $cetakan=$this->renderPartial('_suratpenugasan', ['data'=>$data,'model'=>$dpp]);
+        $pdf=Yii::$app->pdf;
+        $pdf->content=$cetakan;
+        $pdf->cssFile = '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css';
+        return $pdf->render();
+    }
+    public function actionCetaklampiran(){}
     public function actionAssignadmin() {
         $request = Yii::$app->request;
         $pks = explode(',', $request->post('pks'));

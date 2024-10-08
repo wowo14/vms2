@@ -77,7 +77,7 @@ return [
         'class' => 'kartik\grid\ActionColumn',
         'dropdown' => false,
         'noWrap' => 'true',
-        'template' => '{reject} {approve} {ceklistadmin} {printceklistadmin} {formreview} {reviewdpp} {view} {update} {delete}',
+        'template' => '{reject} {approve} {ceklistadmin} {printceklistadmin} {formreview} {reviewdpp} {cetakpenugasan} {cetaklampiran} {view} {update} {delete}',
         'vAlign' => 'middle',
         'contentOptions'=>function ($model, $key, $index, $column) {
             if (isset($model->paketpengadaan) && $model->paketpengadaan->pemenang) {
@@ -112,13 +112,20 @@ return [
             }
         ],
         'buttons' => [
-            // 'penugasan' => function ($url, $model, $key) {
-            //     return Html::a(
-            //         '<span class="fa fa-flag"></span>',
-            //         $url,
-            //         ['class' => 'btn btn-sm btn-outline-info', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote', 'title' => 'Penugasan', 'data-toggle' => 'tooltip']
-            //     );
-            // },
+            'cetakpenugasan' => function ($url, $model, $key) {
+                return Html::a(
+                    '<span class="fa fa-print"></span>',
+                    $url,
+                    ['class' => 'btn btn-sm btn-outline-info', 'data-pjax' => 0, 'title' => 'Penugasan', 'data-toggle' => 'tooltip']
+                );
+            },
+            'cetaklampiran'=>function($url,$model,$key){
+                return Html::a(
+                    '<span class="fa fa-print"></span>',
+                    $url,
+                    ['class' => 'btn btn-sm btn-outline-info', 'data-pjax' => 0, 'title' => 'Cetak Lampiran', 'data-toggle' => 'tooltip']
+                );
+            },
             'approve' => function ($url, $model, $key) {
                 return Html::a(
                     '<span class="fa fa-check-double"></span>',
