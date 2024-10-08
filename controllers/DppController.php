@@ -156,7 +156,7 @@ class DppController extends Controller {
            return $result = $anotherController->actionCreate($iddpp=$id);
         }
     }
-    public function actionCombinedreport($id){
+    public function actionCetakpenugasan($id){
         $dpp = $this->findModel($id);
         $model = $dpp->paketpengadaan;
         $chief = \app\models\Pegawai::findOne($dpp::profile('kepalapengadaan'));
@@ -223,7 +223,7 @@ class DppController extends Controller {
         // Render the final PDF
         return $pdf->render();
     }
-    public function actionCetakpenugasan($id){
+    public function actionCetakpenugasanold($id){
         $dpp=$this->findModel($id);
         $penugasan=$dpp->penugasan;
         $paketpengadaan=$dpp->paketpengadaan;
