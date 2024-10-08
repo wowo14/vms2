@@ -5,13 +5,14 @@ use yii\helpers\{Html};
 <table style="width: 100%; font-size: 14px; text-align: center; font-weight: bold;">
     <tr>
         <td style="width: 15%;">
-            <?= Html::img($data['logogresik'], ['width' => '77px']) ?>
+            <?= Html::img($data['logors'], ['width' => '77px']) ?>
         </td>
         <td><?= $model::profile('dinas') ?> KABUPATEN GRESIK <br>
             <p><?= $model::profile('address') ?></p>
         </td>
-        <td style="width: 15%;">
-            <?= Html::img($data['logors'], ['width' => '77px']) ?>
+        <td style="width: 15%;text-align:right">
+            <?php  echo 'FM-437.76.92.09<br>Revisi : 00';
+            //Html::img($data['logors'], ['width' => '77px']) ?>
         </td>
     </tr>
 </table>
