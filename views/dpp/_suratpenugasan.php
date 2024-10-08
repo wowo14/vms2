@@ -10,7 +10,7 @@ use yii\helpers\{Html};
         <td><?= $model::profile('dinas') ?> KABUPATEN GRESIK <br>
             <p><?= $model::profile('address') ?></p>
         </td>
-        <td style="width: 15%;text-align:right">
+        <td style="width: 20%;text-align:right">
             <?php  echo 'FM-437.76.92.09<br>Revisi : 00';
             //Html::img($data['logors'], ['width' => '77px']) ?>
         </td>
