@@ -253,9 +253,15 @@ class DppController extends Controller {
     public function actionCetaklampiran($id){
         $dpp=$this->findModel($id);
         $paketpengadaan=$dpp->paketpengadaan;
-        $title='Cetak Lampiran Pengadaan Paket <br>'.$paketpengadaan->nama_paket;
         $pdf=Yii::$app->pdf;
-        $pdf->content=$this->renderPartial('_cetaklampiran', ['title'=>$title,'paketpengadaan'=>$paketpengadaan]);
+        $pdf->marginTop=2;
+        $pdf->marginBottom=2;
+        $pdf->marginHeader=2;
+        $pdf->marginFooter=2;
+        $pdf->marginLeft=2;
+        $pdf->marginRight=2;
+        $pdf->format='A4';
+        $pdf->content=$this->renderPartial('_cetaklampiran', ['paketpengadaan'=>$paketpengadaan]);
         $pdf->cssFile = '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css';
         return $pdf->render();
     }
