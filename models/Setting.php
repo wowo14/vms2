@@ -11,7 +11,8 @@ class Setting extends \yii\db\ActiveRecord {
         return [
             [['type', 'active'], 'required'],
             [['active'], 'integer'],
-            [['type', 'param', 'value'], 'string', 'max' => 255],
+            [['type', 'param'], 'string', 'max' => 255],
+            [['value'],'safe'],
         ];
     }
     public function attributeLabels() {

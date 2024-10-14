@@ -14,7 +14,7 @@ use yii\helpers\Html;
     ]); ?>
     <?= $form->field($model, 'type')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'param')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'value')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'value')->textArea() ?>
     <?= $form->field($model, 'active')->widget(SwitchInput::class, [
         'pluginOptions' => ['size' => 'mini'],
     ]); ?>

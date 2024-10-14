@@ -1,5 +1,6 @@
 <?php
 namespace app\controllers;
+use app\models\PenilaianPenyedia;
 use app\models\{Setting,Negosiasi,PenugasanPemilihanpenyedia,Unit,HistoriReject,ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails, PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia};
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -657,6 +658,71 @@ class DppController extends Controller {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
+        }
+    }
+    public function actionPenilaianppk($id){
+        $dpp=$this->findModel($id);
+        $paketpengadaan=$dpp->paketpengadaan;
+        $penilaian=PenilaianPenyedia::last(['dpp_id'=>$dpp->id])??new PenilaianPenyedia();
+        $request = Yii::$app->request;
+        $template = collect($penilaian::settingType('penilaian_ppk'))
+        ->flatMap(function($r){
+            return json_decode($r['value'],true);
+        })
+        ->groupBy('kategori')->map(function ($group)use($penilaian) {
+            return [
+                'kategori' => $group->first()['kategori'],
+                'bobot' => $group->first()['bobot'],
+                'description' => $group->pluck('description')->flatten()->toArray(),
+                'skor'=>($penilaian->dpp)?json_decode($penilaian->details,true)['skor']:10,
+                'nilaikinerja'=>($penilaian->dpp)?json_decode($penilaian->details,true)['nilaikinerja']:10,
+            ];
+        })->values();
+        // if($request->isAjax){
+        //     Yii::$app->response->format = Response::FORMAT_JSON;
+        // }
+        if($penilaian->load($request->post())){
+            $nilai=[
+                'bobot'=>$_POST['bobot'],
+                'skor'=>$_POST['skor'],
+                'nilaikinerja'=>$_POST['nilaikinerja'],
+                'total'=>round(array_sum($_POST['nilaikinerja']),2,PHP_ROUND_HALF_UP),
+            ];
+            $penilaian->dpp_id=$dpp->id;
+            $penilaian->details=json_encode($nilai);
+            if(!$penilaian->save()){
+                Yii::error(json_encode($penilaian->getErrors()));
+            }else{
+                Yii::$app->session->setFlash('success', 'Penilaian Berhasil');
+                return $this->redirect('index');
+            }
+        }else{
+            if($penilaian->dpp){
+                $penilaian=PenilaianPenyedia::where(['dpp_id'=>$dpp->id])->one();
+            }else{
+                $penilaian->attributes=[
+                    'unit_kerja'=>$dpp::profile('dinas'),
+                    'dpp_id'=>$dpp->id,
+                    'nama_perusahaan'=>$paketpengadaan->penawaranpenyedia->vendor->nama_perusahaan,
+                    'alamat_perusahaan'=>$paketpengadaan->penawaranpenyedia->vendor->alamat_perusahaan,
+                    'paket_pekerjaan'=>$paketpengadaan->nama_paket,
+                    'lokasi_pekerjaan'=>$dpp::profile('dinas'),
+                    'nilai_kontrak' => $this->actionListpemenang(['paket_pengadaan_id'=>$paketpengadaan->id])[0]['nilai_penawaran'],
+                    'nomor_kontrak' => $dpp->nomor_dpp,
+                    'tanggal_kontrak' => $dpp->tanggal_dpp,
+                    'jangka_waktu' => $penilaian->jangka_waktu??'',
+                    'metode_pemilihan' => $paketpengadaan->metode_pengadaan,
+                    'details' => $penilaian->details??[],
+                    'pengguna_anggaran' => 'Pengguna Anggaran',
+                    'pejabat_pembuat_komitmen' => $paketpengadaan->pejabatppkom->nama,
+                ];
+            }
+            return $this->render('_frm_penilaianppk',[
+                'dpp'=>$dpp,
+                'paketpengadaan'=>$paketpengadaan,
+                'penilaian'=>$penilaian,
+                'template'=>$template,
+            ]);
         }
     }
 }
