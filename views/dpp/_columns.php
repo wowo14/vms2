@@ -92,6 +92,9 @@ return [
             // 'penugasan'=>function($d){
             //     return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             // },
+            'approve'=>function($d){
+                return isset($d->is_approved) && !$d->paketpengadaan->pemenang;
+            },
             'delete'=>function($d){
                 return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
