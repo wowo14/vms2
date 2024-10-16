@@ -75,8 +75,8 @@ return [
     ],
     [
         'class' => 'kartik\grid\ActionColumn',
-        'dropdown' => false,
-        'noWrap' => 'true',
+        'dropdown' => true,
+        'noWrap' => 'false',
         'template' => '{reject} {approve} {ceklistadmin} {printceklistadmin} {formreview} {reviewdpp} {cetakpenugasan} {cetaklampiran} {view} {update} {delete}',
         'vAlign' => 'middle',
         'contentOptions'=>function ($model, $key, $index, $column) {
@@ -167,17 +167,46 @@ return [
                     ['class' => 'btn btn-sm btn-outline-info', 'data-pjax' => 0, 'title' => 'Cetak reviewdpp', 'data-toggle' => 'tooltip']
                 );
             },
+            'view' => function ($url, $model, $key)use($idmodal) {
+                return Html::a(
+                    '<span class="fa fa-eye"></span>',
+                    $url,
+                    ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success']
+                );
+            },
+            'update' => function ($url, $model, $key)use($idmodal) {
+                return Html::a(
+                    '<span class="fa fa-pencil-alt"></span>',
+                    $url,
+                    ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Update'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-primary'],
+                );
+            },
+            'delete' => function ($url, $model, $key)use($idmodal) {
+                return Html::a(
+                    '<span class="fa fa-trash"></span>',
+                    $url,
+                    [
+                        'role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Delete'), 'class' => 'btn btn-sm btn-outline-danger',
+                        'data-confirm' => false, 'data-target' => '#' . $idmodal,
+                        'data-method' => false, // for overide yii data api
+                        'data-request-method' => 'post',
+                        'data-toggle' => 'tooltip',
+                        'data-confirm-title' => Yii::t('yii2-ajaxcrud', 'Delete'),
+                        'data-confirm-message' => Yii::t('yii2-ajaxcrud', 'Delete Confirm')
+                    ],
+                );
+            },
         ],
-        'viewOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success'],
-        'updateOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Update'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-primary'],
-        'deleteOptions' => [
-            'role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Delete'), 'class' => 'btn btn-sm btn-outline-danger',
-            'data-confirm' => false, 'data-target' => '#' . $idmodal,
-            'data-method' => false, // for overide yii data api
-            'data-request-method' => 'post',
-            'data-toggle' => 'tooltip',
-            'data-confirm-title' => Yii::t('yii2-ajaxcrud', 'Delete'),
-            'data-confirm-message' => Yii::t('yii2-ajaxcrud', 'Delete Confirm')
-        ],
+        // 'viewOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success'],
+        // 'updateOptions' => ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Update'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-primary'],
+        // 'deleteOptions' => [
+        //     'role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Delete'), 'class' => 'btn btn-sm btn-outline-danger',
+        //     'data-confirm' => false, 'data-target' => '#' . $idmodal,
+        //     'data-method' => false, // for overide yii data api
+        //     'data-request-method' => 'post',
+        //     'data-toggle' => 'tooltip',
+        //     'data-confirm-title' => Yii::t('yii2-ajaxcrud', 'Delete'),
+        //     'data-confirm-message' => Yii::t('yii2-ajaxcrud', 'Delete Confirm')
+        // ],
     ],
 ];
