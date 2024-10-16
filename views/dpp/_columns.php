@@ -68,11 +68,11 @@ return [
         'attribute' => 'admin_pengadaan',
         'value' => fn ($d) => $d->staffadmin->nama ?? ''
     ],
-    [
-        'class' => '\kartik\grid\DataColumn',
-        'attribute' => 'kode',
-        'value' => fn ($d) => $d->kode ?? ''
-    ],
+    // [
+    //     'class' => '\kartik\grid\DataColumn',
+    //     'attribute' => 'kode',
+    //     'value' => fn ($d) => $d->kode ?? ''
+    // ],
     [
         'class' => 'kartik\grid\ActionColumn',
         'dropdown' => true,
