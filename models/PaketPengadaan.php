@@ -11,11 +11,11 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     }
     public function rules() {
         return [
-            [['nomor', 'tanggal_paket','tanggal_dpp','tanggal_persetujuan','nomor_persetujuan', 'nama_paket','tahun_anggaran','kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom','unit','pagu','metode_pengadaan','kategori_pengadaan'], 'required'],
-            [['tanggal_paket','tanggal_reject', 'alasan_reject','addition'], 'string'],
+            [['nomor', 'tanggal_paket', 'tanggal_dpp', 'tanggal_persetujuan', 'nomor_persetujuan', 'nama_paket', 'tahun_anggaran', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'unit', 'pagu', 'metode_pengadaan', 'kategori_pengadaan'], 'required'],
+            [['tanggal_paket', 'tanggal_reject', 'alasan_reject', 'addition'], 'string'],
             [['pagu'], 'number'],
             [['nama_paket'], 'unique'],
-            [['created_by', 'tahun_anggaran', 'approval_by','unit'], 'integer'],
+            [['created_by', 'admin_ppkom', 'tahun_anggaran', 'approval_by', 'unit'], 'integer'],
             [['nomor', 'kategori_pengadaan', 'nama_paket', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'metode_pengadaan'], 'string', 'max' => 255],
         ];
     }
@@ -23,7 +23,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         return [
             'id' => 'ID',
             'nomor' => 'Nomor DPP',
-            'nomor_persetujuan'=>'Nomor Persetujuan',
+            'nomor_persetujuan' => 'Nomor Persetujuan',
             'tanggal_dpp' => 'Tanggal DPP',
             'tanggal_persetujuan' => 'Tanggal Persetujuan',
             'tanggal_paket' => 'Tanggal Paket',
@@ -32,6 +32,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             'kode_kegiatan' => 'Kode Kegiatan',
             'kode_rekening' => 'Kode Rekening',
             'ppkom' => 'Ppkom',
+            'admin_ppkom' => 'Admin Ppkom',
             'pagu' => 'Pagu Paket',
             'metode_pengadaan' => 'Metode Pengadaan', //EPL,PL,E-Purchasing,
             'kategori_pengadaan' => 'Kategori Pengadaan', //barang/jasa, konstruksi, konsultansi
@@ -40,8 +41,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             'approval_by' => 'Approval By', //null->belom,ditolak oleh ,<>0->diterima oleh
             'alasan_reject' => 'Alasan Reject', //not null ditolak
             'tanggal_reject' => 'Tanggal Reject', //not null ditolak
-            'pemenang'=>'Pemenang', // id vendor pemenang
-            'addition'=>'Addition', // kolom tambahan
+            'pemenang' => 'Pemenang', // id vendor pemenang
+            'addition' => 'Addition', // kolom tambahan
             'unit' => 'Unit_Bidang_Bagian',
         ];
     }
@@ -54,11 +55,11 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     public function getDetails() {
         return $this->hasMany(PaketPengadaanDetails::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_paketpengadaandetails'));
     }
-    public function getUnitnya(){
+    public function getUnitnya() {
         return $this->hasOne(Unit::class, ['id' => 'unit'])->cache(self::cachetime(), self::settagdep('tag_unit'));
     }
-    public function getKurirnya(){
-        return $this->hasOne(Pegawai::class,['id_user'=>'created_by'])->cache(self::cachetime(), self::settagdep('tag_pegawai'));
+    public function getKurirnya() {
+        return $this->hasOne(Pegawai::class, ['id_user' => 'created_by'])->cache(self::cachetime(), self::settagdep('tag_pegawai'));
     }
     public function getAttachments() {
         return $this->hasMany(Attachment::class, ['user_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_attachment'));
@@ -72,7 +73,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     public function getSubmitedpenawaran() {
         return $this->hasMany(PenawaranPengadaan::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_penawaranpengadaan'));
     }
-    public function getPenawaranpenyedia(){
+    public function getPenawaranpenyedia() {
         return $this->hasOne(PenawaranPengadaan::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_penawaranpengadaan'));
     }
     public function getPejabatppkom() {
@@ -87,57 +88,76 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     public function getRekeningnya() {
         return $this->hasOne(KodeRekening::class, ['kode' => 'kode_rekening'])->cache(self::cachetime(), self::settagdep('tag_koderekening'));
     }
-    public function getHistorireject(){
+    public function getHistorireject() {
         return $this->hasOne(HistoriReject::class, ['paket_id' => 'id'])->orderBy(['id' => SORT_DESC])->cache(self::cachetime(), self::settagdep('tag_historireject'));
     }
-    public function getHistorirejects(){
+    public function getHistorirejects() {
         return $this->hasMany(HistoriReject::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_historireject'));
     }
-    public static function Dashboard(){
+    public static function Dashboard() {
         return self::where(['not', ['paket_pengadaan.id' => null]])
-            ->joinWith(['dpp d','details pd','penawaranpenyedia.negosiasi n', 'dpp.pejabat p', 'dpp.staffadmin s', 'dpp.unit u'])
+            ->joinWith(['dpp d', 'details pd', 'penawaranpenyedia.negosiasi n', 'pejabatppkom ppkom', 'dpp.pejabat p', 'dpp.staffadmin s', 'dpp.unit u'])
             ->select([
                 new Expression("strftime('%Y', paket_pengadaan.tanggal_paket) as year"),
                 new Expression("strftime('%m', paket_pengadaan.tanggal_paket) as month"),
+                'paket_pengadaan.nama_paket',
                 'paket_pengadaan.metode_pengadaan',
                 'paket_pengadaan.kategori_pengadaan',
                 'paket_pengadaan.pagu',
                 'p.nama as pejabat_pengadaan',
                 's.nama as admin_pengadaan',
+                'ppkom.nama as pejabat_ppkom',
                 'u.unit as bidang_bagian',
                 new Expression("COALESCE(n.ammount, 0) AS hasilnego"),
                 new Expression("COALESCE(SUM(pd.hps_satuan), 0) AS hps"),
                 'paket_pengadaan.pemenang'
             ])
             ->andWhere(['not', ['d.bidang_bagian' => null]])
-            ->orWhere(['n.penyedia_accept' => 1,'n.pp_accept'=>1])
-            ->groupBy(['year','month','paket_pengadaan.id'])
-            ->orderBy('year','id')
+            // ->orWhere(['n.penyedia_accept' => 1,'n.pp_accept'=>1])
+            ->groupBy(['year', 'month', 'paket_pengadaan.id'])
+            ->orderBy('year', 'id')
             ->asArray()
             ->all();
     }
-    public static function notifpaketbaru(){
-        return self::where(['not',['paket_pengadaan.id'=>null]])
-        ->joinWith('dpp d')
-        ->andWhere(['is','d.paket_id',null])
-        ->orderBy('id','desc')
-        ->asArray()->all();
+    public static function notifpaketbaru() {
+        return self::where(['not', ['paket_pengadaan.id' => null]])
+            ->joinWith('dpp d')
+            ->andWhere(['is', 'd.paket_id', null])
+            ->orderBy('id', 'desc')
+            ->asArray()->all();
     }
-    public function groupedData($field, $collection) {// part of dashboard
+    public function groupedData($field, $collection) { // part of dashboard
         return $collection->groupBy(function ($item) use ($field) {
             return $item['year'] . '#' . $item[$field];
         })
-        ->map(function ($group, $key) use ($field) {
-            list($year, $value) = explode('#', $key);
-            return [
-                'year' => $year,
-                $field => $value,
-                'jml' => $group->count(),
-                'ammount' => $group->sum('pagu'),
-            ];
+            ->map(function ($group, $key) use ($field) {
+                list($year, $value) = explode('#', $key);
+                return [
+                    'year' => $year,
+                    $field => $value,
+                    'jml' => $group->count(),
+                    'ammount' => $group->sum('pagu'),
+                ];
+            })
+            ->values()
+            ->toArray();
+    }
+    public function groupedDataBymonth($field, $collection) { // part of dashboard
+        return $collection->groupBy(function ($item) use ($field) {
+            //filter grab year and month
+            // return $item['year'] . '#' . $item[$field];
         })
-        ->values()
-        ->toArray();
+            ->map(function ($group, $key) use ($field) {
+                list($year, $value) = explode('#', $key);
+                return [
+                    'year' => $year,
+                    $field => $value,
+                    'jml' => $group->count(),
+                    'ammount' => $group->sum('pagu'),
+                ];
+            })
+            ->values()
+            ->toArray();
     }
     public function afterFind() {
         $this->oldrecord = clone $this;
@@ -153,7 +173,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             }
             $hasil = [];
             $template = TemplateChecklistEvaluasi::where(['like', 'template', 'Ceklist_Kelengkapan_DPP'])->one();
-            if($template){
+            if ($template) {
                 if ($template->element) {
                     $ar_element = explode(',', $template->element);
                 }
@@ -168,12 +188,72 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
                     }
                     $hasil['template'][] = $c;
                 }
-                $this->addition=json_encode($hasil);
+                $this->addition = json_encode($hasil);
             }
-        } else {//update
+        } else { //update
         }
         self::invalidatecache('tag_' . self::getModelname());
         Dpp::invalidatecache('tag_' . Dpp::getModelname());
         return parent::beforeSave($insert);
+    }
+    public function getrawData() {
+        return collect(self::where(['not', ['paket_pengadaan.id' => null]])
+            ->joinWith(['dpp d', 'details pd', 'penawaranpenyedia.negosiasi n', 'pejabatppkom ppkom', 'dpp.pejabat p', 'dpp.staffadmin s', 'dpp.unit u'])
+            ->select([
+                new Expression("strftime('%Y', paket_pengadaan.tanggal_paket) as year"),
+                new Expression("strftime('%m', paket_pengadaan.tanggal_paket) as month"),
+                'paket_pengadaan.nama_paket',
+                'paket_pengadaan.metode_pengadaan',
+                'paket_pengadaan.kategori_pengadaan',
+                'paket_pengadaan.pagu',
+                'p.nama as pejabat_pengadaan',
+                's.nama as admin_pengadaan',
+                'ppkom.nama as pejabat_ppkom',
+                'u.unit as bidang_bagian',
+                new Expression("COALESCE(n.ammount, 0) AS hasilnego"),
+                new Expression("COALESCE(SUM(pd.hps_satuan), 0) AS hps"),
+                'paket_pengadaan.pemenang'
+            ])
+            ->andWhere(['not', ['d.bidang_bagian' => null]])
+            ->groupBy(['paket_pengadaan.id'])
+            ->orderBy('paket_pengadaan.id')
+            ->asArray()
+            ->all());
+    }
+    private function getMonths() {
+        return range(1, 12);
+    }
+    public function byMetode() {
+        $data = $this->getrawData();
+        // $months = $this->getMonths();
+        // $metodePengadaanTypes = self::optionmetodepengadaan();
+        $months = $data->pluck('month')->unique()->sort()->values();
+        $metodePengadaanTypes = $data->pluck('metode_pengadaan')->unique()->sort()->values();
+        $groupedData = $data->groupBy('pejabat_pengadaan');
+        $pivotTable = $groupedData->map(function ($rows, $adminName) use ($months, $metodePengadaanTypes) {
+            $row = ['name' => $adminName, 'total' => 0];
+            foreach ($months as $month) {
+                $monthData = $rows->where('month', $month);
+                foreach ($metodePengadaanTypes as $metode) {
+                    $count = $monthData->where('metode_pengadaan', $metode)->count();
+                    $row[$month][$metode] = $count;
+                    $row['total'] += $count;
+                }
+            }
+            return $row;
+        });
+        // Calculate total row
+        $totalRow = ['name' => 'Total', 'total' => 0];
+        foreach ($months as $month) {
+            foreach ($metodePengadaanTypes as $metode) {
+                $totalRow[$month][$metode] = $pivotTable->sum(function ($row) use ($month, $metode) {
+                    return $row[$month][$metode] ?? 0;
+                });
+                $totalRow['total'] += $totalRow[$month][$metode];
+            }
+        }
+        $pivotTable->put('Total', $totalRow);
+        Yii::error(json_encode($metodePengadaanTypes));
+        return ['months' => $months, 'metodePengadaanTypes' => $metodePengadaanTypes, 'pivotTable' => $pivotTable];
     }
 }

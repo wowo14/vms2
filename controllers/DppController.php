@@ -210,16 +210,18 @@ class DppController extends Controller {
          $combinedContent = "
             <table style='width:100%;'>
                 <tr>
-                    <td style='width:50%; vertical-align:top;'>
+                    <td style='width:50%; vertical-align:top;padding:20px;'>
                         $content2
                     </td>
-                    <td style='width:50%; vertical-align:top;'>
+                    <td style='width:50%; vertical-align:top;padding:20px;'>
                         $content1
                     </td>
                 </tr>
             </table>
         ";
         $pdf->content = $combinedContent;
+        $pdf->marginLeft=0;
+        $pdf->marginRight=0;
         $pdf->cssFile = '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css';
         // Render the final PDF
         return $pdf->render();

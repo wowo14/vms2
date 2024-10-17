@@ -185,6 +185,12 @@ $datakodeprogram = $model->isNewRecord ? \app\models\ProgramKegiatan::optionprog
             'placeholder' => 'Pilih PPKom',
         ]
     ]) ?>
+    <?= $form->field($model, 'admin_ppkom')->widget(Select2::class, [
+        'data' => $model::optionadminppkom(),
+        'options' => [
+            'placeholder' => 'Pilih PPKom',
+        ]
+    ]) ?>
     <?= $form->field($model, 'pagu')->textInput() ?>
     <?= $form->field($model, 'metode_pengadaan')->widget(Select2::class, [
         'data' => $model::optionmetodepengadaan(),

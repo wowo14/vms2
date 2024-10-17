@@ -17,18 +17,8 @@ use yii\console\Controller;
 use yii\db\Expression;
 class HelloController extends Controller {
     public function actionHitung() { // hitung pada paket pengadaan mana?
-        $r = ValidasiKualifikasiPenyedia::getCalculated(1);
-        $r = collect($r)->where('penyedia_id', 1)->where('paket_pengadaan_id', 1)->first();
-        $templates = TemplateChecklistEvaluasi::where(['like', 'template', 'ceklist_evaluasi'])->andWhere(['!=', 'template', 'Ceklist_Evaluasi_Kesimpulan'])->asArray()->all();
-        $arTemplate = collect($templates)->pluck('id')->toArray();
-        $ar1 = $r['templates'];
-        $ar1 = (explode(',', $ar1));
-        sort($ar1, SORT_NUMERIC);
-        $ar_difference = array_diff($arTemplate, $ar1);
-        print_r($ar1);
-        print_r($ar_difference);
-        print_r($arTemplate);
-        // echo in_array($ar1[3], $arTemplate)?'ada '. $ar1[3]:'';
+        $r =(new PaketPengadaan)->byMetode();
+        print_r($r);
     }
     public function actionIndex() {
         echo "\n";

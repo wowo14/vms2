@@ -111,6 +111,9 @@ trait GeneralModelsTrait {
     public static function optionppkom() {
         return collect(Pegawai::where('id_user<>""')->all())->where('hak_akses', 'PPK')->pluck('nama', 'id')->toArray();
     }
+    public static function optionadminppkom() {
+        return collect(Pegawai::where('id_user<>""')->all())->where('hak_akses', 'staffAdmin')->pluck('nama', 'id')->toArray();
+    }
     public static function formassignpetugas($pks = null) {
         $optpetugas = self::getAllpetugas();
         $msg = '<form action="/dpp/assign" method="post">';
