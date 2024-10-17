@@ -23,8 +23,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'pjax' => true,
             'columns' => require(__DIR__ . '/_columns.php'),
             'rowOptions' => function ($model) {
-                if (isset($model->paketpengadaan) && $model->paketpengadaan->pemenang) {
-                    return ['class' => 'bg-primary'];
+                if (isset($model->paketpengadaan) && !$model->paketpengadaan->pemenang) {
+                    return ['class' => 'bg-warning'];
                 }
                 return []; // return an empty array if the condition is not met
             },
@@ -101,7 +101,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     ),
                 ]) .
                     'Legend:
-                    <span class="bg-primary p-1 m-0 text-white">Selesai</span>
+                    <span class="bg-warning p-1 m-0 text-white">On Process</span>
+                    <span class="bg-light p-1 m-0 text-white">Selesai</span>
                     <div class="clearfix"></div>',
             ]
         ]) ?>

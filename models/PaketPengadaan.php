@@ -57,43 +57,6 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     public function getUnitnya(){
         return $this->hasOne(Unit::class, ['id' => 'unit'])->cache(self::cachetime(), self::settagdep('tag_unit'));
     }
-    public function afterFind() {
-        $this->oldrecord = clone $this;
-        parent::afterFind();
-    }
-    public function beforeSave($insert) {
-        if ($insert) {
-            $this->tanggal_paket = date('Y-m-d H:i:s', time());
-            $exist = self::where(['nama_paket' => $this->nama_paket])->exists();
-            if ($exist) {
-                Yii::$app->session->setFlash('error', 'Paket Pengadaan sudah ada');
-                return false;
-            }
-            $hasil = [];
-            $template = TemplateChecklistEvaluasi::where(['like', 'template', 'Ceklist_Kelengkapan_DPP'])->one();
-            if($template){
-                if ($template->element) {
-                    $ar_element = explode(',', $template->element);
-                }
-                foreach (json_decode($template->detail->uraian, true) as $v) {
-                    $c = ['uraian' => $v['uraian']];
-                    if ($template->element) {
-                        foreach ($ar_element as $element) {
-                            if ($element) {
-                                $c[$element] = '';
-                            }
-                        }
-                    }
-                    $hasil['template'][] = $c;
-                }
-                $this->addition=json_encode($hasil);
-            }
-        } else {//update
-        }
-        self::invalidatecache('tag_' . self::getModelname());
-        Dpp::invalidatecache('tag_' . Dpp::getModelname());
-        return parent::beforeSave($insert);
-    }
     public function getKurirnya(){
         return $this->hasOne(Pegawai::class,['id_user'=>'created_by'])->cache(self::cachetime(), self::settagdep('tag_pegawai'));
     }
@@ -175,5 +138,42 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         })
         ->values()
         ->toArray();
+    }
+    public function afterFind() {
+        $this->oldrecord = clone $this;
+        parent::afterFind();
+    }
+    public function beforeSave($insert) {
+        if ($insert) {
+            $this->tanggal_paket = date('Y-m-d H:i:s', time());
+            $exist = self::where(['nama_paket' => $this->nama_paket])->exists();
+            if ($exist) {
+                Yii::$app->session->setFlash('error', 'Paket Pengadaan sudah ada');
+                return false;
+            }
+            $hasil = [];
+            $template = TemplateChecklistEvaluasi::where(['like', 'template', 'Ceklist_Kelengkapan_DPP'])->one();
+            if($template){
+                if ($template->element) {
+                    $ar_element = explode(',', $template->element);
+                }
+                foreach (json_decode($template->detail->uraian, true) as $v) {
+                    $c = ['uraian' => $v['uraian']];
+                    if ($template->element) {
+                        foreach ($ar_element as $element) {
+                            if ($element) {
+                                $c[$element] = '';
+                            }
+                        }
+                    }
+                    $hasil['template'][] = $c;
+                }
+                $this->addition=json_encode($hasil);
+            }
+        } else {//update
+        }
+        self::invalidatecache('tag_' . self::getModelname());
+        Dpp::invalidatecache('tag_' . Dpp::getModelname());
+        return parent::beforeSave($insert);
     }
 }
