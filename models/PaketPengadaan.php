@@ -223,13 +223,13 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     private function getMonths() {
         return range(1, 12);
     }
-    public function byMetode() {
+    public function byMetode($params=null) {
         $data = $this->getrawData();
         // $months = $this->getMonths();
         // $metodePengadaanTypes = self::optionmetodepengadaan();
         $months = $data->pluck('month')->unique()->sort()->values();
         $metodePengadaanTypes = $data->pluck('metode_pengadaan')->unique()->sort()->values();
-        $groupedData = $data->groupBy('pejabat_pengadaan');
+        $groupedData = $data->groupBy($params);
         $pivotTable = $groupedData->map(function ($rows, $adminName) use ($months, $metodePengadaanTypes) {
             $row = ['name' => $adminName, 'total' => 0];
             foreach ($months as $month) {
@@ -255,5 +255,29 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         $pivotTable->put('Total', $totalRow);
         Yii::error(json_encode($metodePengadaanTypes));
         return ['months' => $months, 'metodePengadaanTypes' => $metodePengadaanTypes, 'pivotTable' => $pivotTable];
+    }
+    public function byMetode2($params=null) {
+        $data = $this->getrawData();
+        $months = $this->getMonths();
+        $groupedData = $data->groupBy($params);
+        $pivotTable = $groupedData->map(function ($rows, $adminName) use ($months) {
+            $row = ['name' => $adminName, 'total' => 0];
+            foreach ($months as $month) {
+                $count = $rows->where('month', $month)->count();
+                $row[$month] = $count;
+                $row['total'] += $count;
+            }
+            return $row;
+        });
+        // Calculate total row
+        $totalRow = ['name' => 'Total', 'total' => 0];
+        foreach ($months as $month) {
+            $totalRow[$month] = $pivotTable->sum(function ($row) use ($month) {
+                return $row[$month] ?? 0;
+            });
+            $totalRow['total'] += $totalRow[$month];
+        }
+        $pivotTable->put('Total', $totalRow);
+        return ['months' => $months, 'pivotTable' => $pivotTable];
     }
 }

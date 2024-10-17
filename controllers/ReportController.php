@@ -16,20 +16,36 @@ class ReportController extends \yii\web\Controller
                 'model'=>$model,'raw'=>$raw,'paketpengadaan'=>$paketpengadaan
             ]);
         }else if($model->load($request->post())){
-            if($model->tahun && $model->kategori=='all'){
-                $query=$raw->where('year',$model->tahun)->toArray();
-                VarDumper::dump($query,$depth = 10, $highlight = true);
+            if($model->tahun && $model->metode=='all' && $model->bulan=='all'){
+                $r = $paketpengadaan->byMetode2('metode_pengadaan');
+                return $this->render('by_m2',[
+                    'months'=>$r['months'],
+                    'pivotTable'=> $r['pivotTable'],
+                ]);
             }
-            if($model->tahun && $model->metode=='all'){
-                $r = $paketpengadaan->byMetode();
+            if($model->tahun && $model->kategori=='all' && $model->bulan=='all'){
+                $r = $paketpengadaan->byMetode2('kategori_pengadaan');
+                return $this->render('by_m2',[
+                    'months'=>$r['months'],
+                    'pivotTable'=> $r['pivotTable'],
+                ]);
+            }
+            if($model->tahun && $model->metode=='all' && $model->bidang=='all'){
+                $r = $paketpengadaan->byMetode('bidang_bagian');
                 return $this->render('by_metode',[
                     'months'=>$r['months'],
                     'pivotTable'=> $r['pivotTable'],
                     'metodePengadaanTypes'=>$r['metodePengadaanTypes']
                 ]);
             }
-            // if($model->tahun && $model->bidang){}
-            // if($model->tahun && $model->pejabat){}
+            if($model->tahun && $model->metode=='all' && $model->pejabat=='all'){
+                $r = $paketpengadaan->byMetode('pejabat_pengadaan');
+                return $this->render('by_metode',[
+                    'months'=>$r['months'],
+                    'pivotTable'=> $r['pivotTable'],
+                    'metodePengadaanTypes'=>$r['metodePengadaanTypes']
+                ]);
+            }
         }
     }
 }
