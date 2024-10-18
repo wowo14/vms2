@@ -9,33 +9,50 @@ class ReportController extends \yii\web\Controller
     {
         $model=new ReportModel();
         $paketpengadaan=new PaketPengadaan();
-        $raw=collect($paketpengadaan::Dashboard());
         $request=\Yii::$app->request;
         if($request->isGet){
             return $this->render('index',[
-                'model'=>$model,'raw'=>$raw,'paketpengadaan'=>$paketpengadaan
+                'model'=>$model,'raw'=> $paketpengadaan->getrawData(),'paketpengadaan'=>$paketpengadaan
             ]);
         }else if($model->load($request->post())){
-            if($model->tahun && $model->metode=='all' && $model->bulan=='all'){
-                $r = $paketpengadaan->byMetode2('metode_pengadaan');
-                return $this->render('by_m2',[
-                    'months'=>$r['months'],
-                    'pivotTable'=> $r['pivotTable'],
-                ]);
-            }
             if($model->tahun && $model->kategori=='all' && $model->bulan=='all'){
-                $r = $paketpengadaan->byMetode2('kategori_pengadaan');
-                return $this->render('by_m2',[
+                $r = $paketpengadaan->bymonths('kategori_pengadaan');
+                return $this->render('by_months',[
                     'months'=>$r['months'],
                     'pivotTable'=> $r['pivotTable'],
+                    'title'=>'Filter Kategori '. $model->tahun
                 ]);
             }
-            if($model->tahun && $model->metode=='all' && $model->bidang=='all'){
-                $r = $paketpengadaan->byMetode('bidang_bagian');
-                return $this->render('by_metode',[
+            if ($model->tahun && $model->metode == 'all' && $model->bulan == 'all') {
+                $r = $paketpengadaan->bymonths('metode_pengadaan');
+                return $this->render('by_months', [
+                    'months' => $r['months'],
+                    'pivotTable' => $r['pivotTable'],
+                    'title' => 'Filter Metode '. $model->tahun
+                ]);
+            }
+            if ($model->tahun && $model->pejabat == 'all' && $model->bulan == 'all') {
+                $r = $paketpengadaan->bymonths('pejabat_pengadaan');
+                return $this->render('by_months', [
+                    'months' => $r['months'],
+                    'pivotTable' => $r['pivotTable'],
+                    'title' => 'Filter Pejabat Pengadaan '. $model->tahun
+                ]);
+            }
+            if($model->tahun && $model->admin=='all' && $model->bulan=='all'){
+                $r = $paketpengadaan->bymonths('admin_pengadaan');
+                return $this->render('by_months',[
                     'months'=>$r['months'],
                     'pivotTable'=> $r['pivotTable'],
-                    'metodePengadaanTypes'=>$r['metodePengadaanTypes']
+                    'title' => 'Filter Admin Pengadaan '. $model->tahun
+                ]);
+            }
+            if($model->tahun && $model->bidang=='all' && $model->bulan=='all'){
+                $r = $paketpengadaan->bymonths('bidang_bagian');
+                return $this->render('by_months',[
+                    'months'=>$r['months'],
+                    'pivotTable'=> $r['pivotTable'],
+                    'title' => 'Filter Bidang '. $model->tahun
                 ]);
             }
             if($model->tahun && $model->metode=='all' && $model->pejabat=='all'){
@@ -43,9 +60,60 @@ class ReportController extends \yii\web\Controller
                 return $this->render('by_metode',[
                     'months'=>$r['months'],
                     'pivotTable'=> $r['pivotTable'],
-                    'metodePengadaanTypes'=>$r['metodePengadaanTypes']
+                    'types'=>$r['types'],
+                    'title' => 'Jumlah Kegiatan Pengadaan Per Pejabat Pengadaan x Metode ' . $model->tahun
                 ]);
             }
+            if($model->tahun && $model->metode=='all' && $model->admin=='all'){
+                $r = $paketpengadaan->byMetode('admin_pengadaan');
+                return $this->render('by_metode',[
+                    'months'=>$r['months'],
+                    'pivotTable'=> $r['pivotTable'],
+                    'types'=>$r['types'],
+                    'title' => 'Jumlah Kegiatan Pengadaan Per Admin Pengadaan x Metode ' . $model->tahun
+                ]);
+            }
+            if ($model->tahun && $model->metode == 'all' && $model->bidang == 'all') {
+                $r = $paketpengadaan->byMetode('bidang_bagian');
+                return $this->render('by_metode', [
+                    'months' => $r['months'],
+                    'pivotTable' => $r['pivotTable'],
+                    'types' => $r['types'],
+                    'title' => 'Jumlah Kegiatan Pengadaan Per Bidang x Metode ' . $model->tahun
+                ]);
+            }
+            if ($model->tahun && $model->kategori == 'all' && $model->pejabat == 'all') {
+                $r = $paketpengadaan->byKategori('pejabat_pengadaan');
+                return $this->render('by_metode', [
+                    'months' => $r['months'],
+                    'pivotTable' => $r['pivotTable'],
+                    'types' => $r['types'],
+                    'title' => 'Jumlah Kegiatan Pengadaan Per Pejabat Pengadaan x kategori ' . $model->tahun
+                ]);
+            }
+            if ($model->tahun && $model->kategori == 'all' && $model->admin == 'all') {
+                $r = $paketpengadaan->byKategori('admin_pengadaan');
+                return $this->render('by_metode', [
+                    'months' => $r['months'],
+                    'pivotTable' => $r['pivotTable'],
+                    'types' => $r['types'],
+                    'title' => 'Jumlah Kegiatan Pengadaan Per admin Pengadaan x Kategori ' . $model->tahun
+                ]);
+            }
+            if ($model->tahun && $model->kategori == 'all' && $model->bidang == 'all') {
+                $r = $paketpengadaan->byKategori('bidang_bagian');
+                return $this->render('by_metode', [
+                    'months' => $r['months'],
+                    'pivotTable' => $r['pivotTable'],
+                    'types' => $r['types'],
+                    'title' => 'Jumlah Kegiatan Pengadaan Per Bidang x Kategori ' . $model->tahun
+                ]);
+            }
+            return $this->render('index', [
+                'model' => $model,
+                'raw' => $paketpengadaan->getrawData(),
+                'paketpengadaan' => $paketpengadaan
+            ]);
         }
     }
 }

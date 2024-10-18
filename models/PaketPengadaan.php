@@ -223,20 +223,17 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     private function getMonths() {
         return range(1, 12);
     }
-    public function byMetode($params=null) {
-        $data = $this->getrawData();
-        // $months = $this->getMonths();
-        // $metodePengadaanTypes = self::optionmetodepengadaan();
+    private function createPivotTable($data, $params, $typesKey, $groupKey) {
         $months = $data->pluck('month')->unique()->sort()->values();
-        $metodePengadaanTypes = $data->pluck('metode_pengadaan')->unique()->sort()->values();
+        $types = $data->pluck($typesKey)->unique()->sort()->values();
         $groupedData = $data->groupBy($params);
-        $pivotTable = $groupedData->map(function ($rows, $adminName) use ($months, $metodePengadaanTypes) {
+        $pivotTable = $groupedData->map(function ($rows, $adminName) use ($months, $types, $groupKey) {
             $row = ['name' => $adminName, 'total' => 0];
             foreach ($months as $month) {
                 $monthData = $rows->where('month', $month);
-                foreach ($metodePengadaanTypes as $metode) {
-                    $count = $monthData->where('metode_pengadaan', $metode)->count();
-                    $row[$month][$metode] = $count;
+                foreach ($types as $type) {
+                    $count = $monthData->where($groupKey, $type)->count();
+                    $row[$month][$type] = $count;
                     $row['total'] += $count;
                 }
             }
@@ -245,18 +242,25 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         // Calculate total row
         $totalRow = ['name' => 'Total', 'total' => 0];
         foreach ($months as $month) {
-            foreach ($metodePengadaanTypes as $metode) {
-                $totalRow[$month][$metode] = $pivotTable->sum(function ($row) use ($month, $metode) {
-                    return $row[$month][$metode] ?? 0;
+            foreach ($types as $type) {
+                $totalRow[$month][$type] = $pivotTable->sum(function ($row) use ($month, $type) {
+                    return $row[$month][$type] ?? 0;
                 });
-                $totalRow['total'] += $totalRow[$month][$metode];
+                $totalRow['total'] += $totalRow[$month][$type];
             }
         }
         $pivotTable->put('Total', $totalRow);
-        Yii::error(json_encode($metodePengadaanTypes));
-        return ['months' => $months, 'metodePengadaanTypes' => $metodePengadaanTypes, 'pivotTable' => $pivotTable];
+        return ['months' => $months, 'types' => $types, 'pivotTable' => $pivotTable];
     }
-    public function byMetode2($params=null) {
+    public function byMetode($params = null) {
+        $data = $this->getrawData();
+        return $this->createPivotTable($data, $params, 'metode_pengadaan', 'metode_pengadaan');
+    }
+    public function byKategori($params = null) {
+        $data = $this->getrawData();
+        return $this->createPivotTable($data, $params, 'kategori_pengadaan', 'kategori_pengadaan');
+    }
+    public function bymonths($params = null) {
         $data = $this->getrawData();
         $months = $this->getMonths();
         $groupedData = $data->groupBy($params);
