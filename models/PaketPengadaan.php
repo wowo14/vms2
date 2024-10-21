@@ -1,7 +1,10 @@
 <?php
+
 namespace app\models;
+
 use Yii;
 use yii\db\Expression;
+
 class PaketPengadaan extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
     public $oldrecord;
@@ -223,9 +226,14 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     private function getMonths() {
         return range(1, 12);
     }
-    private function createPivotTable($data, $params, $typesKey, $groupKey) {
-        $months = $data->pluck('month')->unique()->sort()->values();
-        $types = $data->pluck($typesKey)->unique()->sort()->values();
+    private function createPivotTable($data, $params, $groupKey, $bln) {
+        if (isset($bln) && !empty($bln)) {
+            $data = $data->where('month', $bln);
+            $months = [$bln];
+        } else {
+            $months = $data->pluck('month')->unique()->sort()->values();
+        }
+        $types = $data->pluck($groupKey)->unique()->sort()->values();
         $groupedData = $data->groupBy($params);
         $pivotTable = $groupedData->map(function ($rows, $adminName) use ($months, $types, $groupKey) {
             $row = ['name' => $adminName, 'total' => 0];
@@ -252,18 +260,24 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         $pivotTable->put('Total', $totalRow);
         return ['months' => $months, 'types' => $types, 'pivotTable' => $pivotTable];
     }
-    public function byMetode($params = null) {
+    // public function byMetode($params = null) {
+    //     $data = $this->getrawData();
+    //     return $this->createPivotTable($data, $params, 'metode_pengadaan', 'metode_pengadaan');
+    // }
+    public function byKategori($params) { //[groupby,type,bln]
         $data = $this->getrawData();
-        return $this->createPivotTable($data, $params, 'metode_pengadaan', 'metode_pengadaan');
+        Yii::error('kategori called');
+        return $this->createPivotTable($data, $params['groupby'], $params['type'], $params['bln']);
     }
-    public function byKategori($params = null) {
-        $data = $this->getrawData();
-        return $this->createPivotTable($data, $params, 'kategori_pengadaan', 'kategori_pengadaan');
-    }
-    public function bymonths($params = null) {
-        $data = $this->getrawData();
-        $months = $this->getMonths();
-        $groupedData = $data->groupBy($params);
+    public function bymonths2($params) { //[groupby,named,bln]
+        if ($params['bln']) {
+            $data = ($this->getrawData())->where('month', $params['bln']);
+            $months = [$params['bln']];
+        } else {
+            $data = $this->getrawData();
+            $months = $this->getMonths();
+        }
+        $groupedData = $data->groupBy($params['groupby']);
         $pivotTable = $groupedData->map(function ($rows, $adminName) use ($months) {
             $row = ['name' => $adminName, 'total' => 0];
             foreach ($months as $month) {
@@ -273,6 +287,11 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             }
             return $row;
         });
+        if ($params['named']) {
+            $pivotTable = $pivotTable->filter(function ($item) use ($params) {
+                return $item['name'] === $params['named'];
+            });
+        }
         // Calculate total row
         $totalRow = ['name' => 'Total', 'total' => 0];
         foreach ($months as $month) {

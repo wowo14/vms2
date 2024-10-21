@@ -7,7 +7,7 @@ $this->title = 'Report Filter';
 $this->params['breadcrumbs'][] = $this->title;
 $tahun = $raw->unique('year')->pluck('year', 'year')->toArray();
 $month = $model->months;
-$month = array_merge(['all' => 'all'], $month);
+$month = array_merge([0 => 'all'], $month);
 $kategori = array_merge(['' => '', 'all' => 'all'], $model::optionkategoripengadaan());
 $metode = array_merge(['' => '', 'all' => 'all'], $model::optionmetodepengadaan());
 $pejabat = array_merge(['' => '', 'all' => 'all'], $model::getAllpetugas());
