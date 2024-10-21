@@ -232,7 +232,7 @@ class PaketpengadaanController extends Controller {
                     $nego->accept = ($nego->penyedia_accept == 1 && $nego->pp_accept == 1) ? 1 : null;
                     $nego->save(false);
                     Yii::$app->session->setFlash('success', 'Sukses input nilai nego');
-                    $this->redirect($referrer);
+                    // $this->redirect($referrer);
                     return $this->asJson([
                         'status' => 'success',
                         'message' => 'Data saved successfully.',
@@ -278,7 +278,9 @@ class PaketpengadaanController extends Controller {
                     $nego->accept = ($nego->penyedia_accept == 1 && $nego->pp_accept == 1) ? 1 : null;
                     $nego->save(false);
                     Yii::$app->session->setFlash('success', 'Sukses input nilai nego');
-                    return $this->redirect($referrer);
+                    // return $this->redirect($referrer);
+                    return $this->render('//paketpengadaan/negoproduk', ['id' => $id]);
+
                 }
             }else{
                 return $this->render('_frm_negoproduk', ['model' => $paketdetails,'penawaran'=>$penawaran]);
@@ -302,9 +304,9 @@ class PaketpengadaanController extends Controller {
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             if($paketdetails->load($request->post()) && $paketdetails->save()){
-                Yii::$app->session->setFlash('success', 'sukses input penawaran');
-                $this->redirect($request->referrer);
-                return $this->asJson([]);
+                // Yii::$app->session->setFlash('success', 'sukses input penawaran');
+                // $this->redirect($request->referrer);
+                return $this->asJson(['success'=>'Sukses input penawaran']);
             }else{
                 return [
                     'title' => 'Form Penawaran',
@@ -319,7 +321,8 @@ class PaketpengadaanController extends Controller {
         }else{
             if($paketdetails->load($request->post()) && $paketdetails->save()){
                 Yii::$app->session->setFlash('success', 'sukses input penawaran');
-                return $this->redirect($request->referrer);
+                // return $this->redirect($request->referrer);
+                return $this->render('//paketpengadaan/postpenawaran',['id'=>$id]);
             }else{
                 return $this->render('//penawaranpenyedia/_frm_penawaranpenyedia', ['model' => $paketdetails,'penawaran'=>$paketdetails->paketpengadaan->penawaranpenyedia]);
             }

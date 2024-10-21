@@ -81,7 +81,7 @@ class PenawaranpenyediaController extends Controller {
             Yii::$app->response->format = Response::FORMAT_JSON;
             if($model->load($request->post()) ){
                 if($model->save()){
-                    $this->redirect($request->referrer);
+                    // $this->redirect($request->referrer);
                     return $this->asJson([
                         'success' => true,
                         'message' => 'sukses input nilai nego',
