@@ -81,7 +81,6 @@ class PenawaranPengadaan extends \yii\db\ActiveRecord
             $this->lampiran_penawaran = self::isBase64Encoded($this->lampiran_penawaran) ? $this->upload($this->lampiran_penawaran, 'lampiran_penawaran_' . $this->penyedia_id . '_' . time()) : $this->lampiran_penawaran;
             $this->lampiran_penawaran_harga = self::isBase64Encoded($this->lampiran_penawaran_harga) ? $this->upload($this->lampiran_penawaran_harga, 'lampiran_penawaran_harga_' . $this->penyedia_id . '_' . time()) : $this->lampiran_penawaran_harga;
         }
-        
         return parent::beforeSave($insert);
     }
 }

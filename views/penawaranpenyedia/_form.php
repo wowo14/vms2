@@ -1,14 +1,15 @@
 <?php
-
 use app\assets\AppAsset;
 use kartik\date\DatePicker;
 use kartik\select2\Select2;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\{ArrayHelper, Html};
 use yii\web\View;
-
 AppAsset::register($this);
-$paket = ArrayHelper::map($model->allpaketpengadaan, 'id', 'nomornamapaket');
+$exist = ArrayHelper::getColumn($model::where(['not', ['paket_id' => null]])->all(), 'paket_id', 'paket_id');
+$paket = collect($model->allpaketpengadaan)->filter(function ($e) use ($exist) {
+    return !in_array($e->id, $exist);
+})->pluck('nomornamapaket', 'id')->toArray();
 $penyedia = ArrayHelper::map($model->vendors, 'id', 'nama_perusahaan');
 $this->registerJs('
 jQuery(function ($) {
