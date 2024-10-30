@@ -1,10 +1,75 @@
 <?php
+
 namespace app\controllers;
+
 use app\models\PaketPengadaan;
 use app\models\ReportModel;
-
 use yii\helpers\VarDumper;
+
 class ReportController extends Controller {
+    public function actionMetode() {
+        $model = new ReportModel();
+        $paketpengadaan = new PaketPengadaan();
+        $request = \Yii::$app->request;
+        if ($request->isGet) {
+            return $this->render('_frm_by_metode', [
+                'model' => $model,
+                'raw' => $paketpengadaan->getrawData(),
+                'paketpengadaan' => $paketpengadaan
+            ]);
+        } else if ($model->load($request->post())) {
+            if ($model->tahun) {
+                if ($model->metode != 'all') {
+                    if ($model->bulan) {
+                        if ($model->pejabat !== 'all') {
+                            $r = $paketpengadaan->byKategori(['groupby' => $model->pejabat, 'type' => $model->metode, 'bln' => $model->bulan]);
+                        } else {
+                            $r = $paketpengadaan->byKategori(['groupby' => 'pejabat_pengadaan', 'type' => $model->metode, 'bln' => $model->bulan]);
+                        }
+                    } else {
+                        if ($model->pejabat !== 'all') {
+                            $r = $paketpengadaan->byKategori(['groupby' => $model->pejabat, 'type' => $model->metode, 'bln' => '']);
+                        } else {
+                            $r = $paketpengadaan->byKategori(['groupby' => 'pejabat_pengadaan', 'type' => $model->metode, 'bln' => '']);
+                        }
+                    }
+                } else {
+                    if ($model->bulan) {
+                        if ($model->pejabat !== 'all') {
+                            $r = $paketpengadaan->byKategori(['groupby' => $model->pejabat, 'type' => 'metode_pengadaan', 'bln' => $model->bulan]);
+                        } else {
+                            $r = $paketpengadaan->byKategori(['groupby' => 'pejabat_pengadaan', 'type' => 'metode_pengadaan', 'bln' => $model->bulan]);
+                        }
+                    } else {
+                        if ($model->pejabat !== 'all') {
+                            $r = $paketpengadaan->byKategori(['groupby' => $model->pejabat, 'type' => 'metode_pengadaan', 'bln' => '']);
+                        } else {
+                            $r = $paketpengadaan->byKategori(['groupby' => 'pejabat_pengadaan', 'type' => 'metode_pengadaan', 'bln' => '']);
+                        }
+                    }
+                }
+                return $this->render('by_metode', [
+                    'months' => $r['months'],
+                    'pivotTable' => $r['pivotTable'],
+                    'types' => $r['types'],
+                    'title' => 'Jumlah Kegiatan Pengadaan Per Pejabat Pengadaan x Metode ' . $model->tahun
+                ]);
+            }
+        }
+    }
+    public function actionKategori() {
+        $model = new ReportModel();
+        $paketpengadaan = new PaketPengadaan();
+        $request = \Yii::$app->request;
+        if ($request->isGet) {
+            return $this->render('_frm_by_kategori', [
+                'model' => $model,
+                'raw' => $paketpengadaan->getrawData(),
+                'paketpengadaan' => $paketpengadaan
+            ]);
+        } else if ($model->load($request->post())) {
+        }
+    }
     public function actionIndex() {
         $model = new ReportModel();
         $paketpengadaan = new PaketPengadaan();

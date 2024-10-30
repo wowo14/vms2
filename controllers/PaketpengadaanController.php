@@ -1,11 +1,14 @@
 <?php
+
 namespace app\controllers;
-use app\models\{Negosiasi,Unit,TemplateChecklistEvaluasi,Attachment, Dpp, PaketPengadaanDetails, PaketPengadaanSearch, PaketPengadaan};
+
+use app\models\{Negosiasi, Unit, TemplateChecklistEvaluasi, Attachment, Dpp, PaketPengadaanDetails, PaketPengadaanSearch, PaketPengadaan};
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
-use yii\helpers\{ArrayHelper,Html};
+use yii\helpers\{ArrayHelper, Html};
 use yii\web\{ServerErrorHttpException, Response, NotFoundHttpException};
+
 class PaketpengadaanController extends Controller {
     public function behaviors() {
         return [
@@ -21,7 +24,7 @@ class PaketpengadaanController extends Controller {
     public function actionLampiran($id) {
         $request = Yii::$app->request;
         $model = $this->findModel($id);
-        if($model->pemenang){
+        if ($model->pemenang) {
             Yii::$app->session->setFlash('warning', 'Pemenang sudah ditentukan');
             return $this->redirect(['index']);
         }
@@ -57,9 +60,9 @@ class PaketpengadaanController extends Controller {
                     $attachment->name = $newFilename;
                     $attachment->uri = Yii::getAlias('@web/uploads/') . $newFilename;
                     $attachment->user_id = $model->id; //based on paket_id
-                    $attachment->mime = mime_content_type(Yii::getAlias('@uploads').$newFilename)?:$fileType;
-                    $attachment->type = mime_content_type(Yii::getAlias('@uploads').$newFilename)?:$fileType;
-                    $attachment->size = filesize(Yii::getAlias('@uploads').$newFilename)?:$fileSize;
+                    $attachment->mime = mime_content_type(Yii::getAlias('@uploads') . $newFilename) ?: $fileType;
+                    $attachment->type = mime_content_type(Yii::getAlias('@uploads') . $newFilename) ?: $fileType;
+                    $attachment->size = filesize(Yii::getAlias('@uploads') . $newFilename) ?: $fileSize;
                     $attachment->jenis_dokumen = $jenisdokumen;
                     if (!$attachment->save()) {
                         $content = "Error saving attachment: " . json_encode($attachment->errors) . "\n";
@@ -95,10 +98,10 @@ class PaketpengadaanController extends Controller {
             }
             $dpp = new Dpp;
             $dpp->paket_id = $model->id;
-            $dpp->bidang_bagian = $model->unit??'';
-            $dpp->nomor_dpp = $model->nomor??'';
-            $dpp->tanggal_dpp = $model->tanggal_dpp??'';
-            $dpp->nomor_persetujuan = $model->nomor_persetujuan??'';
+            $dpp->bidang_bagian = $model->unit ?? '';
+            $dpp->nomor_dpp = $model->nomor ?? '';
+            $dpp->tanggal_dpp = $model->tanggal_dpp ?? '';
+            $dpp->nomor_persetujuan = $model->nomor_persetujuan ?? '';
             if ($dpp->save()) {
                 Yii::$app->session->setFlash('success', 'Paket Pengadaan ' . $model->nama_paket . ' Berhasil ajukan DPP');
             } else {
@@ -132,19 +135,19 @@ class PaketpengadaanController extends Controller {
             return '<div class="alert alert-danger">No data found</div>';
         }
     }
-    public function actionImportProduct($id){
+    public function actionImportProduct($id) {
         $model = $this->findModel($id);
-        if($model->pemenang){
+        if ($model->pemenang) {
             Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
             return $this->redirect('index');
         }
         $request = Yii::$app->request;
-        if($request->isPost){
-            if(!empty($_FILES)){
+        if ($request->isPost) {
+            if (!empty($_FILES)) {
                 $tempFile = $_FILES['produk']['tmp_name'];
                 $fileTypes = array('xls', 'xlsx');
                 $fileParts = pathinfo($_FILES['produk']['name']);
-                if(in_array(@$fileParts['extension'], $fileTypes)){
+                if (in_array(@$fileParts['extension'], $fileTypes)) {
                     $fileType = \PhpOffice\PhpSpreadsheet\IOFactory::identify($tempFile);
                     $objPHPExcelReader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($fileType);
                     $spreadsheet = $objPHPExcelReader->load($tempFile);
@@ -153,14 +156,14 @@ class PaketpengadaanController extends Controller {
                     $parentSheet = $spreadsheet->getSheetByName('produk');
                     $highestRow = $parentSheet->getHighestRow();
                     $highestColumn = $parentSheet->getHighestColumn();
-                    $existDetails=PaketpengadaanDetails::where(['paket_id' => $model->id])->all();
-                    if($existDetails){
+                    $existDetails = PaketpengadaanDetails::where(['paket_id' => $model->id])->all();
+                    if ($existDetails) {
                         PaketPengadaanDetails::deleteAll(['paket_id' => $model->id]);
                     }
-                    $adata=[];
+                    $adata = [];
                     for ($childRow = 2; $childRow <= $highestRow; ++$childRow) {
                         $inserted++;
-                        $adata[]=[
+                        $adata[] = [
                             'paket_id' => $model->id,
                             'nama_produk' => $parentSheet->getCellByColumnAndRow(2, $childRow)->getValue(),
                             'qty' => $parentSheet->getCellByColumnAndRow(3, $childRow)->getValue(),
@@ -172,12 +175,12 @@ class PaketpengadaanController extends Controller {
                     }
                     if (!empty($adata)) {
                         Yii::$app->db->createCommand()
-                        ->batchInsert(
-                            'paket_pengadaan_details',
-                            ['paket_id', 'nama_produk', 'qty', 'volume', 'satuan', 'hps_satuan', 'penawaran'],
-                            $adata
-                        )
-                        ->execute();
+                            ->batchInsert(
+                                'paket_pengadaan_details',
+                                ['paket_id', 'nama_produk', 'qty', 'volume', 'satuan', 'hps_satuan', 'penawaran'],
+                                $adata
+                            )
+                            ->execute();
                     }
                     //cache flush
                     $model::invalidatecache('tag_' . $model::getModelname());
@@ -186,68 +189,69 @@ class PaketpengadaanController extends Controller {
                     return $this->redirect('index');
                 }
             }
-        }else{
+        } else {
             return $this->render('_import_product', ['model' => $model]);
         }
     }
-    public function actionNegoproduk($id){
-        $paketdetails=PaketPengadaanDetails::findOne(['id' => $id]);
-        $request=Yii::$app->request;
+    public function actionNegoproduk($id) {
+        $paketdetails = PaketPengadaanDetails::findOne(['id' => $id]);
+        $request = Yii::$app->request;
         $referrer = $request->referrer;
-        if(!$paketdetails){
+        if (!$paketdetails) {
             throw new NotFoundHttpException('Produk yang ditawarkan tidak ditemukan.');
         }
-        $penawaran=$paketdetails->paketpengadaan->penawaranpenyedia;
-        if(!$penawaran){
+        $penawaran = $paketdetails->paketpengadaan->penawaranpenyedia;
+        if (!$penawaran) {
             throw new NotFoundHttpException('Paket pengadaan penawaran tidak ditemukan.');
         }
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
-            if($paketdetails->load($request->post()) ){
+            if ($paketdetails->load($request->post())) {
                 $paketdetails->save();
-                    $nego = $penawaran->negosiasi ?? new Negosiasi();
-                    $nego->penawaran_id = $penawaran->id;
-                    $nego->ammount = PaketPengadaanDetails::sumNegosiasi($paketdetails->paket_id);
-                    // Merge old details with new
-                    $oldnegodetail = json_decode($nego->detail, true) ?? []; // Ensure it's an array
-                    $newdetail = [
-                        'id' => $paketdetails->id,
-                        'paket_id' => $paketdetails->paket_id,
-                        'nama_produk' => $paketdetails->nama_produk,
-                        'volume' => $paketdetails->volume ?? 1,
-                        'qty' => $paketdetails->qty ?? 1,
-                        'satuan' => $paketdetails->satuan,
-                        'hps_satuan' => $paketdetails->hps_satuan,
-                        'penawaran' => $paketdetails->penawaran,
-                        'negosiasi' => $paketdetails->negosiasi,
-                        'durasi' => $paketdetails->durasi ?? '',
-                        'informasi_harga' => $paketdetails->informasi_harga ?? '',
-                        'sumber_informasi' => $paketdetails->sumber_informasi ?? ''
-                    ];
-                    $merged = array_merge($oldnegodetail, [$newdetail]);
-                    // Update nego detail
-                    $nego->detail = json_encode($merged, JSON_UNESCAPED_SLASHES);
-                    $nego->pp_accept=$_POST['Negosiasi']['pp_accept'] ?? '';
-                    $nego->penyedia_accept=$_POST['Negosiasi']['penyedia_accept'] ?? '';
-                    $nego->accept = ($nego->penyedia_accept == 1 && $nego->pp_accept == 1) ? 1 : null;
-                    $nego->save(false);
-                    Yii::$app->session->setFlash('success', 'Sukses input nilai nego');
-                    // $this->redirect($referrer);
-                    return $this->asJson([
-                        'status' => 'success',
-                        'message' => 'Data saved successfully.',
-                        // 'redirect' => $referrer,
-                    ]);
-            }else{
+                $nego = $penawaran->negosiasi ?? new Negosiasi();
+                $nego->penawaran_id = $penawaran->id;
+                $nego->ammount = PaketPengadaanDetails::sumNegosiasi($paketdetails->paket_id);
+                // Merge old details with new
+                $oldnegodetail = json_decode($nego->detail, true) ?? []; // Ensure it's an array
+                $newdetail = [
+                    'id' => $paketdetails->id,
+                    'paket_id' => $paketdetails->paket_id,
+                    'nama_produk' => $paketdetails->nama_produk,
+                    'volume' => $paketdetails->volume ?? 1,
+                    'qty' => $paketdetails->qty ?? 1,
+                    'satuan' => $paketdetails->satuan,
+                    'hps_satuan' => $paketdetails->hps_satuan,
+                    'penawaran' => $paketdetails->penawaran,
+                    'negosiasi' => $paketdetails->negosiasi,
+                    'durasi' => $paketdetails->durasi ?? '',
+                    'informasi_harga' => $paketdetails->informasi_harga ?? '',
+                    'sumber_informasi' => $paketdetails->sumber_informasi ?? ''
+                ];
+                $merged = array_merge($oldnegodetail, [$newdetail]);
+                // Update nego detail
+                $nego->detail = json_encode($merged, JSON_UNESCAPED_SLASHES);
+                $nego->pp_accept = $_POST['Negosiasi']['pp_accept'] ?? '';
+                $nego->penyedia_accept = $_POST['Negosiasi']['penyedia_accept'] ?? '';
+                $nego->accept = ($nego->penyedia_accept == 1 && $nego->pp_accept == 1) ? 1 : null;
+                $nego->save(false);
+                Yii::$app->session->setFlash('success', 'Sukses input nilai nego');
+                // $this->redirect($referrer);
+                return [
+                    'title' => 'success',
+                    'content' => 'Data saved successfully.',
+                    // 'forceReload' => '#detailspaket-pjax'
+                    // 'redirect' => $referrer,
+                ];
+            } else {
                 return [
                     'title' => "Nego produk #" . $paketdetails->nama_produk,
-                    'content' => $this->renderAjax('_frm_negoproduk', ['model' => $paketdetails,'penawaran'=>$penawaran]),
+                    'content' => $this->renderAjax('_frm_negoproduk', ['model' => $paketdetails, 'penawaran' => $penawaran]),
                     'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
                         Html::button(Yii::t('yii2-ajaxcrud', 'Create'), ['class' => 'btn btn-primary', 'type' => 'submit'])
                 ];
             }
-        }else{
-            if($request->isPost){
+        } else {
+            if ($request->isPost) {
                 if ($paketdetails->load($request->post())) {
                     $paketdetails->save();
                     // Save to negosiasi
@@ -273,17 +277,16 @@ class PaketpengadaanController extends Controller {
                     $merged = array_merge($oldnegodetail, [$newdetail]);
                     // Update nego detail
                     $nego->detail = json_encode($merged, JSON_UNESCAPED_SLASHES);
-                    $nego->pp_accept=$_POST['Negosiasi']['pp_accept'] ?? '';
-                    $nego->penyedia_accept=$_POST['Negosiasi']['penyedia_accept'] ?? '';
+                    $nego->pp_accept = $_POST['Negosiasi']['pp_accept'] ?? '';
+                    $nego->penyedia_accept = $_POST['Negosiasi']['penyedia_accept'] ?? '';
                     $nego->accept = ($nego->penyedia_accept == 1 && $nego->pp_accept == 1) ? 1 : null;
                     $nego->save(false);
                     Yii::$app->session->setFlash('success', 'Sukses input nilai nego');
                     // return $this->redirect($referrer);
                     return $this->render('//paketpengadaan/negoproduk', ['id' => $id]);
-
                 }
-            }else{
-                return $this->render('_frm_negoproduk', ['model' => $paketdetails,'penawaran'=>$penawaran]);
+            } else {
+                return $this->render('_frm_negoproduk', ['model' => $paketdetails, 'penawaran' => $penawaran]);
             }
         }
     }
@@ -295,36 +298,40 @@ class PaketpengadaanController extends Controller {
             'dataProvider' => $dataProvider,
         ]);
     }
-    public function actionPostpenawaran($id){
+    public function actionPostpenawaran($id) {
         $request = Yii::$app->request;
-        $paketdetails=PaketPengadaanDetails::findOne($id);
-        if(!$paketdetails){
+        $paketdetails = PaketPengadaanDetails::findOne($id);
+        if (!$paketdetails) {
             throw new NotFoundHttpException('Data tidak ditemukan.');
         }
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
-            if($paketdetails->load($request->post()) && $paketdetails->save()){
+            if ($paketdetails->load($request->post()) && $paketdetails->save()) {
                 // Yii::$app->session->setFlash('success', 'sukses input penawaran');
                 // $this->redirect($request->referrer);
-                return $this->asJson(['success'=>'Sukses input penawaran']);
-            }else{
+                return [
+                    'title' => 'Form Penawaran',
+                    'content' => 'Sukses input penawaran',
+                    // 'forceReload' => '#detailspaket-pjax'
+                ];
+            } else {
                 return [
                     'title' => 'Form Penawaran',
                     'content' => $this->renderAjax('//penawaranpenyedia/_frm_penawaranpenyedia', [
                         'model' => $paketdetails,
-                        'penawaran'=>$paketdetails->paketpengadaan->penawaranpenyedia,
+                        'penawaran' => $paketdetails->paketpengadaan->penawaranpenyedia,
                     ]),
                     'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
                         Html::button(Yii::t('yii2-ajaxcrud', 'Save'), ['class' => 'btn btn-primary', 'type' => 'submit'])
                 ];
             }
-        }else{
-            if($paketdetails->load($request->post()) && $paketdetails->save()){
+        } else {
+            if ($paketdetails->load($request->post()) && $paketdetails->save()) {
                 Yii::$app->session->setFlash('success', 'sukses input penawaran');
                 // return $this->redirect($request->referrer);
-                return $this->render('//paketpengadaan/postpenawaran',['id'=>$id]);
-            }else{
-                return $this->render('//penawaranpenyedia/_frm_penawaranpenyedia', ['model' => $paketdetails,'penawaran'=>$paketdetails->paketpengadaan->penawaranpenyedia]);
+                return $this->render('//paketpengadaan/postpenawaran', ['id' => $id]);
+            } else {
+                return $this->render('//penawaranpenyedia/_frm_penawaranpenyedia', ['model' => $paketdetails, 'penawaran' => $paketdetails->paketpengadaan->penawaranpenyedia]);
             }
         }
     }
@@ -339,8 +346,8 @@ class PaketpengadaanController extends Controller {
                     'model' => $model,
                 ]),
                 'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                ($model->pemenang?'':
-                Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote']))
+                    ($model->pemenang ? '' :
+                        Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'data-target' => '#' . $model->hash, 'role' => 'modal-remote']))
             ];
         } else {
             return $this->render('view', [
@@ -379,11 +386,11 @@ class PaketpengadaanController extends Controller {
             }
         }
     }
-    public function actionCeklistadmin($id){
+    public function actionCeklistadmin($id) {
         $request = Yii::$app->request;
-        $title="Kelengkapan DPP";
-        $model=PaketPengadaan::find()->cache(false)->where(['id'=>$id])->one();
-        if($request->isGet){
+        $title = "Kelengkapan DPP";
+        $model = PaketPengadaan::find()->cache(false)->where(['id' => $id])->one();
+        if ($request->isGet) {
             $temp = TemplateChecklistEvaluasi::where(['like', 'template', 'Ceklist_Kelengkapan_DPP'])->one();
             if ($temp) {
                 $ar_element = $temp->element ? explode(',', $temp->element) : [];
@@ -400,64 +407,67 @@ class PaketpengadaanController extends Controller {
                 }
                 $temp = $hasil;
             }
-            if(!$model->addition){
-                $data=['template'=>$temp];
-                $model->addition=json_encode($data, JSON_UNESCAPED_SLASHES);
+            if (!$model->addition) {
+                $data = ['template' => $temp];
+                $model->addition = json_encode($data, JSON_UNESCAPED_SLASHES);
                 $model->save();
             }
-            $dataPaket=$model::collectAll(['approval_by' => null,'pemenang'=>null,'id'=>$id])->pluck('nomornamapaket', 'id')->toArray();
-            return $this->render('_checklistadmin', ['model'=>$model,'dataPaket'=>$dataPaket,'temp'=>$temp,'title'=>$title]);
+            $dataPaket = $model::collectAll(['approval_by' => null, 'pemenang' => null, 'id' => $id])->pluck('nomornamapaket', 'id')->toArray();
+            return $this->render('_checklistadmin', ['model' => $model, 'dataPaket' => $dataPaket, 'temp' => $temp, 'title' => $title]);
         }
-        if($request->isPost){
+        if ($request->isPost) {
             $template = $request->post('PaketPengadaan')['template'];
-            $pure1 = collect($template)->map(function ($e)use($model) {
+            $pure1 = collect($template)->map(function ($e) use ($model) {
                 foreach ($e as $key => $value) {
                     $e[$key] = $model->getPurifier($value);
                 }
-                if(key_exists('sesuai',$e)){
-                    if($e['sesuai']=='on'){
-                        $e['sesuai']=1;
+                if (key_exists('sesuai', $e)) {
+                    if ($e['sesuai'] == 'on') {
+                        $e['sesuai'] = 1;
                     }
                 }
                 return $e;
             });
-            $model->addition=json_encode([
-                'unit'=>$_POST['PaketPengadaan']['unit'],
-                'id'=>$_POST['PaketPengadaan']['id'],
-                'template'=>$pure1
-            ],JSON_UNESCAPED_SLASHES);
+            $model->addition = json_encode([
+                'unit' => $_POST['PaketPengadaan']['unit'],
+                'id' => $_POST['PaketPengadaan']['id'],
+                'template' => $pure1
+            ], JSON_UNESCAPED_SLASHES);
             $model->save();
             Yii::$app->session->setFlash('success', 'Kelengkapan DPP Berhasil Ditambahkan');
             return $this->redirect($request->referrer);
         }
     }
-    public function actionPrintceklistadmin($id){
-        $model=$this->findModel($id);
-        $title='Ceklist Kelengkapan DPP';
-        $data=[
-            'unit'=>Unit::findOne(json_decode($model->addition,true)['unit'])->unit,
-            'paket'=>$model->nama_paket,
-            'details'=>collect(json_decode($model->addition,true)['template'])->map(function ($e) {
-                if(key_exists('sesuai',$e)){
+    public function actionPrintceklistadmin($id) {
+        $model = $this->findModel($id);
+        $title = 'Ceklist Kelengkapan DPP';
+        $data = [
+            'unit' => Unit::findOne(json_decode($model->addition, true)['unit'])->unit,
+            'paket' => $model->nama_paket,
+            'details' => collect(json_decode($model->addition, true)['template'])->map(function ($e) {
+                if (key_exists('sesuai', $e)) {
                     $e['sesuai'] = $e['sesuai'] == 1 ? 'Ya' : 'Tidak';
-                }else{
+                } else {
                     // $e['sesuai'] = 'Tidak';
                 }
                 return $e;
             })->toArray(),
-            'logogresik'=>Yii::getAlias('@webroot/images/logogresik.png', true),
-            'logors'=>Yii::getAlias('@webroot/images/logors.png', true),
-            'kepalapengadaan'=>null,
-            'nipkepalapengadaan'=>'',
-            'admin'=>null,
-            'nipadmin'=>'',
-            'kurir'=>$model->kurirnya->nama,
-            'nipkurir'=>$model->kurirnya->nip,
+            'logogresik' => Yii::getAlias('@webroot/images/logogresik.png', true),
+            'logors' => Yii::getAlias('@webroot/images/logors.png', true),
+            'kepalapengadaan' => null,
+            'nipkepalapengadaan' => '',
+            'admin' => null,
+            'nipadmin' => '',
+            'kurir' => $model->kurirnya->nama,
+            'nipkurir' => $model->kurirnya->nip,
         ];
-        $cetakan=$this->renderPartial('_printceklistadmin', ['data'=>$data,
-        'model'=>$model,'title'=>$title]);
-        $pdf=Yii::$app->pdf;
-        $pdf->content=$cetakan;
+        $cetakan = $this->renderPartial('_printceklistadmin', [
+            'data' => $data,
+            'model' => $model,
+            'title' => $title
+        ]);
+        $pdf = Yii::$app->pdf;
+        $pdf->content = $cetakan;
         $pdf->cssFile = '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css';
         return $pdf->render();
     }
@@ -467,7 +477,7 @@ class PaketpengadaanController extends Controller {
             return $this->render('/historireject/update', ['model' => $model->historireject,]);
         }
         if (Yii::$app->request->isPost) {
-            $histori=$model->historireject;
+            $histori = $model->historireject;
             $histori->load(Yii::$app->request->post());
             $histori->save();
             $model->alasan_reject = '';
@@ -480,7 +490,7 @@ class PaketpengadaanController extends Controller {
     public function actionUpdate($id) {
         $request = Yii::$app->request;
         $model = $this->findModel($id);
-        if($model->pemenang){
+        if ($model->pemenang) {
             Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
             return $this->redirect('index');
         }
@@ -524,11 +534,11 @@ class PaketpengadaanController extends Controller {
     }
     public function actionDelete($id) {
         $request = Yii::$app->request;
-        $model=$this->findModel($id);
-        if($model->pemenang){
-                Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
-                return $this->redirect('index');
-            }
+        $model = $this->findModel($id);
+        if ($model->pemenang) {
+            Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
+            return $this->redirect('index');
+        }
         $model->unlinkAll('details', true);
         $model->delete();
         if ($request->isAjax) {
@@ -543,7 +553,7 @@ class PaketpengadaanController extends Controller {
         $pks = explode(',', $request->post('pks'));
         foreach ($pks as $pk) {
             $model = $this->findModel($pk);
-            if($model->pemenang){
+            if ($model->pemenang) {
                 Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada pemenang');
                 return $this->redirect('index');
             }

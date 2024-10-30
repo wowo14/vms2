@@ -82,10 +82,10 @@ class PenawaranpenyediaController extends Controller {
             if($model->load($request->post()) ){
                 if($model->save()){
                     // $this->redirect($request->referrer);
-                    return $this->asJson([
-                        'success' => true,
-                        'message' => 'sukses input nilai nego',
-                    ]);
+                    return [
+                        'title' => 'Form Nego',
+                        'content' => 'sukses input nilai nego',
+                    ];
                 }else{
                     return [
                         'title' => 'Error Save',

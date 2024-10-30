@@ -9,6 +9,7 @@ use yii\bootstrap4\Modal;
 use yii\data\ActiveDataProvider;
 use yii\grid\GridView;
 use yii\helpers\{Html,Url};
+use yii\widgets\Pjax;
 $paketpengadaan=$penawaran->paketpengadaan;
 // $negosiasi=$paketpengadaan->penawaranpenyedia->negosiasi;
 ?>
