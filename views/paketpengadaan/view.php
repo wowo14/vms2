@@ -46,7 +46,7 @@ use yii\widgets\DetailView;
                 'showPageSummary' => true,
                 'tableOptions' => ['class' => 'new_expand'],
                 'id' => 'details1',
-                'columns' => require('_column_details.php'),
+                'columns' => require('_col_views.php'),
             ]);
             }
             ?>

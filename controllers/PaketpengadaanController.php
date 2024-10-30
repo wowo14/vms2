@@ -1,15 +1,41 @@
 <?php
-
 namespace app\controllers;
-
-use app\models\{Negosiasi, Unit, TemplateChecklistEvaluasi, Attachment, Dpp, PaketPengadaanDetails, PaketPengadaanSearch, PaketPengadaan};
 use Yii;
-use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
+use yii\data\ActiveDataProvider;
 use yii\helpers\{ArrayHelper, Html};
+use kartik\grid\EditableColumnAction;
 use yii\web\{ServerErrorHttpException, Response, NotFoundHttpException};
-
+use app\models\{Negosiasi, Unit, TemplateChecklistEvaluasi, Attachment, Dpp, PaketPengadaanDetails, PaketPengadaanSearch, PaketPengadaan};
 class PaketpengadaanController extends Controller {
+    public function actions() {
+        return ArrayHelper::merge(parent::actions(), [
+            'editablenego' => [
+                'class' => EditableColumnAction::className(),
+                'modelClass' => PaketPengadaanDetails::className(),
+                'outputValue' => function ($model, $attribute, $key, $index) {
+                    return $model->$attribute;
+                },
+                'outputMessage' => function ($model, $attribute, $key, $index) {
+                    return '';
+                },
+                'showModelErrors' => true,
+                'errorOptions' => ['header' => '']
+            ],
+            'editablepenawaran' => [
+                'class' => EditableColumnAction::className(),
+                'modelClass' => PaketPengadaanDetails::className(),
+                'outputValue' => function ($model, $attribute, $key, $index) {
+                    return $model->$attribute;
+                },
+                'outputMessage' => function ($model, $attribute, $key, $index) {
+                    return '';
+                },
+                'showModelErrors' => true,
+                'errorOptions' => ['header' => '']
+            ],
+        ]);
+    }
     public function behaviors() {
         return [
             'verbs' => [

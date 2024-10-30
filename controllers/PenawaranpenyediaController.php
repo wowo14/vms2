@@ -1,11 +1,14 @@
 <?php
+
 namespace app\controllers;
-use app\models\{Negosiasi,PenawaranPengadaan,PenawaranPengadaanSearch};
+
+use app\models\{Negosiasi, PenawaranPengadaan, PenawaranPengadaanSearch};
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
-use yii\helpers\{ArrayHelper,Html};
-use yii\web\{ForbiddenHttpException,Response, NotFoundHttpException};
+use yii\helpers\{ArrayHelper, Html};
+use yii\web\{ForbiddenHttpException, Response, NotFoundHttpException};
+
 class PenawaranpenyediaController extends Controller {
     public function behaviors() {
         return [
@@ -65,42 +68,44 @@ class PenawaranpenyediaController extends Controller {
             return '<div class="alert alert-danger">No data found</div>';
         }
     }
-    public function actionNego($id){
+    public function actionNego($id) {
         $request = Yii::$app->request;
         $model = new Negosiasi();
-        $penawaran=$this->findModel($id);
+        $penawaran = $this->findModel($id);
         // $paketpengadaan=$penawaran->paketpengadaan;
         // if(!$penawaran->incompanygrouporadmin){
         //     throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
         // }
-        if($penawaran->paketpengadaan->pemenang){
+        if ($penawaran->paketpengadaan->pemenang) {
             Yii::$app->session->setFlash('warning', 'Pemenang sudah ditentukan');
             return $this->redirect('index');
         }
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
-            if($model->load($request->post()) ){
-                if($model->save()){
+            if ($model->load($request->post())) {
+                if ($model->save()) {
                     // $this->redirect($request->referrer);
                     return [
                         'title' => 'Form Nego',
                         'content' => 'sukses input nilai nego',
                     ];
-                }else{
+                } else {
                     return [
                         'title' => 'Error Save',
                         'content' => json_encode($model->getErrors()),
                         'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal'])
                     ];
                 }
-            }else{
+            } else {
                 return [
                     'title' => "Nego Penawaran #" . $penawaran->paketpengadaan->nomornamapaket,
-                    'content' => $this->renderAjax('_frm_nego', ['model' => $model,'penawaran'=>$penawaran]),
+                    'content' => $this->renderAjax('_frm_nego', ['model' => $model, 'penawaran' => $penawaran]),
                     'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
-                    (!$penawaran->paketpengadaan->details?Html::button(Yii::t('yii2-ajaxcrud', 'Create'), ['class' => 'btn btn-primary', 'type' => 'submit']):'')
+                        (!$penawaran->paketpengadaan->details ? Html::button(Yii::t('yii2-ajaxcrud', 'Create'), ['class' => 'btn btn-primary', 'type' => 'submit']) : '')
                 ];
             }
+        } else {
+            return $this->renderAjax('_frm_nego', ['model' => $model, 'penawaran' => $penawaran]);
         }
     }
     public function actionCreate() {
@@ -142,7 +147,7 @@ class PenawaranpenyediaController extends Controller {
         // if(!$model->incompanygrouporadmin){
         //     throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
         // }
-        if($model->paketpengadaan->pemenang){
+        if ($model->paketpengadaan->pemenang) {
             throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'Pemenang sudah ditentukan'));
         }
         $oldlampiran_penawaran = $model->lampiran_penawaran;
@@ -195,14 +200,14 @@ class PenawaranpenyediaController extends Controller {
     }
     public function actionDelete($id) {
         $request = Yii::$app->request;
-        $model=$this->findModel($id);
+        $model = $this->findModel($id);
         // if(!$model->incompanygrouporadmin){
         //     throw new ForbiddenHttpException(Yii::t('yii2-ajaxcrud', 'You are not allowed to perform this action.'));
         // }
-        if($model->paketpengadaan->pemenang){
-                Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
-                return $this->redirect('index');
-            }
+        if ($model->paketpengadaan->pemenang) {
+            Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
+            return $this->redirect('index');
+        }
         $model->delete();
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -219,7 +224,7 @@ class PenawaranpenyediaController extends Controller {
             // if(!$model->incompanygrouporadmin){
             //     continue;
             // }
-            if($model->paketpengadaan->pemenang){
+            if ($model->paketpengadaan->pemenang) {
                 Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
                 return $this->redirect('index');
             }
