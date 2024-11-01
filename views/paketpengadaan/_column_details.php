@@ -1,4 +1,5 @@
 <?php
+use app\models\PaketPengadaan;
 use yii\helpers\Html;
 use yii\bootstrap4\Modal;
 use kartik\editable\Editable;
@@ -116,7 +117,7 @@ $totalHpsIndex = $colCollection->search(function ($column) {
     return is_array($column) && isset($column['attribute']) && $column['attribute'] === 'totalhps';
 });
 if ($totalHpsIndex !== false) {
-    if (Yii::$app->tools->isAdmin()) {
+    if (Yii::$app->tools->isAdmin() || PaketPengadaan::isPP()) {
         $colCollection = $colCollection->slice(0, $totalHpsIndex)
             ->concat($editadmin)
             ->concat($colCollection->slice($totalHpsIndex));
