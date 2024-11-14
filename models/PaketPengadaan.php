@@ -200,42 +200,79 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         return parent::beforeSave($insert);
     }
     public function getrawData() {
+        $rawSettingkategori = collect(Setting::type('kategori_pengadaan'))->pluck('id', 'value')->toArray();
+        $rawSettingmetode = collect(Setting::type('metode_pengadaan'))->pluck('id', 'value')->toArray();
         return collect(self::where(['not', ['paket_pengadaan.id' => null]])
-            ->joinWith(['dpp d', 'details pd', 'penawaranpenyedia.negosiasi n', 'pejabatppkom ppkom', 'dpp.pejabat p', 'dpp.staffadmin s', 'dpp.unit u'])
+            ->joinWith([
+                'dpp d',
+                'details pd',
+                'penawaranpenyedia.negosiasi n',
+                'pejabatppkom ppkom',
+                'dpp.pejabat p',
+                'dpp.staffadmin s',
+                'dpp.unit u'
+            ])
             ->select([
                 new Expression("strftime('%Y', paket_pengadaan.tanggal_paket) as year"),
-                new Expression("strftime('%m', paket_pengadaan.tanggal_paket) as month"),
+                new Expression("CAST(strftime('%m', paket_pengadaan.tanggal_paket) AS INTEGER) as month"),
                 'paket_pengadaan.nama_paket',
                 'paket_pengadaan.metode_pengadaan',
                 'paket_pengadaan.kategori_pengadaan',
                 'paket_pengadaan.pagu',
+                'p.id as pejabat_pengadaan_id',
                 'p.nama as pejabat_pengadaan',
+                's.id as admin_pengadaan_id',
                 's.nama as admin_pengadaan',
+                'ppkom.id as pejabat_ppkom_id',
                 'ppkom.nama as pejabat_ppkom',
+                // 'count(paket_pengadaan.id) as count',
+                'u.id as bidang_bagian_id',
                 'u.unit as bidang_bagian',
                 new Expression("COALESCE(n.ammount, 0) AS hasilnego"),
                 new Expression("COALESCE(SUM(pd.hps_satuan), 0) AS hps"),
                 'paket_pengadaan.pemenang'
             ])
             ->andWhere(['not', ['d.bidang_bagian' => null]])
-            ->groupBy(['paket_pengadaan.id'])
+            ->groupBy('paket_pengadaan.id')
             ->orderBy('paket_pengadaan.id')
             ->asArray()
-            ->all());
+            ->all())->map(function ($e) use ($rawSettingkategori, $rawSettingmetode) {
+            $e['metode_pengadaan_id'] = $rawSettingmetode[$e['metode_pengadaan']];
+            $e['kategori_pengadaan_id'] = $rawSettingkategori[$e['kategori_pengadaan']];
+            return $e;
+        });
     }
-    private function getMonths() {
+    public function getMonths() {
         return range(1, 12);
     }
-    private function createPivotTable($data, $params, $groupKey, $bln) {
+    private function createPivotTable($data, $params, $groupKey, $bln) { //($data, $params['groupby'], $params['type'], $params['bln']);
         if (isset($bln) && !empty($bln)) {
             $data = $data->where('month', $bln);
             $months = [$bln];
         } else {
             $months = $data->pluck('month')->unique()->sort()->values();
         }
-        $types = $data->pluck($groupKey)->unique()->sort()->values();
-        $groupedData = $data->groupBy($params);
-        $pivotTable = $groupedData->map(function ($rows, $adminName) use ($months, $types, $groupKey) {
+        Yii::error('months: ' . $months);
+        if ((int)$groupKey) {
+            $data = $data->groupBy('kategori_pengadaan');
+            $types = $data->get($groupKey);
+        } else {
+            $types = $data->pluck($groupKey)->unique()->sort()->values();
+        }
+        Yii::error('types: ' . $types);
+        if ((int)$params) {
+            Yii::error('integer' . $params);
+            $group = $data->groupBy('pejabat_pengadaan_id');
+            $groupedData = $group->get($params);
+        } else {
+            $groupedData = $data->groupBy($params);
+        }
+        Yii::error('groupedData: ' . $groupedData);
+        if ($groupedData) {
+            return $groupedData;
+        }
+        die;
+        $pivotTable = collect($groupedData)->map(function ($rows, $adminName) use ($months, $types, $groupKey) {
             $row = ['name' => $adminName, 'total' => 0];
             foreach ($months as $month) {
                 $monthData = $rows->where('month', $month);
@@ -260,13 +297,11 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         $pivotTable->put('Total', $totalRow);
         return ['months' => $months, 'types' => $types, 'pivotTable' => $pivotTable];
     }
-    // public function byMetode($params = null) {
-    //     $data = $this->getrawData();
-    //     return $this->createPivotTable($data, $params, 'metode_pengadaan', 'metode_pengadaan');
-    // }
     public function byKategori($params) { //[groupby,type,bln]
         $data = $this->getrawData();
-        Yii::error('kategori called');
+        return $data;
+        die;
+        Yii::error('kategori called # raw data: ' . $data);
         return $this->createPivotTable($data, $params['groupby'], $params['type'], $params['bln']);
     }
     public function bymonths2($params) { //[groupby,named,bln]
@@ -302,5 +337,25 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         }
         $pivotTable->put('Total', $totalRow);
         return ['months' => $months, 'pivotTable' => $pivotTable];
+    }
+    public function kategoribulan($params) {
+        $data = $this->getrawData();
+        if ($params['tahun']) {
+            $data = $data->where('year', $params['tahun']);
+        }
+        if ($params['bln'] && $params['bln'] != 0) {
+            $data = $data->where('month', $params['bln'])
+                ->groupBy('month')->get($params['bln']);
+        }
+        if ($params['kategori'] && $params['kategori'] !== 'all') {
+            $data = $data->groupBy('kategori_pengadaan_id')
+                ->get($params['kategori']);
+        }
+        if ($params['pejabat'] && $params['pejabat'] !== 'all') {
+            $data = $data->groupBy('pejabat_pengadaan_id')
+                ->get($params['pejabat']);
+        }
+        // Yii::error($data);
+        return $data;
     }
 }

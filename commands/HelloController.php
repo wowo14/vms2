@@ -1,5 +1,7 @@
 <?php
+
 namespace app\commands;
+
 use app\Controllers\DppController;
 use app\models\Contacts;
 use app\models\Dpp;
@@ -7,6 +9,7 @@ use app\models\PaketPengadaan;
 use app\models\PaketPengadaanDetails;
 use app\models\PenawaranPengadaan;
 use app\models\Sertipikat;
+use app\models\Setting;
 use app\models\TemplateChecklistEvaluasi;
 use app\models\TemplateChecklistEvaluasiDetail;
 use app\models\User;
@@ -15,14 +18,18 @@ use app\models\ValidasiKualifikasiPenyediaDetail;
 use Yii;
 use yii\console\Controller;
 use yii\db\Expression;
+
 class HelloController extends Controller {
     public function actionHitung() { // hitung pada paket pengadaan mana?
-        $r =(new PaketPengadaan)->byMetode();
+        $r = (new PaketPengadaan)->byMetode();
         print_r($r);
     }
     public function actionIndex() {
         echo "\n";
         Yii::error('hello world');
+
+        $d = collect(Setting::type('metode_pengadaan'))->pluck('id', 'value');
+        print_r($d);
         die;
     }
     public function actionSeed() {
@@ -122,15 +129,20 @@ class HelloController extends Controller {
     }
     public function actionJenisperalihan() {
         $peralihan = [
-            'JUAL BELI', 'HIBAH', 'WARIS', 'KONVERSI', 'PECAH', 'SERTIPIKAT HILANG'
+            'JUAL BELI',
+            'HIBAH',
+            'WARIS',
+            'KONVERSI',
+            'PECAH',
+            'SERTIPIKAT HILANG'
         ];
         foreach ($peralihan as $key => $value) {
             Yii::$app->db->createCommand()->insert('setting', ['active' => 1, 'type' => 'jenis_peralihan', 'value' => $value])->execute();
         }
     }
-    public function actionTes2(){
+    public function actionTes2() {
         $formattedAmount = 'Rp 2.440.000,00';
-       $res=(new \app\widgets\Tools)->reverseCurrency($formattedAmount);
-       print_r($res);
+        $res = (new \app\widgets\Tools)->reverseCurrency($formattedAmount);
+        print_r($res);
     }
 }

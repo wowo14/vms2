@@ -10,13 +10,6 @@ class PivotReport extends Widget
     public $pivotData;
     public $colXData = [];
     public $colYData = [];
-    /**
-     * PivotReport constructor.
-     * @param $xColName
-     * @param $yColName
-     * @param $totalColName
-     * @param $data
-     */
     public function __construct(string $titles,string $xColName, string $yColName, string $totalColName, array $data)
     {
         $this->titles = $titles;
@@ -26,13 +19,6 @@ class PivotReport extends Widget
         $this->pivotData = $data;
         $this->_assignData();
     }
-    /**
-     * To get data for selected X and Y
-     *
-     * @param $xValue
-     * @param $yValue
-     * @return mixed|string
-     */
     public function getData($xValue, $yValue)
     {
         foreach ($this->pivotData as $data) {
@@ -42,31 +28,14 @@ class PivotReport extends Widget
         }
         return 0;
     }
-    /**
-     * To get total for X
-     *
-     * @param $value
-     * @return int|mixed
-     */
     public function totalX($value)
     {
         return $this->_total('xColName', $value);
     }
-    /**
-     * To get total for Y
-     *
-     * @param $value
-     * @return int|mixed
-     */
     public function totalY($value)
     {
         return $this->_total('yColName', $value);
     }
-    /**
-     * To get grand total for all data
-     *
-     * @return int|mixed
-     */
     public function grandTotal()
     {
         $total = 0;
@@ -75,11 +44,6 @@ class PivotReport extends Widget
         }
         return $total;
     }
-    /**
-     * To generate html table with pivot data
-     *
-     * @param $options
-     */
     public function generateHtml($options)
     {
         ?>
@@ -109,12 +73,6 @@ class PivotReport extends Widget
         </table>
         <?php
     }
-    /**
-     * To generate and download csv data
-     *
-     * @param null $filename
-     * @param string $delimiter
-     */
     function generateCsv($filename = null, $delimiter = ',')
     {
         if (empty($filename)) {
@@ -146,13 +104,6 @@ class PivotReport extends Widget
         fputcsv($f, $summaryRow, $delimiter);
         exit();
     }
-    /**
-     * To get total based on colname type
-     *
-     * @param string $colNameType
-     * @param $value
-     * @return int|mixed
-     */
     protected function _total(string $colNameType, $value)
     {
         $total = 0;
@@ -163,9 +114,6 @@ class PivotReport extends Widget
         }
         return $total;
     }
-    /**
-     * To filter data to X and Y group
-     */
     protected function _assignData()
     {
         foreach ($this->pivotData as $data) {

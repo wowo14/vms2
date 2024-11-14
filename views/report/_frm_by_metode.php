@@ -8,11 +8,11 @@ $this->params['breadcrumbs'][] = $this->title;
 $tahun = $raw->unique('year')->pluck('year', 'year')->toArray();
 $month = $model->months;
 $month = array_merge([0 => 'all'], $month);
-$kategori = array_merge(['' => '', 'all' => 'all'], $model::optionkategoripengadaan());
+// $kategori = array_merge(['' => '', 'all' => 'all'], $model::optionkategoripengadaan());
 $metode = array_merge(['' => '', 'all' => 'all'], $model::optionmetodepengadaan());
 $pejabat = array_merge(['' => '', 'all' => 'all'], $model::getAllpetugas());
-$admin = array_merge(['' => '', 'all' => 'all'], $model::getAlladmin());
-$bidang = array_merge(['' => '', 'all' => 'all'], Unit::collectAll()->pluck('unit', 'id')->toArray());
+// $admin = array_merge(['' => '', 'all' => 'all'], $model::getAlladmin());
+// $bidang = array_merge(['' => '', 'all' => 'all'], Unit::collectAll()->pluck('unit', 'id')->toArray());
 $form = ActiveForm::begin([
     'id' => 'rpt-form',
     'action' => \yii\helpers\Url::to(['report/metode']),
@@ -46,20 +46,20 @@ echo $form->field($model, 'pejabat')->widget(Select2::class, [
         'allowClear' => true
     ]
 ]);
-echo $form->field($model, 'admin')->widget(Select2::class, [
-    'data' => $admin,
-    'pluginOptions' => [
-        'placeholder' => 'Pilih Admin',
-        'allowClear' => true
-    ]
-]);
-echo $form->field($model, 'bidang')->widget(Select2::class, [
-    'data' => $bidang,
-    'pluginOptions' => [
-        'placeholder' => 'Pilih Bidang',
-        'allowClear' => true
-    ]
-]);
+// echo $form->field($model, 'admin')->widget(Select2::class, [
+//     'data' => $admin,
+//     'pluginOptions' => [
+//         'placeholder' => 'Pilih Admin',
+//         'allowClear' => true
+//     ]
+// ]);
+// echo $form->field($model, 'bidang')->widget(Select2::class, [
+//     'data' => $bidang,
+//     'pluginOptions' => [
+//         'placeholder' => 'Pilih Bidang',
+//         'allowClear' => true
+//     ]
+// ]);
 //button
 echo Html::submitButton('Submit', ['class' => 'btn btn-primary']);
 ActiveForm::end();
