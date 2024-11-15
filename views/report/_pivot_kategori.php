@@ -47,7 +47,6 @@
 </div>
 <?php
 $modeldata = json_encode($model, JSON_NUMERIC_CHECK);
-// print_r($modeldata);
 $js = <<<JS
 const pivotkategoricount =new WebDataRocks({
         container: "#pivot-kategoricount",
