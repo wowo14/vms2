@@ -13,7 +13,6 @@ $month = array_merge([0 => 'all'], $month);
 $all = ['all' => 'all'];
 $kategori = $all + $model::optionsSettingtype('kategori_pengadaan', ['value', 'id']);
 $pejabat = $all + $model::getAllpetugas();
-// $pejabat = $all + collect($model::getAllpetugas())->mapWithKeys(fn($e) => [$e => $e])->toArray();//value-value
 $form = ActiveForm::begin([
     'id' => 'rpt-form',
     'action' => \yii\helpers\Url::to(['report/kategori']),

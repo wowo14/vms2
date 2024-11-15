@@ -10,14 +10,12 @@ $this->params['breadcrumbs'][] = $this->title;
 $tahun = $raw->unique('year')->pluck('year', 'year')->toArray();
 $month = $model->months;
 $month = array_merge([0 => 'all'], $month);
-$kategori = array_merge(['' => '', 'all' => 'all'], $model::optionkategoripengadaan());
-// $metode = array_merge(['' => '', 'all' => 'all'], $model::optionmetodepengadaan());
-// $pejabat = array_merge(['' => '', 'all' => 'all'], $model::getAllpetugas());
-$admin = array_merge(['' => '', 'all' => 'all'], $model::getAlladmin());
-// $bidang = array_merge(['' => '', 'all' => 'all'], Unit::collectAll()->pluck('unit', 'id')->toArray());
+$all = ['all' => 'all'];
+$kategori = $all + $model::optionsSettingtype('kategori_pengadaan', ['value', 'id']);
+$admin = $all + $model::getAlladmin();
 $form = ActiveForm::begin([
     'id' => 'rpt-form',
-    'action' => \yii\helpers\Url::to(['report/adminpengadaan']),
+    'action' => \yii\helpers\Url::to(['report/kategori']),
     'enableAjaxValidation' => false,
     'fieldConfig' => [
         'template' => "<div class='row'>{label}\n<div class='col-sm-9'>{input}\n{error}</div></div>",
@@ -41,13 +39,20 @@ echo $form->field($model, 'kategori')->widget(Select2::class, [
         'allowClear' => true
     ]
 ]);
-echo $form->field($model, 'admin')->widget(Select2::class, [
-    'data' => $admin,
+echo $form->field($model, 'pejabat')->widget(Select2::class, [
+    'data' => $pejabat,
     'pluginOptions' => [
-        'placeholder' => 'Pilih Admin',
+        'placeholder' => 'Pilih Pejabat',
         'allowClear' => true
     ]
 ]);
+// echo $form->field($model, 'admin')->widget(Select2::class, [
+//     'data' => $admin,
+//     'pluginOptions' => [
+//         'placeholder' => 'Pilih Admin',
+//         'allowClear' => true
+//     ]
+// ]);
 // echo $form->field($model, 'bidang')->widget(Select2::class, [
 //     'data' => $bidang,
 //     'pluginOptions' => [

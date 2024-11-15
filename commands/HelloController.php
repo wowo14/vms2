@@ -22,14 +22,11 @@ use yii\db\Expression;
 class HelloController extends Controller {
     public function actionHitung() { // hitung pada paket pengadaan mana?
         $r = (new PaketPengadaan)->byMetode();
-        print_r($r);
+        // print_r($r);
     }
     public function actionIndex() {
         echo "\n";
         Yii::error('hello world');
-
-        $d = collect(Setting::type('metode_pengadaan'))->pluck('id', 'value');
-        print_r($d);
         die;
     }
     public function actionSeed() {
@@ -143,6 +140,6 @@ class HelloController extends Controller {
     public function actionTes2() {
         $formattedAmount = 'Rp 2.440.000,00';
         $res = (new \app\widgets\Tools)->reverseCurrency($formattedAmount);
-        print_r($res);
+        // print_r($res);
     }
 }

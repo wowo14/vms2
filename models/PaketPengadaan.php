@@ -1,10 +1,7 @@
 <?php
-
 namespace app\models;
-
 use Yii;
 use yii\db\Expression;
-
 class PaketPengadaan extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
     public $oldrecord;
@@ -242,9 +239,9 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             return $e;
         });
     }
-    public function getMonths() {
-        return range(1, 12);
-    }
+    // public function getMonths() {
+    //     return range(1, 12);
+    // }
     private function createPivotTable($data, $params, $groupKey, $bln) { //($data, $params['groupby'], $params['type'], $params['bln']);
         if (isset($bln) && !empty($bln)) {
             $data = $data->where('month', $bln);
@@ -304,39 +301,30 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         Yii::error('kategori called # raw data: ' . $data);
         return $this->createPivotTable($data, $params['groupby'], $params['type'], $params['bln']);
     }
-    public function bymonths2($params) { //[groupby,named,bln]
-        if ($params['bln']) {
-            $data = ($this->getrawData())->where('month', $params['bln']);
-            $months = [$params['bln']];
-        } else {
-            $data = $this->getrawData();
-            $months = $this->getMonths();
+    public function metodebulan($params) {
+        $data = $this->getrawData();
+        if ($params['tahun']) {
+            $data = $data->where('year', $params['tahun']);
         }
-        $groupedData = $data->groupBy($params['groupby']);
-        $pivotTable = $groupedData->map(function ($rows, $adminName) use ($months) {
-            $row = ['name' => $adminName, 'total' => 0];
-            foreach ($months as $month) {
-                $count = $rows->where('month', $month)->count();
-                $row[$month] = $count;
-                $row['total'] += $count;
+        if ($params['bln'] && $params['bln'] != 0) {
+            $data = $data->where('month', $params['bln'])
+                ->groupBy('month')->get($params['bln']);
+        }
+        if ($params['metode'] && $params['metode'] !== 'all') {
+            $data = $data->groupBy('metode_pengadaan_id')
+                ->get($params['metode']);
+        }
+        if ($params['pejabat'] && $params['pejabat'] !== 'all') {
+            $data = $data->groupBy('pejabat_pengadaan_id')
+                ->get($params['pejabat']);
+        }
+        $months=$this->getMonths();
+        return $data->map(function($e)use($months){
+            if($e['month']!==0){
+                $e['bulan']=$months[$e['month']];
             }
-            return $row;
+            return $e;
         });
-        if ($params['named']) {
-            $pivotTable = $pivotTable->filter(function ($item) use ($params) {
-                return $item['name'] === $params['named'];
-            });
-        }
-        // Calculate total row
-        $totalRow = ['name' => 'Total', 'total' => 0];
-        foreach ($months as $month) {
-            $totalRow[$month] = $pivotTable->sum(function ($row) use ($month) {
-                return $row[$month] ?? 0;
-            });
-            $totalRow['total'] += $totalRow[$month];
-        }
-        $pivotTable->put('Total', $totalRow);
-        return ['months' => $months, 'pivotTable' => $pivotTable];
     }
     public function kategoribulan($params) {
         $data = $this->getrawData();
@@ -356,6 +344,12 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
                 ->get($params['pejabat']);
         }
         // Yii::error($data);
-        return $data;
+        $months=$this->getMonths();
+        return $data->map(function($e)use($months){
+            if($e['month']!==0){
+                $e['bulan']=$months[$e['month']];
+            }
+            return $e;
+        });
     }
 }
