@@ -6,11 +6,22 @@ use yii\bootstrap4\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\View;
+    \app\assets\AppAsset::register($this);
+    $url = Yii::$app->request->getUrl();
+    $query = parse_url($url, PHP_URL_QUERY);
+    parse_str($query, $params);
+    $where='';
+    if ($params) {
+        @$_GET['uid'] = $params['id'];
+        $where.='pemenang='.$params['id'];
+    }
 $dpp = collect(PaketPengadaan::find()
     // ->where(['tahun_anggaran' => date('Y')])
     // ->where(['<>', 'approval_by', 0])
     // ->andWhere(['!=', 'approval_by', null])
-    ->all())->pluck('nomornamapaket', 'id')->toArray();
+    ->all())
+    ->where($where)
+    ->pluck('nomornamapaket', 'id')->toArray();
 $this->registerJs('
 jQuery(function ($) {
     setupImagePreview($("#imageInput"), $("#imagePreview"), $("#file_akta"));

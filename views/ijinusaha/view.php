@@ -1,4 +1,5 @@
 <?php
+use yii\helpers\Url;
 use yii\widgets\DetailView;
 ?>
 <div class="ijinusaha-view">
@@ -9,7 +10,7 @@ use yii\widgets\DetailView;
             'instansi_pemberi:ntext',
             'nomor_ijinusaha:ntext',
             'tanggal_ijinusaha:ntext',
-            'file_ijinusaha:ntext',
+            ['attribute' => 'file_ijinusaha', 'format' => 'raw', 'value' => fn($model) => "<a href='" . Url::to('@web/uploads/') . $model->file_ijinusaha . "' target='_blank'>$model->file_ijinusaha</a>"],
             'tanggal_berlaku_sampai:ntext',
             'kualifikasi:ntext',
             'klasifikasi:ntext',

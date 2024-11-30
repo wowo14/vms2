@@ -8,6 +8,14 @@ use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
 $idmodal = $searchModel->hash;$this->title = 'Peralatankerja';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
+$profile = $redo = '';
+$url = Yii::$app->request->getUrl();
+$query = parse_url($url, PHP_URL_QUERY);
+parse_str($query, $params);
+if ($params) {
+    $profile = '?id=' . $params['id'];
+    $redo = $url;
+}
 ?>
 <div class="peralatankerja-index">
     <div id="ajaxCrudDatatable">
@@ -22,12 +30,12 @@ CrudAsset::register($this);
                     'content' =>
                     Html::a(
                         '<i class="fa fa-plus"></i>',
-                        ['peralatankerja/create'],
+                        ['peralatankerja/create'.$profile],
                         ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Peralatankerjas', 'class' => 'btn btn-outline-primary']
                     ) .
                         Html::a(
                             '<i class="fa fa-redo"></i>',
-                            [''],
+                            [$redo],
                             ['data-pjax' => 1, 'data-target' => '#' . $idmodal, 'class' => 'btn btn-outline-success', 'title' => Yii::t('yii2-ajaxcrud', 'Reset Grid')]
                         ) .
                         '{toggleData}' .

@@ -8,6 +8,12 @@ use yii\helpers\Html;
 use yii\web\View;
 $arpenyedia=[];
 AppAsset::register($this);
+    $url = Yii::$app->request->getUrl();
+    $query = parse_url($url, PHP_URL_QUERY);
+    parse_str($query, $params);
+    if ($params) {
+        @$_GET['uid'] = $params['id'];
+    }
 $this->registerJs('
 jQuery(function ($) {
     setupImagePreview($("#imageInput"), $("#imagePreview"), $("#file"));

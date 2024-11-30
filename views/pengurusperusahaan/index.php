@@ -7,6 +7,14 @@ use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;$this->title = 'Pengurusperusahaan';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
+$profile=$redo='';
+$url = Yii::$app->request->getUrl();
+$query = parse_url($url, PHP_URL_QUERY);
+parse_str($query, $params);
+if($params){
+    $profile ='?id='.$params['id'];
+    $redo=$url;
+}
 $idmodal = $searchModel->hash;
 ?>
 <div class="pengurusperusahaan-index">
@@ -22,12 +30,12 @@ $idmodal = $searchModel->hash;
                     'content' =>
                     Html::a(
                         '<i class="fa fa-plus"></i>',
-                        ['/pengurusperusahaan/create'],
+                        ['/pengurusperusahaan/create'.$profile],
                         ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Pengurusperusahaans', 'class' => 'btn btn-outline-primary']
                     ) .
                         Html::a(
                             '<i class="fa fa-redo"></i>',
-                            ['' . $searchModel->hashid($searchModel->id)],
+                            [$redo],
                             ['data-pjax' => 1, 'data-target' => '#' . $idmodal, 'class' => 'btn btn-outline-success', 'title' => Yii::t('yii2-ajaxcrud', 'Reset Grid')]
                         ) .
                         '{toggleData}' .

@@ -4,17 +4,25 @@ use kartik\switchinput\SwitchInput;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\{ArrayHelper,Html};
 use yii\web\View;
-$this->registerJs('
+$url = Yii::$app->request->getUrl();
+$query = parse_url($url, PHP_URL_QUERY);
+parse_str($query, $params);
+if ($params) {
+    @$_GET['uid']=$params['id'];
+}
+$js=<<<JS
 jQuery(function ($) {
     jQuery(".reveal").on("click",function() {
-        var $pwd = $(".pwd");
-        if ($pwd.attr("type") === "password") {
-            $pwd.attr("type", "text");
+        var pwd = $(".pwd");
+        if (pwd.attr("type") === "password") {
+            pwd.attr("type", "text");
         } else {
-            $pwd.attr("type", "password");
+            pwd.attr("type", "password");
         }
     });
-});', View::POS_END);
+});
+JS;
+$this->registerJs($js, View::POS_END);
 ?>
 <div class="pengurusperusahaan-form">
     <?php $form = ActiveForm::begin([
