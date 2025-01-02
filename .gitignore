@@ -42,3 +42,4 @@ test*
 web/uploads/attachment/*
 web/uploads/
 web/assets
+.codegpt

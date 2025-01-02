@@ -32,9 +32,114 @@
         <div id="pivot-pejabatmetodesum"></div>
     </div>
 </div>
+<div class="row">
+    <div class="col-md-6">E. Jumlah Kegiatan Pengadaan Per Unit/Bidang/Bagian
+        <div id="pivot-unitbidangcount"></div>
+    </div>
+    <div class="col-md-6">Total Kontrak Pengadaan Per Unit/Bidang/Bagian
+        <div id="pivot-unitbidangsum"></div>
+    </div>
+    <!-- <div id="highcharts-container"></div> -->
+</div>
 <?php
 $modeldata = json_encode($model, JSON_NUMERIC_CHECK);
 $js = <<<JS
+new WebDataRocks({
+        container: "#pivot-unitbidangcount",
+        toolbar: true,
+        report: {
+            dataSource: {
+                data: $modeldata
+            },
+            "slice": {
+                "rows": [
+                    {
+                        "uniqueName": "bidang_bagian",
+                        "caption": "Unit/Bidang/Bagian"
+                    }
+                ],
+                "columns": [
+                    {
+                        "uniqueName": "bulan",
+                        // "caption": "Month",
+                        "showTotals": false
+                    },
+                ],
+                "measures": [
+                    {
+                        "uniqueName": "pagu",
+                        "aggregation": "count",
+                        "caption": "Total"
+                    }
+                ]
+            },
+            options: {
+                 grid: {
+                    type: "compact",
+                    showGrandTotals: "on", // Enable grand totals
+                    showTotals: "off", // Disable sub-totals within rows
+                    showEmptyValues: false
+                }
+            }
+        },
+        reportcomplete: function() {
+        let pivot = this;
+        pivot.off("reportcomplete"); // Ensure it only runs once
+        document.querySelectorAll('.webdatarocks-table td:empty').forEach(cell => {
+            cell.style.display = 'none';
+        });
+    }
+});
+new WebDataRocks({
+        container: "#pivot-unitbidangsum",
+        toolbar: true,
+        report: {
+            dataSource: {
+                data: $modeldata
+            },
+            "slice": {
+                "rows": [
+                    {
+                        "uniqueName": "bidang_bagian",
+                        "caption": "Unit/Bidang/Bagian"
+                    }
+                ],
+                "columns": [
+                    {
+                        "uniqueName": "bulan",
+                        // "caption": "Month",
+                        "showTotals": false
+                    },
+                    {
+                        "uniqueName": "metode_pengadaan",
+                        // "caption": "Kategori Pengadaan"
+                    }
+                ],
+                "measures": [
+                    {
+                        "uniqueName": "hasilnego",
+                        "aggregation": "sum",
+                        "caption": "Total"
+                    }
+                ]
+            },
+            options: {
+                 grid: {
+                    type: "compact",
+                    showGrandTotals: "on", // Enable grand totals
+                    showTotals: "off", // Disable sub-totals within rows
+                    showEmptyValues: false
+                }
+            }
+        },
+        reportcomplete: function() {
+        let pivot = this;
+        pivot.off("reportcomplete"); // Ensure it only runs once
+        document.querySelectorAll('.webdatarocks-table td:empty').forEach(cell => {
+            cell.style.display = 'none';
+        });
+    }
+});
 new WebDataRocks({
         container: "#pivot-metodecount",
         toolbar: true,
@@ -81,6 +186,7 @@ new WebDataRocks({
         });
     }
 });
+
 new WebDataRocks({
         container: "#pivot-metodesum",
         toolbar: true,

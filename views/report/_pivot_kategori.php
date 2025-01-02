@@ -35,7 +35,16 @@
     <div class="col-md-6">Total Kontrak Pengadaan Per Pejabat Pengadaan
         <div id="pivot-pejabatmetodesum"></div>
     </div>
-    <div id="highcharts-container"></div>
+    <!-- <div id="highcharts-container"></div> -->
+</div>
+<div class="row">
+    <div class="col-md-6">E. Jumlah Kegiatan Pengadaan Per Unit/Bidang/Bagian
+        <div id="pivot-unitbidangcount"></div>
+    </div>
+    <div class="col-md-6">Total Kontrak Pengadaan Per Unit/Bidang/Bagian
+        <div id="pivot-unitbidangsum"></div>
+    </div>
+    <!-- <div id="highcharts-container"></div> -->
 </div>
 <?php
 $modeldata = json_encode($model, JSON_NUMERIC_CHECK);
@@ -73,6 +82,18 @@ function createPivot(container, rows, columns, measures, aggregation, caption) {
         // }
     });
 }
+const unitbidangcount = createPivot(
+    "#pivot-unitbidangcount",
+    [{ uniqueName: "bidang_bagian", caption: "Unit/Bidang/Bagian" }],
+    [{ uniqueName: "bulan", showTotals: false }],
+    [{ uniqueName: "pagu", aggregation: "count", caption: "Total" }]
+);
+const unitbidangsum = createPivot(
+    "#pivot-unitbidangsum",
+    [{ uniqueName: "bidang_bagian", caption: "Unit/Bidang/Bagian" }],
+    [{ uniqueName: "bulan", showTotals: false }],
+    [{ uniqueName: "hasilnego", aggregation: "sum", caption: "Total" }]
+);
 const pivotkategoricount = createPivot(
     "#pivot-kategoricount",
     [{ uniqueName: "kategori_pengadaan", caption: "Kategori Pengadaan" }],

@@ -1,4 +1,5 @@
 <?php
+
 use app\models\PaketPengadaan;
 use kartik\date\DatePicker;
 use kartik\select2\Select2;
@@ -6,22 +7,18 @@ use yii\bootstrap4\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\View;
-    \app\assets\AppAsset::register($this);
-    $url = Yii::$app->request->getUrl();
-    $query = parse_url($url, PHP_URL_QUERY);
-    parse_str($query, $params);
-    $where='';
-    if ($params) {
-        @$_GET['uid'] = $params['id'];
-        $where.='pemenang='.$params['id'];
-    }
-$dpp = collect(PaketPengadaan::find()
-    // ->where(['tahun_anggaran' => date('Y')])
-    // ->where(['<>', 'approval_by', 0])
-    // ->andWhere(['!=', 'approval_by', null])
-    ->all())
-    ->where($where)
-    ->pluck('nomornamapaket', 'id')->toArray();
+
+\app\assets\AppAsset::register($this);
+$url = Yii::$app->request->getUrl();
+$query = parse_url($url, PHP_URL_QUERY);
+parse_str($query, $params);
+$where = '';
+$dpp = collect(PaketPengadaan::find()->all())->pluck('nomornamapaket', 'id')->toArray();
+if ($params) {
+    @$_GET['uid'] = $params['id'];
+    // print_r(PaketPengadaan::where(['pemenang' => $params['id']])->all());
+    $dpp = collect(PaketPengadaan::where(['pemenang' => $params['id']])->all())->pluck('nomornamapaket', 'id')->toArray();
+}
 $this->registerJs('
 jQuery(function ($) {
     setupImagePreview($("#imageInput"), $("#imagePreview"), $("#file_akta"));
@@ -39,7 +36,7 @@ jQuery(function ($) {
     <?php if (Yii::$app->tools->isAdmin()) :
         $arpenyedia = isset($_GET['uid'])
             ? collect($model->vendors)
-            ->filter(fn ($vendor) => $vendor->id == $this->context->decodeurl($_GET['uid'])->id)
+            ->filter(fn($vendor) => $vendor->id == $this->context->decodeurl($_GET['uid'])->id)
             ->pluck('nama_perusahaan', 'id')
             ->toArray()
             : ArrayHelper::map($model->vendors, 'id', 'nama_perusahaan');
