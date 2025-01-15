@@ -22,6 +22,11 @@ CrudAsset::register($this);
                 [
                     'content' =>
                     Html::a(
+                        '<i class="fa fa-check"></i>',
+                        ['coa/copyto'],
+                        ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => 'Copy To', 'class' => 'btn btn-default']
+                    ) .
+                    Html::a(
                         '<i class="fa fa-plus"></i>',
                         ['coa/create'],
                         ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Kode Rekenings', 'class' => 'btn btn-outline-primary']

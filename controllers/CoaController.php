@@ -26,6 +26,54 @@ use yii\helpers\Html;class CoaController extends Controller {
             'dataProvider' => $dataProvider,
         ]);
     }
+    public function actionCopyto() {
+        $request = Yii::$app->request;
+        $model = new KodeRekening();
+        if ($request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            if ($request->isGet) {
+                $optionsTahun = $model::optiontahunanggaran();
+                $filterExist = collect($optionsTahun)->filter(function ($th) use ($model) {
+                    return $model::where(['tahun_anggaran' => $th])->exists();
+                });
+                $filternon = collect($optionsTahun)->filter(function ($th) use ($model) {
+                    return !$model::where(['tahun_anggaran' => $th])->exists();
+                });
+                $opttahun = ['from' => $filterExist, 'to' => $filternon];
+                return [
+                    'title' => "Copy to",
+                    'content' => $this->renderAjax('_formcopyto', [
+                        'model' => $model,
+                        'opttahun' => $opttahun
+                    ]),
+                    'footer' => Html::button('Close', ['class' => 'btn btn-default pull-left', 'data-dismiss' => "modal"]) .
+                    Html::button('Save', ['class' => 'btn btn-primary', 'type' => "submit"])
+                ];
+            }
+            if ($model->load($request->post())) {
+                $req = $request->post('KodeRekening')['tahun_anggaran']; // array from multipleinput
+                $res = [];
+                foreach ($req as $key => $val) {
+                    $res = $model::copyto($val['from'], $val['to']);
+                }
+                if ($res['status'] == 'success') {
+                    return [
+                        'forceReload' => '#crud-datatable' . $model->hash . '-pjax',
+                        'title' => $res['status'],
+                        'content' => $res['message'],
+                        // 'forceClose' => true,
+                        'footer' => ''
+                    ];
+                } else {
+                    return [
+                        'title' => $res['status'],
+                        'content' => $res['message'],
+                    ];
+                }
+                Yii::$app->session->setFlash($res['status'], $res['message']);
+            }
+        }
+    }
     public function actionView($id) {
         $request = Yii::$app->request;
         if ($request->isAjax) {
