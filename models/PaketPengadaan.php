@@ -14,7 +14,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             [['nomor', 'tanggal_paket', 'tanggal_dpp', 'tanggal_persetujuan', 'nomor_persetujuan', 'nama_paket', 'tahun_anggaran', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'unit', 'pagu', 'metode_pengadaan', 'kategori_pengadaan'], 'required'],
             [['tanggal_paket', 'tanggal_reject', 'alasan_reject', 'addition'], 'string'],
             [['pagu'], 'number'],
-            [['nama_paket'], 'unique'],
+            // [['nama_paket'], 'unique'],
             [['created_by', 'admin_ppkom', 'tahun_anggaran', 'approval_by', 'unit'], 'integer'],
             [['nomor', 'kategori_pengadaan', 'nama_paket', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'metode_pengadaan'], 'string', 'max' => 255],
         ];
@@ -166,11 +166,11 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     public function beforeSave($insert) {
         if ($insert) {
             $this->tanggal_paket = date('Y-m-d H:i:s', time());
-            $exist = self::where(['nama_paket' => $this->nama_paket])->exists();
-            if ($exist) {
-                Yii::$app->session->setFlash('error', 'Paket Pengadaan sudah ada');
-                return false;
-            }
+            // $exist = self::where(['nama_paket' => $this->nama_paket])->exists();
+            // if ($exist) {
+            //     Yii::$app->session->setFlash('error', 'Paket Pengadaan sudah ada');
+            //     return false;
+            // }
             $hasil = [];
             $template = TemplateChecklistEvaluasi::where(['like', 'template', 'Ceklist_Kelengkapan_DPP'])->one();
             if ($template) {
