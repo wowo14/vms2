@@ -23,7 +23,7 @@ use yii\helpers\Html;
         'data' => collect($model->coacode)->map(function ($e) {
             $e->kode = $e->kode . '||' . $e->rekening;
             return $e;
-        })->pluck('kode', 'id')->toArray(),
+        })->filter(fn($e)=>$e->tahun_anggaran==date('Y'))->pluck('kode', 'id')->toArray(),
         'language' => 'id',
         'options' => ['placeholder' => 'Select parent'],
         'pluginOptions' => [
