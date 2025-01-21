@@ -123,15 +123,15 @@ use yii\web\{Response, NotFoundHttpException};class ProgramkegiatanController ex
             $data = [];
             switch ($param) {
                 case 'tahun':
-                    $data = ProgramKegiatan::find()
-                        ->where(['type' => 'program', 'tahun_anggaran' => $tahun, 'is_active' => 1])
-                        ->asArray()
+                    $data = ProgramKegiatan::where(['type' => 'program', 'tahun_anggaran' => $tahun, 'is_active' => 1])
+                    ->orderBy('code')
+                    ->asArray()
                         ->all();
                     break;
                 case 'program':
-                    $data = ProgramKegiatan::find()
-                        ->where(['type' => 'kegiatan', 'tahun_anggaran' => $tahun, 'is_active' => 1])
-                        ->asArray()
+                    $data = ProgramKegiatan::where(['type' => 'kegiatan', 'tahun_anggaran' => $tahun, 'is_active' => 1])
+                    ->orderBy('code')
+                    ->asArray()
                         ->all();
                     break;
                 case 'koderekening':
@@ -139,6 +139,7 @@ use yii\web\{Response, NotFoundHttpException};class ProgramkegiatanController ex
                     $data = collect($rek->coacode)
                         ->filter(fn ($v) => $v->tahun_anggaran == $tahun)
                         ->map(fn ($el) => ['code' => $el['kode'], 'desc' => $el['rekening']])
+                        ->sortBy('code')
                         ->toArray();
                     break;
             }
