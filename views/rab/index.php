@@ -62,7 +62,7 @@ CrudAsset::register($this);
     </div>
 </div>
 <?php Modal::begin([
-    "id" => $idmodal,
+    "id" => $idmodal,'size'=>'modal-xl',
     "footer" => "",
     "clientOptions" => [
         "tabindex" => false,
