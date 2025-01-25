@@ -2,11 +2,12 @@
 namespace app\controllers;
 use Yii;
 use yii\filters\VerbFilter;
+use app\models\KodeRekening;
 use yii\data\ActiveDataProvider;
 use yii\helpers\{ArrayHelper, Html};
 use kartik\grid\EditableColumnAction;
 use yii\web\{ServerErrorHttpException, Response, NotFoundHttpException};
-use app\models\{Negosiasi, Unit, TemplateChecklistEvaluasi, Attachment, Dpp, PaketPengadaanDetails, PaketPengadaanSearch, PaketPengadaan};
+use app\models\{Negosiasi, Unit, TemplateChecklistEvaluasi, Attachment, Dpp, PaketPengadaanDetails, PaketPengadaanSearch, PaketPengadaan, ProgramKegiatan, Rab};
 class PaketpengadaanController extends Controller {
     public function actions() {
         return ArrayHelper::merge(parent::actions(), [
@@ -160,6 +161,64 @@ class PaketpengadaanController extends Controller {
         } else {
             return '<div class="alert alert-danger">No data found</div>';
         }
+    }
+    public function actionChild($param) {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = [];
+        $selected = '';
+        if (isset($_POST['depdrop_parents']) && (end($_POST['depdrop_parents'])) !== null) {
+            $val = end($_POST['depdrop_parents']);
+            $data = [];
+            $param0 = $param1 = $param2 = '';
+            if (!empty($_POST['depdrop_params'])) {
+                $param0 = $_POST['depdrop_params'][0] ?? '';
+                $param1 = $_POST['depdrop_params'][1] ?? '';
+                $param2 = $_POST['depdrop_params'][2] ?? '';
+            }
+            switch ($param) {
+                case 'tahun':
+                    $data = ProgramKegiatan::where(['type' => 'program', 'tahun_anggaran' => $val, 'is_active' => 1])
+                        ->orderBy('code')
+                        ->asArray()
+                        ->all();
+                    break;
+                case 'program':
+                    $data = Rab::where(['tahun_anggaran' => $param0, 'kode_program' => $param1])
+                        ->select(['kode_kegiatan as code', 'nama_kegiatan as desc'])
+                        ->orderBy('id')
+                        ->groupBy('kode_kegiatan')
+                        ->distinct()
+                        ->asArray()
+                        ->all();
+                    if (empty($data)) {
+                        $data = ProgramKegiatan::where(['type' => 'kegiatan', 'tahun_anggaran' => $param0, 'is_active' => 1])
+                            ->orderBy('code')
+                            ->asArray()
+                            ->all();
+                    }
+                    break;
+                case 'koderekening':
+                    $data = Rab::where(['tahun_anggaran' => $param0, 'kode_program' => $param1, 'kode_kegiatan' => $param2])
+                        ->select(['kode_rekening as code', 'uraian_anggaran as desc'])
+                        ->orderBy('id')
+                        ->asArray()
+                        ->all();
+                    if (empty($data)) {
+                        $rek = new KodeRekening();
+                        $data = collect($rek->coacode)
+                            ->filter(fn($v) => $v->tahun_anggaran == $param0)
+                            ->map(fn($el) => ['code' => $el['kode'], 'desc' => $el['rekening']])
+                            ->sortBy('code')
+                            ->toArray();
+                    }
+                    break;
+            }
+            foreach ($data as $i => $account) {
+                $out[] = ['id' => $account['code'], 'name' => $account['code'] . ' - ' . $account['desc']];
+                $selected = ($i == 0) ? $account['code'] : $selected;
+            }
+        }
+        return ['output' => $out, 'selected' => $selected];
     }
     public function actionImportProduct($id) {
         $model = $this->findModel($id);

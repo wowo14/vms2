@@ -1,5 +1,6 @@
 <?php
 use app\assets\AppAsset;
+use app\models\Pegawai;
 use app\models\Unit;
 use app\widgets\FilePreview;
 use kartik\date\DatePicker;
@@ -31,6 +32,15 @@ function rabid(){
 JS;
 $this->registerJs($js, \yii\web\View::POS_HEAD);
 $datakodeprogram = $model->isNewRecord ? \app\models\ProgramKegiatan::optionprogram() : \app\models\ProgramKegiatan::optionprogram($model->kode_program, $model->tahun_anggaran);
+$adminppkom=[];
+if($model::isAdmin() || $model::isStaffpp()){
+    $adminppkom=$model::optionadminppkom();
+}
+if($model::isStaff()){
+    $adminppkom= collect($model::optionadminppkom())->filter(function($value,$key){
+        return $key==Pegawai::findOne(['id_user'=> Yii::$app->user->identity->id])->id;
+    })->toArray();
+}
 ?>
 <div class="paket-pengadaan-form">
     <?php $form = ActiveForm::begin([
@@ -100,7 +110,7 @@ $datakodeprogram = $model->isNewRecord ? \app\models\ProgramKegiatan::optionprog
         'pluginOptions' => [
             'depends' => ['paketpengadaan-tahun_anggaran'],
             'placeholder' => 'Select...',
-            'url' => Url::to(['/programkegiatan/child?param=tahun'])
+            'url' => Url::to(['/paketpengadaan/child?param=tahun']),
         ],
         'pluginEvents' => [
             "depdrop:change" => "function(){
@@ -129,9 +139,10 @@ $datakodeprogram = $model->isNewRecord ? \app\models\ProgramKegiatan::optionprog
             ],
         ],
         'pluginOptions' => [
-            'depends' => ['paketpengadaan-tahun_anggaran'],
+            'depends' => ['paketpengadaan-kode_program'],
             'placeholder' => 'Select...',
-            'url' => Url::to(['/programkegiatan/child?param=program'])
+            'url' => Url::to(['/paketpengadaan/child?param=program']),
+            'params' => ['paketpengadaan-tahun_anggaran', 'paketpengadaan-kode_program']
         ],
         'pluginEvents' => [
             "depdrop:change" => "function(){
@@ -160,9 +171,10 @@ $datakodeprogram = $model->isNewRecord ? \app\models\ProgramKegiatan::optionprog
             ],
         ],
         'pluginOptions' => [
-            'depends' => ['paketpengadaan-tahun_anggaran'],
+            'depends' => ['paketpengadaan-kode_kegiatan'],
             'placeholder' => 'Select...',
-            'url' => Url::to(['/programkegiatan/child?param=koderekening'])
+            'url' => Url::to(['/paketpengadaan/child?param=koderekening']),
+            'params' => ['paketpengadaan-tahun_anggaran', 'paketpengadaan-kode_program', 'paketpengadaan-kode_kegiatan']
         ],
         'pluginEvents' => [
             "depdrop:change" => "function(){
@@ -186,7 +198,7 @@ $datakodeprogram = $model->isNewRecord ? \app\models\ProgramKegiatan::optionprog
         ]
     ]) ?>
     <?= $form->field($model, 'admin_ppkom')->widget(Select2::class, [
-        'data' => $model::optionadminppkom(),
+        'data' => $adminppkom,
         'options' => [
             'placeholder' => 'Pilih PPKom',
         ]

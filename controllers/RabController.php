@@ -69,13 +69,14 @@ class RabController extends Controller {
                             'jumlah_anggaran' => $parentSheet->getCellByColumnAndRow(7, $childRow)->getValue(),
                             'nama_program' => ProgramKegiatan::findOne(['tahun_anggaran' => $parentSheet->getCellByColumnAndRow(2, $childRow)->getValue(), 'code' => $parentSheet->getCellByColumnAndRow(3, $childRow)->getValue()])->desc,
                             'nama_kegiatan' => ProgramKegiatan::findOne(['tahun_anggaran' => $parentSheet->getCellByColumnAndRow(2, $childRow)->getValue(), 'code' => $parentSheet->getCellByColumnAndRow(4, $childRow)->getValue()])->desc,
+                            'sumber_dana'=>1,
                         ];
                     }
                     if (!empty($adata)) {
                         Yii::$app->db->createCommand()
                             ->batchInsert(
                                 'rab',
-                                ['tahun_anggaran', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'uraian_anggaran', 'jumlah_anggaran', 'nama_program', 'nama_kegiatan'],
+                                ['tahun_anggaran', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'uraian_anggaran', 'jumlah_anggaran', 'nama_program', 'nama_kegiatan', 'sumber_dana'],
                                 $adata
                             )
                             ->execute();
