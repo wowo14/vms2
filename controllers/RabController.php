@@ -1,11 +1,13 @@
 <?php
 namespace app\controllers;
+use app\models\ProgramKegiatan;
 use Yii;
 use app\models\Rab;
 use app\models\RabSearch;
 use yii\web\{Response, NotFoundHttpException};
 use yii\filters\VerbFilter;
-use yii\helpers\Html;class RabController extends Controller {
+use yii\helpers\Html;
+class RabController extends Controller {
     public function behaviors() {
         return [
             'verbs' => [
@@ -24,6 +26,67 @@ use yii\helpers\Html;class RabController extends Controller {
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+    }
+    public function actionImport() {
+        $request = Yii::$app->request;
+        if ($request->isPost) {
+            if (!empty($_FILES)) {
+                if (is_array($_FILES['Rab']['name'])) {
+                    foreach ($_FILES['Rab']['name'] as $key => $fileName) {
+                        $fileParts = pathinfo($fileName);
+                    }
+                }
+                if (is_string($_FILES['Rab']['name'])) {
+                    $fileParts = pathinfo($_FILES['Rab']['name']);
+                }
+                if (is_string($_FILES['Rab']['tmp_name'])) {
+                    $tempFile = $_FILES['Rab']['tmp_name'];
+                }
+                if (is_array($_FILES['Rab']['tmp_name'])) {
+                    foreach ($_FILES['Rab']['tmp_name'] as $key => $val) {
+                        $tempFile = $val;
+                    }
+                }
+                $fileTypes = array('xls', 'xlsx');
+                if (in_array(@$fileParts['extension'], $fileTypes)) {
+                    $fileType = \PhpOffice\PhpSpreadsheet\IOFactory::identify($tempFile);
+                    $objPHPExcelReader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($fileType);
+                    $spreadsheet = $objPHPExcelReader->load($tempFile);
+                    $inserted = 0;
+                    $errorCount = 0;
+                    $parentSheet = $spreadsheet->getActiveSheet();
+                    $highestRow = $parentSheet->getHighestRow();
+                    $highestColumn = $parentSheet->getHighestColumn();
+                    $adata = [];
+                    for ($childRow = 2; $childRow <= $highestRow; ++$childRow) {
+                        $inserted++;
+                        $adata[] = [
+                            'tahun_anggaran' => $parentSheet->getCellByColumnAndRow(2, $childRow)->getValue(),
+                            'kode_program' => $parentSheet->getCellByColumnAndRow(3, $childRow)->getValue(),
+                            'kode_kegiatan' => $parentSheet->getCellByColumnAndRow(4, $childRow)->getValue(),
+                            'kode_rekening' => $parentSheet->getCellByColumnAndRow(5, $childRow)->getValue(),
+                            'uraian_anggaran' => $parentSheet->getCellByColumnAndRow(6, $childRow)->getValue(),
+                            'jumlah_anggaran' => $parentSheet->getCellByColumnAndRow(7, $childRow)->getValue(),
+                            'nama_program' => ProgramKegiatan::findOne(['tahun_anggaran' => $parentSheet->getCellByColumnAndRow(2, $childRow)->getValue(), 'code' => $parentSheet->getCellByColumnAndRow(3, $childRow)->getValue()])->desc,
+                            'nama_kegiatan' => ProgramKegiatan::findOne(['tahun_anggaran' => $parentSheet->getCellByColumnAndRow(2, $childRow)->getValue(), 'code' => $parentSheet->getCellByColumnAndRow(4, $childRow)->getValue()])->desc,
+                        ];
+                    }
+                    if (!empty($adata)) {
+                        Yii::$app->db->createCommand()
+                            ->batchInsert(
+                                'rab',
+                                ['tahun_anggaran', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'uraian_anggaran', 'jumlah_anggaran', 'nama_program', 'nama_kegiatan'],
+                                $adata
+                            )
+                            ->execute();
+                    }
+                    //cache flush
+                    Rab::invalidatecache('tag_' . Rab::getModelname());
+                    Yii::$app->session->setFlash('success', ($inserted) . ' row inserted');
+                    return $this->redirect('index');
+                }
+            }
+        }
     }
     public function actionView($id) {
         $request = Yii::$app->request;

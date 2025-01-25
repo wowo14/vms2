@@ -1,11 +1,14 @@
 <?php
+
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\bootstrap4\Modal;
 use kartik\grid\GridView;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use yii2ajaxcrud\ajaxcrud\BulkButtonWidget;
-$idmodal = $searchModel->hash;$this->title = 'Rab';
+
+$idmodal = $searchModel->hash;
+$this->title = 'Rab';
 $this->params['breadcrumbs'][] = $this->title;
 CrudAsset::register($this);
 ?>
@@ -47,7 +50,8 @@ CrudAsset::register($this);
                         ["bulkdelete"],
                         [
                             'class' => 'btn btn-danger btn-xs',
-                            'role' => 'modal-remote-bulk', 'data-target' => '#' . $idmodal,
+                            'role' => 'modal-remote-bulk',
+                            'data-target' => '#' . $idmodal,
                             'data-confirm' => false,
                             'data-method' => false,
                             'data-request-method' => 'post',
@@ -62,7 +66,8 @@ CrudAsset::register($this);
     </div>
 </div>
 <?php Modal::begin([
-    "id" => $idmodal,'size'=>'modal-xl',
+    "id" => $idmodal,
+    'size' => 'modal-xl',
     "footer" => "",
     "clientOptions" => [
         "tabindex" => false,
@@ -74,3 +79,4 @@ CrudAsset::register($this);
     ]
 ]) ?>
 <?php Modal::end(); ?>
+<?= app\widgets\Importer::widget(['searchModel' => $searchModel, 'action' => '/rab/import']); ?>
