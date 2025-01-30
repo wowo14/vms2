@@ -667,6 +667,9 @@ class DppController extends Controller {
         $paketpengadaan=$dpp->paketpengadaan;
         $penilaian=PenilaianPenyedia::last(['dpp_id'=>$dpp->id])??new PenilaianPenyedia();
         $request = Yii::$app->request;
+        $tce=TemplateChecklistEvaluasi::where(['like', 'template', 'Evaluasi_Supplier_Oleh_PPK'])->one()->detail->uraian;
+        print_r(json_decode($tce,true));
+        die;
         $template = collect($penilaian::settingType('penilaian_ppk'))
         ->flatMap(function($r){
             return json_decode($r['value'],true);
