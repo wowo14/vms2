@@ -1,7 +1,5 @@
 <?php
-
 namespace app\commands;
-
 use app\Controllers\DppController;
 use app\models\Contacts;
 use app\models\Dpp;
@@ -18,18 +16,19 @@ use app\models\ValidasiKualifikasiPenyediaDetail;
 use Yii;
 use yii\console\Controller;
 use yii\db\Expression;
-
 class HelloController extends Controller {
-    public function actionHitung() { // hitung pada paket pengadaan mana?
-        $r = (new PaketPengadaan)->byMetode();
-        // print_r($r);
-    }
     public function actionIndex() {
         echo "\n";
         Yii::error('hello world');
         die;
     }
-    public function actionSeed() {
+    public function actionCount() {
+    $dpp= Dpp::where(['is', 'pp.pemenang', null])
+            ->joinWith(['paketpengadaan pp'])->asArray()->all();
+    $countpp=collect($dpp)->pluck('pejabat_pengadaan')->countBy();
+    $countadminpp=collect($dpp)->pluck('admin_pengadaan')->countBy();
+    print_r($countpp);
+    print_r($countadminpp);
     }
     public function actionDropAllTables() {
         $db = \Yii::$app->db;

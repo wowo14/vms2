@@ -1,6 +1,8 @@
 <?php
+
 use kartik\grid\GridView;
 use yii\helpers\{Html, Url};
+
 return [
     [
         'class' => 'kartik\grid\CheckboxColumn',
@@ -21,10 +23,11 @@ return [
     ],
     [
         'class' => '\kartik\grid\DataColumn',
-        'attribute' => 'nomor_dpp', 'format' => 'raw',
-        'contentOptions'=>['class' => 'text-center'],
-        'value' => fn ($d) =>
-        Html::a($d->nomor_dpp, ['/dpp/tab', 'id' => $d->id],['class'=>'bg-white'])
+        'attribute' => 'nomor_dpp',
+        'format' => 'raw',
+        'contentOptions' => ['class' => 'text-center'],
+        'value' => fn($d) =>
+        Html::a($d->nomor_dpp, ['/dpp/tab', 'id' => $d->id], ['class' => 'bg-white'])
             ?? ''
     ],
     [
@@ -47,12 +50,13 @@ return [
     [
         'class' => '\kartik\grid\DataColumn',
         'attribute' => 'bidang_bagian',
-        'value' => fn ($d) => $d->unit->unit ?? ''
+        'value' => fn($d) => $d->unit->unit ?? ''
     ],
     [
         'class' => '\kartik\grid\DataColumn',
-        'attribute' => 'paket_id', 'format' => 'raw',
-        'value' => fn ($d) => $d->paketpengadaan->nomornamapaket ?? ''
+        'attribute' => 'paket_id',
+        'format' => 'raw',
+        'value' => fn($d) => $d->paketpengadaan->nomornamapaket ?? ''
     ],
     [
         'class' => '\kartik\grid\DataColumn',
@@ -61,12 +65,12 @@ return [
     [
         'class' => '\kartik\grid\DataColumn',
         'attribute' => 'pejabat_pengadaan',
-        'value' => fn ($d) => $d->pejabat->nama ?? ''
+        'value' => fn($d) => isset($d->pejabat) ? $d->pejabat->nama . $d->countPejabatWithNullPemenang($d->pejabat_pengadaan) : ''
     ],
     [
         'class' => '\kartik\grid\DataColumn',
         'attribute' => 'admin_pengadaan',
-        'value' => fn ($d) => $d->staffadmin->nama ?? ''
+        'value' => fn($d) => isset($d->staffadmin)?$d->staffadmin->nama .$d->countAdminWithNullPemenang($d->admin_pengadaan) :''
     ],
     // [
     //     'class' => '\kartik\grid\DataColumn',
@@ -79,7 +83,7 @@ return [
         'noWrap' => 'false',
         'template' => '{reject} {approve} {ceklistadmin} {printceklistadmin} {formreview} {reviewdpp} {cetakpenugasan} {cetaklampiran} {view} {update} {delete}',
         'vAlign' => 'middle',
-        'contentOptions'=>function ($model, $key, $index, $column) {
+        'contentOptions' => function ($model, $key, $index, $column) {
             if (isset($model->paketpengadaan) && $model->paketpengadaan->pemenang) {
                 return ['style' => 'background-color: white;'];
             }
@@ -88,29 +92,29 @@ return [
         'urlCreator' => function ($action, $model, $key, $index) {
             return Url::to([$action, 'id' => $key]);
         },
-        'visibleButtons'=>[
+        'visibleButtons' => [
             // 'penugasan'=>function($d){
             //     return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             // },
-            'approve'=>function($d){
+            'approve' => function ($d) {
                 return isset($d->is_approved) && !$d->paketpengadaan->pemenang;
             },
-            'delete'=>function($d){
+            'delete' => function ($d) {
                 return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
-            'update'=>function($d){
+            'update' => function ($d) {
                 return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
-            'reject'=>function($d){
+            'reject' => function ($d) {
                 return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
-            'ceklistadmin'=>function($d){
+            'ceklistadmin' => function ($d) {
                 return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
             // 'printceklistadmin'=>function($d){
             //     return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             // },
-            'formreview'=>function($d){
+            'formreview' => function ($d) {
                 return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             }
         ],
@@ -122,7 +126,7 @@ return [
                     ['class' => 'btn btn-sm btn-outline-info', 'data-pjax' => 0, 'title' => 'Penugasan', 'data-toggle' => 'tooltip']
                 );
             },
-            'cetaklampiran'=>function($url,$model,$key){
+            'cetaklampiran' => function ($url, $model, $key) {
                 return Html::a(
                     '<span class="fa fa-print"></span>',
                     $url,
@@ -146,7 +150,8 @@ return [
             'printceklistadmin' => function ($url, $model, $key) {
                 return Html::a('<span class="fa fa-print"></span>', $url, [
                     'title' => Yii::t('yii2-ajaxcrud', 'Print Ceklist Admin'),
-                    'data-pjax' => '0', 'class' => 'btn btn-sm btn-outline-primary'
+                    'data-pjax' => '0',
+                    'class' => 'btn btn-sm btn-outline-primary'
                 ]);
             },
             'reject' => function ($url, $model, $key) {
@@ -170,27 +175,30 @@ return [
                     ['class' => 'btn btn-sm btn-outline-info', 'data-pjax' => 0, 'title' => 'Cetak reviewdpp', 'data-toggle' => 'tooltip']
                 );
             },
-            'view' => function ($url, $model, $key)use($idmodal) {
+            'view' => function ($url, $model, $key) use ($idmodal) {
                 return Html::a(
                     '<span class="fa fa-eye"></span>',
                     $url,
                     ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'View'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-success']
                 );
             },
-            'update' => function ($url, $model, $key)use($idmodal) {
+            'update' => function ($url, $model, $key) use ($idmodal) {
                 return Html::a(
                     '<span class="fa fa-pencil-alt"></span>',
                     $url,
                     ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Update'), 'data-toggle' => 'tooltip', 'class' => 'btn btn-sm btn-outline-primary'],
                 );
             },
-            'delete' => function ($url, $model, $key)use($idmodal) {
+            'delete' => function ($url, $model, $key) use ($idmodal) {
                 return Html::a(
                     '<span class="fa fa-trash"></span>',
                     $url,
                     [
-                        'role' => 'modal-remote', 'title' => Yii::t('yii2-ajaxcrud', 'Delete'), 'class' => 'btn btn-sm btn-outline-danger',
-                        'data-confirm' => false, 'data-target' => '#' . $idmodal,
+                        'role' => 'modal-remote',
+                        'title' => Yii::t('yii2-ajaxcrud', 'Delete'),
+                        'class' => 'btn btn-sm btn-outline-danger',
+                        'data-confirm' => false,
+                        'data-target' => '#' . $idmodal,
                         'data-method' => false, // for overide yii data api
                         'data-request-method' => 'post',
                         'data-toggle' => 'tooltip',

@@ -35,10 +35,9 @@ class Dpp extends \yii\db\ActiveRecord {
         ];
     }
     public function getNomordpp() {
-        if($this->nomor_dpp == null) {
-           return $this->nomor_dpp = 'DPP-'.date('Ymd').' - '.$this->paketpengadaan->nomor;
-        }
-        else{
+        if ($this->nomor_dpp == null) {
+            return $this->nomor_dpp = 'DPP-' . date('Ymd') . ' - ' . $this->paketpengadaan->nomor;
+        } else {
             return $this->nomor_dpp;
         }
     }
@@ -69,10 +68,27 @@ class Dpp extends \yii\db\ActiveRecord {
     public function getStaffadmin() {
         return $this->hasOne(Pegawai::class, ['id' => 'admin_pengadaan'])->cache(self::cachetime(), self::settagdep('tag_pegawai'));
     }
-    public function getPenugasan(){
+    public function getPenugasan() {
         return $this->hasOne(PenugasanPemilihanpenyedia::class, ['dpp_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_penugasanpemilihanpenyedia'));
     }
-    // public function getPenawaranpenyedia(){
-    //     return $this->hasMany(PenawaranPengadaan::class, ['paket_id' => 'paket_id'])->cache(self::cachetime(), self::settagdep('tag_penawaranpengadaan'));
-    // }
+    private function getAllnonpemenang() {
+        return Dpp::where(['is', 'pp.pemenang', null])
+            ->joinWith(['paketpengadaan pp'])->asArray()->all();
+    }
+    public function countPejabatWithNullPemenang($idpejabat) {
+        if ($idpejabat == null) return '';
+        $countpp = collect($this->getAllnonpemenang())->pluck('pejabat_pengadaan')->countBy();
+        if (!isset($countpp[$idpejabat])) return '';
+        if ($countpp[$idpejabat] !== '') {
+            return ' (' . $countpp[$idpejabat] . ')';
+        }
+    }
+    public function countAdminWithNullPemenang($idadmin) {
+        if ($idadmin == null) return '';
+        $countpp = collect($this->getAllnonpemenang())->pluck('admin_pengadaan')->countBy();
+        if (!isset($countpp[$idadmin])) return '';
+        if ($countpp[$idadmin] !== '') {
+            return ' (' . $countpp[$idadmin] . ')';
+        }
+    }
 }

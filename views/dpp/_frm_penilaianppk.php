@@ -1,39 +1,46 @@
 <?php
 use kartik\date\DatePicker;
-use unclead\multipleinput\{MultipleInput,MultipleInputColumn};
+use unclead\multipleinput\{MultipleInput, MultipleInputColumn};
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\Html;
-$js=<<<JS
+$js = <<<JS
  $('select[name^="skor"]').on('change', function() {
      const index = $(this).attr('name').match(/\d+/)[0];
-     const bobot = $(this).parent().parent().find('input[name="bobot['+index+']"]').val();
      const skor = parseFloat($(this).val());
-     const nilaiKinerja = (parseFloat(bobot) * skor) / 100;
-     const hasil=$(this).parent().parent().find('input[name="nilaikinerja['+index+']"]');
-    hasil.val(nilaiKinerja.toFixed(2));
     recalculate();
  });
  function recalculate(){
      let total = 0;
-     $('input[name^="nilaikinerja"]').each(function () {
-         total += parseFloat($(this).val());
+     $('select[name^="skor"]').each(function () {
+         var val = $(this).val();
+         if (!isNaN(val) && val !== '') {
+             total += parseFloat(val);
+         }
      });
-     $('#total').val(total.toFixed(2));
+     var count=$('select[name^="skor"]').length;
+     var nilai=total.toFixed(2)/count;
+     if (nilai > 3) {
+        var point = "A";
+    } else if (nilai >= 2 && nilai <= 3) {
+        var point = "B";
+    } else {
+        var point = "C";
+    }
+    $('#total').val(total.toFixed(2));
+    $('#nilaiakhir').val(point + " = " + total.toFixed(2)/count);
+    if (point === "A") {
+        $('#hasil_evaluasi').val("Direkomendasi untuk digunakan kembali");
+        $('#hasil_evaluasi').prop('readonly', true);
+    } else if (point === "B") {
+        $('#hasil_evaluasi').prop('readonly', false);
+        $('#hasil_evaluasi').val("Direkomendasi dengan catatan ( pemantauan lebih intensif ):");
+    } else {
+        $('#hasil_evaluasi').val("Tidak direkomendasi untuk digunakan kembali");
+        $('#hasil_evaluasi').prop('readonly', true);
+    }
  }
-    recalculate();
 JS;
 $this->registerJs($js);
-$data=collect($template)->map(function ($e, $index) {
-    $r = [
-        'id' => $index,
-        'aspek' => $e['kategori'],
-        'indicators'=>$e['description'],
-        'bobot'=>$e['bobot'],
-        'skor'=>$e['skor'][$index],
-        'nilaikinerja'=>$e['nilaikinerja'][$index],
-    ];
-    return $r;
-})->toArray();
 ?>
 <div class="dpp-form">
     <?php $form = ActiveForm::begin([
@@ -69,65 +76,67 @@ $data=collect($template)->map(function ($e, $index) {
         </div>
     </div>
     <table class="table table-bordered table-striped table-hover">
-    <thead>
-        <tr>
-            <th class="text-center align-middle m-0 p-0">No.</th>
-            <th class="text-center align-middle m-0 p-0">Aspek Kinerja</th>
-            <th class="text-center align-middle m-0 p-0" colspan="2">Indikator</th>
-            <th class="text-center align-middle m-0 p-0">Bobot (%)</th>
-            <th class="text-center align-middle m-0 p-0">Skor <br>Cukup (1) Baik (2) Sangat Baik (3)</th>
-            <th class="text-center align-middle m-0 p-0">Nilai Kinerja (4 x 5)</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php
-        $no = 1;
-        $inIndex=1;
-        echo "<tr>
-        <td class='text-center align-middle m-0 p-0'>1</td>
-        <td class='text-center align-middle m-0 p-0'>2</td>
-        <td class='text-center align-middle m-0 p-0' colspan='2'>3</td>
-        <td class='text-center align-middle m-0 p-0'>4</td>
-        <td class='text-center align-middle m-0 p-0'>5</td>
-        <td class='text-center align-middle m-0 p-0'>6</td>
-        </tr>";
-        foreach ($data as $v=>$item) {
-            foreach ($item['indicators'] as $indicatorIndex => $indicator) {
-                echo '<tr>';
-                if ($indicatorIndex == 0) {
-                    $inIndex=($indicatorIndex+1);
-                    echo "<td class='text-center align-middle p-1' rowspan='3'>{$no}</td>";
-                    echo "<td class='text-center align-middle  p-1' rowspan='3'>{$item['aspek']}</td>";
-                    echo "<td>{$inIndex}</td>";
-                    echo "<td class='align-middle  p-1'>{$indicator}</td>";
-                    echo "<td rowspan='3' class='text-center align-middle  p-1'>
-                    <input name='bobot[$v]' class='form-control' readonly  value='" . $item['bobot'] . "'/></td>";
-                    echo "<td rowspan='3' class='text-center align-middle  p-1'>";
-                    echo "<select name='skor[$v]' class='select2 form-control'>";
-                    echo "<option></option>";
-                    echo "<option value='1'" .(($item['skor']== '1') ? ' selected' : ''). ">1</option>";
-                    echo "<option value='2'" .(($item['skor']== '2') ? ' selected' : ''). ">2</option>";
-                    echo "<option value='3'" .(($item['skor']== '3') ? ' selected' : ''). ">3</option>";
-                    echo "</select>";
-                    echo "</td>";
-                    echo "<td rowspan='3' class='text-center align-middle  p-1'>
-                    <input name='nilaikinerja[$v]' class='form-control' readonly  value='" . ($item['nilaikinerja']) . "'/></td>";
-                } else {
-                    echo "<td class='align-middle p-1'>{$inIndex}</td>";
-                    echo "<td class='align-middle  p-1'>{$indicator}</td>";
-                }
-                echo '</tr>';
-                $inIndex++;
+        <thead>
+            <tr>
+                <th class="text-center align-middle m-0 p-0">No.</th>
+                <th class="text-center align-middle m-0 p-0">Aspek Kinerja</th>
+                <th class="text-center align-middle m-0 p-0">Skor <br>Tidak Baik (1) Baik (3) Sangat Baik (5)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            $no = 1;
+            $inIndex = 1;
+            $total = $nilaiakhir = $hasil_evaluasi = $ulasan_pejabat_pengadaan = '';
+            echo "<tr>
+            <td class='text-center align-middle m-0 p-0'>1</td>
+            <td class='text-center align-middle m-0 p-0'>2</td>
+            <td class='text-center align-middle m-0 p-0'>3</td>
+            </tr>";
+            foreach ($template as $v => $item) {
+                echo "<tr>";
+                echo "<td>{$no}</td>";
+
+                echo "<td class='text-center align-middle  p-1'>
+                    <input name='uraian[$v]' class='form-control' readonly  value='" . (is_array($item['uraian'])? $item['uraian'][$v]: $item['uraian']) . "'/></td>";
+                echo "<td class='text-center align-middle  p-1'>";
+                echo "<select name='skor[$v]' class='select2 form-control'>";
+                echo "<option></option>";
+                echo "<option value='1'" . (is_array($item['skor'])? (($item['skor'][$v] == '1') ? ' selected' : ''):'') . ">1</option>";
+                echo "<option value='3'" . (is_array($item['skor'])? (($item['skor'][$v] == '3') ? ' selected' : ''):'') . ">3</option>";
+                echo "<option value='5'" . (is_array($item['skor'])? (($item['skor'][$v] == '5') ? ' selected' : ''):'') . ">5</option>";
+                echo "</select>";
+                echo "</td>";
+                echo "</tr>";
+                $no++;
+                $total = $item['total'];
+                $nilaiakhir = $item['nilaiakhir'];
+                $hasil_evaluasi = $item['hasil_evaluasi'];
+                $ulasan_pejabat_pengadaan = $item['ulasan_pejabat_pengadaan'];
             }
-            $no++;
-        }
-        echo '<tr>
-        <td class="align-middle text-right" colspan="6">Total</td>
-        <td class="align-middle"><input class="form-control" type="text" readonly id="total"></span></td>
-        </tr>';
-        ?>
-    </tbody>
+            echo '<tr>
+                <td class="align-middle text-right" colspan="2">Total Nilai</td>
+                <td class="align-middle"><input class="form-control" type="text" readonly name="total" id="total" value="' . ($total ?? 0) . '"></span></td>
+                </tr>';
+            echo '<tr>
+                <td class="align-middle text-right" colspan="2">Nilai Akhir (Nilai rata-rata) </td>
+                <td class="align-middle"><input class="form-control" type="text" readonly name="nilaiakhir" id="nilaiakhir" value="' . ($nilaiakhir ?? 0) . '"></span></td>
+                </tr>';
+            ?>
+        </tbody>
     </table>
+    <div class="form-group">
+        <div class="row">
+            <label class="control-label right col-sm-3" for="hasil_evaluasi">Hasil Evaluasi</label>
+            <input class="form-control col-sm-9" type="text" id="hasil_evaluasi" name="hasil_evaluasi" value="<?= $hasil_evaluasi ?>">
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <label class="control-label right col-sm-3" for="ulasan_pejabat_pengadaan">Ulasan Pejabat Pengadaan</label>
+            <input class="form-control col-sm-9" type="text" id="ulasan_pejabat_pengadaan" name="ulasan_pejabat_pengadaan" value="<?= $ulasan_pejabat_pengadaan ?>">
+        </div>
+    </div>
     <?php if (!Yii::$app->request->isAjax) { ?>
         <div class="form-group">
             <?= Html::submitButton($penilaian->isNewRecord ? 'Create' : 'Update', ['class' => $penilaian->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
