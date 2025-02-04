@@ -3,7 +3,7 @@ use kartik\date\DatePicker;
 use unclead\multipleinput\{MultipleInput, MultipleInputColumn};
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\Html;
-$this->title="Penilaian Penyedia oleh PPK";
+$this->title="Penilaian Penyedia oleh Pejabat Pengadaan";
 $js = <<<JS
  $('select[name^="skor"]').on('change', function() {
      const index = $(this).attr('name').match(/\d+/)[0];
@@ -30,13 +30,13 @@ $js = <<<JS
     $('#total').val(total.toFixed(2));
     $('#nilaiakhir').val(point + " = " + total.toFixed(2)/count);
     if (point === "A") {
-        $('#hasil_evaluasi').val("Penyedia bermutu Sangat Baik");
+        $('#hasil_evaluasi').val("Direkomendasi untuk digunakan kembali");
         $('#hasil_evaluasi').prop('readonly', true);
     } else if (point === "B") {
         $('#hasil_evaluasi').prop('readonly', false);
-        $('#hasil_evaluasi').val("Penyedia bermutu Baik");
+        $('#hasil_evaluasi').val("Direkomendasi dengan catatan ( pemantauan lebih intensif ):");
     } else {
-        $('#hasil_evaluasi').val("Penyedia tidak bermutu baik");
+        $('#hasil_evaluasi').val("Tidak direkomendasi untuk digunakan kembali");
         $('#hasil_evaluasi').prop('readonly', true);
     }
  }
@@ -67,14 +67,14 @@ $this->registerJs($js);
                 'pluginOptions' => [
                     'format' => 'yyyy-mm-dd',
                     'todayHighlight' => true,
-                    'autoclose' => true,
+                    'autoclose' => true
                 ],
             ])->label('Tanggal Penilaian') ?>
             <?= $form->field($penilaian, 'tanggal_kontrak')->widget(DatePicker::class, [
                 'pluginOptions' => [
                     'format' => 'yyyy-mm-dd',
                     'todayHighlight' => true,
-                    'autoclose' => true,
+                    'autoclose' => true
                 ],
                 'readonly' => true
             ]) ?>
@@ -141,7 +141,7 @@ $this->registerJs($js);
     </div>
     <div class="form-group">
         <div class="row">
-            <label class="control-label right col-sm-3" for="ulasan_pejabat_pengadaan">Ulasan</label>
+            <label class="control-label right col-sm-3" for="ulasan_pejabat_pengadaan">Ulasan Pejabat Pengadaan</label>
             <input class="form-control col-sm-9" type="text" id="ulasan_pejabat_pengadaan" name="ulasan_pejabat_pengadaan" value="<?= $ulasan_pejabat_pengadaan ?>">
         </div>
     </div>

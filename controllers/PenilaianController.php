@@ -40,8 +40,8 @@ class PenilaianController extends Controller
                 'content' =>$this->renderAjax('view', [
                     'model' => $this->findModel($id),
                 ]),
-                'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']).
-                    Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'role' => 'modal-remote'])
+                'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal'])
+                    // Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id], ['class' => 'btn btn-primary', 'role' => 'modal-remote'])
             ];
         }else{
             return $this->render('view', [
@@ -49,78 +49,78 @@ class PenilaianController extends Controller
             ]);
         }
     }
-    public function actionCreate()
-    {
-        $request = Yii::$app->request;
-        $model = new PenilaianPenyedia();
-        if($request->isAjax){
+    // public function actionCreate()
+    // {
+    //     $request = Yii::$app->request;
+    //     $model = new PenilaianPenyedia();
+    //     if($request->isAjax){
 
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            if($model->load($request->post()) && $model->save()){
-                return [
-                    'forceReload' => '#crud-datatable-pjax',
-                    'title' => Yii::t('yii2-ajaxcrud', 'Create New')." PenilaianPenyedia",
-                    'content' => '<span class="text-success">'.Yii::t('yii2-ajaxcrud', 'Create').' PenilaianPenyedia '.Yii::t('yii2-ajaxcrud', 'Success').'</span>',
-                    'footer' =>  Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']).
-                        Html::a(Yii::t('yii2-ajaxcrud', 'Create More'), ['create'], ['class' => 'btn btn-primary', 'role' => 'modal-remote'])
-                ];
-            }else{
-                return [
-                    'title' => Yii::t('yii2-ajaxcrud', 'Create New')." PenilaianPenyedia",
-                    'content' => $this->renderAjax('create', [
-                        'model' => $model,
-                    ]),
-                    'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']).
-                        Html::button(Yii::t('yii2-ajaxcrud', 'Save'), ['class' => 'btn btn-primary', 'type' => 'submit'])
-                ];
-            }
-        }else{
+    //         Yii::$app->response->format = Response::FORMAT_JSON;
+    //         if($model->load($request->post()) && $model->save()){
+    //             return [
+    //                 'forceReload' => '#crud-datatable-pjax',
+    //                 'title' => Yii::t('yii2-ajaxcrud', 'Create New')." PenilaianPenyedia",
+    //                 'content' => '<span class="text-success">'.Yii::t('yii2-ajaxcrud', 'Create').' PenilaianPenyedia '.Yii::t('yii2-ajaxcrud', 'Success').'</span>',
+    //                 'footer' =>  Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']).
+    //                     Html::a(Yii::t('yii2-ajaxcrud', 'Create More'), ['create'], ['class' => 'btn btn-primary', 'role' => 'modal-remote'])
+    //             ];
+    //         }else{
+    //             return [
+    //                 'title' => Yii::t('yii2-ajaxcrud', 'Create New')." PenilaianPenyedia",
+    //                 'content' => $this->renderAjax('create', [
+    //                     'model' => $model,
+    //                 ]),
+    //                 'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']).
+    //                     Html::button(Yii::t('yii2-ajaxcrud', 'Save'), ['class' => 'btn btn-primary', 'type' => 'submit'])
+    //             ];
+    //         }
+    //     }else{
 
-            if ($model->load($request->post()) && $model->save()){
-                return $this->redirect(['view', 'id' => $model->id]);
-            }else{
-                return $this->render('create', [
-                    'model' => $model,
-                ]);
-            }
-        }
-    }
-    public function actionUpdate($id)
-    {
-        $request = Yii::$app->request;
-        $model = $this->findModel($id);
-        if($request->isAjax){
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            if($model->load($request->post()) && $model->save()){
-                return [
-                    'forceReload' => '#crud-datatable-pjax',
-                    'title' => "PenilaianPenyedia #".$id,
-                    'content' => $this->renderAjax('view', [
-                        'model' => $model,
-                    ]),
-                    'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']).
-                        Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id],['class' => 'btn btn-primary', 'role' => 'modal-remote'])
-                ];
-            }else{
-                 return [
-                    'title' => Yii::t('yii2-ajaxcrud', 'Update')." PenilaianPenyedia #".$id,
-                    'content' => $this->renderAjax('update', [
-                        'model' => $model,
-                    ]),
-                    'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']).
-                        Html::button(Yii::t('yii2-ajaxcrud', 'Save'), ['class' => 'btn btn-primary', 'type' => 'submit'])
-                ];
-            }
-        }else{
-            if ($model->load($request->post()) && $model->save()){
-                return $this->redirect(['view', 'id' => $model->id]);
-            }else{
-                return $this->render('update', [
-                    'model' => $model,
-                ]);
-            }
-        }
-    }
+    //         if ($model->load($request->post()) && $model->save()){
+    //             return $this->redirect(['view', 'id' => $model->id]);
+    //         }else{
+    //             return $this->render('create', [
+    //                 'model' => $model,
+    //             ]);
+    //         }
+    //     }
+    // }
+    // public function actionUpdate($id)
+    // {
+    //     $request = Yii::$app->request;
+    //     $model = $this->findModel($id);
+    //     if($request->isAjax){
+    //         Yii::$app->response->format = Response::FORMAT_JSON;
+    //         if($model->load($request->post()) && $model->save()){
+    //             return [
+    //                 'forceReload' => '#crud-datatable-pjax',
+    //                 'title' => "PenilaianPenyedia #".$id,
+    //                 'content' => $this->renderAjax('view', [
+    //                     'model' => $model,
+    //                 ]),
+    //                 'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']).
+    //                     Html::a(Yii::t('yii2-ajaxcrud', 'Update'), ['update', 'id' => $id],['class' => 'btn btn-primary', 'role' => 'modal-remote'])
+    //             ];
+    //         }else{
+    //              return [
+    //                 'title' => Yii::t('yii2-ajaxcrud', 'Update')." PenilaianPenyedia #".$id,
+    //                 'content' => $this->renderAjax('update', [
+    //                     'model' => $model,
+    //                 ]),
+    //                 'footer' => Html::button(Yii::t('yii2-ajaxcrud', 'Close'), ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']).
+    //                     Html::button(Yii::t('yii2-ajaxcrud', 'Save'), ['class' => 'btn btn-primary', 'type' => 'submit'])
+    //             ];
+    //         }
+    //     }else{
+    //         if ($model->load($request->post()) && $model->save()){
+    //             return $this->redirect(['view', 'id' => $model->id]);
+    //         }else{
+    //             return $this->render('update', [
+    //                 'model' => $model,
+    //             ]);
+    //         }
+    //     }
+    // }
     public function actionDelete($id)
     {
         $request = Yii::$app->request;

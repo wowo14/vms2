@@ -1,11 +1,16 @@
 <?php
 ?>
 <table>
-    <tr>
-        <td><a href="/dpp/penilaianppk?id=<?= $model->id ?>">Penilaian penyedia oleh PPK</a></td></tr>
-    <tr>
-        <td><a href="/dpp/penilaianpenyedia?id=<?= $model->id ?>">Penilaian ppk oleh Penyedia</a></td></tr>
-    <tr>
-        <td><a href="/dpp/penilaianpp?id=<?= $model->id ?>">Penilaian penyedia oleh Pejabat Pengadaan</a></td>
-    </tr>
+    <?php if ($model::isPPK() || $model::isAdmin()): ?>
+        <tr>
+            <td><a href="/dpp/penilaianppk?id=<?= $model->id ?>">Penilaian penyedia oleh PPK</a></td>
+        </tr>
+        <tr>
+        <?php endif;
+    if ($model::isPP() || $model::isAdmin()):
+        ?>
+        <tr>
+            <td><a href="/dpp/penilaianolehpejabat?id=<?= $model->id ?>">Penilaian penyedia oleh Pejabat Pengadaan</a></td>
+        </tr>
+    <?php endif; ?>
 </table>

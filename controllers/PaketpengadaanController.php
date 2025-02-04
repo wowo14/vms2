@@ -247,16 +247,29 @@ class PaketpengadaanController extends Controller {
                     }
                     $adata = [];
                     for ($childRow = 2; $childRow <= $highestRow; ++$childRow) {
-                        $inserted++;
-                        $adata[] = [
-                            'paket_id' => $model->id,
-                            'nama_produk' => $parentSheet->getCellByColumnAndRow(2, $childRow)->getValue(),
-                            'qty' => $parentSheet->getCellByColumnAndRow(3, $childRow)->getValue(),
-                            'volume' => $parentSheet->getCellByColumnAndRow(4, $childRow)->getValue(),
-                            'satuan' => $parentSheet->getCellByColumnAndRow(5, $childRow)->getValue(),
-                            'hps_satuan' => $parentSheet->getCellByColumnAndRow(6, $childRow)->getValue(),
-                            'penawaran' => $parentSheet->getCellByColumnAndRow(7, $childRow)->getValue(),
-                        ];
+                        // Read data from the sheet
+                        $nama_produk = $parentSheet->getCellByColumnAndRow(2, $childRow)->getValue();
+                        $qty = $parentSheet->getCellByColumnAndRow(3, $childRow)->getValue();
+                        $volume = $parentSheet->getCellByColumnAndRow(4, $childRow)->getValue();
+                        $satuan = $parentSheet->getCellByColumnAndRow(5, $childRow)->getValue();
+                        $hps_satuan = $parentSheet->getCellByColumnAndRow(6, $childRow)->getValue();
+                        $penawaran = $parentSheet->getCellByColumnAndRow(7, $childRow)->getValue();
+                        // Check if mandatory fields are valid
+                        if (!empty($nama_produk) && !empty($qty) && !empty($volume) && !empty($satuan) && !empty($hps_satuan) && !empty($penawaran)) {
+                            $inserted++;
+                            $adata[] = [
+                                'paket_id' => $model->id,
+                                'nama_produk' => $nama_produk,
+                                'qty' => $qty,
+                                'volume' => $volume,
+                                'satuan' => $satuan,
+                                'hps_satuan' => $hps_satuan,
+                                'penawaran' => $penawaran,
+                            ];
+                        } else {
+                            // Log or handle the row with missing data
+                            $errorCount++;
+                        }
                     }
                     if (!empty($adata)) {
                         Yii::$app->db->createCommand()

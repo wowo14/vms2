@@ -693,7 +693,7 @@ class DppController extends Controller {
     public function actionPenilaianppk($id) {
         $dpp = $this->findModel($id);
         $paketpengadaan = $dpp->paketpengadaan;
-        $penilaian = PenilaianPenyedia::last(['dpp_id' => $dpp->id]) ?? new PenilaianPenyedia();
+        $penilaian = PenilaianPenyedia::last(['dpp_id' => $dpp->id, 'created_by' => Yii::$app->user->id]) ?? new PenilaianPenyedia();
         $request = Yii::$app->request;
         $template = collect(json_decode(TemplateChecklistEvaluasi::where(['like', 'template', 'Evaluasi_Supplier_Oleh_PPK'])->one()->detail->uraian, true))
             ->map(function ($e) use ($penilaian) {
@@ -725,7 +725,7 @@ class DppController extends Controller {
             }
         } else {
             if ($penilaian->dpp) {
-                $penilaian = PenilaianPenyedia::where(['dpp_id' => $dpp->id])->one();
+                $penilaian = PenilaianPenyedia::where(['dpp_id' => $dpp->id, 'created_by'=>Yii::$app->user->id])->one();
             } else {
                 $penilaian->attributes = [
                     'unit_kerja' => $dpp::profile('dinas'),
@@ -745,6 +745,68 @@ class DppController extends Controller {
                 ];
             }
             return $this->render('_frm_penilaianppk', [
+                'dpp' => $dpp,
+                'paketpengadaan' => $paketpengadaan,
+                'penilaian' => $penilaian,
+                'template' => $template,
+            ]);
+        }
+    }
+    public function actionPenilaianolehpejabat($id) {
+        $dpp = $this->findModel($id);
+        $paketpengadaan = $dpp->paketpengadaan;
+        $penilaian = PenilaianPenyedia::last(['dpp_id' => $dpp->id, 'created_by'=>Yii::$app->user->id]) ?? new PenilaianPenyedia();
+        $request = Yii::$app->request;
+        $template = collect(json_decode(TemplateChecklistEvaluasi::where(['like', 'template', 'Evaluasi_Supplier_Oleh_Pejabat'])->one()->detail->uraian, true))
+            ->map(function ($e) use ($penilaian) {
+                return [
+                    'uraian' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['uraian'] : $e['uraian'],
+                    'skor' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['skor'] : 0,
+                    'nilaiakhir' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['nilaiakhir'] : 0,
+                    'hasil_evaluasi' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['hasil_evaluasi'] : '',
+                    'ulasan_pejabat_pengadaan' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['ulasan_pejabat_pengadaan'] : '',
+                    'total' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['total'] : 0,
+                ];
+            })->values()->toArray();
+        if ($penilaian->load($request->post())) {
+            $nilai = [
+                'uraian' => $_POST['uraian'],
+                'skor' => $_POST['skor'],
+                'total' => round(($_POST['total']), 2, PHP_ROUND_HALF_UP),
+                'nilaiakhir' => $_POST['nilaiakhir'],
+                'hasil_evaluasi' => $_POST['hasil_evaluasi'],
+                'ulasan_pejabat_pengadaan' => $_POST['ulasan_pejabat_pengadaan'],
+            ];
+            $penilaian->dpp_id = $dpp->id;
+            $penilaian->details = json_encode($nilai);
+            if (!$penilaian->save()) {
+                Yii::error(json_encode($penilaian->getErrors()));
+            } else {
+                Yii::$app->session->setFlash('success', 'Penilaian Berhasil');
+                return $this->redirect('index');
+            }
+        } else {
+            if ($penilaian->dpp) {
+                $penilaian = PenilaianPenyedia::where(['dpp_id' => $dpp->id, 'created_by'=>Yii::$app->user->id])->one();
+            } else {
+                $penilaian->attributes = [
+                    'unit_kerja' => $dpp::profile('dinas'),
+                    'dpp_id' => $dpp->id,
+                    'nama_perusahaan' => $paketpengadaan->penawaranpenyedia->vendor->nama_perusahaan,
+                    'alamat_perusahaan' => $paketpengadaan->penawaranpenyedia->vendor->alamat_perusahaan,
+                    'paket_pekerjaan' => $paketpengadaan->nama_paket,
+                    'lokasi_pekerjaan' => $dpp::profile('dinas'),
+                    'nilai_kontrak' => $this->actionListpemenang(['paket_pengadaan_id' => $paketpengadaan->id])[0]['nilai_penawaran'],
+                    'nomor_kontrak' => $dpp->nomor_dpp,
+                    'tanggal_kontrak' => $dpp->tanggal_dpp,
+                    'jangka_waktu' => $penilaian->jangka_waktu ?? '',
+                    'metode_pemilihan' => $paketpengadaan->metode_pengadaan,
+                    'details' => $penilaian->details ?? [],
+                    'pengguna_anggaran' => 'Pengguna Anggaran',
+                    'pejabat_pembuat_komitmen' => $paketpengadaan->pejabatppkom->nama,
+                ];
+            }
+            return $this->render('_frm_penilaianpejabat', [
                 'dpp' => $dpp,
                 'paketpengadaan' => $paketpengadaan,
                 'penilaian' => $penilaian,

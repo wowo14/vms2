@@ -23,11 +23,11 @@ AppAsset::register($this);
             'toolbar' => [
                 [
                     'content' =>
-                    Html::a(
-                        '<i class="fa fa-plus"></i>',
-                        ['penilaian/create'],
-                        ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Penilaian', 'class' => 'btn btn-outline-primary']
-                    ) .
+                    // Html::a(
+                    //     '<i class="fa fa-plus"></i>',
+                    //     ['penilaian/create'],
+                    //     ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Penilaian', 'class' => 'btn btn-outline-primary']
+                    // ) .
                         Html::a(
                             '<i class="fa fa-redo"></i>',
                             [''],
@@ -65,12 +65,13 @@ AppAsset::register($this);
     </div>
 </div>
 <?php Modal::begin([
-    "id" => $idmodal,
+    "id" => $idmodal,'size'=>'modal-xl',
     "footer" => "",
     "clientOptions" => [
         "tabindex" => false,
         "backdrop" => "static",
         "keyboard" => true,
+        "focus" => true,
     ],
     "options" => [
         "tabindex" => true

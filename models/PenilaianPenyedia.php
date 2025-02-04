@@ -1,9 +1,6 @@
 <?php
-
 namespace app\models;
-
 use Yii;
-
 class PenilaianPenyedia extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
     public static function tableName() {
@@ -58,5 +55,26 @@ class PenilaianPenyedia extends \yii\db\ActiveRecord {
         } else {
             return false;
         }
+    }
+    public function getGriddetail(){
+        $data=json_decode($this->details,true);
+        $rows = [];
+        //add check isset key uraian
+        if(isset($data['uraian'])){
+            foreach ($data['uraian'] as $index => $uraian) {
+                $rows[] = [
+                    'uraian' => $uraian,
+                    'skor' => $data['skor'][$index],
+                ];
+            }
+        }
+        $summary = [
+                ['uraian' => 'Total', 'skor' => $data['total']],
+                ['uraian' => 'Nilai Akhir', 'skor' => $data['nilaiakhir']],
+                ['uraian' => 'Hasil Evaluasi', 'skor' => $data['hasil_evaluasi']],
+                ['uraian' => 'Ulasan Pejabat Pengadaan', 'skor' => $data['ulasan_pejabat_pengadaan']],
+            ];
+        // Merge the main rows and summary rows
+        return array_merge($rows, $summary);
     }
 }
