@@ -3,7 +3,7 @@ use kartik\date\DatePicker;
 use unclead\multipleinput\{MultipleInput, MultipleInputColumn};
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\Html;
-$this->title="Penilaian Penyedia oleh Pejabat Pengadaan";
+$this->title="Evaluasi Kinerja Penyedia oleh Pejabat Pengadaan";
 $js = <<<JS
  $('select[name^="skor"]').on('change', function() {
      const index = $(this).attr('name').match(/\d+/)[0];
@@ -87,9 +87,9 @@ $this->registerJs($js);
     <table class="table table-bordered table-striped table-hover">
         <thead>
             <tr>
-                <th class="text-center align-middle m-0 p-0">No.</th>
-                <th class="text-center align-middle m-0 p-0">Aspek Kinerja</th>
-                <th class="text-center align-middle m-0 p-0">Skor <br>Tidak Baik (1) Baik (3) Sangat Baik (5)</th>
+                <th class="text-center col-md-0 align-middle m-0 p-0">No.</th>
+                <th class="text-center col-md-5 align-middle m-0 p-0">Aspek Kinerja</th>
+                <th class="text-center col-md-7 align-middle m-0 p-0">Skor <br>Tidak Baik (1) Baik (3) Sangat Baik (5)</th>
             </tr>
         </thead>
         <tbody>
@@ -110,9 +110,9 @@ $this->registerJs($js);
                 echo "<td class='text-center align-middle  p-1'>";
                 echo "<select name='skor[$v]' class='select2 form-control'>";
                 echo "<option></option>";
-                echo "<option value='1'" . (is_array($item['skor']) ? (($item['skor'][$v] == '1') ? ' selected' : '') : '') . ">1</option>";
-                echo "<option value='3'" . (is_array($item['skor']) ? (($item['skor'][$v] == '3') ? ' selected' : '') : '') . ">3</option>";
-                echo "<option value='5'" . (is_array($item['skor']) ? (($item['skor'][$v] == '5') ? ' selected' : '') : '') . ">5</option>";
+                foreach ($item['desc'] as $i => $d) {
+                    echo "<option value=$i" . (is_array($item['skor']) ? (($item['skor'][$v] == $i) ? ' selected' : '') : '') . ">" . $d . "</option>";
+                }
                 echo "</select>";
                 echo "</td>";
                 echo "</tr>";

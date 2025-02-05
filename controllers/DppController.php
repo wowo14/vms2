@@ -378,7 +378,7 @@ class DppController extends Controller {
     }
     private function updateNamesWithCounts($data, $names, $keyField) {
         $counts = collect($data)->pluck($keyField)->countBy();
-        $filtered=$counts->mapWithKeys(function ($count, $id) use ($names) {
+        $filtered = $counts->mapWithKeys(function ($count, $id) use ($names) {
             $name = $names[$id] ?? 'Unknown'; // Default to 'Unknown' if the name is not in the array
             return [$id => "$name ($count)"];
         })->toArray();
@@ -427,7 +427,6 @@ class DppController extends Controller {
             }
             $pejabatNames = $model::getAllpetugas();
             $adminnames = $model::getAlladmin();
-
             $pejabatNames = $this->updateNamesWithCounts($dt, $pejabatNames, 'pejabat_pengadaan');
             $adminnames = $this->updateNamesWithCounts($dt, $adminnames, 'admin_pengadaan');
             $datapenugasan = [
@@ -695,17 +694,23 @@ class DppController extends Controller {
         $paketpengadaan = $dpp->paketpengadaan;
         $penilaian = PenilaianPenyedia::last(['dpp_id' => $dpp->id, 'created_by' => Yii::$app->user->id]) ?? new PenilaianPenyedia();
         $request = Yii::$app->request;
-        $template = collect(json_decode(TemplateChecklistEvaluasi::where(['like', 'template', 'Evaluasi_Supplier_Oleh_PPK'])->one()->detail->uraian, true))
+        $template = collect(json_decode(Setting::where(['type' => 'evaluasi_suplier_ppk', 'active' => 1])->one()->value, true)['kriteria'])
             ->map(function ($e) use ($penilaian) {
                 return [
-                    'uraian' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['uraian'] : $e['uraian'],
+                    'uraian' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['uraian'] : $e['name'],
                     'skor' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['skor'] : 0,
                     'nilaiakhir' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['nilaiakhir'] : 0,
                     'hasil_evaluasi' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['hasil_evaluasi'] : '',
                     'ulasan_pejabat_pengadaan' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['ulasan_pejabat_pengadaan'] : '',
                     'total' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['total'] : 0,
+                    'desc'=> collect($e['description'])->map(function($d, $i){
+                        return $i.'. '.$d;
+                    })->sortKeys(),
                 ];
-            })->values()->toArray();
+            });
+        if (!$template) {
+            echo 'Template tidak ditemukan';
+        }
         if ($penilaian->load($request->post())) {
             $nilai = [
                 'uraian' => $_POST['uraian'],
@@ -725,7 +730,7 @@ class DppController extends Controller {
             }
         } else {
             if ($penilaian->dpp) {
-                $penilaian = PenilaianPenyedia::where(['dpp_id' => $dpp->id, 'created_by'=>Yii::$app->user->id])->one();
+                $penilaian = PenilaianPenyedia::where(['dpp_id' => $dpp->id, 'created_by' => Yii::$app->user->id])->one();
             } else {
                 $penilaian->attributes = [
                     'unit_kerja' => $dpp::profile('dinas'),
@@ -755,19 +760,36 @@ class DppController extends Controller {
     public function actionPenilaianolehpejabat($id) {
         $dpp = $this->findModel($id);
         $paketpengadaan = $dpp->paketpengadaan;
-        $penilaian = PenilaianPenyedia::last(['dpp_id' => $dpp->id, 'created_by'=>Yii::$app->user->id]) ?? new PenilaianPenyedia();
+        $penilaian = PenilaianPenyedia::last(['dpp_id' => $dpp->id, 'created_by' => Yii::$app->user->id]) ?? new PenilaianPenyedia();
         $request = Yii::$app->request;
-        $template = collect(json_decode(TemplateChecklistEvaluasi::where(['like', 'template', 'Evaluasi_Supplier_Oleh_Pejabat'])->one()->detail->uraian, true))
-            ->map(function ($e) use ($penilaian) {
-                return [
-                    'uraian' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['uraian'] : $e['uraian'],
-                    'skor' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['skor'] : 0,
-                    'nilaiakhir' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['nilaiakhir'] : 0,
-                    'hasil_evaluasi' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['hasil_evaluasi'] : '',
-                    'ulasan_pejabat_pengadaan' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['ulasan_pejabat_pengadaan'] : '',
-                    'total' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['total'] : 0,
-                ];
-            })->values()->toArray();
+        $template = collect(json_decode(Setting::where(['type' => 'evaluasi_suplier_pejabat', 'active' => 1])->one()->value, true)['kriteria'])
+        ->map(function ($e) use ($penilaian) {
+            return [
+                'uraian' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['uraian'] : $e['name'],
+                'skor' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['skor'] : 0,
+                'nilaiakhir' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['nilaiakhir'] : 0,
+                'hasil_evaluasi' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['hasil_evaluasi'] : '',
+                'ulasan_pejabat_pengadaan' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['ulasan_pejabat_pengadaan'] : '',
+                'total' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['total'] : 0,
+                'desc' => collect($e['description'])->map(function ($d, $i) {
+                    return $i . '. ' . $d;
+                })->sortKeys(),
+            ];
+        });
+        if(!$template){
+            echo 'Template tidak ditemukan';
+        }
+        // $template = collect(json_decode(TemplateChecklistEvaluasi::where(['like', 'template', 'Evaluasi_Supplier_Oleh_Pejabat'])->one()->detail->uraian, true))
+        //     ->map(function ($e) use ($penilaian) {
+        //         return [
+        //             'uraian' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['uraian'] : $e['uraian'],
+        //             'skor' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['skor'] : 0,
+        //             'nilaiakhir' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['nilaiakhir'] : 0,
+        //             'hasil_evaluasi' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['hasil_evaluasi'] : '',
+        //             'ulasan_pejabat_pengadaan' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['ulasan_pejabat_pengadaan'] : '',
+        //             'total' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['total'] : 0,
+        //         ];
+        //     })->values()->toArray();
         if ($penilaian->load($request->post())) {
             $nilai = [
                 'uraian' => $_POST['uraian'],
@@ -787,7 +809,7 @@ class DppController extends Controller {
             }
         } else {
             if ($penilaian->dpp) {
-                $penilaian = PenilaianPenyedia::where(['dpp_id' => $dpp->id, 'created_by'=>Yii::$app->user->id])->one();
+                $penilaian = PenilaianPenyedia::where(['dpp_id' => $dpp->id, 'created_by' => Yii::$app->user->id])->one();
             } else {
                 $penilaian->attributes = [
                     'unit_kerja' => $dpp::profile('dinas'),

@@ -3,7 +3,7 @@ use kartik\date\DatePicker;
 use unclead\multipleinput\{MultipleInput, MultipleInputColumn};
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\Html;
-$this->title="Penilaian Penyedia oleh PPK";
+$this->title="Evaluasi Kinerja Penyedia oleh PPK";
 $js = <<<JS
  $('select[name^="skor"]').on('change', function() {
      const index = $(this).attr('name').match(/\d+/)[0];
@@ -110,9 +110,12 @@ $this->registerJs($js);
                 echo "<td class='text-center align-middle  p-1'>";
                 echo "<select name='skor[$v]' class='select2 form-control'>";
                 echo "<option></option>";
-                echo "<option value='1'" . (is_array($item['skor']) ? (($item['skor'][$v] == '1') ? ' selected' : '') : '') . ">1</option>";
-                echo "<option value='3'" . (is_array($item['skor']) ? (($item['skor'][$v] == '3') ? ' selected' : '') : '') . ">3</option>";
-                echo "<option value='5'" . (is_array($item['skor']) ? (($item['skor'][$v] == '5') ? ' selected' : '') : '') . ">5</option>";
+                foreach($item['desc'] as $i=>$d){
+                    echo "<option value=$i" . (is_array($item['skor']) ? (($item['skor'][$v] == $i) ? ' selected' : '') : '') . ">".$d."</option>";
+                }
+                // echo "<option value='1'" . (is_array($item['skor']) ? (($item['skor'][$v] == '1') ? ' selected' : '') : '') . ">1</option>";
+                // echo "<option value='3'" . (is_array($item['skor']) ? (($item['skor'][$v] == '3') ? ' selected' : '') : '') . ">3</option>";
+                // echo "<option value='5'" . (is_array($item['skor']) ? (($item['skor'][$v] == '5') ? ' selected' : '') : '') . ">5</option>";
                 echo "</select>";
                 echo "</td>";
                 echo "</tr>";

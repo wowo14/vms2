@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Dpp', 'url' => ['/dpp/index']];
         ];
         if ($model->paketpengadaan->pemenang) {
             $tabsItems[] = [
-                'label' => 'Penilaian & evaluasi',
+                'label' => 'Evaluasi Kinerja Penyedia',
                 'content' => $this->render('//dpp/_evaluasi', ['model' => $model]),
                 'options' => ['id' => 'eval' . $model->hash],
             ];
