@@ -87,9 +87,9 @@ $this->registerJs($js);
     <table class="table table-bordered table-striped table-hover">
         <thead>
             <tr>
-                <th class="text-center align-middle m-0 p-0">No.</th>
-                <th class="text-center align-middle m-0 p-0">Aspek Kinerja</th>
-                <th class="text-center align-middle m-0 p-0">Skor <br>Tidak Baik (1) Baik (3) Sangat Baik (5)</th>
+                <th class="text-center col-md-0 align-middle m-0 p-0">No.</th>
+                <th class="text-center col-md-5 align-middle m-0 p-0">Aspek Kinerja</th>
+                <th class="text-center col-md-7 align-middle m-0 p-0">Skor <br>Tidak Baik (1) Baik (3) Sangat Baik (5)</th>
             </tr>
         </thead>
         <tbody>
