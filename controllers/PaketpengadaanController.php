@@ -8,6 +8,7 @@ use yii\helpers\{ArrayHelper, Html};
 use kartik\grid\EditableColumnAction;
 use yii\web\{ServerErrorHttpException, Response, NotFoundHttpException};
 use app\models\{Negosiasi, Unit, TemplateChecklistEvaluasi, Attachment, Dpp, PaketPengadaanDetails, PaketPengadaanSearch, PaketPengadaan, ProgramKegiatan, Rab};
+use yii\debug\models\search\Log;
 class PaketpengadaanController extends Controller {
     public function actions() {
         return ArrayHelper::merge(parent::actions(), [
@@ -255,7 +256,7 @@ class PaketpengadaanController extends Controller {
                         $hps_satuan = $parentSheet->getCellByColumnAndRow(6, $childRow)->getValue();
                         $penawaran = $parentSheet->getCellByColumnAndRow(7, $childRow)->getValue();
                         // Check if mandatory fields are valid
-                        if (!empty($nama_produk) && !empty($qty) && !empty($volume) && !empty($satuan) && !empty($hps_satuan) && !empty($penawaran)) {
+                        if (!empty($nama_produk) && !empty($qty) && !empty($volume) && !empty($satuan) && !empty($hps_satuan) ) {
                             $inserted++;
                             $adata[] = [
                                 'paket_id' => $model->id,
@@ -264,7 +265,7 @@ class PaketpengadaanController extends Controller {
                                 'volume' => $volume,
                                 'satuan' => $satuan,
                                 'hps_satuan' => $hps_satuan,
-                                'penawaran' => $penawaran,
+                                'penawaran' => $penawaran??0,
                             ];
                         } else {
                             // Log or handle the row with missing data
