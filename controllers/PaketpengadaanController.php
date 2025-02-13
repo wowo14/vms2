@@ -58,7 +58,7 @@ class PaketpengadaanController extends Controller {
         }
         if (!$model::isAdmin()) {
             if (!$model::isStaffpp()) {
-                if ($model->dpp->pejabat_pengadaan) {
+                if (isset($model->dpp) ? $model->dpp->pejabat_pengadaan : false) {
                     Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
                     return $this->redirect('index');
                 }
@@ -238,7 +238,7 @@ class PaketpengadaanController extends Controller {
         }
         if (!$model::isAdmin()) {
             if (!$model::isStaffpp()) {
-                if ($model->dpp->pejabat_pengadaan) {
+                if (isset($model->dpp) ? $model->dpp->pejabat_pengadaan : false) {
                     Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
                     return $this->redirect('index');
                 }
@@ -613,7 +613,7 @@ class PaketpengadaanController extends Controller {
         //cek dpp udah di assign ?
         if(!$model::isAdmin()){
             if (!$model::isStaffpp()) {
-                if($model->dpp->pejabat_pengadaan){
+                if (isset($model->dpp) ? $model->dpp->pejabat_pengadaan : false) {
                     Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
                     return $this->redirect('index');
                 }
@@ -667,7 +667,7 @@ class PaketpengadaanController extends Controller {
         }
         if (!$model::isAdmin()) {
             if (!$model::isStaffpp()) {
-                if ($model->dpp->pejabat_pengadaan) {
+                if (isset($model->dpp) ? $model->dpp->pejabat_pengadaan : false) {
                     Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
                     return $this->redirect('index');
                 }
@@ -693,7 +693,7 @@ class PaketpengadaanController extends Controller {
             }
             if (!$model::isAdmin()) {
                 if (!$model::isStaffpp()) {
-                    if ($model->dpp->pejabat_pengadaan) {
+                    if (isset($model->dpp)?$model->dpp->pejabat_pengadaan:false) {
                         Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
                         return $this->redirect('index');
                     }
