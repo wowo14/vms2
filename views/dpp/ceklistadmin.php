@@ -6,6 +6,7 @@ use kartik\select2\Select2;
 use yii\bootstrap4\ActiveForm;
 use app\models\{Unit, CeklistModel};
 use unclead\multipleinput\MultipleInput;
+$this->title = 'Ceklist Admin DPP :'.$dpp->tanggal_terima;
 $this->registerJs("
 jQuery(function ($) {
     $('.list-cell__button').hide();
@@ -48,7 +49,7 @@ foreach ($model->reorderArray(array_keys($temp[0]), $template) as $item) {
     ] : [
         'name' => trim($item),
         'title' => $title,
-        'type' => 'textArea'
+        'type' => 'textArea',
     ];
 }
 $form = ActiveForm::begin([

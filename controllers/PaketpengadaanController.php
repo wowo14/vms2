@@ -56,6 +56,14 @@ class PaketpengadaanController extends Controller {
             Yii::$app->session->setFlash('warning', 'Pemenang sudah ditentukan');
             return $this->redirect(['index']);
         }
+        if (!$model::isAdmin()) {
+            if (!$model::isStaffpp()) {
+                if ($model->dpp->pejabat_pengadaan) {
+                    Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
+                    return $this->redirect('index');
+                }
+            }
+        }
         if ($request->isGet) {
             return $this->render('lampiran', ['model' => $model]);
         }
@@ -107,7 +115,7 @@ class PaketpengadaanController extends Controller {
             return $this->redirect(['index']);
         }
     }
-    public function actionDpp() {
+    public function actionDpp() {// kirim dpp
         $request = Yii::$app->request;
         $pks = explode(',', $request->post('pks'));
         foreach ($pks as $pk) {
@@ -126,6 +134,7 @@ class PaketpengadaanController extends Controller {
             }
             $dpp = new Dpp;
             $dpp->paket_id = $model->id;
+            $dpp->tanggal_terima = date('Y-m-d H:i:s', time());
             $dpp->bidang_bagian = $model->unit ?? '';
             $dpp->nomor_dpp = $model->nomor ?? '';
             $dpp->tanggal_dpp = $model->tanggal_dpp ?? '';
@@ -226,6 +235,14 @@ class PaketpengadaanController extends Controller {
         if ($model->pemenang) {
             Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
             return $this->redirect('index');
+        }
+        if (!$model::isAdmin()) {
+            if (!$model::isStaffpp()) {
+                if ($model->dpp->pejabat_pengadaan) {
+                    Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
+                    return $this->redirect('index');
+                }
+            }
         }
         $request = Yii::$app->request;
         if ($request->isPost) {
@@ -593,6 +610,16 @@ class PaketpengadaanController extends Controller {
             Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
             return $this->redirect('index');
         }
+        //cek dpp udah di assign ?
+        if(!$model::isAdmin()){
+            if (!$model::isStaffpp()) {
+                if($model->dpp->pejabat_pengadaan){
+                    Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
+                    return $this->redirect('index');
+                }
+            }
+        }
+
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             if ($model->load($request->post()) && $model->save()) {
@@ -638,6 +665,14 @@ class PaketpengadaanController extends Controller {
             Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
             return $this->redirect('index');
         }
+        if (!$model::isAdmin()) {
+            if (!$model::isStaffpp()) {
+                if ($model->dpp->pejabat_pengadaan) {
+                    Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
+                    return $this->redirect('index');
+                }
+            }
+        }
         $model->unlinkAll('details', true);
         $model->delete();
         if ($request->isAjax) {
@@ -655,6 +690,14 @@ class PaketpengadaanController extends Controller {
             if ($model->pemenang) {
                 Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada pemenang');
                 return $this->redirect('index');
+            }
+            if (!$model::isAdmin()) {
+                if (!$model::isStaffpp()) {
+                    if ($model->dpp->pejabat_pengadaan) {
+                        Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
+                        return $this->redirect('index');
+                    }
+                }
             }
             $model->unlinkAll('details', true);
             $model->delete();

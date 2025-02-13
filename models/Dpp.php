@@ -8,7 +8,7 @@ class Dpp extends \yii\db\ActiveRecord {
     }
     public function rules() {
         return [
-            [['tanggal_dpp', 'created_at', 'updated_at'], 'safe'],
+            [['tanggal_dpp','tanggal_terima', 'created_at', 'updated_at'], 'safe'],
             ['paket_id', 'unique'],
             [['paket_id', 'pejabat_pengadaan', 'admin_pengadaan', 'created_by', 'updated_by'], 'integer'],
             [['status_review', 'is_approved'], 'integer', 'max' => 1],
@@ -20,6 +20,7 @@ class Dpp extends \yii\db\ActiveRecord {
             'id' => 'ID',
             'nomor_dpp' => 'Nomor Dpp',
             'tanggal_dpp' => 'Tanggal Dpp',
+            'tanggal_terima' => 'Tanggal Terima Dpp',
             'bidang_bagian' => 'Bidang Bagian',
             'paket_id' => 'Paket Pengadaan',
             'status_review' => 'Status Review',

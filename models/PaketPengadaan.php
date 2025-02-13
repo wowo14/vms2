@@ -12,7 +12,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['nomor', 'tanggal_paket', 'tanggal_dpp', 'tanggal_persetujuan', 'nomor_persetujuan', 'nama_paket', 'tahun_anggaran', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'unit', 'pagu', 'metode_pengadaan', 'kategori_pengadaan'], 'required'],
-            [['tanggal_paket', 'tanggal_reject', 'alasan_reject', 'addition'], 'string'],
+            [['tanggal_paket', 'created_at', 'updated_at', 'tanggal_reject', 'alasan_reject', 'addition'], 'string'],
             [['pagu'], 'number'],
             // [['nama_paket'], 'unique'],
             [['created_by', 'admin_ppkom', 'tahun_anggaran', 'approval_by', 'unit'], 'integer'],
@@ -37,6 +37,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             'metode_pengadaan' => 'Metode Pengadaan', //EPL,PL,E-Purchasing,
             'kategori_pengadaan' => 'Kategori Pengadaan', //barang/jasa, konstruksi, konsultansi
             'created_by' => 'Created By',
+            'created_at' => 'Created at',
+            'updated_at' => 'Updated at',
             'tahun_anggaran' => 'Tahun Anggaran',
             'approval_by' => 'Approval By', //null->belom,ditolak oleh ,<>0->diterima oleh
             'alasan_reject' => 'Alasan Reject', //not null ditolak
