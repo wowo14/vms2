@@ -56,11 +56,13 @@ class PaketpengadaanController extends Controller {
             Yii::$app->session->setFlash('warning', 'Pemenang sudah ditentukan');
             return $this->redirect(['index']);
         }
-        if (!$model::isAdmin()) {
-            if (!$model::isStaffpp()) {
-                if (isset($model->dpp) ? $model->dpp->pejabat_pengadaan : false) {
-                    Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
-                    return $this->redirect('index');
+        if ($model->tanggal_reject == '' && $model->alasan_reject == '') {
+            if (!$model::isAdmin()) {
+                if (!$model::isStaffpp()) {
+                    if (isset($model->dpp) ? $model->dpp->pejabat_pengadaan : false) {
+                        Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
+                        return $this->redirect('index');
+                    }
                 }
             }
         }
@@ -115,7 +117,7 @@ class PaketpengadaanController extends Controller {
             return $this->redirect(['index']);
         }
     }
-    public function actionDpp() {// kirim dpp
+    public function actionDpp() { // kirim dpp
         $request = Yii::$app->request;
         $pks = explode(',', $request->post('pks'));
         foreach ($pks as $pk) {
@@ -236,11 +238,13 @@ class PaketpengadaanController extends Controller {
             Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
             return $this->redirect('index');
         }
-        if (!$model::isAdmin()) {
-            if (!$model::isStaffpp()) {
-                if (isset($model->dpp) ? $model->dpp->pejabat_pengadaan : false) {
-                    Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
-                    return $this->redirect('index');
+        if ($model->tanggal_reject == '' && $model->alasan_reject == '') {
+            if (!$model::isAdmin()) {
+                if (!$model::isStaffpp()) {
+                    if (isset($model->dpp) ? $model->dpp->pejabat_pengadaan : false) {
+                        Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
+                        return $this->redirect('index');
+                    }
                 }
             }
         }
@@ -273,7 +277,7 @@ class PaketpengadaanController extends Controller {
                         $hps_satuan = $parentSheet->getCellByColumnAndRow(6, $childRow)->getValue();
                         $penawaran = $parentSheet->getCellByColumnAndRow(7, $childRow)->getValue();
                         // Check if mandatory fields are valid
-                        if (!empty($nama_produk) && !empty($qty) && !empty($volume) && !empty($satuan) && !empty($hps_satuan) ) {
+                        if (!empty($nama_produk) && !empty($qty) && !empty($volume) && !empty($satuan) && !empty($hps_satuan)) {
                             $inserted++;
                             $adata[] = [
                                 'paket_id' => $model->id,
@@ -282,7 +286,7 @@ class PaketpengadaanController extends Controller {
                                 'volume' => $volume,
                                 'satuan' => $satuan,
                                 'hps_satuan' => $hps_satuan,
-                                'penawaran' => $penawaran??0,
+                                'penawaran' => $penawaran ?? 0,
                             ];
                         } else {
                             // Log or handle the row with missing data
@@ -611,15 +615,16 @@ class PaketpengadaanController extends Controller {
             return $this->redirect('index');
         }
         //cek dpp udah di assign ?
-        if(!$model::isAdmin()){
-            if (!$model::isStaffpp()) {
-                if (isset($model->dpp) ? $model->dpp->pejabat_pengadaan : false) {
-                    Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
-                    return $this->redirect('index');
+        if ($model->tanggal_reject == '' && $model->alasan_reject == '') {
+            if (!$model::isAdmin()) {
+                if (!$model::isStaffpp()) {
+                    if (isset($model->dpp) ? $model->dpp->pejabat_pengadaan : false) {
+                        Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
+                        return $this->redirect('index');
+                    }
                 }
             }
         }
-
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             if ($model->load($request->post()) && $model->save()) {
@@ -665,11 +670,13 @@ class PaketpengadaanController extends Controller {
             Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
             return $this->redirect('index');
         }
-        if (!$model::isAdmin()) {
-            if (!$model::isStaffpp()) {
-                if (isset($model->dpp) ? $model->dpp->pejabat_pengadaan : false) {
-                    Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
-                    return $this->redirect('index');
+        if ($model->tanggal_reject == '' && $model->alasan_reject == '') {
+            if (!$model::isAdmin()) {
+                if (!$model::isStaffpp()) {
+                    if (isset($model->dpp) ? $model->dpp->pejabat_pengadaan : false) {
+                        Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
+                        return $this->redirect('index');
+                    }
                 }
             }
         }
@@ -691,11 +698,13 @@ class PaketpengadaanController extends Controller {
                 Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada pemenang');
                 return $this->redirect('index');
             }
-            if (!$model::isAdmin()) {
-                if (!$model::isStaffpp()) {
-                    if (isset($model->dpp)?$model->dpp->pejabat_pengadaan:false) {
-                        Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
-                        return $this->redirect('index');
+            if ($model->tanggal_reject == '' && $model->alasan_reject == '') {
+                if (!$model::isAdmin()) {
+                    if (!$model::isStaffpp()) {
+                        if (isset($model->dpp) ? $model->dpp->pejabat_pengadaan : false) {
+                            Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah Diproses DPP');
+                            return $this->redirect('index');
+                        }
                     }
                 }
             }

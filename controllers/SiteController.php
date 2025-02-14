@@ -151,6 +151,7 @@ class SiteController extends Controller
             'byadmin' => $model->groupedData('admin_pengadaan',$collection),
             'bybidang' => $model->groupedData('bidang_bagian',$collection),
         ];
+        // batasi dashboard 3th tahun terakhir
         return $this->render('_dashboard', ['params' => $params]);
     }
     public function actionNotif(){
