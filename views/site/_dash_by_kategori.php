@@ -1,7 +1,16 @@
 <?php
-foreach($params['kategori'] as $key => $value){
-    $dashkategori[]=['name'=>$value['kategori_pengadaan'],'y'=>$value['jml']];
+foreach ($params['kategori'] as $row) {
+    $kategori = $row['kategori_pengadaan'];
+    if (!isset($dashkategori[$kategori])) {
+        $dashkategori[$kategori] = [
+            "name" => $kategori,
+            "y" => 0
+        ];
+    }
+    $dashkategori[$kategori]["y"] += $row['jml'];
 }
+$dashkategori = array_values($dashkategori);
+
 $dashkategori=json_encode($dashkategori??[],JSON_NUMERIC_CHECK);
 $js=<<<JS
 Highcharts.chart('dash-kategori', {

@@ -1,7 +1,16 @@
 <?php
-foreach($params['byadmin'] as $key => $value){
-    $dashbyadmin[]=['name'=>$value['admin_pengadaan'],'y'=>$value['jml']];
+
+foreach ($params['byadmin'] as $row) {
+    $admin = $row['admin_pengadaan'];
+    if (!isset($dashbyadmin[$admin])) {
+        $dashbyadmin[$admin] = [
+            "name" => $admin,
+            "y" => 0
+        ];
+    }
+    $dashbyadmin[$admin]["y"] += $row['jml'];
 }
+$dashbyadmin = array_values($dashbyadmin);
 $dashbyadmin=json_encode($dashbyadmin??[],JSON_NUMERIC_CHECK);
 $js=<<<JS
 Highcharts.chart('dash-byadmin', {

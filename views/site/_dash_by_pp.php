@@ -1,7 +1,15 @@
 <?php
-foreach($params['bypp'] as $key => $value){
-    $dashbypp[]=['name'=>$value['pejabat_pengadaan'],'y'=>$value['jml']];
+foreach ($params['bypp'] as $row) {
+    $pp = $row['pejabat_pengadaan'];
+    if (!isset($dashbypp[$pp])) {
+        $dashbypp[$pp] = [
+            "name" => $pp,
+            "y" => 0
+        ];
+    }
+    $dashbypp[$pp]["y"] += $row['jml'];
 }
+$dashbypp = array_values($dashbypp);
 $dashbypp=json_encode($dashbypp??[],JSON_NUMERIC_CHECK);
 $js=<<<JS
 Highcharts.chart('dash-bypp', {

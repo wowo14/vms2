@@ -1,7 +1,15 @@
 <?php
-foreach($params['bybidang'] as $key => $value){
-    $dashbybidang[]=['name'=>$value['bidang_bagian'],'y'=>$value['jml']];
+foreach ($params['bybidang'] as $row) {
+    $bidang = $row['bidang_bagian'];
+    if (!isset($dashbybidang[$bidang])) {
+        $dashbybidang[$bidang] = [
+            "name" => $bidang,
+            "y" => 0
+        ];
+    }
+    $dashbybidang[$bidang]["y"] += $row['jml'];
 }
+$dashbybidang = array_values($dashbybidang);
 $dashbybidang=json_encode($dashbybidang??[],JSON_NUMERIC_CHECK);
 $js=<<<JS
 Highcharts.chart('dash-bybidang', {
@@ -83,6 +91,15 @@ foreach ($params['bybidang'] as $row) {
         'ammount' => $row['ammount']
     ];
 }
+// Calculate Total Per Year
+$yearlyTotals = [];
+foreach ($params['bybidang'] as $row) {
+    $year = $row['year'];
+    if (!isset($yearlyTotals[$year])) {
+        $yearlyTotals[$year] = 0;
+    }
+    $yearlyTotals[$year] += $row['jml'];
+}
 $totalByBidang = array_sum(array_column($params['bybidang'], 'jml')) ?? 0;
 $totalAmmount = array_sum(array_column($params['bybidang'], 'ammount')) ?? 0;
 echo '<table class="table table-responsive">';
@@ -108,10 +125,9 @@ if ($totalByBidang > 0) {
     echo '<tfoot><tr>
         <td colspan="2">Total</td>';
     foreach ($years as $year) {
-        $yearTotal = array_sum(array_column($params['bybidang'], 'jml', $year));
-        echo '<td>'.$yearTotal.'</td>';
+        echo '<td>' . $yearlyTotals[$year] . '</td>';
     }
-    echo '<td>'.($totalByBidang).'</td>';
+    echo '<td>' . $totalByBidang . '</td>';
     echo '</tr></tfoot>';
 }
 echo '</table>';
