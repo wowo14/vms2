@@ -521,7 +521,7 @@ class DppController extends Controller {
         $template = (json_decode($r));
         $reviews = $model->reviews;
         $histori = $model->paketpengadaan->historireject;
-        if ($histori) {
+        if ($histori && $reviews) {
             $reviews->keterangan = $histori->alasan_reject??'';
             $reviews->kesimpulan = $histori->kesimpulan??'';
             $reviews->tgl_dikembalikan = $histori->tanggal_dikembalikan??'';
@@ -536,8 +536,6 @@ class DppController extends Controller {
             ]);
         }
         if ($request->isPost) {
-            $paket = $model->paketpengadaan;
-            $historireject = $paket->historireject;
             $rr = ReviewDpp::where(['dpp_id' => $model->id])->orderBy('id desc')->one();
             if ($rr) {
                 $oldfile = $rr->file_tanggapan;
