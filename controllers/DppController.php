@@ -522,11 +522,11 @@ class DppController extends Controller {
         $reviews = $model->reviews;
         $histori = $model->paketpengadaan->historireject;
         if ($histori) {
-            $reviews->keterangan = $histori->alasan_reject;
-            $reviews->kesimpulan = $histori->kesimpulan;
-            $reviews->tgl_dikembalikan = $histori->tanggal_dikembalikan;
-            $reviews->tanggapan_ppk = $histori->tanggapan_ppk;
-            $reviews->file_tanggapan = $histori->file_tanggapan;
+            $reviews->keterangan = $histori->alasan_reject??'';
+            $reviews->kesimpulan = $histori->kesimpulan??'';
+            $reviews->tgl_dikembalikan = $histori->tanggal_dikembalikan??'';
+            $reviews->tanggapan_ppk = $histori->tanggapan_ppk??'';
+            $reviews->file_tanggapan = $histori->file_tanggapan??'';
         }
         if ($request->isGet) {
             return $this->render('_frmreviewdpp', [
