@@ -6,12 +6,16 @@ use kartik\select2\Select2;
 use yii\bootstrap4\ActiveForm;
 use app\models\{Unit, CeklistModel};
 use unclead\multipleinput\MultipleInput;
-$this->title = 'Ceklist Admin DPP :'.$dpp->tanggal_terima;
+$this->title = 'Ceklist Admin DPP ';
+$tglditerima= '<b>Tgl Diterima : '.$dpp->tanggal_terima.'</b>';
 $this->registerJs("
 jQuery(function ($) {
     $('.list-cell__button').hide();
     $('.field-ceklistmodel-template').find('.col-sm-9').removeClass('col-sm-9');
     $('.field-ceklistmodel-template').find('.row').removeClass('row');
+    var tglditerima=$('.content-header .container-fluid .row .col-sm-6').last();
+    tglditerima.addClass('right');
+    tglditerima.html('$tglditerima');
 });", View::POS_END);
 $additions = json_decode($model->addition, true);
 $col = [];

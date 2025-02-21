@@ -61,6 +61,7 @@ return [
     [
         'class' => '\kartik\grid\DataColumn',
         'attribute' => 'status_review',
+        'label'=>'Review'
     ],
     [
         'class' => '\kartik\grid\DataColumn',
