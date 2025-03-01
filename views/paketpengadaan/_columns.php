@@ -76,7 +76,7 @@ return [
             },
             'import-product'=>function($d){
                 return !$d->pemenang;
-            },  
+            },
             'ceklistadmin'=>function($d){
                 return !$d->pemenang;
             },

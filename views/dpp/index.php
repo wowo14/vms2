@@ -31,11 +31,11 @@ $this->params['breadcrumbs'][] = $this->title;
             'toolbar' => [
                 [
                     'content' =>
-                    Html::a(
-                        '<i class="fa fa-plus"></i>',
-                        ['dpp/create'],
-                        ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Dpps', 'class' => 'btn btn-outline-primary']
-                    ) .
+                    // Html::a(
+                    //     '<i class="fa fa-plus"></i>',
+                    //     ['dpp/create'],
+                    //     ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Dpps', 'class' => 'btn btn-outline-primary']
+                    // ) .
                         Html::a(
                             '<i class="fa fa-redo"></i>',
                             [''],
