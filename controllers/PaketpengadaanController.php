@@ -681,6 +681,11 @@ class PaketpengadaanController extends Controller {
             }
         }
         $model->unlinkAll('details', true);
+        if (isset($model->dpp)) {
+            $model->dpp->unlinkAll('reviews', true);
+            $model->dpp->unlinkAll('penugasan', true);
+            $model->dpp->delete();
+        }
         $model->delete();
         if ($request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -709,6 +714,11 @@ class PaketpengadaanController extends Controller {
                 }
             }
             $model->unlinkAll('details', true);
+            if (isset($model->dpp)) {
+                $model->dpp->unlinkAll('reviews', true);
+                $model->dpp->unlinkAll('penugasan', true);
+                $model->dpp->delete();
+            }
             $model->delete();
         }
         if ($request->isAjax) {

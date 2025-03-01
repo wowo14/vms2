@@ -30,6 +30,18 @@ class HelloController extends Controller {
     print_r($countpp);
     print_r($countadminpp);
     }
+    public function actionDeletedpp(){
+        //grab dpp without paket pengadaan
+        $dpp= Dpp::collectAll();
+        $dpp->map(function($d){
+            if(!$d->paketpengadaan){
+                $d->unlinkAll('reviews', true);
+                $d->unlinkAll('penugasan', true);
+                $d->delete();
+                Yii::error('deleted dpp '.$d->id);
+            }
+        });
+    }
     public function actionDropAllTables() {
         $db = \Yii::$app->db;
         $schema = $db->schema;
