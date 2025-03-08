@@ -38,12 +38,17 @@ class DppSearch extends Dpp{
         }
         if(self::isPP()){
             $chief=\app\models\Pegawai::findOne(self::profile('kepalapengadaan'));
-            if(!$chief->id_user==Yii::$app->user->identity->id){
+            if($chief->id_user<>Yii::$app->user->identity->id){
+                Yii::error(($chief->id_user));
                 $query->andWhere(['p2.id_user' => Yii::$app->user->identity->id]);
             }
         }
         if(self::isStaff()){
             $query->andWhere(['p.created_by' => Yii::$app->user->identity->id]);
+        }
+        if(self::isPPK()){
+            $query->joinWith(['paketpengadaan.pejabatppkom ppkom']);
+            $query->andWhere(['ppkom.id_user' => Yii::$app->user->identity->id]);
         }
         $query->andFilterWhere([
             'id' => $this->id,

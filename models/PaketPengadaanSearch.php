@@ -23,6 +23,18 @@ class PaketPengadaanSearch extends PaketPengadaan{
         if(self::isStaff()){
             $query->andWhere(['created_by' => Yii::$app->user->identity->id]);
         }
+        if(self::isPPK()){
+            $query->joinWith('pejabatppkom ppkom');
+            $query->andWhere(['ppkom.id_user'=>Yii::$app->user->identity->id]);
+        }
+        if(self::isPP()){
+            $query->joinWith('dpp.pejabat p');
+            $query->andWhere(['p.id_user'=> Yii::$app->user->identity->id]);
+        }
+        if(self::isStaffpp()){
+            $query->joinWith('dpp.staffadmin s');
+            $query->andWhere(['s.id_user'=> Yii::$app->user->identity->id]);
+        }
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
