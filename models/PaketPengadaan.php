@@ -236,6 +236,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             ->orderBy('paket_pengadaan.id')
             ->asArray()
             ->all())->map(function ($e) use ($rawSettingkategori, $rawSettingmetode) {
+            $e['metode_pengadaan']=$e['metode_pengadaan']=== 'E-Purchasing'? 'E-Katalog': $e['metode_pengadaan'];
             $e['metode_pengadaan_id'] = $rawSettingmetode[$e['metode_pengadaan']];
             $e['kategori_pengadaan_id'] = $rawSettingkategori[$e['kategori_pengadaan']];
             return $e;
