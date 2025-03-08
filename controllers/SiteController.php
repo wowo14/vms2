@@ -1,6 +1,6 @@
 <?php
 namespace app\controllers;
-use app\models\{BackupUpload,User,LoginForm, ContactForm,PaketPengadaan};
+use app\models\{Dpp,BackupUpload,User,LoginForm, ContactForm,PaketPengadaan};
 use app\widgets\ImageConverter;
 use Yii;
 use yii\db\Expression;
@@ -157,9 +157,12 @@ class SiteController extends Controller
     public function actionNotif(){
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $model=new PaketPengadaan();
-        $paketbaru=collect($model::notifpaketbaru());
+        $dpp=new Dpp();
         $params = [
-            'paketbaru'=>$paketbaru->count(),
+            'paketbaru'=>(float)$model->notifpaketbaru,
+            'belumditugaskan'=>(float)$dpp->belumditugaskan,
+            'paketreject'=>(float)$model->paketreject,
+            'totalnotif'=> (float)$model->notifpaketbaru+ (float)$dpp->belumditugaskan+(float)$model->paketreject,
         ];
         return $params;
     }

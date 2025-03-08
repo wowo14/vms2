@@ -121,12 +121,19 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             ->asArray()
             ->all();
     }
-    public static function notifpaketbaru() {
+    public function getNotifpaketbaru() {
         return self::where(['not', ['paket_pengadaan.id' => null]])
             ->joinWith('dpp d')
             ->andWhere(['is', 'd.paket_id', null])
             ->orderBy('id', 'desc')
-            ->asArray()->all();
+            ->asArray()->count();
+    }
+    public function getPaketreject(){
+        return self::where(['IS NOT', 'tanggal_reject', null])
+            ->andWhere(['!=', 'tanggal_reject', ''])
+            ->andWhere(['IS NOT', 'alasan_reject', null])
+            ->andWhere(['!=', 'alasan_reject', ''])
+            ->count();
     }
     public function groupedData($field, $collection) { // part of dashboard
         return $collection->groupBy(function ($item) use ($field) {

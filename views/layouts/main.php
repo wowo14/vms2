@@ -40,6 +40,10 @@ var totalnotif1=0;
             dataType:"json",
             success:function(data){
                 $("#count_notifbaru").html(data.paketbaru);
+                $("#dpp_belumditugaskan").html(data.belumditugaskan);
+                $("#paket_reject").html(data.paketreject);
+                $("#total_notif").html(data.totalnotif);
+                $("#total_notif2").html(data.totalnotif+' Notifications');
                 if(notif1!=data.paketbaru){
                     totalnotif1+=data.paketbaru;
                     }

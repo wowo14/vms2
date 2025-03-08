@@ -35,6 +35,9 @@ class Dpp extends \yii\db\ActiveRecord {
             'kode' => 'Kode Paket/kode pemesanan'
         ];
     }
+    public function getBelumditugaskan(){
+        return self::where(['pejabat_pengadaan'=>null,'admin_pengadaan'=>null])->count();
+    }
     public function getNomordpp() {
         if ($this->nomor_dpp == null) {
             return $this->nomor_dpp = 'DPP-' . date('Ymd') . ' - ' . $this->paketpengadaan->nomor;
