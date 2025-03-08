@@ -199,8 +199,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         return parent::beforeSave($insert);
     }
     public function getrawData() {
-        $rawSettingkategori = collect(Setting::where(['type'=>'kategori_pengadaan']))->pluck('id', 'value')->toArray();
-        $rawSettingmetode = collect(Setting::where(['type'=>'metode_pengadaan']))->pluck('id', 'value')->toArray();
+        $rawSettingkategori = collect(Setting::where(['type'=>'kategori_pengadaan'])->all())->pluck('id', 'value')->toArray();
+        $rawSettingmetode = collect(Setting::where(['type'=>'metode_pengadaan'])->all())->pluck('id', 'value')->toArray();
         return collect(self::where(['not', ['paket_pengadaan.id' => null]])
             ->joinWith([
                 'dpp d',
