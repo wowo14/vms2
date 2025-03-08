@@ -153,4 +153,3 @@ AppAsset::register($this);
     ]
 ]) ?>
 <?php Modal::end(); ?>
-<?= app\widgets\Importer::widget(['searchModel' => $searchModel, 'action' => '/paketpengadaan/import']); ?>
