@@ -199,8 +199,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         return parent::beforeSave($insert);
     }
     public function getrawData() {
-        $rawSettingkategori = collect(Setting::type('kategori_pengadaan'))->pluck('id', 'value')->toArray();
-        $rawSettingmetode = collect(Setting::type('metode_pengadaan'))->pluck('id', 'value')->toArray();
+        $rawSettingkategori = collect(Setting::where(['type','kategori_pengadaan']))->pluck('id', 'value')->toArray();
+        $rawSettingmetode = collect(Setting::where(['type','metode_pengadaan']))->pluck('id', 'value')->toArray();
         return collect(self::where(['not', ['paket_pengadaan.id' => null]])
             ->joinWith([
                 'dpp d',
@@ -236,7 +236,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             ->orderBy('paket_pengadaan.id')
             ->asArray()
             ->all())->map(function ($e) use ($rawSettingkategori, $rawSettingmetode) {
-            $e['metode_pengadaan']=$e['metode_pengadaan']=== 'E-Purchasing'? 'E-Katalog': $e['metode_pengadaan'];
+            // $e['metode_pengadaan']=$e['metode_pengadaan']=== 'E-Purchasing'? 'E-Katalog': $e['metode_pengadaan'];
             $e['metode_pengadaan_id'] = $rawSettingmetode[$e['metode_pengadaan']];
             $e['kategori_pengadaan_id'] = $rawSettingkategori[$e['kategori_pengadaan']];
             return $e;
