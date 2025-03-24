@@ -14,7 +14,8 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['paket_id', 'qty','volume'], 'integer'],
+            [['paket_id'], 'integer'],
+            [['qty','volume'], 'number'],
             [['nama_produk', 'volume', 'satuan'], 'required'],
             [['hps_satuan', 'informasi_harga'], 'number'],
             [['nama_produk', 'satuan', 'durasi', 'sumber_informasi'], 'string', 'max' => 255],
@@ -42,14 +43,12 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
     public function getPaketpengadaan(){
         return $this->hasOne(PaketPengadaan::className(), ['id' => 'paket_id']);
     }
-    public static function sumNegosiasi($paket_id){
+    public static function sumNegosiasi($paket_id) {
         $model = PaketPengadaanDetails::collectAll(['paket_id' => $paket_id]);
-        $model=$model->map(function($e){
-            $d['totalnegosiasi']=($e->qty??1)
-                *
-                ($e->volume??1)
-                *
-                (Yii::$app->tools->reverseCurrency($e->negosiasi));
+        $model = $model->map(function ($e) {
+            $d['totalnegosiasi'] = (float)($e->qty ?? 1)
+                * (float)($e->volume ?? 1)
+                * (float)(Yii::$app->tools->reverseCurrency($e->negosiasi));
             return $d;
         });
         return $model->sum('totalnegosiasi');
