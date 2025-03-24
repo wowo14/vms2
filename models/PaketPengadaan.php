@@ -334,7 +334,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
                 $e['bulan']=$months[$e['month']];
             }
             return $e;
-        });
+        })->values();
     }
     public function kategoribulan($params) {
         $data = $this->getrawData();
@@ -360,6 +360,6 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
                 $e['bulan']=$months[$e['month']];
             }
             return $e;
-        });
+        })->values();
     }
 }
