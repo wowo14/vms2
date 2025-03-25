@@ -9,7 +9,7 @@ class PenilaianPenyediaSearch extends PenilaianPenyedia{
     {
         return [
             [['id', 'dpp_id', 'created_by', 'updated_by'], 'integer'],
-            [['unit_kerja', 'nama_perusahaan', 'alamat_perusahaan', 'paket_pekerjaan', 'lokasi_pekerjaan', 'nomor_kontrak', 'jangka_waktu', 'tanggal_kontrak', 'metode_pemilihan', 'details', 'pengguna_anggaran', 'pejabat_pembuat_komitmen', 'created_at', 'updated_at'], 'safe'],
+            [['unit_kerja','bast','bast_diterimagudang', 'nama_perusahaan', 'alamat_perusahaan', 'paket_pekerjaan', 'lokasi_pekerjaan', 'nomor_kontrak', 'jangka_waktu', 'tanggal_kontrak', 'metode_pemilihan', 'details', 'pengguna_anggaran', 'pejabat_pembuat_komitmen', 'created_at', 'updated_at'], 'safe'],
             [['nilai_kontrak'], 'number'],
         ];
     }
@@ -49,6 +49,8 @@ class PenilaianPenyediaSearch extends PenilaianPenyedia{
             ->andFilterWhere(['like', 'metode_pemilihan', $this->metode_pemilihan])
             ->andFilterWhere(['like', 'details', $this->details])
             ->andFilterWhere(['like', 'pengguna_anggaran', $this->pengguna_anggaran])
+            ->andFilterWhere(['like', 'bast', $this->bast])
+            ->andFilterWhere(['like', 'bast_diterimagudang', $this->bast_diterimagudang])
             ->andFilterWhere(['like', 'pejabat_pembuat_komitmen', $this->pejabat_pembuat_komitmen]);
         return $dataProvider;
     }

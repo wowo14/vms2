@@ -1,9 +1,16 @@
 <?php
-use kartik\date\DatePicker;
-use unclead\multipleinput\{MultipleInput, MultipleInputColumn};
-use yii\bootstrap4\ActiveForm;
+use yii\web\View;
 use yii\helpers\Html;
-$this->title="Evaluasi Kinerja Penyedia oleh PPK";
+use app\assets\AppAsset;
+use kartik\date\DatePicker;
+use app\widgets\FilePreview;
+use yii\bootstrap4\ActiveForm;
+AppAsset::register($this);
+$this->title = "Evaluasi Kinerja Penyedia oleh PPK";
+$this->registerJs('
+jQuery(function ($) {
+    setupImagePreview($("#imageInput"), $("#imagePreview"), $("#bast"));
+});', View::POS_END);
 $js = <<<JS
  $('select[name^="skor"]').on('change', function() {
      const index = $(this).attr('name').match(/\d+/)[0];
@@ -82,6 +89,32 @@ $this->registerJs($js);
             <?= $form->field($penilaian, 'metode_pemilihan')->textInput(['readonly' => true]) ?>
             <?= $form->field($penilaian, 'pengguna_anggaran')->textInput(['maxlength' => true]) ?>
             <?= $form->field($penilaian, 'pejabat_pembuat_komitmen')->textInput(['readonly' => true]) ?>
+            <?= $form->field($penilaian, 'bast_diterimagudang')->widget(DatePicker::class, [
+                'pluginOptions' => [
+                    'format' => 'yyyy-mm-dd',
+                    'todayHighlight' => true,
+                    'autoclose' => true,
+                ],
+            ])?>
+            <?= $form->field($penilaian, 'bast')->hiddenInput(['id' => 'bast'])->label(false) ?>
+            <div class="form-group ">
+                <div class="row">
+                    <label class="control-label right col-sm-3" for="reviewdpp-bast">File bast (images/pdf)</label>
+                    <div class="col-sm-9">
+                        <input type="file" accept=".pdf, .png, .jpg, .jpeg, .gif" id="imageInput">
+                        <div id="imagePreview"></div>
+                    </div>
+                </div>
+            </div>
+            <?php echo $penilaian->bast ? Html::a(
+                FilePreview::widget([
+                    'model' => $penilaian,
+                    'attribute' => 'bast',
+                ]),
+                Yii::getAlias('@web/uploads/') . $penilaian->bast,
+                ['target' => '_blank']
+            ) : '';
+            ?>
         </div>
     </div>
     <table class="table table-bordered table-striped table-hover">
@@ -110,8 +143,8 @@ $this->registerJs($js);
                 echo "<td class='text-center align-middle  p-1'>";
                 echo "<select name='skor[$v]' class='select2 form-control'>";
                 echo "<option></option>";
-                foreach($item['desc'] as $i=>$d){
-                    echo "<option value=$i" . (is_array($item['skor']) ? (($item['skor'][$v] == $i) ? ' selected' : '') : '') . ">".$d."</option>";
+                foreach ($item['desc'] as $i => $d) {
+                    echo "<option value=$i" . (is_array($item['skor']) ? (($item['skor'][$v] == $i) ? ' selected' : '') : '') . ">" . $d . "</option>";
                 }
                 // echo "<option value='1'" . (is_array($item['skor']) ? (($item['skor'][$v] == '1') ? ' selected' : '') : '') . ">1</option>";
                 // echo "<option value='3'" . (is_array($item['skor']) ? (($item['skor'][$v] == '3') ? ' selected' : '') : '') . ">3</option>";

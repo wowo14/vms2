@@ -331,7 +331,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         $months=$this->getMonths();
         return $data->map(function($e)use($months){
             if($e['month']!==0){
-                $e['bulan']= $e['month'].$months[$e['month']];
+                $e['bulan']= $months[$e['month']];
             }
             return $e;
         })
@@ -359,7 +359,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         $months=$this->getMonths();
         return $data->map(function($e)use($months){
             if($e['month']!==0){
-                $e['bulan']= $e['month'].$months[$e['month']];
+                $e['bulan']= $months[$e['month']];
             }
             return $e;
         })

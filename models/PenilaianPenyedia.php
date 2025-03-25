@@ -8,7 +8,7 @@ class PenilaianPenyedia extends \yii\db\ActiveRecord {
     }
     public function rules() {
         return [
-            [['unit_kerja', 'created_at', 'updated_at', 'nama_perusahaan', 'alamat_perusahaan', 'paket_pekerjaan', 'lokasi_pekerjaan', 'nomor_kontrak', 'jangka_waktu', 'tanggal_kontrak', 'metode_pemilihan', 'details', 'pengguna_anggaran', 'pejabat_pembuat_komitmen'], 'string'],
+            [['unit_kerja', 'bast', 'bast_diterimagudang', 'created_at', 'updated_at', 'nama_perusahaan', 'alamat_perusahaan', 'paket_pekerjaan', 'lokasi_pekerjaan', 'nomor_kontrak', 'jangka_waktu', 'tanggal_kontrak', 'metode_pemilihan', 'details', 'pengguna_anggaran', 'pejabat_pembuat_komitmen'], 'string'],
             [['alamat_perusahaan', 'paket_pekerjaan', 'nilai_kontrak', 'nomor_kontrak'], 'required'],
             [['nilai_kontrak'], 'number'],
             [['dpp_id', 'created_by', 'updated_by'], 'integer'],
@@ -35,6 +35,8 @@ class PenilaianPenyedia extends \yii\db\ActiveRecord {
             'updated_at' => 'Updated At',
             'created_by' => 'Created By',
             'updated_by' => 'Updated By',
+            'bast' => 'BAST',
+            'bast_diterimagudangan' => 'BAST Diterima Gudang',
         ];
     }
     public function getDpp() {
@@ -47,20 +49,24 @@ class PenilaianPenyedia extends \yii\db\ActiveRecord {
             if ($insert) {
                 $this->created_at = date('Y-m-d H:i:s');
                 $this->created_by = Yii::$app->user->id;
+                if (isset($this->bast)) {
+                    $this->bast = !empty($this->bast) ? $this->upload($this->bast, 'bast_' . $this->dpp_id . '_' . time()) : '';
+                }
             } else {
                 $this->updated_at = date('Y-m-d H:i:s');
                 $this->updated_by = Yii::$app->user->id;
+                $this->bast = !empty($this->bast) && self::isBase64Encoded($this->bast) ? $this->upload($this->bast, 'bast_' . $this->dpp_id . '_' . time()) : $this->bast;
             }
             return true;
         } else {
             return false;
         }
     }
-    public function getGriddetail(){
-        $data=json_decode($this->details,true);
+    public function getGriddetail() {
+        $data = json_decode($this->details, true);
         $rows = [];
         //add check isset key uraian
-        if(isset($data['uraian'])){
+        if (isset($data['uraian'])) {
             foreach ($data['uraian'] as $index => $uraian) {
                 $rows[] = [
                     'uraian' => $uraian,
@@ -69,11 +75,11 @@ class PenilaianPenyedia extends \yii\db\ActiveRecord {
             }
         }
         $summary = [
-                ['uraian' => 'Total', 'skor' => $data['total']],
-                ['uraian' => 'Nilai Akhir', 'skor' => $data['nilaiakhir']],
-                ['uraian' => 'Hasil Evaluasi', 'skor' => $data['hasil_evaluasi']],
-                ['uraian' => 'Ulasan Pejabat Pengadaan', 'skor' => $data['ulasan_pejabat_pengadaan']],
-            ];
+            ['uraian' => 'Total', 'skor' => $data['total']],
+            ['uraian' => 'Nilai Akhir', 'skor' => $data['nilaiakhir']],
+            ['uraian' => 'Hasil Evaluasi', 'skor' => $data['hasil_evaluasi']],
+            ['uraian' => 'Ulasan Pejabat Pengadaan', 'skor' => $data['ulasan_pejabat_pengadaan']],
+        ];
         // Merge the main rows and summary rows
         return array_merge($rows, $summary);
     }

@@ -22,6 +22,11 @@ class HelloController extends Controller {
         Yii::error('hello world');
         die;
     }
+    public function actionUnpemenang($id){
+        $dpp=PaketPengadaan::findOne($id);
+        $dpp->pemenang=null;
+        $dpp->save();
+    }
     public function actionCount() {
     $dpp= Dpp::where(['is', 'pp.pemenang', null])
             ->joinWith(['paketpengadaan pp'])->asArray()->all();

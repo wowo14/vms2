@@ -709,7 +709,8 @@ class DppController extends Controller {
         if (!$template) {
             echo 'Template tidak ditemukan';
         }
-        if ($penilaian->load($request->post())) {
+        $oldbastfile = $penilaian->bast??'';
+        if ($penilaian->load($request->post())) { // post request
             $nilai = [
                 'uraian' => $_POST['uraian'],
                 'skor' => $_POST['skor'],
@@ -720,6 +721,9 @@ class DppController extends Controller {
             ];
             $penilaian->dpp_id = $dpp->id;
             $penilaian->details = json_encode($nilai);
+            if (file_exists(Yii::getAlias('@uploads') . $oldbastfile) && !empty($oldbastfile) && ($penilaian->isBase64Encoded($penilaian->bast))) {
+                unlink(Yii::getAlias('@uploads') . $oldbastfile);
+            }
             if (!$penilaian->save()) {
                 Yii::error(json_encode($penilaian->getErrors()));
             } else {
