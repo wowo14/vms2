@@ -331,10 +331,12 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         $months=$this->getMonths();
         return $data->map(function($e)use($months){
             if($e['month']!==0){
-                $e['bulan']=$months[$e['month']];
+                $e['bulan']= $e['month'].$months[$e['month']];
             }
             return $e;
-        })->values();
+        })
+        ->sortBy('month')
+        ->values();
     }
     public function kategoribulan($params) {
         $data = $this->getrawData();
@@ -357,9 +359,11 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         $months=$this->getMonths();
         return $data->map(function($e)use($months){
             if($e['month']!==0){
-                $e['bulan']=$months[$e['month']];
+                $e['bulan']= $e['month'].$months[$e['month']];
             }
             return $e;
-        })->values();
+        })
+        ->sortBy('month')
+        ->values();
     }
 }
