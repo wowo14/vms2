@@ -57,17 +57,17 @@ class DppSearch extends Dpp{
             'created_by' => $this->created_by,
             'updated_by' => $this->updated_by,
         ]);
-        $query->andFilterWhere(['like', 'nomor_dpp', $this->nomor_dpp])
-            ->andFilterWhere(['like', 'bidang_bagian', $this->bidang_bagian])
+        $query->andFilterWhere(['like', 'dpp.nomor_dpp', $this->nomor_dpp])
+            ->andFilterWhere(['like', 'dpp.bidang_bagian', $this->bidang_bagian])
             ->andFilterWhere(['like', 'p.nama_paket', $this->paket_id])
             ->andFilterWhere(['like', 'p2.nama', $this->pejabat_pengadaan])
-            ->andFilterWhere(['between', 'tanggal_dpp', ($this->range($this->tanggal_dpp, 's')), ($this->range($this->tanggal_dpp, 'e'))])
-            ->andFilterWhere(['between', 'tanggal_terima', ($this->range($this->tanggal_terima, 's')), ($this->range($this->tanggal_terima, 'e'))])
+            ->andFilterWhere(['between', 'dpp.tanggal_dpp', ($this->range($this->tanggal_dpp, 's')), ($this->range($this->tanggal_dpp, 'e'))])
+            ->andFilterWhere(['between', 'dpp.tanggal_terima', ($this->range($this->tanggal_terima, 's')), ($this->range($this->tanggal_terima, 'e'))])
             ->andFilterWhere(['like', 's.nama', $this->admin_pengadaan])
             ->andFilterWhere(['like', 'dpp.kode', $this->kode])
-            ->andFilterWhere(['like', 'status_review', $this->status_review])
-            ->andFilterWhere(['like', 'is_approved', $this->is_approved])
-            ->andFilterWhere(['like', 'nomor_persetujuan', $this->nomor_persetujuan]);
+            ->andFilterWhere(['like', 'dpp.status_review', $this->status_review])
+            ->andFilterWhere(['like', 'dpp.is_approved', $this->is_approved])
+            ->andFilterWhere(['like', 'dpp.nomor_persetujuan', $this->nomor_persetujuan]);
         return $dataProvider;
     }
 }
