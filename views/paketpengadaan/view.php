@@ -68,7 +68,7 @@ use yii\widgets\DetailView;
                         [
                             'attribute' => 'jenis_dokumen',
                             'value' => function ($d) {
-                                return $d->jenisdokumen->value;
+                                return $d->jenisdokumen->value??'';
                             }
                         ],
                         [
