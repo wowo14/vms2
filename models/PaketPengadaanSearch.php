@@ -51,7 +51,7 @@ class PaketPengadaanSearch extends PaketPengadaan{
             'approval_by' => $this->approval_by,
         ]);
         $query->andFilterWhere(['like', 'nomor', $this->nomor])
-            ->andFilterWhere(['between', 'tanggal_paket', ($this->range($this->tanggal_paket, 's')), ($this->range($this->tanggal_paket, 'e'))])
+            ->andFilterWhere(['between', 'datetime(tanggal_paket)', ($this->range($this->tanggal_paket, 's')), ($this->range($this->tanggal_paket, 'e'))])
             ->andFilterWhere(['like', 'nama_paket', $this->nama_paket])
             ->andFilterWhere(['like', 'kode_program', $this->kode_program])
             ->andFilterWhere(['like', 'kode_kegiatan', $this->kode_kegiatan])

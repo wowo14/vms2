@@ -43,8 +43,8 @@ class HistoriRejectSearch extends HistoriReject{
         ]);
         $query->andFilterWhere(['like', 'nomor', $this->nomor])
             ->andFilterWhere(['like', new Expression('pp.nomor || pp.nama_paket'),$this->paket_id])
-            ->andFilterWhere(['between', 'histori_reject.tanggal_reject', ($this->range($this->tanggal_reject, 's')), ($this->range($this->tanggal_reject, 'e'))])
-            ->andFilterWhere(['between', 'histori_reject.tanggal_dikembalikan', ($this->range($this->tanggal_dikembalikan, 's')), ($this->range($this->tanggal_dikembalikan, 'e'))])
+            ->andFilterWhere(['between', 'datetime(histori_reject.tanggal_reject)', ($this->range($this->tanggal_reject, 's')), ($this->range($this->tanggal_reject, 'e'))])
+            ->andFilterWhere(['between', 'datetime(histori_reject.tanggal_dikembalikan)', ($this->range($this->tanggal_dikembalikan, 's')), ($this->range($this->tanggal_dikembalikan, 'e'))])
             ->andFilterWhere(['like', 'nama_paket', $this->nama_paket])
             ->andFilterWhere(['like', 'alasan_reject', $this->alasan_reject])
             ->andFilterWhere(['like', 'kesimpulan', $this->kesimpulan])
