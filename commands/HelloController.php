@@ -22,6 +22,9 @@ class HelloController extends Controller {
         Yii::error('hello world');
         die;
     }
+    public function actionDpptgl($dpp,$createddate,$updateddate){
+        Dpp::updateAll(['created_at'=>$createddate,'updated_at'=>$updateddate],['id'=>$dpp]);
+    }
     public function actionUnpemenang($id){
         $dpp=PaketPengadaan::findOne($id);
         $dpp->pemenang=null;
