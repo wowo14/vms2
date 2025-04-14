@@ -1,18 +1,8 @@
 <?php
 namespace app\commands;
-use app\Controllers\DppController;
-use app\models\Contacts;
 use app\models\Dpp;
+use app\models\HistoriReject;
 use app\models\PaketPengadaan;
-use app\models\PaketPengadaanDetails;
-use app\models\PenawaranPengadaan;
-use app\models\Sertipikat;
-use app\models\Setting;
-use app\models\TemplateChecklistEvaluasi;
-use app\models\TemplateChecklistEvaluasiDetail;
-use app\models\User;
-use app\models\ValidasiKualifikasiPenyedia;
-use app\models\ValidasiKualifikasiPenyediaDetail;
 use Yii;
 use yii\console\Controller;
 use yii\db\Expression;
@@ -22,34 +12,66 @@ class HelloController extends Controller {
         Yii::error('hello world');
         die;
     }
-    public function actionDpptgl($dpp,$createddate,$updateddate){
-        Dpp::updateAll(['created_at'=>$createddate,'updated_at'=>$updateddate],['id'=>$dpp]);
+    public function actionDpptgl($nomordpp, $createddate, $updateddate) {
+        Dpp::updateAll(['created_at' => $createddate, 'updated_at' => $updateddate], ['nomor_dpp' => $nomordpp]);
+        Yii::$app->cache->flush();
+        Yii::$app->db->schema->refresh();
     }
-    public function actionUnpemenang($id){
-        $dpp=PaketPengadaan::findOne($id);
-        $dpp->pemenang=null;
-        $dpp->save();
+    public function actionRemovehistory($nomordpp) {
+        $paket=PaketPengadaan::find()
+        ->where(['nomor' => $nomordpp])->one();
+        $history=HistoriReject::last(['paket_id' => $paket->id])->delete();
+        if($history)
+            print_r('sukses delete history');
+        Yii::$app->cache->flush();
+        Yii::$app->db->schema->refresh();
     }
-    public function actionCount() {
-    $dpp= Dpp::where(['is', 'pp.pemenang', null])
-            ->joinWith(['paketpengadaan pp'])->asArray()->all();
-    $countpp=collect($dpp)->pluck('pejabat_pengadaan')->countBy();
-    $countadminpp=collect($dpp)->pluck('admin_pengadaan')->countBy();
-    print_r($countpp);
-    print_r($countadminpp);
-    }
-    public function actionDeletedpp(){
-        //grab dpp without paket pengadaan
-        $dpp= Dpp::collectAll();
-        $dpp->map(function($d){
-            if(!$d->paketpengadaan){
-                $d->unlinkAll('reviews', true);
-                $d->unlinkAll('penugasan', true);
-                $d->delete();
-                Yii::error('deleted dpp '.$d->id);
-            }
+    public function actionHistoritgl($nomordpp, $tanggal_reject, $tanggal_dikembalikan) {
+        $paket = PaketPengadaan::find()
+            ->where(['nomor' => $nomordpp])->one();
+        $his=HistoriReject::collectAll(['paket_id' => $paket->id]);
+        // print_r($his->toArray());
+        $his->values()->map(function ($h,$i) use ($tanggal_reject, $tanggal_dikembalikan) {
+            $h->tanggal_reject = date('Y-m-d H:i:s', strtotime("-{$i} day", strtotime($tanggal_reject)));
+            $h->tanggal_dikembalikan = date('Y-m-d H:i:s', strtotime("-{$i} day", strtotime($tanggal_dikembalikan)));
+            $h->save();
         });
+        print_r($his->pluck('tanggal_dikembalikan','tanggal_reject')->toArray());
+        Yii::$app->cache->flush();
+        Yii::$app->db->schema->refresh();
     }
+    public function actionTglpaket($nomordpp,$tglpaket) {
+        PaketPengadaan::updateAll(['tanggal_paket' => $tglpaket], ['nomor' => $nomordpp]);
+        Yii::$app->cache->flush();
+        Yii::$app->db->schema->refresh();
+    }
+    public function actionUnpemenang($id) {
+        $dpp = PaketPengadaan::findOne($id);
+        $dpp->pemenang = null;
+        $dpp->save();
+        Yii::$app->cache->flush();
+        Yii::$app->db->schema->refresh();
+    }
+    // public function actionCount() {
+    //     $dpp = Dpp::where(['is', 'pp.pemenang', null])
+    //         ->joinWith(['paketpengadaan pp'])->asArray()->all();
+    //     $countpp = collect($dpp)->pluck('pejabat_pengadaan')->countBy();
+    //     $countadminpp = collect($dpp)->pluck('admin_pengadaan')->countBy();
+    //     print_r($countpp);
+    //     print_r($countadminpp);
+    // }
+    // public function actionDeletedpp() {
+    //     //grab dpp without paket pengadaan
+    //     $dpp = Dpp::collectAll();
+    //     $dpp->map(function ($d) {
+    //         if (!$d->paketpengadaan) {
+    //             $d->unlinkAll('reviews', true);
+    //             $d->unlinkAll('penugasan', true);
+    //             $d->delete();
+    //             Yii::error('deleted dpp ' . $d->id);
+    //         }
+    //     });
+    // }
     public function actionDropAllTables() {
         $db = \Yii::$app->db;
         $schema = $db->schema;
@@ -156,9 +178,9 @@ class HelloController extends Controller {
             Yii::$app->db->createCommand()->insert('setting', ['active' => 1, 'type' => 'jenis_peralihan', 'value' => $value])->execute();
         }
     }
-    public function actionTes2() {
-        $formattedAmount = 'Rp 2.440.000,00';
-        $res = (new \app\widgets\Tools)->reverseCurrency($formattedAmount);
-        // print_r($res);
-    }
+    // public function actionTes2() {
+    //     $formattedAmount = 'Rp 2.440.000,00';
+    //     $res = (new \app\widgets\Tools)->reverseCurrency($formattedAmount);
+    //     // print_r($res);
+    // }
 }

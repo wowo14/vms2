@@ -239,6 +239,16 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
                 'paket_pengadaan.pemenang'
             ])
             ->andWhere(['not', ['d.bidang_bagian' => null]])
+            ->andWhere([
+                'OR',
+                ['paket_pengadaan.tanggal_reject' => null],
+                ['paket_pengadaan.tanggal_reject' => '']
+            ])
+            ->andWhere([
+                'OR',
+                ['paket_pengadaan.alasan_reject' => null],
+                ['paket_pengadaan.alasan_reject' => '']
+            ])
             ->groupBy('paket_pengadaan.id')
             ->orderBy('paket_pengadaan.id')
             ->asArray()
