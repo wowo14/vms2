@@ -1,7 +1,10 @@
 <?php
+
 namespace app\controllers;
+
 use app\models\PaketPengadaan;
 use app\models\ReportModel;
+
 class ReportController extends Controller {
     public function actionMetode() {
         $model = new ReportModel();
@@ -106,45 +109,20 @@ class ReportController extends Controller {
                 'paketpengadaan' => $paketpengadaan
             ]);
         } else if ($model->load($request->post())) {
-            if ($model->tahun) {
-                $params = [
-                    'groupby' => '',
-                    'named' => '',
-                    'bln' => $model->bulan == 0 ? '' : $model->bulan
-                ];
-                if ($model->kategori !== 'all') {
-                    $params['groupby'] = 'kategori_pengadaan';
-                    $params['named'] = $model->kategori;
-                }
-                if ($model->metode !== 'all') {
-                    $params['groupby'] = 'metode_pengadaan';
-                    $params['named'] = $model->metode;
-                }
-                if ($model->pejabat !== 'all') {
-                    $params['groupby'] = 'pejabat_pengadaan';
-                    $params['named'] = $model->pejabat;
-                }
-                if ($model->admin !== 'all') {
-                    $params['groupby'] = 'admin_pengadaan';
-                    $params['named'] = $model->admin;
-                }
-                if ($model->bidang !== 'all') {
-                    $params['groupby'] = 'bidang_bagian';
-                    $params['named'] = $model->bidang;
-                }
-                if (empty($params['groupby'])) {
-                    $params['groupby'] = 'metode_pengadaan';
-                }
-                $r = $paketpengadaan->bymonths2($params);
-                return $this->render('by_months', [
-                    'months' => $r['months'],
-                    'pivotTable' => $r['pivotTable'],
-                    'title' => 'Filtered Report for ' . $model->tahun
-                ]);
-            }
-            return $this->render('index', [
+            $filters = collect([
+                'year'   => $model->tahun,
+                'month'   => $model->bulan == 0 ? null : $model->bulan,
+                'kategori_pengadaan_id' => $model->kategori !== 'all' ? $model->kategori : null,
+                'metode_pengadaan_id'   => $model->metode !== 'all' ? $model->metode : null,
+                'pejabat_pengadaan_id'  => $model->pejabat !== 'all' ? $model->pejabat : null,
+                'admin_pengadaan_id'    => $model->admin !== 'all' ? $model->admin : null,
+                'bidang_bagian_id'      => $model->bidang !== 'all' ? $model->bidang : null,
+            ])->filter();
+            $raw = $paketpengadaan->getFilteredData($filters);
+                // print_r($raw);
+            return $this->render('_report_dppmasuk', [
                 'model' => $model,
-                'raw' => $paketpengadaan->getrawData(),
+                'rawData' => $raw,
                 'paketpengadaan' => $paketpengadaan
             ]);
         }

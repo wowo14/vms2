@@ -7,11 +7,16 @@ $this->title = 'Report Filter';
 $this->params['breadcrumbs'][] = $this->title;
 $tahun = $raw->unique('year')->pluck('year', 'year')->toArray();
 $month = $model->months;
+$all = ['all' => 'all'];
 $month = array_merge([0 => 'all'], $month);
-$kategori = array_merge(['' => '', 'all' => 'all'], $model::optionkategoripengadaan());
-$metode = array_merge(['' => '', 'all' => 'all'], $model::optionmetodepengadaan());
-$pejabat = array_merge(['' => '', 'all' => 'all'], $model::getAllpetugas());
-$admin = array_merge(['' => '', 'all' => 'all'], $model::getAlladmin());
+// $kategori = array_merge(['' => '', 'all' => 'all'], $model::optionkategoripengadaan());
+$kategori = $all + $model::optionsSettingtype('kategori_pengadaan', ['value', 'id']);
+// $metode = array_merge(['' => '', 'all' => 'all'], $model::optionmetodepengadaan());
+$metode = $all + $model::optionsSettingtype('metode_pengadaan', ['value', 'id']);
+// $pejabat = array_merge(['' => '', 'all' => 'all'], $model::getAllpetugas());
+$pejabat = $all + $model::getAllpetugas();
+// $admin = array_merge(['' => '', 'all' => 'all'], $model::getAlladmin());
+$admin = $all + $model::getAlladmin();
 $bidang = array_merge(['' => '', 'all' => 'all'], Unit::collectAll()->pluck('unit', 'id')->toArray());
 $form = ActiveForm::begin([
     'id' => 'rpt-form',

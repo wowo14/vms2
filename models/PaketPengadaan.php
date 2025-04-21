@@ -259,6 +259,60 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             return $e;
         });
     }
+    public function getrawDpp() {
+        $rawSettingkategori = collect(Setting::where(['type'=>'kategori_pengadaan'])->all())->pluck('id', 'value')->toArray();
+        $rawSettingmetode = collect(Setting::where(['type'=>'metode_pengadaan'])->all())->pluck('id', 'value')->toArray();
+        return collect(self::where(['not', ['paket_pengadaan.id' => null]])
+            ->joinWith([
+                'dpp d',
+                'details pd',
+                'penawaranpenyedia.negosiasi n',
+                'pejabatppkom ppkom',
+                'dpp.pejabat p',
+                'dpp.staffadmin s',
+                'dpp.unit u'
+            ])
+            ->select([
+                new Expression("strftime('%Y', d.tanggal_terima) as year"),
+                new Expression("CAST(strftime('%m', d.tanggal_terima) AS INTEGER) as month"),
+                'paket_pengadaan.nama_paket',
+                'paket_pengadaan.metode_pengadaan',
+                'paket_pengadaan.kategori_pengadaan',
+                'paket_pengadaan.pagu',
+                'p.id as pejabat_pengadaan_id',
+                'p.nama as pejabat_pengadaan',
+                's.id as admin_pengadaan_id',
+                's.nama as admin_pengadaan',
+                'ppkom.id as pejabat_ppkom_id',
+                'ppkom.nama as pejabat_ppkom',
+                // 'count(paket_pengadaan.id) as count',
+                'u.id as bidang_bagian_id',
+                'u.unit as bidang_bagian',
+                new Expression("COALESCE(n.ammount, 0) AS hasilnego"),
+                new Expression("COALESCE(SUM(pd.hps_satuan), 0) AS hps"),
+                'paket_pengadaan.pemenang'
+            ])
+            ->andWhere(['not', ['d.bidang_bagian' => null]])
+            ->andWhere([
+                'OR',
+                ['paket_pengadaan.tanggal_reject' => null],
+                ['paket_pengadaan.tanggal_reject' => '']
+            ])
+            ->andWhere([
+                'OR',
+                ['paket_pengadaan.alasan_reject' => null],
+                ['paket_pengadaan.alasan_reject' => '']
+            ])
+            ->groupBy('paket_pengadaan.id')
+            ->orderBy('paket_pengadaan.id')
+            ->asArray()
+            ->all())->map(function ($e) use ($rawSettingkategori, $rawSettingmetode) {
+            // $e['metode_pengadaan']=$e['metode_pengadaan']=== 'E-Purchasing'? 'E-Katalog': $e['metode_pengadaan'];
+            $e['metode_pengadaan_id'] = $rawSettingmetode[$e['metode_pengadaan']];
+            $e['kategori_pengadaan_id'] = $rawSettingkategori[$e['kategori_pengadaan']];
+            return $e;
+        });
+    }
     // public function getMonths() {
     //     return range(1, 12);
     // }
@@ -375,5 +429,23 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         })
         ->sortBy('month')
         ->values();
+    }
+    public function getFilteredData($filters = null) {//collection
+        $data = $this->getrawData();
+        if ($filters && $filters->isNotEmpty()) {
+            $data = $data->filter(function ($item) use ($filters) {
+                foreach ($filters as $key => $value) {
+                    if (!array_key_exists($key, $item)) {
+                        return false;
+                    }
+                    // Paksa jadi string biar bandingannya reliable
+                    if ((string) $item[$key] != (string) $value) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
+        return $data->values(); // reset index
     }
 }
