@@ -128,7 +128,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             ->orderBy('id', 'desc')
             ->asArray()->count();
     }
-    public function getPaketreject(){
+    public function getPaketreject() {
         return self::where(['IS NOT', 'tanggal_reject', null])
             ->andWhere(['!=', 'tanggal_reject', ''])
             ->andWhere(['IS NOT', 'alasan_reject', null])
@@ -206,8 +206,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         return parent::beforeSave($insert);
     }
     public function getrawData() {
-        $rawSettingkategori = collect(Setting::where(['type'=>'kategori_pengadaan'])->all())->pluck('id', 'value')->toArray();
-        $rawSettingmetode = collect(Setting::where(['type'=>'metode_pengadaan'])->all())->pluck('id', 'value')->toArray();
+        $rawSettingkategori = collect(Setting::where(['type' => 'kategori_pengadaan'])->all())->pluck('id', 'value')->toArray();
+        $rawSettingmetode = collect(Setting::where(['type' => 'metode_pengadaan'])->all())->pluck('id', 'value')->toArray();
         return collect(self::where(['not', ['paket_pengadaan.id' => null]])
             ->joinWith([
                 'dpp d',
@@ -260,8 +260,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         });
     }
     public function getrawDpp() {
-        $rawSettingkategori = collect(Setting::where(['type'=>'kategori_pengadaan'])->all())->pluck('id', 'value')->toArray();
-        $rawSettingmetode = collect(Setting::where(['type'=>'metode_pengadaan'])->all())->pluck('id', 'value')->toArray();
+        $rawSettingkategori = collect(Setting::where(['type' => 'kategori_pengadaan'])->all())->pluck('id', 'value')->toArray();
+        $rawSettingmetode = collect(Setting::where(['type' => 'metode_pengadaan'])->all())->pluck('id', 'value')->toArray();
         return collect(self::where(['not', ['paket_pengadaan.id' => null]])
             ->joinWith([
                 'dpp d',
@@ -376,7 +376,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         return $this->createPivotTable($data, $params['groupby'], $params['type'], $params['bln']);
     }
     public function metodebulan($params) {
-        $data = $this->getrawData();
+        $data = $this->getrawData()->values();
         if ($params['tahun']) {
             $data = $data->where('year', $params['tahun']);
         }
@@ -392,15 +392,14 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             $data = $data->groupBy('pejabat_pengadaan_id')
                 ->get($params['pejabat']);
         }
-        $months=$this->getMonths();
-        return $data->map(function($e)use($months){
-            if($e['month']!==0){
-                $e['bulan']= $months[$e['month']];
+        return $data->map(function ($e) {
+            if ($e['month'] !== 0) {
+                $e['bulan'] = $e['month'] . ' ' . $this->getMonths()[$e['month']];
             }
             return $e;
         })
-        ->sortBy('month')
-        ->values();
+            ->sortBy('bulan')
+            ->values();
     }
     public function kategoribulan($params) {
         $data = $this->getrawData();
@@ -419,18 +418,16 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             $data = $data->groupBy('pejabat_pengadaan_id')
                 ->get($params['pejabat']);
         }
-        // Yii::error($data);
-        $months=$this->getMonths();
-        return $data->map(function($e)use($months){
-            if($e['month']!==0){
-                $e['bulan']= $months[$e['month']];
+        return $data->map(function ($e) {
+            if ($e['month'] !== 0) {
+                $e['bulan'] = $this->getMonths()[$e['month']];
             }
             return $e;
         })
-        ->sortBy('month')
-        ->values();
+            ->sortBy('bulan')
+            ->values();
     }
-    public function getFilteredData($filters = null) {//collection
+    public function getFilteredData($filters = null) { //collection
         $data = $this->getrawData();
         if ($filters && $filters->isNotEmpty()) {
             $data = $data->filter(function ($item) use ($filters) {
@@ -446,6 +443,10 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
                 return true;
             });
         }
+        $data = $data->map(function ($e) {
+            $e['bulan'] = $e['month'] . ' ' . $this->getMonths()[$e['month']];
+            return $e;
+        });
         return $data->values(); // reset index
     }
 }

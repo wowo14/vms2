@@ -20,7 +20,7 @@ $admin = $all + $model::getAlladmin();
 $bidang = array_merge(['' => '', 'all' => 'all'], Unit::collectAll()->pluck('unit', 'id')->toArray());
 $form = ActiveForm::begin([
     'id' => 'rpt-form',
-    'action' => \yii\helpers\Url::to(['report/index']),
+    'action' => $action,
     'enableAjaxValidation' => false,
     'fieldConfig' => [
         'template' => "<div class='row'>{label}\n<div class='col-sm-9'>{input}\n{error}</div></div>",

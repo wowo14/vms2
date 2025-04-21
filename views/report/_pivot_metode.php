@@ -44,12 +44,30 @@
 <?php
 $modeldata = json_encode($model, JSON_NUMERIC_CHECK);
 $js = <<<JS
+const monthLabels = {
+  1: "1.Januari",
+  2: "2.Februari",
+  3: "3.Maret",
+  4: "4.April",
+  5: "5.Mei",
+  6: "6.Juni",
+  7: "7.Juli",
+  8: "8.Agustus",
+  9: "9.September",
+  10: "10.Oktober",
+  11: "11.November",
+  12: "12.Desember"
+};
+const transformedData = $modeldata.map(row => ({
+    ...row,
+    monthLabel: monthLabels[row.month] || row.month
+}));
 new WebDataRocks({
         container: "#pivot-unitbidangcount",
         toolbar: true,
         report: {
             dataSource: {
-                data: $modeldata
+                data: transformedData
             },
             "slice": {
                 "rows": [
@@ -60,8 +78,8 @@ new WebDataRocks({
                 ],
                 "columns": [
                     {
-                        "uniqueName": "bulan",
-                        // "caption": "Month",
+                        "uniqueName": "month",
+                        "caption": "Month",
                         "showTotals": false
                     },
                 ],
@@ -95,7 +113,7 @@ new WebDataRocks({
         toolbar: true,
         report: {
             dataSource: {
-                data: $modeldata
+                data: transformedData
             },
             "slice": {
                 "rows": [
@@ -106,8 +124,8 @@ new WebDataRocks({
                 ],
                 "columns": [
                     {
-                        "uniqueName": "bulan",
-                        // "caption": "Month",
+                        "uniqueName": "month",
+                        "caption": "Month",
                         "showTotals": false
                     },
                     {
@@ -145,7 +163,7 @@ new WebDataRocks({
         toolbar: true,
         report: {
             dataSource: {
-                data: $modeldata
+                data: transformedData
             },
             "slice": {
                 "rows": [
@@ -156,7 +174,7 @@ new WebDataRocks({
                 ],
                 "columns": [
                     {
-                        "uniqueName": "bulan",
+                        "uniqueName": "month",
                         // "caption": "Month",
                         "showTotals": false
                     },
@@ -186,13 +204,12 @@ new WebDataRocks({
         });
     }
 });
-
 new WebDataRocks({
         container: "#pivot-metodesum",
         toolbar: true,
         report: {
             dataSource: {
-                data: $modeldata
+                data: transformedData
             },
             "slice": {
                 "rows": [
@@ -203,7 +220,7 @@ new WebDataRocks({
                 ],
                 "columns": [
                     {
-                        "uniqueName": "bulan",
+                        "uniqueName": "month",
                         // "caption": "Month",
                         "showTotals": false
                     }
@@ -238,7 +255,7 @@ new WebDataRocks({
         toolbar: true,
         report: {
             dataSource: {
-                data: $modeldata
+                data: transformedData
             },
             "slice": {
                 "rows": [
@@ -249,7 +266,7 @@ new WebDataRocks({
                 ],
                 "columns": [
                     {
-                        "uniqueName": "bulan",
+                        "uniqueName": "month",
                         // "caption": "Month",
                         "showTotals": false
                     },
@@ -288,7 +305,7 @@ new WebDataRocks({
         toolbar: true,
         report: {
             dataSource: {
-                data: $modeldata
+                data: transformedData
             },
             "slice": {
                 "rows": [
@@ -299,7 +316,7 @@ new WebDataRocks({
                 ],
                 "columns": [
                     {
-                        "uniqueName": "bulan",
+                        "uniqueName": "month",
                         // "caption": "Month",
                         "showTotals": false
                     },
@@ -338,7 +355,7 @@ new WebDataRocks({
         toolbar: true,
         report: {
             dataSource: {
-                data: $modeldata
+                data: transformedData
             },
             "slice": {
                 "rows": [
@@ -349,7 +366,7 @@ new WebDataRocks({
                 ],
                 "columns": [
                     {
-                        "uniqueName": "bulan",
+                        "uniqueName": "month",
                         // "caption": "Month",
                         "showTotals": false
                     },
@@ -388,7 +405,7 @@ new WebDataRocks({
         toolbar: true,
         report: {
             dataSource: {
-                data: $modeldata
+                data: transformedData
             },
             "slice": {
                 "rows": [
@@ -399,7 +416,7 @@ new WebDataRocks({
                 ],
                 "columns": [
                     {
-                        "uniqueName": "bulan",
+                        "uniqueName": "month",
                         // "caption": "Month",
                         "showTotals": false
                     },
