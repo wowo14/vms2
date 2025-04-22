@@ -2,6 +2,13 @@
 <script src="https://cdn.webdatarocks.com/latest/webdatarocks.toolbar.min.js"></script>
 <script src="https://cdn.webdatarocks.com/latest/webdatarocks.js"></script>
 <script src="https://cdn.webdatarocks.com/latest/webdatarocks.highcharts.js"></script>
+<select id="yearFilter" style="margin: 10px; padding: 5px;">
+    <option value="all">Semua Tahun</option>
+</select>
+<label for="startMonth">Bulan Awal:</label>
+<select id="startMonth"></select>
+<label for="endMonth">Bulan Akhir:</label>
+<select id="endMonth"></select>
 <div class="row">
     <div class="col-md-6">
         B. Jumlah Metode Pengadaan Barang/Jasa
@@ -45,410 +52,171 @@
 $modeldata = json_encode($model, JSON_NUMERIC_CHECK);
 $js = <<<JS
 const monthLabels = {
-  1: "1.Januari",
-  2: "2.Februari",
-  3: "3.Maret",
-  4: "4.April",
-  5: "5.Mei",
-  6: "6.Juni",
-  7: "7.Juli",
-  8: "8.Agustus",
-  9: "9.September",
-  10: "10.Oktober",
-  11: "11.November",
-  12: "12.Desember"
+  1: "1.Januari", 2: "2.Februari", 3: "3.Maret", 4: "4.April",
+  5: "5.Mei", 6: "6.Juni", 7: "7.Juli", 8: "8.Agustus",
+  9: "9.September", 10: "10.Oktober", 11: "11.November", 12: "12.Desember"
 };
-const transformedData = $modeldata.map(row => ({
-    ...row,
-    monthLabel: monthLabels[row.month] || row.month
+let currentYear = "all";
+function filterDataByYear(data, year) {
+  return year === "all" ? data : data.filter(row => String(row.year) === year);
+}
+const originalData = $modeldata.map(row => ({
+  ...row,
+  monthLabel: monthLabels[row.month] || row.month
 }));
-new WebDataRocks({
-        container: "#pivot-unitbidangcount",
-        toolbar: true,
-        report: {
-            dataSource: {
-                data: transformedData
-            },
-            "slice": {
-                "rows": [
-                    {
-                        "uniqueName": "bidang_bagian",
-                        "caption": "Unit/Bidang/Bagian"
-                    }
-                ],
-                "columns": [
-                    {
-                        "uniqueName": "month",
-                        "caption": "Month",
-                        "showTotals": false
-                    },
-                ],
-                "measures": [
-                    {
-                        "uniqueName": "pagu",
-                        "aggregation": "count",
-                        "caption": "Total"
-                    }
-                ]
-            },
-            options: {
-                 grid: {
-                    type: "compact",
-                    showGrandTotals: "on", // Enable grand totals
-                    showTotals: "off", // Disable sub-totals within rows
-                    showEmptyValues: false
-                }
-            }
-        },
-        reportcomplete: function() {
-        let pivot = this;
-        pivot.off("reportcomplete"); // Ensure it only runs once
-        document.querySelectorAll('.webdatarocks-table td:empty').forEach(cell => {
-            cell.style.display = 'none';
-        });
-    }
+function initPivot({ container, title, rows, columns, measures }, data) {
+  new WebDataRocks({
+    container,
+    toolbar: true,
+    report: {
+      dataSource: { data },
+      slice: { rows, columns, measures },
+      options: {
+        grid: {
+          title,
+          type: "compact",
+          showGrandTotals: "on",
+          showTotals: "off",
+          showEmptyValues: false
+        }
+      }
+    },
+  });
+}
+const pivotConfigs = [
+  {
+    container: "#pivot-unitbidangcount",
+    title: "Jumlah Kegiatan Pengadaan Per Unit/Bidang/Bagian",
+    rows: [{ uniqueName: "bidang_bagian", caption: "Unit/Bidang/Bagian" }],
+    columns: [{ uniqueName: "month", caption: "Month", showTotals: false }],
+    measures: [{ uniqueName: "pagu", aggregation: "count", caption: "Total" }]
+  },
+  {
+    container: "#pivot-unitbidangsum",
+    title: "Total Kontrak Pengadaan Per Unit/Bidang/Bagian",
+    rows: [{ uniqueName: "bidang_bagian", caption: "Unit/Bidang/Bagian" }],
+    columns: [
+      { uniqueName: "month", caption: "Month", showTotals: false },
+      { uniqueName: "metode_pengadaan" }
+    ],
+    measures: [{ uniqueName: "hasilnego", aggregation: "sum", caption: "Total" }]
+  },
+  {
+    container: "#pivot-metodecount",
+    title: "Jumlah Kegiatan Pengadaan Per Metode Pengadaan",
+    rows: [{ uniqueName: "metode_pengadaan", caption: "Metode Pengadaan" }],
+    columns: [{ uniqueName: "month", showTotals: false }],
+    measures: [{ uniqueName: "pagu", aggregation: "count", caption: "Total" }]
+  },
+  {
+    container: "#pivot-metodesum",
+    title: "Total Kontrak Pengadaan Per Metode Pengadaan",
+    rows: [{ uniqueName: "metode_pengadaan", caption: "Metode Pengadaan" }],
+    columns: [{ uniqueName: "month", showTotals: false }],
+    measures: [{ uniqueName: "hasilnego", aggregation: "sum", caption: "Total" }]
+  },
+  {
+    container: "#pivot-pejabatkategoricount",
+    title: "Jumlah Kegiatan Pengadaan Per Unit/Bidang/Bagian",
+    rows: [{ uniqueName: "pejabat_pengadaan", caption: "Pejabat Pengadaan" }],
+    columns: [
+      { uniqueName: "month", showTotals: false },
+      { uniqueName: "kategori_pengadaan" }
+    ],
+    measures: [{ uniqueName: "pagu", aggregation: "count", caption: "Total Job" }]
+  },
+  {
+    container: "#pivot-pejabatkategorisum",
+    title: "Total Kontrak Pengadaan Per Unit/Bidang/Bagian",
+    rows: [{ uniqueName: "pejabat_pengadaan", caption: "Pejabat Pengadaan" }],
+    columns: [
+      { uniqueName: "month", showTotals: false },
+      { uniqueName: "kategori_pengadaan" }
+    ],
+    measures: [{ uniqueName: "hasilnego", aggregation: "sum", caption: "Total" }]
+  },
+  {
+    container: "#pivot-pejabatmetodecount",
+    title: "Jumlah Kegiatan Pengadaan Per Metode Pengadaan",
+    rows: [{ uniqueName: "pejabat_pengadaan", caption: "Pejabat Pengadaan" }],
+    columns: [
+      { uniqueName: "month", showTotals: false },
+      { uniqueName: "metode_pengadaan" }
+    ],
+    measures: [{ uniqueName: "pagu", aggregation: "count", caption: "Total" }]
+  },
+  {
+    container: "#pivot-pejabatmetodesum",
+    title: "Total Kontrak Pengadaan Per Metode Pengadaan",
+    rows: [{ uniqueName: "pejabat_pengadaan", caption: "Pejabat Pengadaan" }],
+    columns: [
+      { uniqueName: "month", showTotals: false },
+      { uniqueName: "metode_pengadaan" }
+    ],
+    measures: [{ uniqueName: "hasilnego", aggregation: "sum", caption: "Total" }]
+  }
+];
+function renderAllPivots(year = "all") {
+  const filteredData = filterDataByYear(originalData, year);
+  pivotConfigs.forEach(config => initPivot(config, filteredData));
+}
+renderAllPivots();
+// Populate tahun ke dropdown
+const yearSet = new Set(originalData.map(row => row.year));
+console.log(originalData);
+console.log(yearSet);
+const yearFilter = document.getElementById("yearFilter");
+Array.from(yearSet).sort().forEach(year => {
+  const option = document.createElement("option");
+  option.value = year;
+  option.textContent = year;
+  yearFilter.appendChild(option);
 });
-new WebDataRocks({
-        container: "#pivot-unitbidangsum",
-        toolbar: true,
-        report: {
-            dataSource: {
-                data: transformedData
-            },
-            "slice": {
-                "rows": [
-                    {
-                        "uniqueName": "bidang_bagian",
-                        "caption": "Unit/Bidang/Bagian"
-                    }
-                ],
-                "columns": [
-                    {
-                        "uniqueName": "month",
-                        "caption": "Month",
-                        "showTotals": false
-                    },
-                    {
-                        "uniqueName": "metode_pengadaan",
-                        // "caption": "Kategori Pengadaan"
-                    }
-                ],
-                "measures": [
-                    {
-                        "uniqueName": "hasilnego",
-                        "aggregation": "sum",
-                        "caption": "Total"
-                    }
-                ]
-            },
-            options: {
-                 grid: {
-                    type: "compact",
-                    showGrandTotals: "on", // Enable grand totals
-                    showTotals: "off", // Disable sub-totals within rows
-                    showEmptyValues: false
-                }
-            }
-        },
-        reportcomplete: function() {
-        let pivot = this;
-        pivot.off("reportcomplete"); // Ensure it only runs once
-        document.querySelectorAll('.webdatarocks-table td:empty').forEach(cell => {
-            cell.style.display = 'none';
-        });
-    }
+// Event: Saat user ganti tahun
+yearFilter.addEventListener("change", function () {
+  currentYear = this.value;
+  document.querySelectorAll(".webdatarocks").forEach(el => el.innerHTML = ""); // clear containers
+  renderAllPivots(currentYear);
 });
-new WebDataRocks({
-        container: "#pivot-metodecount",
-        toolbar: true,
-        report: {
-            dataSource: {
-                data: transformedData
-            },
-            "slice": {
-                "rows": [
-                    {
-                        "uniqueName": "metode_pengadaan",
-                        "caption": "Metode Pengadaan"
-                    }
-                ],
-                "columns": [
-                    {
-                        "uniqueName": "month",
-                        // "caption": "Month",
-                        "showTotals": false
-                    },
-                ],
-                "measures": [
-                    {
-                        "uniqueName": "pagu",
-                        "aggregation": "count",
-                        "caption": "Total"
-                    }
-                ]
-            },
-            options: {
-                 grid: {
-                    type: "compact",
-                    showGrandTotals: "on", // Enable grand totals
-                    showTotals: "off", // Disable sub-totals within rows
-                    showEmptyValues: false
-                }
-            }
-        },
-        reportcomplete: function() {
-        let pivot = this;
-        pivot.off("reportcomplete"); // Ensure it only runs once
-        document.querySelectorAll('.webdatarocks-table td:empty').forEach(cell => {
-            cell.style.display = 'none';
-        });
-    }
+function filterDataByPeriod(data, year, startMonth, endMonth) {
+  return data.filter(row => {
+    const matchYear = year === "all" || String(row.tahun) === year;
+    const matchMonth = startMonth && endMonth
+      ? (startMonth <= endMonth
+        ? row.month >= startMonth && row.month <= endMonth
+        : row.month >= startMonth || row.month <= endMonth)
+      : true;
+    return matchYear && matchMonth;
+  });
+}
+function renderAllPivots(year = "all", startMonth = null, endMonth = null) {
+  const filteredData = filterDataByPeriod(originalData, year, startMonth, endMonth);
+  document.querySelectorAll(".webdatarocks").forEach(el => el.innerHTML = ""); // clear
+  pivotConfigs.forEach(config => initPivot(config, filteredData));
+}
+// Populate dropdown bulan
+const startMonthSelect = document.getElementById("startMonth");
+const endMonthSelect = document.getElementById("endMonth");
+for (let i = 1; i <= 12; i++) {
+  const opt1 = new Option(monthLabels[i], i);
+  const opt2 = new Option(monthLabels[i], i);
+  startMonthSelect.appendChild(opt1);
+  endMonthSelect.appendChild(opt2);
+}
+// Event handler
+document.getElementById("yearFilter").addEventListener("change", function () {
+  const year = this.value;
+  const startMonth = parseInt(startMonthSelect.value) || null;
+  const endMonth = parseInt(endMonthSelect.value) || null;
+  renderAllPivots(year, startMonth, endMonth);
 });
-new WebDataRocks({
-        container: "#pivot-metodesum",
-        toolbar: true,
-        report: {
-            dataSource: {
-                data: transformedData
-            },
-            "slice": {
-                "rows": [
-                    {
-                        "uniqueName": "metode_pengadaan",
-                        "caption": "Metode Pengadaan"
-                    }
-                ],
-                "columns": [
-                    {
-                        "uniqueName": "month",
-                        // "caption": "Month",
-                        "showTotals": false
-                    }
-                ],
-                "measures": [
-                    {
-                        "uniqueName": "hasilnego",
-                        "aggregation": "sum",
-                        "caption": "Total"
-                    }
-                ]
-            },
-            options: {
-                 grid: {
-                    type: "compact",
-                    showGrandTotals: "on", // Enable grand totals
-                    showTotals: "off", // Disable sub-totals within rows
-                    showEmptyValues: false
-                }
-            }
-        },
-        reportcomplete: function() {
-        let pivot = this;
-        pivot.off("reportcomplete"); // Ensure it only runs once
-        document.querySelectorAll('.webdatarocks-table td:empty').forEach(cell => {
-            cell.style.display = 'none';
-        });
-    }
-});
-new WebDataRocks({
-        container: "#pivot-pejabatkategoricount",
-        toolbar: true,
-        report: {
-            dataSource: {
-                data: transformedData
-            },
-            "slice": {
-                "rows": [
-                    {
-                        "uniqueName": "pejabat_pengadaan",
-                        "caption": "Pejabat Pengadaan"
-                    }
-                ],
-                "columns": [
-                    {
-                        "uniqueName": "month",
-                        // "caption": "Month",
-                        "showTotals": false
-                    },
-                    {
-                        "uniqueName": "kategori_pengadaan",
-                        // "caption": "Kategori Pengadaan"
-                    }
-                ],
-                "measures": [
-                    {
-                        "uniqueName": "pagu",
-                        "aggregation": "count",
-                        "caption": "Total Job"
-                    }
-                ]
-            },
-            options: {
-                 grid: {
-                    type: "compact",
-                    showGrandTotals: "on", // Enable grand totals
-                    showTotals: "off", // Disable sub-totals within rows
-                    showEmptyValues: false
-                }
-            }
-        },
-        reportcomplete: function() {
-        let pivot = this;
-        pivot.off("reportcomplete"); // Ensure it only runs once
-        document.querySelectorAll('.webdatarocks-table td:empty').forEach(cell => {
-            cell.style.display = 'none';
-        });
-    }
-});
-new WebDataRocks({
-        container: "#pivot-pejabatkategorisum",
-        toolbar: true,
-        report: {
-            dataSource: {
-                data: transformedData
-            },
-            "slice": {
-                "rows": [
-                    {
-                        "uniqueName": "pejabat_pengadaan",
-                        "caption": "Pejabat Pengadaan"
-                    }
-                ],
-                "columns": [
-                    {
-                        "uniqueName": "month",
-                        // "caption": "Month",
-                        "showTotals": false
-                    },
-                    {
-                        "uniqueName": "kategori_pengadaan",
-                        // "caption": "Kategori Pengadaan"
-                    }
-                ],
-                "measures": [
-                    {
-                        "uniqueName": "hasilnego",
-                        "aggregation": "sum",
-                        "caption": "Total"
-                    }
-                ]
-            },
-            options: {
-                 grid: {
-                    type: "compact",
-                    showGrandTotals: "on", // Enable grand totals
-                    showTotals: "off", // Disable sub-totals within rows
-                    showEmptyValues: false
-                }
-            }
-        },
-        reportcomplete: function() {
-        let pivot = this;
-        pivot.off("reportcomplete"); // Ensure it only runs once
-        document.querySelectorAll('.webdatarocks-table td:empty').forEach(cell => {
-            cell.style.display = 'none';
-        });
-    }
-});
-new WebDataRocks({
-        container: "#pivot-pejabatmetodecount",
-        toolbar: true,
-        report: {
-            dataSource: {
-                data: transformedData
-            },
-            "slice": {
-                "rows": [
-                    {
-                        "uniqueName": "pejabat_pengadaan",
-                        "caption": "Pejabat Pengadaan"
-                    }
-                ],
-                "columns": [
-                    {
-                        "uniqueName": "month",
-                        // "caption": "Month",
-                        "showTotals": false
-                    },
-                    {
-                        "uniqueName": "metode_pengadaan",
-                        // "caption": "Kategori Pengadaan"
-                    }
-                ],
-                "measures": [
-                    {
-                        "uniqueName": "pagu",
-                        "aggregation": "count",
-                        "caption": "Total"
-                    }
-                ]
-            },
-            options: {
-                 grid: {
-                    type: "compact",
-                    showGrandTotals: "on", // Enable grand totals
-                    showTotals: "off", // Disable sub-totals within rows
-                    showEmptyValues: false
-                }
-            }
-        },
-        reportcomplete: function() {
-        let pivot = this;
-        pivot.off("reportcomplete"); // Ensure it only runs once
-        document.querySelectorAll('.webdatarocks-table td:empty').forEach(cell => {
-            cell.style.display = 'none';
-        });
-    }
-});
-new WebDataRocks({
-        container: "#pivot-pejabatmetodesum",
-        toolbar: true,
-        report: {
-            dataSource: {
-                data: transformedData
-            },
-            "slice": {
-                "rows": [
-                    {
-                        "uniqueName": "pejabat_pengadaan",
-                        "caption": "Pejabat Pengadaan"
-                    }
-                ],
-                "columns": [
-                    {
-                        "uniqueName": "month",
-                        // "caption": "Month",
-                        "showTotals": false
-                    },
-                    {
-                        "uniqueName": "metode_pengadaan",
-                        // "caption": "Kategori Pengadaan"
-                    }
-                ],
-                "measures": [
-                    {
-                        "uniqueName": "hasilnego",
-                        "aggregation": "sum",
-                        "caption": "Total"
-                    }
-                ]
-            },
-            options: {
-                 grid: {
-                    type: "compact",
-                    showGrandTotals: "on", // Enable grand totals
-                    showTotals: "off", // Disable sub-totals within rows
-                    showEmptyValues: false
-                }
-            }
-        },
-        reportcomplete: function() {
-        let pivot = this;
-        pivot.off("reportcomplete"); // Ensure it only runs once
-        document.querySelectorAll('.webdatarocks-table td:empty').forEach(cell => {
-            cell.style.display = 'none';
-        });
-    }
+[startMonthSelect, endMonthSelect].forEach(select => {
+  select.addEventListener("change", () => {
+    const year = document.getElementById("yearFilter").value;
+    const startMonth = parseInt(startMonthSelect.value) || null;
+    const endMonth = parseInt(endMonthSelect.value) || null;
+    renderAllPivots(year, startMonth, endMonth);
+  });
 });
 JS;
 $this->registerJs($js);
