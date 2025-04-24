@@ -55,26 +55,34 @@ $this->registerJs($JS);
 <script src="https://cdn.webdatarocks.com/latest/webdatarocks.highcharts.js"></script>
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-4 col-sm-6 col-12">
+        <div class="col-md-3 col-sm-6 col-12">
             <?= \hail812\adminlte\widgets\InfoBox::widget([
                 'text' => 'Paket Pengadaan Selesai',
                 'number' =>$params['paketselesai'],
                 'icon' => 'far fa-envelope',
             ]) ?>
         </div>
-        <div class="col-md-4 col-sm-6 col-12">
+        <div class="col-md-3 col-sm-6 col-12">
             <?= \hail812\adminlte\widgets\InfoBox::widget([
-                'text' => 'Paket Pengadaan Belum Selesai',
+                'text' => 'Paket Belum Selesai',
                 'number' => $params['paketbelom'],
                 'theme' => 'success',
                 'icon' => 'far fa-flag',
             ]) ?>
         </div>
-        <div class="col-md-4 col-sm-6 col-12">
+        <div class="col-md-3 col-sm-6 col-12">
             <?= \hail812\adminlte\widgets\InfoBox::widget([
                 'text' => 'Total Pagu Pengadaan',
                 'number' => \Yii::$app->formatter->asCurrency($params['totalpagu']),
                 'theme' => 'gradient-warning',
+                'icon' => 'far fa-copy',
+            ]) ?>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+            <?= \hail812\adminlte\widgets\InfoBox::widget([
+                'text' => 'Total Penyerapan',
+                'number' => \Yii::$app->formatter->asCurrency($params['totalpenyerapan']),
+                'theme' => 'gradient-secondary',
                 'icon' => 'far fa-copy',
             ]) ?>
         </div>

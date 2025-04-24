@@ -53,4 +53,34 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
         });
         return $model->sum('totalnegosiasi');
     }
+    public function getTotalnego() {
+        $model = PaketPengadaanDetails::collectAll(['paket_id' => $this->paket_id]);
+        $model = $model->map(function ($e) {
+            $d['totalnegosiasi'] = (float)($e->qty ?? 1)
+                * (float)($e->volume ?? 1)
+                * (float)(Yii::$app->tools->reverseCurrency($e->negosiasi));
+            return $d;
+        });
+        return $model->sum('totalnegosiasi');
+    }
+    public function getTotalpnwrn() {
+        $model = PaketPengadaanDetails::collectAll(['paket_id' => $this->paket_id]);
+        $model = $model->map(function ($e) {
+            $d['totalpenawaran'] = (float)($e->qty ?? 1)
+                * (float)($e->volume ?? 1)
+                * (float)(Yii::$app->tools->reverseCurrency($e->penawaran));
+            return $d;
+        });
+        return $model->sum('totalpenawaran');
+    }
+    public function getTotalhpssatuan() {
+        $model = PaketPengadaanDetails::collectAll(['paket_id' => $this->paket_id]);
+        $model = $model->map(function ($e) {
+            $d['totalhps'] = (float)($e->qty ?? 1)
+                * (float)($e->volume ?? 1)
+                * (float)(Yii::$app->tools->reverseCurrency($e->hps_satuan));
+            return $d;
+        });
+        return $model->sum('totalhps');
+    }
 }

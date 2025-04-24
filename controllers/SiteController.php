@@ -138,13 +138,14 @@ class SiteController extends Controller
     }
     public function actionDashboard() {
         $model=new PaketPengadaan();
-        $collection = collect($model::Dashboard());
+        $collection = collect($model->dashboard);
         $params = [
             'years' => $collection->unique('year')->pluck('year')->toArray(),
             'yearData' => $collection->groupBy('year')->map->count()->values()->toArray(),
             'paketselesai' => $collection->whereNotNull('pemenang')->count(),
             'paketbelom' => $collection->whereNull('pemenang')->count(),
             'totalpagu' => $collection->sum('pagu'),
+            'totalpenyerapan' => $collection->sum('hasilnego'),
             'metode' => $model->groupedData('metode_pengadaan',$collection),
             'kategori' => $model->groupedData('kategori_pengadaan',$collection),
             'bypp' => $model->groupedData('pejabat_pengadaan',$collection),
