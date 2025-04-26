@@ -32,13 +32,13 @@ function rabid(){
 JS;
 $this->registerJs($js, \yii\web\View::POS_HEAD);
 $datakodeprogram = $model->isNewRecord ? \app\models\ProgramKegiatan::optionprogram() : \app\models\ProgramKegiatan::optionprogram($model->kode_program, $model->tahun_anggaran);
-$adminppkom=[];
-if($model::isAdmin() || $model::isStaffpp() || $model::isPPK() || $model::isPP()){
-    $adminppkom=$model::optionadminppkom();
+$adminppkom = [];
+if ($model::isAdmin() || $model::isStaffpp() || $model::isPPK() || $model::isPP()) {
+    $adminppkom = $model::optionadminppkom();
 }
-if($model::isStaff()){
-    $adminppkom= collect($model::optionadminppkom())->filter(function($value,$key){
-        return $key==Pegawai::findOne(['id_user'=> Yii::$app->user->identity->id])->id;
+if ($model::isStaff()) {
+    $adminppkom = collect($model::optionadminppkom())->filter(function ($value, $key) {
+        return $key == Pegawai::findOne(['id_user' => Yii::$app->user->identity->id])->id;
     })->toArray();
 }
 ?>
@@ -53,34 +53,34 @@ if($model::isStaff()){
         ],
     ]); ?>
     <div class="row">
-    <div class="col-md-7">
-        <?= $form->field($model, 'nomor')->textInput() ?>
-        <?= $form->field($model, 'nomor_persetujuan')->textInput() ?>
-        <?= $form->field($model, 'nama_paket')->textArea() ?>
-    </div>
-    <div class="col-md-5">
-        <?= $form->field($model, 'tanggal_dpp')->widget(DatePicker::class, [
-        'pluginOptions' => [
-            'format' => 'yyyy-mm-dd',
-            'todayHighlight' => true,
-            'autoclose' => true
-        ],
-    ])?>
-        <?= $form->field($model, 'tanggal_persetujuan')->widget(DatePicker::class, [
-        'pluginOptions' => [
-            'format' => 'yyyy-mm-dd',
-            'todayHighlight' => true,
-            'autoclose' => true
-        ],
-    ])?>
-    <?= $form->field($model, 'tanggal_paket')->widget(DatePicker::class, [
-        'pluginOptions' => [
-            'format' => 'yyyy-mm-dd',
-            'todayHighlight' => true,
-            'autoclose' => true
-        ],
-    ]) ?>
-    </div>
+        <div class="col-md-7">
+            <?= $form->field($model, 'nomor')->textInput() ?>
+            <?= $form->field($model, 'nomor_persetujuan')->textInput() ?>
+            <?= $form->field($model, 'nama_paket')->textArea() ?>
+        </div>
+        <div class="col-md-5">
+            <?= $form->field($model, 'tanggal_dpp')->widget(DatePicker::class, [
+                'pluginOptions' => [
+                    'format' => 'yyyy-mm-dd',
+                    'todayHighlight' => true,
+                    'autoclose' => true
+                ],
+            ]) ?>
+            <?= $form->field($model, 'tanggal_persetujuan')->widget(DatePicker::class, [
+                'pluginOptions' => [
+                    'format' => 'yyyy-mm-dd',
+                    'todayHighlight' => true,
+                    'autoclose' => true
+                ],
+            ]) ?>
+            <?= $form->field($model, 'tanggal_paket')->widget(DatePicker::class, [
+                'pluginOptions' => [
+                    'format' => 'yyyy-mm-dd',
+                    'todayHighlight' => true,
+                    'autoclose' => true
+                ],
+            ]) ?>
+        </div>
     </div>
     <?= $form->field($model, 'tahun_anggaran')->widget(Select2::class, [
         'data' => $model::optiontahunanggaran(),
@@ -217,38 +217,40 @@ if($model::isStaff()){
         ]
     ]) ?>
     <?php if (!$model->isNewRecord && ($model->tanggal_reject && $model->alasan_reject)) :
-        $reviews = $model->dpp->reviews;
+        $reviews = $model->dpp->reviews??null;
+        if ($reviews instanceof \yii\base\Model):
     ?>
-        <?= $form->field($model, 'tanggal_reject')->textInput() ?>
-        <?= $form->field($model, 'alasan_reject')->textInput() ?>
-        <?= $form->field($reviews, 'tanggapan_ppk')->textInput() ?>
-        <?= $form->field($reviews, 'tgl_dikembalikan')->widget(DatePicker::class, [
-            'options' => ['placeholder' => 'Select date ...'],
-            'pluginOptions' => [
-                'format' => 'yyyy-mm-dd',
-                'todayHighlight' => true,
-                'autoclose' => true
-            ]
-        ]) ?>
-        <?= $form->field($reviews, 'file_tanggapan')->hiddenInput(['id' => 'file_tanggapan'])->label(false) ?>
-        <div class="form-group ">
-            <div class="row">
-                <label class="control-label right col-sm-3" for="reviewdpp-file_tanggapan">File Tanggapan PPK (images/pdf)</label>
-                <div class="col-sm-9">
-                    <input type="file" accept=".pdf, .png, .jpg, .jpeg, .gif" id="imageInput">
-                    <div id="imagePreview"></div>
+            <?= $form->field($model, 'tanggal_reject')->textInput() ?>
+            <?= $form->field($model, 'alasan_reject')->textInput() ?>
+            <?= $form->field($reviews, 'tanggapan_ppk')->textInput() ?>
+            <?= $form->field($reviews, 'tgl_dikembalikan')->widget(DatePicker::class, [
+                'options' => ['placeholder' => 'Select date ...'],
+                'pluginOptions' => [
+                    'format' => 'yyyy-mm-dd',
+                    'todayHighlight' => true,
+                    'autoclose' => true
+                ]
+            ]) ?>
+            <?= $form->field($reviews, 'file_tanggapan')->hiddenInput(['id' => 'file_tanggapan'])->label(false) ?>
+            <div class="form-group ">
+                <div class="row">
+                    <label class="control-label right col-sm-3" for="reviewdpp-file_tanggapan">File Tanggapan PPK (images/pdf)</label>
+                    <div class="col-sm-9">
+                        <input type="file" accept=".pdf, .png, .jpg, .jpeg, .gif" id="imageInput">
+                        <div id="imagePreview"></div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <?php echo $reviews->file_tanggapan ? Html::a(
-            FilePreview::widget([
-                'model' => $reviews,
-                'attribute' => 'file_tanggapan',
-            ]),
-            Yii::getAlias('@web/uploads/') . $reviews->file_tanggapan,
-            ['target' => '_blank']
-        ) : '';
-        ?>
+            <?php echo $reviews->file_tanggapan ? Html::a(
+                FilePreview::widget([
+                    'model' => $reviews,
+                    'attribute' => 'file_tanggapan',
+                ]),
+                Yii::getAlias('@web/uploads/') . $reviews->file_tanggapan,
+                ['target' => '_blank']
+            ) : '';
+            ?>
+        <?php endif; ?>
     <?php endif; ?>
     <?php if (!Yii::$app->request->isAjax) { ?>
         <div class="form-group">

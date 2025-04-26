@@ -1,7 +1,8 @@
 <?php
 namespace app\controllers;
-use app\models\PaketPengadaan;
+use yii\base\DynamicModel;
 use app\models\ReportModel;
+use app\models\PaketPengadaan;
 class ReportController extends Controller {
     public function actionMetode() {
         $model = new ReportModel();
@@ -21,9 +22,10 @@ class ReportController extends Controller {
                 'pejabat' => $model->pejabat
             ];
             $result = $paketpengadaan->metodebulan($params);
-            return $this->render('_pivot_metode', [
-                'model' => $result
-            ]);
+            return $this->actionMetodecount($result);
+            // return $this->render('_pivot_metode', [
+            //     'model' => $result
+            // ]);
         }
     }
     public function actionKategori() {
@@ -95,13 +97,13 @@ class ReportController extends Controller {
             ]);
         }
     }
-    public function actionIndex() {//rekap
+    public function actionIndex() { //rekap
         $model = new ReportModel();
         $paketpengadaan = new PaketPengadaan();
         $request = \Yii::$app->request;
         if ($request->isGet) {
             return $this->render('index', [
-                'action'=> \yii\helpers\Url::to(['report/index']),
+                'action' => \yii\helpers\Url::to(['report/index']),
                 'model' => $model,
                 'raw' => $paketpengadaan->getrawData(),
                 'paketpengadaan' => $paketpengadaan
@@ -136,8 +138,7 @@ class ReportController extends Controller {
                     'bulan'             => $item['month'],
                 ];
             })->all();
-            $title='Rekap Pengadaan '.$model->tahun;
-
+            $title = 'Rekap Pengadaan ' . $model->tahun;
             $dataProvider = new \yii\data\ArrayDataProvider([
                 'allModels'  => $rows,
                 'pagination' => false,
@@ -158,7 +159,7 @@ class ReportController extends Controller {
                         'ppkom',
                         'bidang'
                     ],
-                    'defaultOrder' => ['tahun' => SORT_DESC, 'bulan' => SORT_DESC,'paket_id' => SORT_DESC],
+                    'defaultOrder' => ['tahun' => SORT_DESC, 'bulan' => SORT_DESC, 'paket_id' => SORT_DESC],
                 ],
             ]);
             return $this->render('_rekap-paket', [
@@ -172,13 +173,18 @@ class ReportController extends Controller {
             // ]);
         }
     }
-    public function actionDppmasuk(){
+    public function actionMetodecount($raw) {
+        return $this->render('_pivot_metodecount', [
+            'data' => $raw
+        ]);
+    }
+    public function actionDppmasuk() {
         $model = new ReportModel();
         $paketpengadaan = new PaketPengadaan();
         $request = \Yii::$app->request;
         if ($request->isGet) {
             return $this->render('index', [
-                'action'=> \yii\helpers\Url::to(['report/dppmasuk']),
+                'action' => \yii\helpers\Url::to(['report/dppmasuk']),
                 'model' => $model,
                 'raw' => $paketpengadaan->getrawData(),
                 'paketpengadaan' => $paketpengadaan
@@ -197,8 +203,34 @@ class ReportController extends Controller {
             // print_r($raw);
             return $this->render('_pivot_dppmasuk', [
                 'model' => $raw,
-                'months'=> $model->getMonths()
+                'months' => $model->getMonths()
             ]);
         }
+    }
+    public function createPenetapanModel($params = []) {
+        $model = DynamicModel::validateData($params, [
+            [['nama_paket', 'metode_pengadaan', 'pemenang_nama', 'pemenang_alamat', 'pemenang_npwp'], 'string'],
+            [['harga_penawaran', 'harga_negosiasi'], 'number'],
+            [['tanggal_surat'], 'date', 'format' => 'php:Y-m-d'],
+            [['nomor_surat', 'pejabat_nama', 'pejabat_nip'], 'string'],
+        ]);
+        return $model;
+    }
+    public function actionPreviewSurat($id) {
+        $paket = PaketPengadaan::findOne($id);
+        $model = $this->createPenetapanModel([
+            'nama_paket'       => $paket->nama_paket,
+            'metode_pengadaan' => $paket->metode_pengadaan,
+            'pemenang_nama'    => $paket->penawaranpenyedia->vendor->nama_perusahaan ?? '-',
+            'pemenang_alamat'  => $paket->penawaranpenyedia->vendor->alamat_perusahaan ?? '-',
+            'pemenang_npwp'    => $paket->penawaranpenyedia->vendor->npwp ?? '-',
+            'harga_penawaran'  => $paket->details->totalpnwrn ?? 0,
+            'harga_negosiasi'  => $paket->details->totalnego ?? 0,
+            'nomor_surat'      => '027/XXX/GRESIK/' . date('Y'),
+            'tanggal_surat'    => date('Y-m-d'),
+            'pejabat_nama'     => $paket->dpp->pejabat->nama ?? '-',
+            'pejabat_nip'      => $paket->dpp->pejabat->nip ?? '-',
+        ]);
+        return $this->render('template_penetapan', ['model' => $model]);
     }
 }

@@ -359,11 +359,11 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         }
         return $data->map(function ($e) {
             if ($e['month'] !== 0) {
-                $e['bulan'] = $e['month'] . ' ' . $this->getMonths()[$e['month']];
+                $e['bulan'] = $this->getMonths()[$e['month']];
             }
             return $e;
         })
-            ->sortBy('bulan')
+            // ->sortBy('bulan')
             ->values();
     }
     public function kategoribulan($params) { // collection sudah assign / diterima
