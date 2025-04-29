@@ -1,5 +1,6 @@
 <?php
 namespace app\controllers;
+use kartik\mpdf\Pdf;
 use yii\base\DynamicModel;
 use app\models\ReportModel;
 use app\models\PaketPengadaan;
@@ -22,10 +23,10 @@ class ReportController extends Controller {
                 'pejabat' => $model->pejabat
             ];
             $result = $paketpengadaan->metodebulan($params);
-            return $this->actionMetodecount($result);
-            // return $this->render('_pivot_metode', [
-            //     'model' => $result
-            // ]);
+            // return $this->actionMetodecount($result);
+            return $this->render('_pivot_metode', [
+                'model' => $result
+            ]);
         }
     }
     public function actionKategori() {
@@ -173,10 +174,49 @@ class ReportController extends Controller {
             // ]);
         }
     }
-    public function actionMetodecount($raw) {
-        return $this->render('_pivot_metodecount', [
-            'data' => $raw
-        ]);
+    public function actionMetodecount() {
+        $model = new ReportModel();
+        $paketpengadaan = new PaketPengadaan();
+        $request = \Yii::$app->request;
+        if ($request->isGet) {
+            return $this->render('_frm_by_metode', [
+                'model' => $model,
+                'raw' => $paketpengadaan->getrawData(),
+            ]);
+        } else if ($model->load($request->post())) {
+            $params = [
+                'tahun' => $model->tahun ?? '',
+                'bln' => $model->bulan,
+                'metode' => $model->metode,
+                'pejabat' => $model->pejabat
+            ];
+            $result = $paketpengadaan->metodebulan($params);
+            if ($request->post('type') === 'grid') {
+                return $this->render('_pivot_metodecount', [
+                    'data' => $result,
+                ]);
+            }
+            if ($request->post('type') === 'pdf') {
+                $pdf = new Pdf([
+                    'mode' => Pdf::MODE_UTF8,
+                    'format' => Pdf::FORMAT_A4,
+                    'orientation' => Pdf::ORIENT_PORTRAIT,
+                    'destination' => Pdf::DEST_BROWSER,
+                    'content' => $this->renderPartial('_pivot_metodecount', [
+                        'data' => $result,
+                    ]),
+                    'options' => [
+                        'title' => 'Metode Pengadaan',
+                        'subject' => 'Metode Pengadaan',
+                    ],
+                    'methods' => [
+                        'SetHeader' => ['Metode Pengadaan'],
+                        'SetFooter' => ['{PAGENO}'],
+                    ]
+                ]);
+                return $pdf->render();
+            }
+        }
     }
     public function actionDppmasuk() {
         $model = new ReportModel();
@@ -200,11 +240,33 @@ class ReportController extends Controller {
                 'bidang_bagian_id'      => $model->bidang !== 'all' ? $model->bidang : null,
             ])->filter();
             $raw = $paketpengadaan->getFilteredData($filters);
-            // print_r($raw);
-            return $this->render('_pivot_dppmasuk', [
-                'model' => $raw,
-                'months' => $model->getMonths()
-            ]);
+            if ($request->post('type') === 'pdf') {
+                $pdf = new Pdf([
+                    'mode' => Pdf::MODE_UTF8,
+                    'format' => Pdf::FORMAT_A4,
+                    'orientation' => Pdf::ORIENT_PORTRAIT,
+                    'destination' => Pdf::DEST_BROWSER,
+                    'content' => $this->renderPartial('_pdf_dppmasuk', [
+                        'model' => $raw,
+                        'months' => $model->getMonths()
+                    ]),
+                    'options' => [
+                        'title' => 'DPP Masuk',
+                        'subject' => 'DPP Masuk',
+                    ],
+                    'methods' => [
+                        'SetHeader' => ['DPP Masuk'],
+                        'SetFooter' => ['{PAGENO}'],
+                    ]
+                ]);
+                return $pdf->render();
+            }
+            if ($request->post('type') === 'grid') {
+                return $this->render('_pivot_dppmasuk', [
+                    'model' => $raw,
+                    'months' => $model->getMonths()
+                ]);
+            }
         }
     }
     public function createPenetapanModel($params = []) {

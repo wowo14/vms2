@@ -1,18 +1,15 @@
 <?php
-
 use app\models\Unit;
 use yii\helpers\Url;
 use yii\helpers\Html;
 use kartik\select2\Select2;
 use yii\widgets\ActiveForm;
-
 $this->title = 'Report Filter';
 $this->params['breadcrumbs'][] = $this->title;
 $currentController = Yii::$app->controller->id;
 $currentAction = Yii::$app->controller->action->id;
 $link = Url::to([$currentController . '/' . $currentAction]);
-$tahun = $raw->unique('year')->pluck('year', 'year')->toArray();
-$month = $model->months;
+$month = $months;
 $all = ['all' => 'all'];
 $month = array_merge([0 => 'all'], $month);
 // $kategori = array_merge(['' => '', 'all' => 'all'], $model::optionkategoripengadaan());
@@ -26,7 +23,7 @@ $admin = $all + $model::getAlladmin();
 $bidang = array_merge(['' => '', 'all' => 'all'], Unit::collectAll()->pluck('unit', 'id')->toArray());
 $form = ActiveForm::begin([
     'id' => 'rpt-form',
-    'action' => $action ?? $link,
+    'action' =>$action??$link,
     'enableAjaxValidation' => false,
     'fieldConfig' => [
         'template' => "<div class='row'>{label}\n<div class='col-sm-9'>{input}\n{error}</div></div>",
@@ -34,7 +31,7 @@ $form = ActiveForm::begin([
     ],
 ]);
 echo $form->field($model, 'tahun')->widget(Select2::class, [
-    'data' => $tahun,
+    'data' => $years,
 ]);
 echo $form->field($model, 'bulan')->widget(Select2::class, [
     'data' => $month,

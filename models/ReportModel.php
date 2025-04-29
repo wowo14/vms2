@@ -1,7 +1,8 @@
 <?php
 namespace app\models;
-use yii\base\Model;
-class ReportModel extends Model
+use yii\base\DynamicModel;
+// use yii\base\Model;
+class ReportModel extends DynamicModel
 {
     use GeneralModelsTrait;
     public $tahun;

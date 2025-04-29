@@ -284,22 +284,22 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         } else {
             $months = $data->pluck('month')->unique()->sort()->values();
         }
-        Yii::error('months: ' . $months);
+        // Yii::error('months: ' . $months);
         if ((int)$groupKey) {
             $data = $data->groupBy('kategori_pengadaan');
             $types = $data->get($groupKey);
         } else {
             $types = $data->pluck($groupKey)->unique()->sort()->values();
         }
-        Yii::error('types: ' . $types);
+        // Yii::error('types: ' . $types);
         if ((int)$params) {
-            Yii::error('integer' . $params);
+            // Yii::error('integer' . $params);
             $group = $data->groupBy('pejabat_pengadaan_id');
             $groupedData = $group->get($params);
         } else {
             $groupedData = $data->groupBy($params);
         }
-        Yii::error('groupedData: ' . $groupedData);
+        // Yii::error('groupedData: ' . $groupedData);
         if ($groupedData) {
             return $groupedData;
         }
@@ -333,12 +333,11 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         $data = $this->getrawData();
         return $data;
         die;
-        Yii::error('kategori called # raw data: ' . $data);
+        // Yii::error('kategori called # raw data: ' . $data);
         return $this->createPivotTable($data, $params['groupby'], $params['type'], $params['bln']);
     }
     public function metodebulan($params) { // collection sudah diterima dpp / complete
         $data = $this->getrawData()->values();
-        // Filter: hanya data dengan pejabat_pengadaan_id dan admin_pengadaan_id yang tidak null
         $data = $data->filter(function ($item) {
             return !empty($item['pejabat_pengadaan_id']) || !empty($item['admin_pengadaan_id']);
         });
@@ -347,23 +346,30 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         }
         if ($params['bln'] && $params['bln'] != 0) {
             $data = $data->where('month', $params['bln'])
-                ->groupBy('month')->get($params['bln']);
+                ->groupBy('month')
+                ->get($params['bln']);
         }
         if ($params['metode'] && $params['metode'] !== 'all') {
-            $data = $data->groupBy('metode_pengadaan_id')
-                ->get($params['metode']);
+            $data = $data->filter(function ($item) use ($params) {
+                return $item['metode_pengadaan_id'] == $params['metode'];
+            });
         }
+        // $data = $data->groupBy('metode_pengadaan_id');
         if ($params['pejabat'] && $params['pejabat'] !== 'all') {
             $data = $data->groupBy('pejabat_pengadaan_id')
                 ->get($params['pejabat']);
         }
+        if ($data === null) {
+            Yii::error('Data after filters is null.');
+            return [];
+        }
+        // Yii::error(json_encode($data));
         return $data->map(function ($e) {
             if ($e['month'] !== 0) {
                 $e['bulan'] = $this->getMonths()[$e['month']];
             }
             return $e;
         })
-            // ->sortBy('bulan')
             ->values();
     }
     public function kategoribulan($params) { // collection sudah assign / diterima
