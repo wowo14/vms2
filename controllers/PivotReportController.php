@@ -1,7 +1,5 @@
 <?php
-
 namespace app\controllers;
-
 use Yii;
 use kartik\mpdf\Pdf;
 use yii\db\Expression;
@@ -10,7 +8,6 @@ use app\models\ReportModel;
 use app\models\PaketPengadaan;
 use app\helpers\PivotReportHelper;
 use yii\helpers\ArrayHelper;
-
 class PivotReportController extends Controller {
     public function actionIndex() {
         $model = new ReportModel();
@@ -29,7 +26,7 @@ class PivotReportController extends Controller {
         $model = new ReportModel();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             $data = $this->getRawData($model);
-            $types = ['metode', 'metode_total', 'kategori', 'kategori_total', 'pejabat', 'pejabat_total'];
+            $types = array_keys($this->getAllReportConfigs());
             $configs = [];
             $reports = [];
             foreach ($types as $type) {
@@ -89,7 +86,6 @@ class PivotReportController extends Controller {
             $data = $this->getRawData($model);
             // Ambil semua konfigurasi
             $allConfigs = $this->getAllReportConfigs();
-            Yii::error($allConfigs);
             // Jika type == all, proses semua jenis
             if ($type === 'all') {
                 $reports = [];
