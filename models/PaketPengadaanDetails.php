@@ -40,6 +40,12 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
             'sumber_informasi' => 'Sumber Informasi',
         ];
     }
+    public function beforeSave($insert)
+    {
+        
+        $this->nama_produk=preg_replace('/\s+/', ' ', trim($this->nama_produk));
+        return parent::beforeSave($insert);
+    }
     public function getPaketpengadaan(){
         return $this->hasOne(PaketPengadaan::className(), ['id' => 'paket_id']);
     }

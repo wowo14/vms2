@@ -281,10 +281,10 @@ class PaketpengadaanController extends Controller {
                             $inserted++;
                             $adata[] = [
                                 'paket_id' => $model->id,
-                                'nama_produk' => $nama_produk,
+                                'nama_produk' => preg_replace('/\s+/', ' ', trim($nama_produk)),
                                 'qty' => $qty,
                                 'volume' => $volume,
-                                'satuan' => $satuan,
+                                'satuan' => preg_replace('/\s+/', ' ', trim($satuan)),
                                 'hps_satuan' => $hps_satuan,
                                 'penawaran' => $penawaran ?? 0,
                             ];
