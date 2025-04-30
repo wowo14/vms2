@@ -26,7 +26,80 @@ class PivotReportController extends Controller {
         $model = new ReportModel();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             $data = $this->getRawData($model);
-            $types = array_keys($this->getAllReportConfigs());
+            $all = $this->getAllReportConfigs();
+            // Kumpulkan keyword filter yang aktif
+            $filters = [];
+            $filterLabels = [];
+            if ($model->kategori) {
+                $filters[] = 'kategori';
+                if ($model->kategori !== 'all') {
+                    $ar = array_filter($model::optionsSettingtype('kategori_pengadaan', ['value', 'id']), function ($key) use ($model) {
+                        return strpos($key, $model->kategori) !== false;
+                    }, ARRAY_FILTER_USE_KEY);
+                    $filterLabels[] = 'Kategori: '.reset($ar);
+                }
+            }
+            if ($model->metode) {
+                $filters[] = 'metode';
+                if ($model->metode !== 'all') {
+                    $ar = array_filter($model::optionsSettingtype('metode_pengadaan', ['value', 'id']), function ($key) use ($model) {
+                        return strpos($key, $model->metode) !== false;
+                    }, ARRAY_FILTER_USE_KEY);
+                    $filterLabels[] = 'Metode: '.reset($ar);
+                }
+            }
+            if ($model->pejabat) {
+                $filters[] = 'pejabat';
+                if ($model->pejabat !== 'all') {
+                    $ar = array_filter($model::getAllpetugas(), function ($key) use ($model) {
+                        return strpos($key, $model->pejabat) !== false;
+                    }, ARRAY_FILTER_USE_KEY);
+                    $filterLabels[] = 'Pejabat: ' . reset($ar);
+                }
+            }
+            if ($model->admin) {
+                $filters[] = 'admin';
+                if ($model->admin !== 'all') {
+                    $ar = array_filter($model::getAlladmin(), function ($key) use ($model) {
+                        return strpos($key, $model->admin) !== false;
+                    }, ARRAY_FILTER_USE_KEY);
+                    $filterLabels[] = 'Admin: ' . reset($ar);
+                }
+            }
+            if ($model->bidang) $filters[] = 'bidang';
+            if ($model->bidang) {
+                $filters[] = 'bidang';
+                if ($model->bidang !== 'all') {
+                    $ar = array_filter(\app\models\Unit::collectAll()->pluck('unit', 'id')->toArray(), function ($key) use ($model) {
+                        return strpos($key, $model->bidang) !== false;
+                    }, ARRAY_FILTER_USE_KEY);
+                    $filterLabels[] = 'Bidang: ' . reset($ar);
+                }
+            }
+            if ($model->ppkom) {
+                $filters[] = 'ppkom';
+                if ($model->ppkom !== 'all') {
+                    $ar = array_filter($model::optionppkom(), function ($key) use ($model) {
+                        return strpos($key, $model->ppkom) !== false;
+                    }, ARRAY_FILTER_USE_KEY);
+                    $filterLabels[] = 'PPKOM: ' . reset($ar);
+                }
+            }
+            Yii::error($filterLabels);
+            if (empty($filters)) {
+                $allConfigs = $all;
+            } else {
+                $allConfigs = array_filter($all, function ($_, $key) use ($filters) {
+                    foreach ($filters as $filter) {
+                        if (strpos($key, $filter) !== false) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }, ARRAY_FILTER_USE_BOTH);
+            }
+            // Yii::error($allConfigs);
+            $types = array_keys($allConfigs);
             $configs = [];
             $reports = [];
             foreach ($types as $type) {
@@ -51,6 +124,9 @@ class PivotReportController extends Controller {
                     'configs' => $configs,
                     'months' => (new PaketPengadaan())->months,
                     'year' => $model->tahun,
+                    'model' => $model,
+                    'filters' => $filters,
+                    'filterLabels' => $filterLabels
                 ];
                 // Generate PDF
                 $pdf = new Pdf([
@@ -76,329 +152,13 @@ class PivotReportController extends Controller {
                 'configs' => $configs,
                 'months' => (new PaketPengadaan())->months,
                 'year' => $model->tahun,
-            ]);
-        }
-        return $this->redirect(['index']);
-    }
-    public function actionReport($type = 'all') {
-        $model = new ReportModel();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $data = $this->getRawData($model);
-            // Ambil semua konfigurasi
-            $allConfigs = $this->getAllReportConfigs();
-            // Jika type == all, proses semua jenis
-            if ($type === 'all') {
-                $reports = [];
-                foreach ($allConfigs as $key => $config) {
-                    $reports[$key] = PivotReportHelper::generatePivotReport(
-                        $data,
-                        $config['rowField'],
-                        $config['rowLabel'],
-                        'month',
-                        (new PaketPengadaan())->months,
-                        null,
-                        $config['sumField'] ?? null
-                    );
-                }
-                // Jika PDF semua
-                if (Yii::$app->request->post('type') == 'pdf') {
-                    return $this->renderPartial('_report_all_pdf', [
-                        'reports' => $reports,
-                        'configs' => $allConfigs,
-                        'year' => $model->tahun,
-                        'months' => (new PaketPengadaan())->months,
-                    ]);
-                }
-                return $this->render('_report_all', [
-                    'reports' => $reports,
-                    'configs' => $allConfigs,
-                    'model' => $model,
-                    'months' => (new PaketPengadaan())->months,
-                ]);
-            }
-            // Jika hanya satu type
-            $reportConfig = $this->getReportConfig($type);
-            $report = PivotReportHelper::generatePivotReport(
-                $data,
-                $reportConfig['rowField'],
-                $reportConfig['rowLabel'],
-                'month',
-                (new PaketPengadaan())->months,
-                null,
-                $reportConfig['sumField'] ?? null
-            );
-            // Jika PDF tunggal
-            if (Yii::$app->request->post('type') == 'pdf') {
-                $pdf = new Pdf([
-                    'mode' => Pdf::MODE_UTF8,
-                    'format' => Pdf::FORMAT_A4,
-                    'orientation' => Pdf::ORIENT_LANDSCAPE,
-                    'destination' => Pdf::DEST_BROWSER,
-                    'content' => $this->renderPartial('_report_pdf', [
-                        'report' => $report,
-                        'reportConfig' => $reportConfig,
-                        'type' => $type,
-                        'year' => $model->tahun,
-                        'months' => (new PaketPengadaan())->months,
-                    ]),
-                    'cssFile' => '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
-                    'cssInline' => $this->getPdfStyles(),
-                    'options' => [
-                        'title' => 'Laporan ' . $reportConfig['title'],
-                    ],
-                    'methods' => [
-                        'SetHeader' => ['Laporan ' . $reportConfig['title'] . ' - ' . date('d/m/Y')],
-                        'SetFooter' => ['{PAGENO}'],
-                    ]
-                ]);
-                return $pdf->render();
-            }
-            return $this->render('report', [
-                'report' => $report,
-                'reportConfig' => $reportConfig,
-                'type' => $type,
                 'model' => $model,
-                'year' => $model->tahun,
-                'months' => (new PaketPengadaan())->months,
+                'filters' => $filters,
+                'filterLabels' => $filterLabels
             ]);
         }
         return $this->redirect(['index']);
     }
-    /**
-     * Generate multiple reports for dashboard view
-     */
-    public function actionDashboard($year = null, $monthStart = 1, $monthEnd = 12) {
-        // Get raw data
-        $data = $this->getRawData($year, $monthStart, $monthEnd);
-        // Define report configurations
-        $pivotConfigs = [
-            'metodeCount' => [
-                'rowField' => 'metode_pengadaan',
-                'rowLabel' => 'Metode Pengadaan',
-                'subTitle' => 'Jumlah Paket Pengadaan Per Metode Pengadaan',
-                'colField' => 'month',
-                'monthLabels' => (new PaketPengadaan())->months,
-            ],
-            'metodeTotal' => [
-                'rowField' => 'metode_pengadaan',
-                'rowLabel' => 'Metode Pengadaan',
-                'subTitle' => 'Total Kontrak Per Metode Pengadaan',
-                'colField' => 'month',
-                'monthLabels' => (new PaketPengadaan())->months,
-                'sumField' => 'hasilnego'
-            ],
-            'kategoriCount' => [
-                'rowField' => 'kategori_pengadaan',
-                'rowLabel' => 'Kategori Pengadaan',
-                'subTitle' => 'Jumlah Paket Pengadaan Per Kategori Pengadaan',
-                'colField' => 'month',
-                'monthLabels' => (new PaketPengadaan())->months,
-            ],
-            'kategoriTotal' => [
-                'rowField' => 'kategori_pengadaan',
-                'rowLabel' => 'Kategori Pengadaan',
-                'subTitle' => 'Total Kontrak Per Kategori Pengadaan',
-                'colField' => 'month',
-                'monthLabels' => (new PaketPengadaan())->months,
-                'sumField' => 'hasilnego'
-            ],
-            'pejabatCount' => [
-                'rowField' => 'pejabat_pengadaan',
-                'rowLabel' => 'Pejabat Pengadaan',
-                'subTitle' => 'Jumlah Paket Pengadaan Per Pejabat Pengadaan',
-                'colField' => 'month',
-                'monthLabels' => (new PaketPengadaan())->months,
-            ],
-        ];
-        // Generate all reports at once
-        $reports = PivotReportHelper::generateMultiplePivotReports($data, $pivotConfigs);
-        return $this->render('dashboard', [
-            'reports' => $reports,
-            'year' => $year,
-            'monthStart' => $monthStart,
-            'monthEnd' => $monthEnd,
-            'months' => (new PaketPengadaan())->months,
-        ]);
-    }
-    /**
-     * Export pivot report to PDF
-     */
-    public function actionExportPdf($raw, $type) {
-        if (isset(Yii::$app->modules['debug'])) {
-            Yii::$app->modules['debug']->enabled = false;
-        }
-        $reportConfig = $this->getReportConfig($type);
-        $data = $raw;
-        // Generate pivot report
-        $report = PivotReportHelper::generatePivotReport(
-            $data,
-            $reportConfig['rowField'],
-            $reportConfig['rowLabel'],
-            'month',
-            (new PaketPengadaan())->months,
-            null,
-            $reportConfig['sumField'] ?? null
-        );
-        // Prepare view data
-        $viewData = [
-            'report' => $report,
-            'reportConfig' => $reportConfig,
-            'type' => $type,
-            'year' => "year",
-            'months' => (new PaketPengadaan())->months,
-            // 'monthStart' => $monthStart,
-            // 'monthEnd' => $monthEnd,
-        ];
-        // Generate PDF
-        $pdf = new Pdf([
-            'mode' => Pdf::MODE_UTF8,
-            'format' => Pdf::FORMAT_A4,
-            'orientation' => Pdf::ORIENT_LANDSCAPE,
-            'destination' => Pdf::DEST_BROWSER,
-            'content' => $this->renderPartial('_report_pdf', $viewData),
-            'cssFile' => '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
-            'cssInline' => $this->getPdfStyles(),
-            'options' => [
-                'title' => 'Laporan ' . $reportConfig['title'],
-            ],
-            'methods' => [
-                'SetHeader' => ['Laporan ' . $reportConfig['title'] . ' - ' . date('d/m/Y')],
-                'SetFooter' => ['{PAGENO}'],
-            ]
-        ]);
-        return $pdf->render();
-    }
-    /**
-     * Export multiple reports to PDF (dashboard)
-     */
-    public function actionExportDashboardPdf($year = null, $monthStart = 1, $monthEnd = 12) {
-        // Disable debug module in PDF
-        if (isset(Yii::$app->modules['debug'])) {
-            Yii::$app->modules['debug']->enabled = false;
-        }
-        // Get raw data
-        $data = $this->getRawData($year, $monthStart, $monthEnd);
-        // Define report configurations
-        $pivotConfigs = [
-            'metodeCount' => [
-                'rowField' => 'metode_pengadaan',
-                'rowLabel' => 'Metode Pengadaan',
-                'title' => 'Jumlah Per Metode Pengadaan',
-                'colField' => 'month',
-                'monthLabels' => (new PaketPengadaan())->months,
-            ],
-            'metodeTotal' => [
-                'rowField' => 'metode_pengadaan',
-                'rowLabel' => 'Metode Pengadaan',
-                'title' => 'Total Kontrak Per Metode Pengadaan',
-                'colField' => 'month',
-                'monthLabels' => (new PaketPengadaan())->months,
-                'sumField' => 'hasilnego'
-            ],
-            'kategoriCount' => [
-                'rowField' => 'kategori_pengadaan',
-                'rowLabel' => 'Kategori Pengadaan',
-                'title' => 'Jumlah Per Kategori Pengadaan',
-                'colField' => 'month',
-                'monthLabels' => (new PaketPengadaan())->months,
-            ],
-            'kategoriTotal' => [
-                'rowField' => 'kategori_pengadaan',
-                'rowLabel' => 'Kategori Pengadaan',
-                'title' => 'Total Kontrak Per Kategori Pengadaan',
-                'colField' => 'month',
-                'monthLabels' => (new PaketPengadaan())->months,
-                'sumField' => 'hasilnego'
-            ],
-            'pejabatCount' => [
-                'rowField' => 'pejabat_pengadaan',
-                'rowLabel' => 'Pejabat Pengadaan',
-                'title' => 'Jumlah Per Pejabat Pengadaan',
-                'colField' => 'month',
-                'monthLabels' => (new PaketPengadaan())->months,
-            ],
-        ];
-        // Generate all reports at once
-        $reports = PivotReportHelper::generateMultiplePivotReports($data, $pivotConfigs);
-        // Prepare view data
-        $viewData = [
-            'reports' => $reports,
-            'pivotConfigs' => $pivotConfigs,
-            'year' => $year,
-            'monthStart' => $monthStart,
-            'monthEnd' => $monthEnd,
-            'months' => (new PaketPengadaan())->months,
-        ];
-        // Generate PDF
-        $pdf = new Pdf([
-            'mode' => Pdf::MODE_UTF8,
-            'format' => Pdf::FORMAT_A4,
-            'orientation' => Pdf::ORIENT_LANDSCAPE,
-            'destination' => Pdf::DEST_BROWSER,
-            'content' => $this->renderPartial('_dashboard_pdf', $viewData),
-            'cssFile' => '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
-            'cssInline' => $this->getPdfStyles(),
-            'options' => [
-                'title' => 'Dashboard Laporan Pengadaan',
-            ],
-            'methods' => [
-                'SetHeader' => ['Dashboard Laporan Pengadaan - ' . date('d/m/Y')],
-                'SetFooter' => ['{PAGENO}'],
-            ]
-        ]);
-        return $pdf->render();
-    }
-    /**
-     * AJAX endpoint to get raw data for WebDataRocks
-     */
-    public function actionGetData($year = null, $monthStart = 1, $monthEnd = 12) {
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        // Get raw data
-        $data = $this->getRawData($year, $monthStart, $monthEnd);
-        // Define report configurations
-        $pivotConfigs = [
-            'kategoriJumlah' => [
-                'rowField' => 'kategori_pengadaan',
-                'rowLabel' => 'Kategori Pengadaan',
-                'colField' => 'month',
-            ],
-            'kategoriTotal' => [
-                'rowField' => 'kategori_pengadaan',
-                'rowLabel' => 'Kategori Pengadaan',
-                'colField' => 'month',
-                'sumField' => 'hasilnego'
-            ],
-            'metodeJumlah' => [
-                'rowField' => 'metode_pengadaan',
-                'rowLabel' => 'Metode Pengadaan',
-                'colField' => 'month',
-            ],
-            'metodeTotal' => [
-                'rowField' => 'metode_pengadaan',
-                'rowLabel' => 'Metode Pengadaan',
-                'colField' => 'month',
-                'sumField' => 'hasilnego'
-            ],
-        ];
-        // Generate all reports at once
-        $reports = PivotReportHelper::generateMultiplePivotReports($data, $pivotConfigs);
-        // Format data for WebDataRocks
-        $webDataRocksData = [];
-        foreach ($reports as $key => $report) {
-            $webDataRocksData[$key] = $this->formatDataForWebDataRocks(
-                $report['pivotData'],
-                $pivotConfigs[$key]['rowField'],
-                $pivotConfigs[$key]['sumField'] ?? null
-            );
-        }
-        return [
-            'success' => true,
-            'data' => $webDataRocksData,
-        ];
-    }
-    /**
-     * Get the list of available years for the filter
-     */
     private function getYearList() {
         $years = PaketPengadaan::find()
             ->select(
@@ -407,23 +167,18 @@ class PivotReportController extends Controller {
             ->distinct()
             ->asArray()
             ->all();
-        // If no years found, include current year
         if (empty($years)) {
             $years['year'] = [date('Y')];
         }
         // Sort years descending
         rsort($years);
         $years = ArrayHelper::map($years, 'year', 'year');
-        Yii::error($years);
         return $years;
     }
-    /**
-     * Get the raw data for reports
-     */
     private function getRawData(ReportModel $model = null) {
         $query = collect((new PaketPengadaan)->rawData);
         if ($model) {
-            if ($model->tahun && $model->tahun !== 'all') {
+            if ($model->tahun) {
                 $query = $query->filter(fn($item) => $item['year'] == $model->tahun);
             }
             if ($model->bulan && $model->bulan != 0) {
@@ -444,29 +199,11 @@ class PivotReportController extends Controller {
             if ($model->bidang && $model->bidang !== 'all') {
                 $query = $query->filter(fn($item) => $item['bidang_bagian_id'] == $model->bidang);
             }
-        }
-        return $query->toArray();
-    }
-    private function formatDataForWebDataRocks($pivotData, $rowField, $sumField = null) {
-        $result = [];
-        foreach ($pivotData as $row) {
-            $rowFieldValue = $row[$rowField];
-            foreach ($row as $key => $value) {
-                if ($key != $rowField && is_numeric($key)) {
-                    $item = [
-                        $rowField => $rowFieldValue,
-                        'bulan' => (int)$key,
-                    ];
-                    if ($sumField) {
-                        $item['total'] = $value;
-                    } else {
-                        $item['jumlah'] = $value;
-                    }
-                    $result[] = $item;
-                }
+            if ($model->ppkom && $model->ppkom !== 'all') {
+                $query = $query->filter(fn($item) => $item['pejabat_ppkom_id'] == $model->ppkom);
             }
         }
-        return $result;
+        return $query->toArray();
     }
     private function getAllReportConfigs() {
         return [
@@ -534,6 +271,19 @@ class PivotReportController extends Controller {
                 'title' => '∑ Kontrak per Bidang Bagian',
                 'sumField' => 'hasilnego',
                 'subTitle' => 'Jumlah Kontrak Per Bidang Bagian'
+            ],
+            'ppkom' => [
+                'rowField' => 'pejabat_ppkom',
+                'rowLabel' => 'PPKOM',
+                'title' => '∑ Pengadaan per PPKOM',
+                'subTitle' => 'Jumlah Paket Pengadaan Per PPKOM'
+            ],
+            'ppkom_total' => [
+                'rowField' => 'pejabat_ppkom',
+                'rowLabel' => 'PPKOM',
+                'title' => '∑ Kontrak per PPKOM',
+                'sumField' => 'hasilnego',
+                'subTitle' => 'Jumlah Kontrak Per PPKOM'
             ],
         ];
     }

@@ -39,7 +39,7 @@ class DppSearch extends Dpp{
         if(self::isPP()){
             $chief=\app\models\Pegawai::findOne(self::profile('kepalapengadaan'));
             if($chief->id_user<>Yii::$app->user->identity->id){
-                Yii::error(($chief->id_user));
+                // Yii::error(($chief->id_user));
                 $query->andWhere(['p2.id_user' => Yii::$app->user->identity->id]);
             }
         }

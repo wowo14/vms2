@@ -12,16 +12,18 @@ class ReportModel extends DynamicModel
     public $pejabat;
     public $admin;
     public $bidang;
+    public $ppkom;
     public function rules()
     {
         return [
-            [['tahun','bulan', 'metode', 'kategori','pejabat','admin','bidang'], 'safe'],
+            [['tahun','bulan', 'metode', 'kategori','pejabat','admin','bidang','ppkom'], 'safe'],
         ];
     }
      public function attributeLabels() {
         return [
             'pejabat' => 'Pejabat Pengadaan',
             'admin'=>'Admin Pengadaan',
+            'ppkom'=>'Pejabat Pembuat Komitmen'
         ];
     }
 }

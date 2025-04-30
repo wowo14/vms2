@@ -20,6 +20,7 @@ $metode = $all + $model::optionsSettingtype('metode_pengadaan', ['value', 'id'])
 $pejabat = $all + $model::getAllpetugas();
 // $admin = array_merge(['' => '', 'all' => 'all'], $model::getAlladmin());
 $admin = $all + $model::getAlladmin();
+$ppkom = $all + $model::optionppkom();
 $bidang = array_merge(['' => '', 'all' => 'all'], Unit::collectAll()->pluck('unit', 'id')->toArray());
 $form = ActiveForm::begin([
     'id' => 'rpt-form',
@@ -70,6 +71,13 @@ echo $form->field($model, 'admin')->widget(Select2::class, [
 ]);
 echo $form->field($model, 'bidang')->widget(Select2::class, [
     'data' => $bidang,
+    'pluginOptions' => [
+        'placeholder' => 'Pilih Bidang',
+        'allowClear' => true
+    ]
+]);
+echo $form->field($model, 'ppkom')->widget(Select2::class, [
+    'data' => $ppkom,
     'pluginOptions' => [
         'placeholder' => 'Pilih Bidang',
         'allowClear' => true
