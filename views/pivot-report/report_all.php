@@ -1,23 +1,22 @@
 <?php
 use yii\helpers\Html;
 $this->title = 'Laporan Gabungan Tahun ' . Html::encode($year);
-// $subtitle='';
 if (!empty($filters)) {
-    $subtitle = 'Filter berdasarkan ' ;//. implode(', ', array_map('ucwords', $filters));
+    $subtitle = 'Filter berdasarkan ';
     if (!empty($filterLabels)) {
         $subtitle .= implode(', ', $filterLabels);
     }
 } else {
     $subtitle = 'Tanpa filter, menampilkan semua data';
 }
-// $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="report-all">
     <!-- <h3><?= Html::encode($this->title) ?></h3> -->
     <h5><?= Html::encode($subtitle) ?></h5>
     <?php
+    $keys = array_keys($reports);
+    $lastKey = end($keys);
     foreach ($reports as $key => $report):
-        // $report = is_object($report) ? $report = $report->allModels : $report;
     ?>
         <div class="card mb-1 border-primary">
             <div class="card-header bg-primary text-white">
@@ -37,6 +36,9 @@ if (!empty($filters)) {
                 ?>
             </div>
         </div>
-        <div style="page-break-before: always;"></div>
-    <?php endforeach; ?>
+    <?php
+        if ($key !== $lastKey):
+            echo '<div style="page-break-after: always;"></div>';
+        endif;
+    endforeach; ?>
 </div>

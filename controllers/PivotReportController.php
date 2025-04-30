@@ -66,7 +66,6 @@ class PivotReportController extends Controller {
                     $filterLabels[] = 'Admin: ' . reset($ar);
                 }
             }
-            if ($model->bidang) $filters[] = 'bidang';
             if ($model->bidang) {
                 $filters[] = 'bidang';
                 if ($model->bidang !== 'all') {
@@ -85,7 +84,7 @@ class PivotReportController extends Controller {
                     $filterLabels[] = 'PPKOM: ' . reset($ar);
                 }
             }
-            Yii::error($filterLabels);
+            // Yii::error($filterLabels);
             if (empty($filters)) {
                 $allConfigs = $all;
             } else {
