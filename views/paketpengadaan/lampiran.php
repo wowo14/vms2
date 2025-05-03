@@ -45,9 +45,9 @@ $this->title = 'Upload Lampiran Paket : ' . $model->nomor;
                             'type'  => Select2::class,
                             'options' => [
                                 'data' => collect($model::settingType('jenis_dokumen'))->where('param', 'lampiran')->pluck('value', 'id')->toArray(),
-                                'options' => ['placeholder' => 'pilih jenis dokumen ...'],
+                                // 'options' => ['placeholder' => 'pilih jenis dokumen ...'],
                                 'pluginOptions' => [
-                                    'allowClear' => true,
+                                    'allowClear' => false,
                                     'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
                                     'templateResult' => new JsExpression('function(item) { return item.text; }'),
                                     'templateSelection' => new JsExpression('function (item) { return item.text; }'),
