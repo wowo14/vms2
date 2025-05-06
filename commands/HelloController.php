@@ -17,6 +17,11 @@ class HelloController extends Controller {
         Yii::$app->cache->flush();
         Yii::$app->db->schema->refresh();
     }
+    public function actionDpptglterima($nomordpp, $tglterima) {
+        Dpp::updateAll(['tanggal_terima' => $tglterima], ['nomor_dpp' => $nomordpp]);
+        Yii::$app->cache->flush();
+        Yii::$app->db->schema->refresh();
+    }
     public function actionRemovehistory($nomordpp) {
         $paket=PaketPengadaan::find()
         ->where(['nomor' => $nomordpp])->one();
