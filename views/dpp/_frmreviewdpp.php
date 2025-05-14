@@ -113,7 +113,7 @@ jQuery(function ($) {
         ],
     ])->label(false); ?>
     Review Oleh Pejabat Pengadaan:<br>
-    <?= $form->field($reviews, 'keterangan') ?>
+    <?= $form->field($reviews, 'keterangan')->textarea(['rows' => 2]) ?>
     <div class="form-group row">
     <div class="col-sm-3">&nbsp;</div>
     <div class="col-sm-9">
