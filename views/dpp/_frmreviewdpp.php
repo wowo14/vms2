@@ -1,16 +1,16 @@
 <?php
+use yii\web\View;
+use yii\helpers\Html;
 use app\assets\AppAsset;
-use app\widgets\FilePreview;
+use yii\bootstrap4\Tabs;
+use yii\bootstrap4\Modal;
 use kartik\date\DatePicker;
 use kartik\select2\Select2;
-use kartik\switchinput\SwitchInput;
-use unclead\multipleinput\{MultipleInput,MultipleInputColumn};
-// use yii\bootstrap4\ActiveForm;
-use yii2ajaxcrud\ajaxcrud\CrudAsset;
-use yii\bootstrap4\Modal;
-use yii\helpers\Html;
-use yii\web\View;
 use yii\widgets\ActiveForm;
+use app\widgets\FilePreview;
+use kartik\switchinput\SwitchInput;
+use yii2ajaxcrud\ajaxcrud\CrudAsset;
+use unclead\multipleinput\{MultipleInput,MultipleInputColumn};
 $idmodal='modal-reviewdpp';
 CrudAsset::register($this);
 AppAsset::register($this);
@@ -20,6 +20,22 @@ jQuery(function ($) {
     setupImagePreview($("#imageInput"), $("#imagePreview"), $("#file_tanggapan"));
 });', View::POS_END);
 ?>
+<?php
+echo Tabs::widget([
+    'items' => [
+        // [
+        //     'label' => 'DPP',
+        //     'content' => $this->render('//dpp/view', ['model' => $model,]),
+        //     'options' => ['id' => 'dpp' . $model->hash],
+        // ],
+        // [
+        //     'label' => 'Evaluasi',
+        //     'content' => $this->render('//validasikualifikasipenyedia/validasikualifikasipenyedia', ['model' => $penawaran,]),
+        //     'options' => ['id' => 'evaluasi' . $model->hash],
+        // ],
+    ]
+]);?>
+
 <div id="form-reviewdpp">
     <?php $form = ActiveForm::begin([
         'id' => 'review-form-dpp',
@@ -174,6 +190,10 @@ jQuery(function ($) {
         </div>
     <?php } ?>
     <?php ActiveForm::end(); ?>
+</div>
+<div class="clearfix"></div>
+<div id="4parameter">
+
 </div>
 <?php Modal::begin([
     "id" => $idmodal, "size" => "modal-xl",

@@ -66,6 +66,9 @@ class Dpp extends \yii\db\ActiveRecord {
     public function getReviews() {
         return $this->hasOne(ReviewDpp::class, ['dpp_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_reviewdpp'));
     }
+    public function getReviewhistory(){
+        return HistoriReject::where(['paket_id'=>$this->paket_id])->orderBy('id desc')->one();
+    }
     public function getPejabat() {
         return $this->hasOne(Pegawai::class, ['id' => 'pejabat_pengadaan'])->cache(self::cachetime(), self::settagdep('tag_pegawai'));
     }

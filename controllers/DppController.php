@@ -1,5 +1,7 @@
 <?php
+
 namespace app\controllers;
+
 use app\models\PenilaianPenyedia;
 use app\models\{Setting, Negosiasi, PenugasanPemilihanpenyedia, Unit, HistoriReject, ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails, PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia};
 use Yii;
@@ -8,6 +10,7 @@ use yii\db\Expression;
 use yii\filters\VerbFilter;
 use yii\helpers\{ArrayHelper, Html};
 use yii\web\{BadRequestHttpException, Response, NotFoundHttpException};
+
 class DppController extends Controller {
     private $_pageSize = 1;
     public function behaviors() {
@@ -367,7 +370,8 @@ class DppController extends Controller {
                 'model' => $model,
                 'logogresik' => $logogresik,
                 'logors' => $logors,
-                'template' => $model->reviews ?? []
+                'template' => $model->reviews ?? [],
+                'historyreject' => $model->reviewhistory ?? [],
             ]);
             $pdf->cssInline = ".center{text-align:center}.border1solid {border: #eee 1px solid;}";
             return $pdf->render();
@@ -522,11 +526,11 @@ class DppController extends Controller {
         $reviews = $model->reviews;
         $histori = $model->paketpengadaan->historireject;
         if ($histori && $reviews) {
-            $reviews->keterangan = $histori->alasan_reject??'';
-            $reviews->kesimpulan = $histori->kesimpulan??'';
-            $reviews->tgl_dikembalikan = $histori->tanggal_dikembalikan??'';
-            $reviews->tanggapan_ppk = $histori->tanggapan_ppk??'';
-            $reviews->file_tanggapan = $histori->file_tanggapan??'';
+            $reviews->keterangan = $histori->alasan_reject ?? '';
+            $reviews->kesimpulan = $histori->kesimpulan ?? '';
+            $reviews->tgl_dikembalikan = $histori->tanggal_dikembalikan ?? '';
+            $reviews->tanggapan_ppk = $histori->tanggapan_ppk ?? '';
+            $reviews->file_tanggapan = $histori->file_tanggapan ?? '';
         }
         if ($request->isGet) {
             return $this->render('_frmreviewdpp', [
@@ -701,15 +705,15 @@ class DppController extends Controller {
                     'hasil_evaluasi' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['hasil_evaluasi'] : '',
                     'ulasan_pejabat_pengadaan' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['ulasan_pejabat_pengadaan'] : '',
                     'total' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['total'] : 0,
-                    'desc'=> collect($e['description'])->map(function($d, $i){
-                        return $i.'. '.$d;
+                    'desc' => collect($e['description'])->map(function ($d, $i) {
+                        return $i . '. ' . $d;
                     })->sortKeys(),
                 ];
             });
         if (!$template) {
             echo 'Template tidak ditemukan';
         }
-        $oldbastfile = $penilaian->bast??'';
+        $oldbastfile = $penilaian->bast ?? '';
         if ($penilaian->load($request->post())) { // post request
             $nilai = [
                 'uraian' => $_POST['uraian'],
@@ -765,20 +769,20 @@ class DppController extends Controller {
         $penilaian = PenilaianPenyedia::last(['dpp_id' => $dpp->id, 'created_by' => Yii::$app->user->id]) ?? new PenilaianPenyedia();
         $request = Yii::$app->request;
         $template = collect(json_decode(Setting::where(['type' => 'evaluasi_suplier_pejabat', 'active' => 1])->one()->value, true)['kriteria'])
-        ->map(function ($e) use ($penilaian) {
-            return [
-                'uraian' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['uraian'] : $e['name'],
-                'skor' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['skor'] : 0,
-                'nilaiakhir' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['nilaiakhir'] : 0,
-                'hasil_evaluasi' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['hasil_evaluasi'] : '',
-                'ulasan_pejabat_pengadaan' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['ulasan_pejabat_pengadaan'] : '',
-                'total' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['total'] : 0,
-                'desc' => collect($e['description'])->map(function ($d, $i) {
-                    return $i . '. ' . $d;
-                })->sortKeys(),
-            ];
-        });
-        if(!$template){
+            ->map(function ($e) use ($penilaian) {
+                return [
+                    'uraian' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['uraian'] : $e['name'],
+                    'skor' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['skor'] : 0,
+                    'nilaiakhir' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['nilaiakhir'] : 0,
+                    'hasil_evaluasi' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['hasil_evaluasi'] : '',
+                    'ulasan_pejabat_pengadaan' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['ulasan_pejabat_pengadaan'] : '',
+                    'total' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['total'] : 0,
+                    'desc' => collect($e['description'])->map(function ($d, $i) {
+                        return $i . '. ' . $d;
+                    })->sortKeys(),
+                ];
+            });
+        if (!$template) {
             echo 'Template tidak ditemukan';
         }
         // $template = collect(json_decode(TemplateChecklistEvaluasi::where(['like', 'template', 'Evaluasi_Supplier_Oleh_Pejabat'])->one()->detail->uraian, true))
