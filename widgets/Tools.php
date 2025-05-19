@@ -1,14 +1,11 @@
 <?php
-
 namespace app\widgets;
-
 use DateTime;
 use Yii;
 use Intervention\Image\ImageManagerStatic as Image;
 use yii\base\Widget;
 use yii\caching\FileCache;
 use yii\helpers\ArrayHelper;
-
 class Tools extends Widget {
   public function __construct() {
   }
@@ -43,33 +40,25 @@ class Tools extends Widget {
   public function asCurrency($val) {
     return ($val > 0) ? Yii::$app->formatter->asCurrency($val, 'Rp.') : '';
   }
-  public function reverseCurrency($formattedAmount){ // asumsi currency indonesia
-    // Yii::error(json_encode($formattedAmount));
-     $rawAmount = str_replace("\u{00a0}", ' ', $formattedAmount);
-    if (strpos($formattedAmount, 'Rp') !== false) {
-      $rawAmount = str_replace(['Rp', ' '], '', $rawAmount);
-    }
+  // public function reverseCurrency($formattedAmount){ // asumsi currency indonesia
+  //   // Yii::error(json_encode($formattedAmount));
+  //    $rawAmount = str_replace("\u{00a0}", ' ', $formattedAmount);
+  //   if (strpos($formattedAmount, 'Rp') !== false) {
+  //     $rawAmount = str_replace(['Rp', ' '], '', $rawAmount);
+  //   }
+  //   $rawAmount = str_replace('.', '', $rawAmount);
+  //   $rawAmount = str_replace(',', '.', $rawAmount);
+  //   return (float) $rawAmount;
+  // }
+  public function reverseCurrency($formattedAmount) {
+    $formattedAmount = (string) $formattedAmount;
+    // Ganti non-breaking space (U+00A0) dengan space biasa
+    $rawAmount = str_replace("\xc2\xa0", ' ', $formattedAmount);
+    $rawAmount = str_replace(['Rp', 'rp', ' ', "\t"], '', $rawAmount);
     $rawAmount = str_replace('.', '', $rawAmount);
     $rawAmount = str_replace(',', '.', $rawAmount);
     return (float) $rawAmount;
   }
-  // public function reverseCurrency($formattedAmount) {
-  //   // Convert to UTF-8 if it's not already (to avoid issues with invalid UTF-8 characters)
-  //   if (!mb_check_encoding($formattedAmount, 'UTF-8')) {
-  //     $formattedAmount = mb_convert_encoding($formattedAmount, 'UTF-8');
-  //   }
-  //   // Clean the formatted amount string
-  //   $rawAmount = str_replace("\u{00a0}", ' ', $formattedAmount);
-  //   if (strpos($formattedAmount, 'Rp') !== false) {
-  //     // Remove 'Rp' and spaces safely
-  //     $rawAmount = str_replace(['Rp', ' '], '', $rawAmount);
-  //   }
-  //   // Remove dots (thousands separator in Indonesia) and replace commas with dots (decimal separator)
-  //   $rawAmount = str_replace('.', '', $rawAmount);
-  //   $rawAmount = str_replace(',', '.', $rawAmount);
-  //   // Return the final amount as a float
-  //   return (float) $rawAmount;
-  // }
   public function sumCurrency($data) {
     $dd = collect($data)->map(function ($e) {
       $d = $this->reverseCurrency(($e));
