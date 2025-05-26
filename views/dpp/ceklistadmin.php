@@ -34,6 +34,7 @@ $mdl->admin = $modelpenugasan->admin ?? '';
 $mdl->paket_id = $dpp->paket_id ?? '';
 $mdl->unit = $dpp->bidang_bagian ?? '';
 $mdl->nomor_persetujuan = $model->nomor_persetujuan ?? '';
+$mdl->linksirup = $model->linksirup ?? '';
 $mdl->tanggal_persetujuan = $model->tanggal_persetujuan ?? '';
 $mdl->template = $additions['template'];
 $template = array('uraian', 'sesuai', 'keterangan');
@@ -75,15 +76,16 @@ echo '<div class="row">
         'options' => ['placeholder' => 'Pilih Pejabat'],
         'pluginOptions' => ['allowClear' => true],
     ]) .
-    '</div>
-    <div class="col-md-6">' .
-    $form->field($dpp, 'tanggal_dpp')->textInput(['maxlength' => true]) .
-    $form->field($mdl, 'tanggal_persetujuan')->textInput(['maxlength' => true]) .
     $form->field($mdl, 'unit')->widget(Select2::class, [
         'data' => $dataUnit,
         'options' => ['placeholder' => 'Pilih Unit/Bidang/Bagian'],
         'pluginOptions' => ['allowClear' => true],
     ])->label('Bidang/Bagian') .
+    '</div>
+    <div class="col-md-6">' .
+    $form->field($dpp, 'tanggal_dpp')->textInput(['maxlength' => true]) .
+    $form->field($mdl, 'tanggal_persetujuan')->textInput(['maxlength' => true]) .
+    $form->field($mdl, 'linksirup')->textInput(['maxlength' => true]) .
     $form->field($mdl, 'tanggal_tugas')->widget(DatePicker::class, [
         'language' => 'id',
         'pluginOptions' => [

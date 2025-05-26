@@ -468,6 +468,7 @@ class DppController extends Controller {
                 'id' => $_POST['CeklistModel']['paket_id'],
                 'template' => $pure1
             ], JSON_UNESCAPED_SLASHES);
+            $model->linksirup=$_POST['CeklistModel']['linksirup'];
             $model->save();
             $dpp->nomor_dpp = $_POST['CeklistModel']['nomor_dpp'];
             $dpp->bidang_bagian = $_POST['CeklistModel']['unit'];

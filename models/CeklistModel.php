@@ -13,6 +13,7 @@ class CeklistModel extends Model
     public $template;
     public $nomor_persetujuan;
     public $tanggal_persetujuan;
+    public $linksirup;
     public function rules()
     {
         return [
@@ -23,6 +24,7 @@ class CeklistModel extends Model
         return [
             'pejabat' => 'Pejabat Pengadaan',
             'admin'=>'Admin Pengadaan',
+            'linksirup'=>'Link Sirup'
         ];
     }
 }

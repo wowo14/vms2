@@ -9,7 +9,7 @@ class PaketPengadaanSearch extends PaketPengadaan{
     {
         return [
             [['id', 'created_by', 'unit','tahun_anggaran', 'approval_by'], 'integer'],
-            [['nomor','admin_ppkom','created_at','updated_at', 'tanggal_dpp','tanggal_persetujuan','nomor_persetujuan','kategori_pengadaan','addition','tanggal_paket', 'tanggal_reject','alasan_reject', 'nama_paket', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'metode_pengadaan'], 'safe'],
+            [['nomor','admin_ppkom', 'linksirup','created_at','updated_at', 'tanggal_dpp','tanggal_persetujuan','nomor_persetujuan','kategori_pengadaan','addition','tanggal_paket', 'tanggal_reject','alasan_reject', 'nama_paket', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'metode_pengadaan'], 'safe'],
             [['pagu'], 'number'],
         ];
     }
@@ -53,6 +53,7 @@ class PaketPengadaanSearch extends PaketPengadaan{
         $query->andFilterWhere(['like', 'nomor', $this->nomor])
             ->andFilterWhere(['between', 'datetime(tanggal_paket)', ($this->range($this->tanggal_paket, 's')), ($this->range($this->tanggal_paket, 'e'))])
             ->andFilterWhere(['like', 'nama_paket', $this->nama_paket])
+            ->andFilterWhere(['like', 'linksirup', $this->linksirup])
             ->andFilterWhere(['like', 'kode_program', $this->kode_program])
             ->andFilterWhere(['like', 'kode_kegiatan', $this->kode_kegiatan])
             ->andFilterWhere(['like', 'kode_rekening', $this->kode_rekening])

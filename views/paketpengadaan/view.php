@@ -29,6 +29,7 @@ use yii\widgets\DetailView;
                     'tahun_anggaran',
                     'approval_by',
                     'unitnya.unit',
+                    ['attribute'=>'linksirup','format' => 'raw','value'=>Html::a($model->linksirup, $model->linksirup, ['target' => '_blank','data-pjax' => 0])],
                     'alasan_reject:ntext',
                     'tanggal_reject:ntext',
                 ],

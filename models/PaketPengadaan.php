@@ -1,8 +1,11 @@
 <?php
+
 namespace app\models;
+
 use Yii;
 use yii\db\Query;
 use yii\db\Expression;
+
 class PaketPengadaan extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
     // public $oldrecord;
@@ -15,7 +18,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             [['nomor', 'tanggal_paket', 'tanggal_dpp', 'tanggal_persetujuan', 'nomor_persetujuan', 'nama_paket', 'tahun_anggaran', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'unit', 'pagu', 'metode_pengadaan', 'kategori_pengadaan'], 'required'],
             [['tanggal_paket', 'created_at', 'updated_at', 'tanggal_reject', 'alasan_reject', 'addition'], 'string'],
             [['pagu'], 'number'],
-            // [['nama_paket'], 'unique'],
+            [['linksirup'], 'safe'],
             [['created_by', 'admin_ppkom', 'tahun_anggaran', 'approval_by', 'unit'], 'integer'],
             [['nomor', 'kategori_pengadaan', 'nama_paket', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'metode_pengadaan'], 'string', 'max' => 255],
         ];
@@ -33,6 +36,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             'kode_kegiatan' => 'Kode Kegiatan',
             'kode_rekening' => 'Kode Rekening',
             'ppkom' => 'Ppkom',
+            'linksirup' => 'Link Sirup',
             'admin_ppkom' => 'Admin Ppkom',
             'pagu' => 'Pagu Paket',
             'metode_pengadaan' => 'Metode Pengadaan', //EPL,PL,E-Purchasing,
@@ -65,7 +69,9 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         return $this->hasOne(Pegawai::class, ['id_user' => 'created_by'])->cache(self::cachetime(), self::settagdep('tag_pegawai'));
     }
     public function getAttachments() {
-        return $this->hasMany(Attachment::class, ['user_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_attachment'));
+        return $this->hasMany(Attachment::class, ['user_id' => 'id'])
+            ->andWhere(['<>', 'jenis_dokumen', 0])
+            ->cache(self::cachetime(), self::settagdep('tag_attachment'));
     }
     public function getRequiredlampiran() { //array id
         return collect(self::settingType('jenis_dokumen'))->where('param', 'lampiran')->pluck('id')->toArray();
@@ -97,7 +103,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     public function getHistorirejects() {
         return $this->hasMany(HistoriReject::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_historireject'));
     }
-    public function getCtedetails(){//Query
+    public function getCtedetails() { //Query
         return (new Query())
             ->select([
                 'paket_id',
