@@ -36,7 +36,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             'kode_kegiatan' => 'Kode Kegiatan',
             'kode_rekening' => 'Kode Rekening',
             'ppkom' => 'Ppkom',
-            'linksirup' => 'Link Sirup',
+            'linksirup' => 'Link Paket',
             'admin_ppkom' => 'Admin Ppkom',
             'pagu' => 'Pagu Paket',
             'metode_pengadaan' => 'Metode Pengadaan', //EPL,PL,E-Purchasing,

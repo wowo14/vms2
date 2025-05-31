@@ -109,9 +109,9 @@ return [
             'reject' => function ($d) {
                 return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             },
-            'ceklistadmin' => function ($d) {
-                return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
-            },
+            // 'ceklistadmin' => function ($d) {
+            //     return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
+            // },
             // 'printceklistadmin'=>function($d){
             //     return isset($d->paketpengadaan) && !$d->paketpengadaan->pemenang;
             // },
