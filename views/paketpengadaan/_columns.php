@@ -113,7 +113,7 @@ return [
                 ]);
             },
             'kirimulang' => function ($url, $model, $key) {
-                return ($model->alasan_reject && $model->tanggal_reject) ? Html::a('<span class="fa fa-plane"></span>', $url, [
+                return ($model->alasan_reject || $model->tanggal_reject) ? Html::a('<span class="fa fa-plane"></span>', $url, [
                     'title' => Yii::t('yii2-ajaxcrud', 'Kirim Ulang DPP'),
                     'data-pjax' => '0', 'class' => 'btn btn-sm btn-outline-warning'
                 ]) : '';

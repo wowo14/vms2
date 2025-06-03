@@ -1,7 +1,5 @@
 <?php
-
 namespace app\controllers;
-
 use app\models\PenilaianPenyedia;
 use app\models\{Setting, Negosiasi, PenugasanPemilihanpenyedia, Unit, HistoriReject, ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails, PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia};
 use Yii;
@@ -10,7 +8,6 @@ use yii\db\Expression;
 use yii\filters\VerbFilter;
 use yii\helpers\{ArrayHelper, Html};
 use yii\web\{BadRequestHttpException, Response, NotFoundHttpException};
-
 class DppController extends Controller {
     private $_pageSize = 1;
     public function behaviors() {
@@ -299,27 +296,31 @@ class DppController extends Controller {
         if ($request->isGet) {
             return $this->render('_frm_reject', ['model' => $paket]);
         } elseif ($request->isPost) {
-            //update paketpengadaan
-            if ($paket->load($request->post())) {
-                $paket->save();
-                Dpp::invalidatecache('tag_' . Dpp::getModelname());
-                $paket::invalidatecache('tag_' . $paket::getModelname());
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                if ($paket->load($request->post()) && $paket->save()) {
+                    Dpp::invalidatecache('tag_' . Dpp::getModelname());
+                    $paket::invalidatecache('tag_' . $paket::getModelname());
+                } else {
+                    throw new \yii\web\BadRequestHttpException('Gagal menyimpan PaketPengadaan.');
+                }
+                $data = $_POST['PaketPengadaan'];
+                $data['paket_id'] = $data['id'];
+                unset($data['id']);
+                $historyreject = new HistoriReject();
+                $historyreject->attributes = $data;
+                if ($historyreject->tanggal_reject && $historyreject->alasan_reject && $historyreject->save()) {
+                    Dpp::invalidatecache('tag_' . Dpp::getModelname());
+                    $historyreject::invalidatecache('tag_' . $historyreject::getModelname());
+                } else {
+                    throw new \yii\web\BadRequestHttpException('Gagal menyimpan histori reject.');
+                }
+                $transaction->commit();
+                return $this->redirect(['index']);
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                throw $e; // akan dilempar ke error handler Yii
             }
-            //update historireject
-            $data = $_POST['PaketPengadaan'];
-            $data['paket_id'] = $data['id'];
-            unset($data['id']);
-            $historyreject = new HistoriReject();
-            // $historyreject= HistoriReject::where(['paket_id' =>$data['paket_id']])->one()??new HistoriReject();
-            $historyreject->attributes = $data;
-            if ($historyreject->tanggal_reject && $historyreject->alasan_reject) {
-                $historyreject->save();
-                Dpp::invalidatecache('tag_' . Dpp::getModelname());
-                $historyreject::invalidatecache('tag_' . $historyreject::getModelname());
-            } else {
-                throw new BadRequestHttpException('Data Gagal disimpan');
-            }
-            return $this->redirect(['index']);
         }
     }
     public function actionApprove($id) {

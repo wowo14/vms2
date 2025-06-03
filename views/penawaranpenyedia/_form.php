@@ -7,9 +7,11 @@ use yii\helpers\{ArrayHelper, Html};
 use yii\web\View;
 AppAsset::register($this);
 $exist = ArrayHelper::getColumn($model::where(['not', ['paket_id' => null]])->all(), 'paket_id', 'paket_id');
-$paket = collect($model->allpaketpengadaan)->filter(function ($e) use ($exist) {
-    return !in_array($e->id, $exist);
-})->pluck('nomornamapaket', 'id')->toArray();
+$paket = collect($model->allpaketpengadaan)
+// ->filter(function ($e) use ($exist) {
+//     return !in_array($e->id, $exist);
+// })
+->pluck('nomornamapaket', 'id')->toArray();
 if(!$model->isNewRecord){
     $paket= collect($model->allpaketpengadaan)->filter(function ($e) use ($model) {
         return $e->id==$model->paket_id;

@@ -12,6 +12,15 @@ class HelloController extends Controller {
         Yii::error('hello world');
         die;
     }
+    public function actionRemoverejectpaket($id){
+        $pp=PaketPengadaan::findOne($id);
+        $pp->alasan_reject = null;
+        $pp->tanggal_reject = null;
+        $pp->save();
+        Yii::$app->cache->flush();
+        Yii::$app->db->schema->refresh();
+        print_r('sukses delete reject');
+    }
     public function actionDpptgl($nomordpp, $createddate, $updateddate) {
         Dpp::updateAll(['created_at' => $createddate, 'updated_at' => $updateddate], ['nomor_dpp' => $nomordpp]);
         Yii::$app->cache->flush();
