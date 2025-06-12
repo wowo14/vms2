@@ -24,7 +24,7 @@ class CeklistModel extends Model
         return [
             'pejabat' => 'Pejabat Pengadaan',
             'admin'=>'Admin Pengadaan',
-            'linksirup'=>'Link Sirup'
+            'linksirup'=>'Link Paket'
         ];
     }
 }

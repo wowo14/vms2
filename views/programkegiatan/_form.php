@@ -17,6 +17,7 @@ use yii\widgets\ActiveForm;
     ); ?>
     <?= $form->field($model, 'code')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'desc')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'parent')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'type')->widget(Select2::class, [
             'data' => ['program' => 'Program', 'kegiatan' => 'Kegiatan'],
             'options' => ['placeholder' => 'Select type'],

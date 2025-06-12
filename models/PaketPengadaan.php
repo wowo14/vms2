@@ -51,6 +51,10 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             'pemenang' => 'Pemenang', // id vendor pemenang
             'addition' => 'Addition', // kolom tambahan
             'unit' => 'Unit_Bidang_Bagian',
+            'dibatalkan' => 'Dibatalkan Oleh',
+            'alasan_dibatalkan' => 'Alasan Dibatalkan',
+            'berita_acara_pembatalan'=>'Berita Acara Pembatalan',
+            'tanggal_dibatalkan'=>'Tanggal Pembatalan',
         ];
     }
     public function getListpaketoutstanding() {

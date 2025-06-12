@@ -6,7 +6,8 @@ use app\models\KodeRekeningSearch;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use \yii\web\Response;
-use yii\helpers\Html;class CoaController extends Controller {
+use yii\helpers\Html;
+class CoaController extends Controller {
     public function behaviors() {
         return [
             'verbs' => [

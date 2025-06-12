@@ -607,6 +607,20 @@ class PaketpengadaanController extends Controller {
             return $this->redirect('index');
         }
     }
+    public function actionBatalkanpemenang($id) {
+        $model = $this->findModel($id);
+        $request=Yii::$app->request;
+        if($model->load($request->post())){
+            $model->pemenang = null;
+            $model->dibatalkan = Yii::$app->user->identity->id;
+            $model->save(false);
+            Yii::$app->session->setFlash('success', 'PaketPengadaan Berhasil Dibatalkan Pemenang');
+            return $this->redirect('index');
+        }else{
+            //form konfimasi pembatalan pemenang
+            return $this->render('_batalkanpemenang', ['model' => $model]);
+        }
+    }
     public function actionUpdate($id) {
         $request = Yii::$app->request;
         $model = $this->findModel($id);
