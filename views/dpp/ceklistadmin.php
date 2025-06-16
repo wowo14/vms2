@@ -85,7 +85,7 @@ echo '<div class="row">
     <div class="col-md-6">' .
     $form->field($dpp, 'tanggal_dpp')->textInput(['maxlength' => true]) .
     $form->field($mdl, 'tanggal_persetujuan')->textInput(['maxlength' => true]) .
-    $form->field($mdl, 'linksirup')->textInput(['maxlength' => true]) .
+    $form->field($mdl, 'linksirup')->textInput() .
     $form->field($mdl, 'tanggal_tugas')->widget(DatePicker::class, [
         'language' => 'id',
         'pluginOptions' => [
