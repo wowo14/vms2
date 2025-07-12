@@ -9,7 +9,7 @@ class BackupUpload extends Model
     public function rules()
     {
         return [
-            [['backupFile'], 'file', 'skipOnEmpty' => false, 'extensions' => 'sqlite', 'checkExtensionByMimeType' => false],
+            [['backupFile'], 'file', 'skipOnEmpty' => false, 'extensions' => 'sqlite3', 'checkExtensionByMimeType' => false],
         ];
     }
     public function attributeLabels()
