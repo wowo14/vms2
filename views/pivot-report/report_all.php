@@ -9,10 +9,11 @@ if (!empty($filters)) {
 } else {
     $subtitle = 'Tanpa filter, menampilkan semua data';
 }
+print_r($configs);
+
 ?>
 <div class="report-all">
-    <!-- <h3><?= Html::encode($this->title) ?></h3> -->
-    <h5><?= Html::encode($subtitle) ?></h5>
+    <!-- <h5><?= Html::encode($subtitle) ?></h5> -->
     <?php
     $keys = array_keys($reports);
     $lastKey = end($keys);

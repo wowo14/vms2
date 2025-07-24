@@ -34,10 +34,17 @@ $form = ActiveForm::begin([
 echo $form->field($model, 'tahun')->widget(Select2::class, [
     'data' => $years,
 ]);
-echo $form->field($model, 'bulan')->widget(Select2::class, [
+echo $form->field($model, 'bulan_awal')->widget(Select2::class, [
     'data' => $month,
     'pluginOptions' => [
-        'placeholder' => 'Pilih Bulan',
+        'placeholder' => 'Periode Awal',
+        'allowClear' => true
+    ]
+]);
+echo $form->field($model, 'bulan_akhir')->widget(Select2::class, [
+    'data' => $month,
+    'pluginOptions' => [
+        'placeholder' => 'Periode Akhir',
         'allowClear' => true
     ]
 ]);

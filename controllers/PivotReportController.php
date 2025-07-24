@@ -180,7 +180,16 @@ class PivotReportController extends Controller {
             if ($model->tahun) {
                 $query = $query->filter(fn($item) => $item['year'] == $model->tahun);
             }
-            if ($model->bulan && $model->bulan != 0) {
+            // Tambahan filter periode
+            if ($model->bulan_awal && $model->bulan_akhir && $model->bulan_awal != 0 && $model->bulan_akhir != 0) {
+                $awal = (int)$model->bulan_awal;
+                $akhir = (int)$model->bulan_akhir;
+                if ($awal > $akhir) {
+                    // swap jika user input terbalik
+                    [$awal, $akhir] = [$akhir, $awal];
+                }
+                $query = $query->filter(fn($item) => (int)$item['month'] >= $awal && (int)$item['month'] <= $akhir);
+            } else if ($model->bulan && $model->bulan != 0) {
                 $query = $query->filter(fn($item) => $item['month'] == $model->bulan);
             }
             if ($model->kategori && $model->kategori !== 'all') {
