@@ -104,17 +104,29 @@ class PivotReportController extends Controller {
             foreach ($types as $type) {
                 $config = $this->getReportConfig($type);
                 $configs[$type] = $config;
-                // Yii::error('field: ' . $config['rowField']);
-                // Yii::error('label: ' . $config['rowLabel']);
-                $reports[$type] = PivotReportHelper::generatePivotReport(
-                    $data,
-                    $config['rowField'],
-                    $config['rowLabel'],
-                    'month',
-                    (new PaketPengadaan())->months,
-                    null,
-                    $config['sumField'] ?? null
-                );
+                // Jika config punya sumField, gunakan multiSumFields
+                if (isset($config['sumField'])) {
+                    $reports[$type] = PivotReportHelper::generatePivotReport(
+                        $data,
+                        $config['rowField'],
+                        $config['rowLabel'],
+                        'month',
+                        (new PaketPengadaan())->months,
+                        null,
+                        null,
+                        ['hps','hasilnego','efisien']
+                    );
+                } else {
+                    $reports[$type] = PivotReportHelper::generatePivotReport(
+                        $data,
+                        $config['rowField'],
+                        $config['rowLabel'],
+                        'month',
+                        (new PaketPengadaan())->months,
+                        null,
+                        $config['sumField'] ?? null
+                    );
+                }
             }
             // Yii::error($reports);
             if (Yii::$app->request->post('type') === 'pdf') {
