@@ -9,8 +9,6 @@ if (!empty($filters)) {
 } else {
     $subtitle = 'Tanpa filter, menampilkan semua data';
 }
-print_r($configs);
-
 ?>
 <div class="report-all">
     <!-- <h5><?= Html::encode($subtitle) ?></h5> -->
