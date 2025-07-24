@@ -63,7 +63,12 @@ class PivotReportHelper {
                     }
                     // Efisien khusus: jika ada hps dan hasilnego
                     if (in_array('hps', $multiSumFields) && in_array('hasilnego', $multiSumFields)) {
-                        $entry['efisien_'.$colValue] = ($entry['hps_'.$colValue] ?? 0) - ($entry['hasilnego_'.$colValue] ?? 0);
+                        $hasilnego=($entry['hasilnego_'.$colValue] ?? 0);
+                        if($hasilnego>0){
+                            $entry['efisien_'.$colValue] = ($entry['hps_'.$colValue] ?? 0) - $hasilnego;
+                        }else{
+                            $entry['efisien_'.$colValue]=0;
+                        }
                     }
                 }
                 $pivotRows[] = $entry;
