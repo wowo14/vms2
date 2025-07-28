@@ -36,7 +36,7 @@ class PivotReportController extends Controller {
                     $ar = array_filter($model::optionsSettingtype('kategori_pengadaan', ['value', 'id']), function ($key) use ($model) {
                         return strpos($key, $model->kategori) !== false;
                     }, ARRAY_FILTER_USE_KEY);
-                    $filterLabels[] = 'Kategori: '.reset($ar);
+                    $filterLabels[] = 'Kategori: ' . reset($ar);
                 }
             }
             if ($model->metode) {
@@ -45,7 +45,7 @@ class PivotReportController extends Controller {
                     $ar = array_filter($model::optionsSettingtype('metode_pengadaan', ['value', 'id']), function ($key) use ($model) {
                         return strpos($key, $model->metode) !== false;
                     }, ARRAY_FILTER_USE_KEY);
-                    $filterLabels[] = 'Metode: '.reset($ar);
+                    $filterLabels[] = 'Metode: ' . reset($ar);
                 }
             }
             if ($model->pejabat) {
@@ -104,8 +104,9 @@ class PivotReportController extends Controller {
             foreach ($types as $type) {
                 $config = $this->getReportConfig($type);
                 $configs[$type] = $config;
-                // Jika config punya sumField, gunakan multiSumFields
-                if (isset($config['sumField'])) {
+                // Jika config punya sumField, dan multi gunakan multiSumFields
+                if (isset($config['multi'])) {
+                    $multipleSumFields = ['hps', 'hasilnego', 'efisien'];
                     $reports[$type] = PivotReportHelper::generatePivotReport(
                         $data,
                         $config['rowField'],
@@ -114,7 +115,7 @@ class PivotReportController extends Controller {
                         (new PaketPengadaan())->months,
                         null,
                         null,
-                        ['hps','hasilnego','efisien']
+                        $multipleSumFields
                     );
                 } else {
                     $reports[$type] = PivotReportHelper::generatePivotReport(
@@ -129,16 +130,16 @@ class PivotReportController extends Controller {
                 }
             }
             // Yii::error($reports);
+            $viewData = [
+                'reports' => $reports,
+                'configs' => $configs,
+                'months' => (new PaketPengadaan())->months,
+                'year' => $model->tahun,
+                'model' => $model,
+                'filters' => $filters,
+                'filterLabels' => $filterLabels,
+            ];
             if (Yii::$app->request->post('type') === 'pdf') {
-                $viewData = [
-                    'reports' => $reports,
-                    'configs' => $configs,
-                    'months' => (new PaketPengadaan())->months,
-                    'year' => $model->tahun,
-                    'model' => $model,
-                    'filters' => $filters,
-                    'filterLabels' => $filterLabels
-                ];
                 // Generate PDF
                 $pdf = new Pdf([
                     'mode' => Pdf::MODE_UTF8,
@@ -158,15 +159,7 @@ class PivotReportController extends Controller {
                 ]);
                 return $pdf->render();
             }
-            return $this->render('report_all', [
-                'reports' => $reports,
-                'configs' => $configs,
-                'months' => (new PaketPengadaan())->months,
-                'year' => $model->tahun,
-                'model' => $model,
-                'filters' => $filters,
-                'filterLabels' => $filterLabels
-            ]);
+            return $this->render('report_all', $viewData);
         }
         return $this->redirect(['index']);
     }
@@ -240,6 +233,13 @@ class PivotReportController extends Controller {
                 'sumField' => 'hasilnego',
                 'subTitle' => 'Jumlah Kontrak Per Metode'
             ],
+            'metode_total_multiple' => [
+                'rowField' => 'metode_pengadaan',
+                'rowLabel' => 'Metode Pengadaan',
+                'title' => 'Total Kontrak per Metode',
+                'multi' => 'hasilnego',
+                'subTitle' => 'Jumlah Kontrak Per Metode'
+            ],
             'kategori' => [
                 'rowField' => 'kategori_pengadaan',
                 'rowLabel' => 'Kategori Pengadaan',
@@ -251,6 +251,13 @@ class PivotReportController extends Controller {
                 'rowLabel' => 'Kategori Pengadaan',
                 'title' => 'Total Kontrak per Kategori',
                 'sumField' => 'hasilnego',
+                'subTitle' => 'Jumlah Kontrak Per Kategori'
+            ],
+            'kategori_total_multiple' => [
+                'rowField' => 'kategori_pengadaan',
+                'rowLabel' => 'Kategori Pengadaan',
+                'title' => 'Total Kontrak per Kategori',
+                'multi' => 'hasilnego',
                 'subTitle' => 'Jumlah Kontrak Per Kategori'
             ],
             'pejabat' => [
@@ -266,6 +273,13 @@ class PivotReportController extends Controller {
                 'sumField' => 'hasilnego',
                 'subTitle' => 'Jumlah Kontrak Per Pejabat'
             ],
+            'pejabat_total_multiple' => [
+                'rowField' => 'pejabat_pengadaan',
+                'rowLabel' => 'Pejabat Pengadaan',
+                'title' => 'Total Kontrak per Pejabat',
+                'multi' => 'hasilnego',
+                'subTitle' => 'Jumlah Kontrak Per Pejabat'
+            ],
             'admin' => [
                 'rowField' => 'admin_pengadaan',
                 'rowLabel' => 'Admin Pengadaan',
@@ -277,6 +291,13 @@ class PivotReportController extends Controller {
                 'rowLabel' => 'Admin Pengadaan',
                 'title' => '∑ Kontrak per Admin Pengadaan',
                 'sumField' => 'hasilnego',
+                'subTitle' => 'Jumlah Kontrak Per Admin Pengadaan'
+            ],
+            'admin_total_multiple' => [
+                'rowField' => 'admin_pengadaan',
+                'rowLabel' => 'Admin Pengadaan',
+                'title' => '∑ Kontrak per Admin Pengadaan',
+                'multi' => 'hasilnego',
                 'subTitle' => 'Jumlah Kontrak Per Admin Pengadaan'
             ],
             'bidang' => [
@@ -292,6 +313,13 @@ class PivotReportController extends Controller {
                 'sumField' => 'hasilnego',
                 'subTitle' => 'Jumlah Kontrak Per Bidang Bagian'
             ],
+            'bidang_total_multiple' => [
+                'rowField' => 'bidang_bagian',
+                'rowLabel' => 'Bidang Bagian',
+                'title' => '∑ Kontrak per Bidang Bagian',
+                'multi' => 'hasilnego',
+                'subTitle' => 'Jumlah Kontrak Per Bidang Bagian'
+            ],
             'ppkom' => [
                 'rowField' => 'pejabat_ppkom',
                 'rowLabel' => 'PPKOM',
@@ -303,6 +331,13 @@ class PivotReportController extends Controller {
                 'rowLabel' => 'PPKOM',
                 'title' => '∑ Kontrak per PPKOM',
                 'sumField' => 'hasilnego',
+                'subTitle' => 'Jumlah Kontrak Per PPKOM'
+            ],
+            'ppkom_total_multiple' => [
+                'rowField' => 'pejabat_ppkom',
+                'rowLabel' => 'PPKOM',
+                'title' => '∑ Kontrak per PPKOM',
+                'multi' => 'hasilnego',
                 'subTitle' => 'Jumlah Kontrak Per PPKOM'
             ],
         ];

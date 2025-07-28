@@ -14,6 +14,7 @@ class PivotReportHelper {
      * @param array $monthLabels Associative array of month numbers to month names
      * @param string $countField Field to count (or null to count occurrences)
      * @param string $sumField Field to sum (or null for count only reports)
+     * @param array|null $multiSumFields Array of field names to sum for multi-column reports (e.g., ['hps', 'hasilnego'])
      * @return array An array containing 'dataProvider' and 'columnDefinitions'
      */
     public static function generatePivotReport($data, $rowField, $rowLabel, $colField = 'month', $monthLabels = [], $countField = null, $sumField = null, $multiSumFields = null) {
@@ -53,21 +54,22 @@ class PivotReportHelper {
         ksort($allMonths);
         // Create pivot rows
         $pivotRows = [];
+        $columnDefinitions = [];
         // Jika multiSumFields diisi (hanya config dengan sumField), split kolom bulan menjadi multi kolom per bulan
         if ($multiSumFields && is_array($multiSumFields)) {
             foreach ($pivot as $rowValue => $rowData) {
                 $entry = [$rowField => $rowValue];
                 foreach ($allMonths as $colValue) {
                     foreach ($multiSumFields as $field) {
-                        $entry[$field.'_'.$colValue] = isset($rowData[$colValue][$field]) ? $rowData[$colValue][$field] : 0;
+                        $entry[$field . '_' . $colValue] = isset($rowData[$colValue][$field]) ? $rowData[$colValue][$field] : 0;
                     }
                     // Efisien khusus: jika ada hps dan hasilnego
                     if (in_array('hps', $multiSumFields) && in_array('hasilnego', $multiSumFields)) {
-                        $hasilnego=($entry['hasilnego_'.$colValue] ?? 0);
-                        if($hasilnego>0){
-                            $entry['efisien_'.$colValue] = ($entry['hps_'.$colValue] ?? 0) - $hasilnego;
-                        }else{
-                            $entry['efisien_'.$colValue]=0;
+                        $hasilnego = ($entry['hasilnego_' . $colValue] ?? 0);
+                        if ($hasilnego > 0) {
+                            $entry['efisien_' . $colValue] = ($entry['hps_' . $colValue] ?? 0) - $hasilnego;
+                        } else {
+                            $entry['efisien_' . $colValue] = 0;
                         }
                     }
                 }
@@ -87,80 +89,92 @@ class PivotReportHelper {
                     $label = strtoupper($field);
                     if ($field === 'efisien') $label = 'Efisien';
                     $columnDefinitions[] = [
-                        'attribute' => $field.'_'.$colValue,
-                        'label' => $colLabel.' '.$label,
+                        'attribute' => $field . '_' . $colValue,
+                        'label' => $colLabel . ' ' . $label,
                         'format' => 'currency',
                         'contentOptions' => ['class' => 'text-right'],
                         'headerOptions' => ['class' => 'text-right'],
                         'footerOptions' => ['class' => 'text-right'],
                         'value' => function ($model) use ($field, $colValue) {
-                            return $model[$field.'_'.$colValue] ?? 0;
+                            return $model[$field . '_' . $colValue] ?? 0;
                         },
-                        'footer' => function($models) use ($field, $colValue) {
-                            return array_sum(array_column($models, $field.'_'.$colValue));
+                        'footer' => function ($models) use ($field, $colValue) {
+                            return array_sum(array_column($models, $field . '_' . $colValue));
                         }
                     ];
                 }
                 // Efisien kolom
                 if (in_array('hps', $multiSumFields) && in_array('hasilnego', $multiSumFields)) {
                     $columnDefinitions[] = [
-                        'attribute' => 'efisien_'.$colValue,
-                        'label' => (isset($monthLabels[$colValue]) ? $monthLabels[$colValue] : $colValue).' Efisien',
+                        'attribute' => 'efisien_' . $colValue,
+                        'label' => (isset($monthLabels[$colValue]) ? $monthLabels[$colValue] : $colValue) . ' Efisien',
                         'format' => 'currency',
                         'contentOptions' => ['class' => 'text-right'],
                         'headerOptions' => ['class' => 'text-right'],
                         'footerOptions' => ['class' => 'text-right'],
                         'value' => function ($model) use ($colValue) {
-                            return $model['efisien_'.$colValue] ?? 0;
+                            return $model['efisien_' . $colValue] ?? 0;
                         },
-                        'footer' => function($models) use ($colValue) {
-                            return array_sum(array_column($models, 'efisien_'.$colValue));
+                        'footer' => function ($models) use ($colValue) {
+                            return array_sum(array_column($models, 'efisien_' . $colValue));
                         }
                     ];
                 }
             }
         } else {
-            $totalField = $sumField ? 'total_sum' : 'total_count';
+            // Ini adalah bagian yang dikoreksi
+            // Jika multiSumFields null atau tidak array, maka buat pivot dengan 1 kolom data (sum atau count)
             foreach ($pivot as $rowValue => $rowData) {
                 $entry = [$rowField => $rowValue];
-                foreach ($columns as $colValue) {
+                // Inisialisasi total untuk baris ini
+                $rowTotal = 0;
+                foreach ($allMonths as $colValue) { // Menggunakan $allMonths untuk memastikan semua bulan ada
                     if ($sumField) {
-                        $entry[$colValue] = $rowData[$colValue]['sum'] ?? 0;
+                        $value = $rowData[$colValue]['sum'] ?? 0;
                     } else {
-                        $entry[$colValue] = $rowData[$colValue]['count'] ?? 0;
+                        $value = $rowData[$colValue]['count'] ?? 0;
                     }
+                    $entry[$colValue] = $value; // Tetap simpan per bulan untuk perhitungan total baris
+                    $rowTotal += $value;
                 }
+                $entry['total_data'] = $rowTotal; // Menambahkan kolom total data untuk baris ini
                 $pivotRows[] = $entry;
             }
-            // Calculate row totals
-            foreach ($pivotRows as &$row) {
-                $row[$totalField] = 0;
-                foreach ($columns as $colValue) {
-                    $row[$totalField] += $row[$colValue] ?? 0;
-                }
-            }
-            unset($row);
             // Build column definitions
-            $columnDefinitions = array_merge(
+            $columnDefinitions = [
                 [
-                    [
-                        'attribute' => $rowField,
-                        'label' => $rowLabel,
-                        'footer' => 'Total',
-                    ]
-                ],
-                array_map(function ($colValue) use ($monthLabels, $sumField) {
-                    $colLabel = isset($monthLabels[$colValue]) ? $monthLabels[$colValue] : $colValue;
-                    return [
-                        'attribute' => $colValue,
-                        'label' => $colLabel,
-                        'format' => $sumField ? 'currency' : 'raw',
-                        'contentOptions' => $sumField ? ['class' => 'text-right'] : [],
-                        'headerOptions' => $sumField ? ['class' => 'text-right'] : [],
-                        'footerOptions' => $sumField ? ['class' => 'text-right'] : [],
-                    ];
-                }, array_keys($columns))
-            );
+                    'attribute' => $rowField,
+                    'label' => $rowLabel,
+                    'footer' => 'Total',
+                ]
+            ];
+            // Tambahkan kolom untuk setiap bulan yang ada
+            foreach ($allMonths as $colValue) {
+                $colLabel = isset($monthLabels[$colValue]) ? $monthLabels[$colValue] : $colValue;
+                $columnDefinitions[] = [
+                    'attribute' => $colValue,
+                    'label' => $colLabel,
+                    'format' => $sumField ? 'currency' : 'raw',
+                    'contentOptions' => ['class' => 'text-right'],
+                    'headerOptions' => ['class' => 'text-right'],
+                    'footerOptions' => ['class' => 'text-right'],
+                    'footer' => function ($models) use ($colValue) {
+                        return array_sum(array_column($models, $colValue));
+                    }
+                ];
+            }
+            // Tambahkan kolom total di akhir
+            $columnDefinitions[] = [
+                'attribute' => 'total_data',
+                'label' => 'Total',
+                'format' => $sumField ? 'currency' : 'raw',
+                'contentOptions' => ['class' => 'text-right'],
+                'headerOptions' => ['class' => 'text-right'],
+                'footerOptions' => ['class' => 'text-right'],
+                'footer' => function ($models) {
+                    return array_sum(array_column($models, 'total_data'));
+                }
+            ];
         }
         return [
             'dataProvider' => new ArrayDataProvider([
@@ -189,7 +203,8 @@ class PivotReportHelper {
                 $config['colField'] ?? 'month',
                 $config['monthLabels'] ?? [],
                 $config['countField'] ?? null,
-                $config['sumField'] ?? null
+                $config['sumField'] ?? null,
+                $config['multiSumFields'] ?? null // Pastikan multiSumFields juga diteruskan
             );
         }
         return $reports;
