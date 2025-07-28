@@ -1,43 +1,64 @@
 <?php
 use yii\helpers\Html;
 $bulan = '';
-if (
-    isset($model->bulan_awal) && isset($model->bulan_akhir)
-    && $model->bulan_awal && $model->bulan_akhir
-    && $model->bulan_awal != $model->bulan_akhir
-) {
+$bulanRange = [];
+// Menentukan bulanRange dan label bulan
+if (isset($model->bulan_awal) && isset($model->bulan_akhir) && $model->bulan_awal && $model->bulan_akhir) {
     $awal = (int)$model->bulan_awal;
     $akhir = (int)$model->bulan_akhir;
-    if ($awal > $akhir) [$awal, $akhir] = [$akhir, $awal];
+    // Pastikan awal tidak lebih besar dari akhir, jika ya, tukar
+    if ($awal > $akhir) {
+        [$awal, $akhir] = [$akhir, $awal];
+    }
     $bulanRange = array_slice($months, $awal - 1, $akhir - $awal + 1, true);
-    $bulan = $months[$model->bulan_awal] . ' s/d ' . $months[$model->bulan_akhir];
-} elseif ($model->bulan_awal == $model->bulan_akhir) {
-    $model->bulan = $model->bulan_awal;
-    $bulanRange = [$model->bulan => $months[$model->bulan]];
-    $bulan = $months[$model->bulan_awal];
+    if ($awal == $akhir) {
+        $bulan = $months[$model->bulan_awal];
+    } else {
+        $bulan = $months[$awal] . ' s/d ' . $months[$akhir];
+    }
 }
+// Persiapan data laporan
 $pivotData = $report['pivotData'];
 $rowField = $keys['rowField'];
-$rows = array_unique(array_column($pivotData, $rowField));
-$isMultiSum = isset($keys['multi']);
-$issumfiled = isset($keys['sumField']);
-echo '<h3 style="text-align:center">' . $keys['subTitle'] . ' Periode ' . $bulan . ' Tahun ' . $year . '</h3>';
+$rowLabel = $keys['rowLabel']; // Ambil rowLabel dari $keys jika sudah ada
+$isMultiSum = isset($keys['multi']); // Asumsi 'multi' mengindikasikan multiSumFields
+$issumfiled = isset($keys['sumField']); // Asumsi 'sumField' mengindikasikan perlu format currency
+// Fungsi pembantu untuk format currency atau tidak
+$formatValue = function ($value) use ($issumfiled) {
+    return $issumfiled ? Yii::$app->formatter->asCurrency($value) : $value;
+};
+// Hitung total kolom untuk footer di awal (lebih efisien)
+$totalHpsBulan = [];
+$totalNegoBulan = [];
+$totalEfisienBulan = [];
+$totalPerBulanSingle = [];
+if ($isMultiSum) {
+    foreach ($bulanRange as $bulanNum => $bulanLabel) {
+        $totalHpsBulan[$bulanNum] = array_sum(array_column($pivotData, 'hps_' . $bulanNum));
+        $totalNegoBulan[$bulanNum] = array_sum(array_column($pivotData, 'hasilnego_' . $bulanNum));
+        $totalEfisienBulan[$bulanNum] = array_sum(array_column($pivotData, 'efisien_' . $bulanNum));
+    }
+} else {
+    foreach ($bulanRange as $bulanNum => $bulanLabel) {
+        $totalPerBulanSingle[$bulanNum] = array_sum(array_column($pivotData, $bulanNum));
+    }
+}
+// Hitung grand totals
+$grandHps = array_sum($totalHpsBulan);
+$grandNego = array_sum($totalNegoBulan);
+$grandEfisien = array_sum($totalEfisienBulan);
+$grandTotalSingle = array_sum($totalPerBulanSingle);
+// --- Bagian Tampilan (HTML & PHP Campuran) ---
 ?>
+<h3 style="text-align:center"><?= Html::encode($keys['subTitle']) ?> Periode <?= Html::encode($bulan) ?> Tahun <?= Html::encode($year) ?></h3>
 <table class="table table-bordered table-striped table-hover">
     <thead>
         <tr class="table-primary">
             <th rowspan="<?= $isMultiSum ? 2 : 1 ?>"><?= Html::encode($rowLabel) ?></th>
-            <?php if ($isMultiSum): ?>
-                <?php foreach ($bulanRange as $bulanLabel): ?>
-                    <th colspan="3" class="text-center"><?= Html::encode($bulanLabel) ?></th>
-                <?php endforeach; ?>
-                <th colspan="3" class="text-center">Jumlah</th>
-            <?php else: ?>
-                <?php foreach ($bulanRange as $bulanLabel): ?>
-                    <th class="text-center"><?= Html::encode($bulanLabel) ?></th>
-                <?php endforeach; ?>
-                <th class="text-center">Jumlah</th>
-            <?php endif; ?>
+            <?php foreach ($bulanRange as $bulanLabel): ?>
+                <th colspan="<?= $isMultiSum ? 3 : 1 ?>" class="text-center"><?= Html::encode($bulanLabel) ?></th>
+            <?php endforeach; ?>
+            <th colspan="<?= $isMultiSum ? 3 : 1 ?>" class="text-center">Jumlah</th>
         </tr>
         <?php if ($isMultiSum): ?>
             <tr class="table-primary">
@@ -58,78 +79,50 @@ echo '<h3 style="text-align:center">' . $keys['subTitle'] . ' Periode ' . $bulan
                 <td><?= Html::encode($row[$rowField]) ?></td>
                 <?php
                 if ($isMultiSum) {
-                    $totalHps = $totalNego = $totalEfisien = 0;
+                    $rowTotalHps = $rowTotalNego = $rowTotalEfisien = 0;
                     foreach ($bulanRange as $bulanNum => $bulanLabel) {
                         $hps = $row['hps_' . $bulanNum] ?? 0;
                         $nego = $row['hasilnego_' . $bulanNum] ?? 0;
                         $efisien = $row['efisien_' . $bulanNum] ?? 0;
-                        $totalHps += $hps;
-                        $totalNego += $nego;
-                        $totalEfisien += $efisien;
+                        $rowTotalHps += $hps;
+                        $rowTotalNego += $nego;
+                        $rowTotalEfisien += $efisien;
                         echo '<td class="text-right">' . Yii::$app->formatter->asCurrency($hps) . '</td>';
                         echo '<td class="text-right">' . Yii::$app->formatter->asCurrency($nego) . '</td>';
                         echo '<td class="text-right">' . Yii::$app->formatter->asCurrency($efisien) . '</td>';
                     }
-                    echo '<td class="text-right"><strong>' . Yii::$app->formatter->asCurrency($totalHps) . '</strong></td>';
-                    echo '<td class="text-right"><strong>' . Yii::$app->formatter->asCurrency($totalNego) . '</strong></td>';
-                    echo '<td class="text-right"><strong>' . Yii::$app->formatter->asCurrency($totalEfisien) . '</strong></td>';
+                    echo '<td class="text-right"><strong>' . Yii::$app->formatter->asCurrency($rowTotalHps) . '</strong></td>';
+                    echo '<td class="text-right"><strong>' . Yii::$app->formatter->asCurrency($rowTotalNego) . '</strong></td>';
+                    echo '<td class="text-right"><strong>' . Yii::$app->formatter->asCurrency($rowTotalEfisien) . '</strong></td>';
                 } else {
-                    $total = 0;
                     foreach ($bulanRange as $bulanNum => $bulanLabel) {
                         $val = $row[$bulanNum] ?? 0;
-                        $formatedval = !$issumfiled ? $val : Yii::$app->formatter->asCurrency($val);
-                        echo '<td class="text-right">' . $formatedval . '</td>';
+                        echo '<td class="text-right">' . $formatValue($val) . '</td>';
                     }
-                    $totaldata = !$issumfiled ? $row['total_data'] : Yii::$app->formatter->asCurrency($row['total_data']);
-                    echo '<td class="text-right"><strong>' . $totaldata . '</strong></td>';
+                    echo '<td class="text-right"><strong>' . $formatValue($row['total_data'] ?? 0) . '</strong></td>';
                 }
                 ?>
             </tr>
         <?php endforeach; ?>
     </tbody>
     <tfoot>
-        <?php if ($isMultiSum): ?>
-            <tr class="table-secondary">
-                <th>Total</th>
-                <?php
-                $totalHps = $totalNego = $totalEfisien = [];
-                foreach ($bulanRange as $bulanNum => $bulanLabel) {
-                    $totalHps[$bulanNum] = $totalNego[$bulanNum] = $totalEfisien[$bulanNum] = 0;
-                    foreach ($pivotData as $row) {
-                        $totalHps[$bulanNum] += $row['hps_' . $bulanNum] ?? 0;
-                        $totalNego[$bulanNum] += $row['hasilnego_' . $bulanNum] ?? 0;
-                        $totalEfisien[$bulanNum] += $row['efisien_' . $bulanNum] ?? 0;
-                    }
-                    echo '<th class="text-right">' . Yii::$app->formatter->asCurrency($totalHps[$bulanNum]) . '</th>';
-                    echo '<th class="text-right">' . Yii::$app->formatter->asCurrency($totalNego[$bulanNum]) . '</th>';
-                    echo '<th class="text-right">' . Yii::$app->formatter->asCurrency($totalEfisien[$bulanNum]) . '</th>';
-                }
-                $grandHps = array_sum($totalHps);
-                $grandNego = array_sum($totalNego);
-                $grandEfisien = array_sum($totalEfisien);
-                echo '<th class="text-right"><strong>' . Yii::$app->formatter->asCurrency($grandHps) . '</strong></th>';
-                echo '<th class="text-right"><strong>' . Yii::$app->formatter->asCurrency($grandNego) . '</strong></th>';
-                echo '<th class="text-right"><strong>' . Yii::$app->formatter->asCurrency($grandEfisien) . '</strong></th>';
-                ?>
-            </tr>
-        <?php else: ?>
-            <tr class="table-secondary">
-                <th>Total</th>
-                <?php
-                $totalPerBulan = [];
-                foreach ($bulanRange as $bulanNum => $bulanLabel) {
-                    $totalPerBulan[$bulanNum] = 0;
-                    foreach ($pivotData as $row) {
-                        $totalPerBulan[$bulanNum] += $row[$bulanNum] ?? 0;
-                    }
-                    $totalbulan = !$issumfiled ? $totalPerBulan[$bulanNum] : Yii::$app->formatter->asCurrency($totalPerBulan[$bulanNum]);
-                    echo '<th class="text-right">' . $totalbulan . '</th>';
-                }
-                $grandTotal = array_sum($totalPerBulan);
-                $gt = !$issumfiled ? $grandTotal : Yii::$app->formatter->asCurrency($grandTotal);
-                echo '<th class="text-right"><strong>' . $gt . '</strong></th>';
-                ?>
-            </tr>
-        <?php endif; ?>
+        <tr class="table-secondary">
+            <th>Total</th>
+            <?php if ($isMultiSum): ?>
+                <?php foreach ($bulanRange as $bulanNum => $bulanLabel): ?>
+                    <th class="text-right"><?= Yii::$app->formatter->asCurrency($totalHpsBulan[$bulanNum]) ?></th>
+                    <th class="text-right"><?= Yii::$app->formatter->asCurrency($totalNegoBulan[$bulanNum]) ?></th>
+                    <th class="text-right"><?= Yii::$app->formatter->asCurrency($totalEfisienBulan[$bulanNum]) ?></th>
+                <?php endforeach; ?>
+                <th class="text-right"><strong><?= Yii::$app->formatter->asCurrency($grandHps) ?></strong></th>
+                <th class="text-right"><strong><?= Yii::$app->formatter->asCurrency($grandNego) ?></strong></th>
+                <th class="text-right"><strong><?= Yii::$app->formatter->asCurrency($grandEfisien) ?></strong></th>
+            <?php else: ?>
+                <?php foreach ($bulanRange as $bulanNum => $bulanLabel): ?>
+                    <th class="text-right"><?= $formatValue($totalPerBulanSingle[$bulanNum]) ?></th>
+                <?php endforeach; ?>
+                <th class="text-right"><strong><?= $formatValue($grandTotalSingle) ?></strong></th>
+            <?php endif; ?>
+        </tr>
     </tfoot>
 </table>
