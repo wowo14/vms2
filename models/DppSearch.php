@@ -22,6 +22,9 @@ class DppSearch extends Dpp{
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
+            'pagination' => [
+                'pageSize' => 10, // Set to 10 records per page
+            ],
         ]);
         $this->load($params);
         if (!$this->validate()) {

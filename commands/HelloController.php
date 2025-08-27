@@ -9,7 +9,14 @@ use yii\db\Expression;
 class HelloController extends Controller {
     public function actionIndex() {
         echo "\n";
-        Yii::error('hello world');
+        // Yii::error('hello world');
+        $r= Dpp::where(['is', 'pp.pemenang', null])
+            ->joinWith(['paketpengadaan pp'])
+            ->andWhere(['pp.tahun_anggaran' => date('Y')])
+            ->select(['pejabat_pengadaan','admin_pengadaan','pp.pemenang'])
+            ->where(['pejabat_pengadaan' => 24])
+            ->asArray()->all();
+            print_r($r);
         die;
     }
     public function actionRemoverejectpaket($id){
