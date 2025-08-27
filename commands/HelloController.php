@@ -10,11 +10,12 @@ class HelloController extends Controller {
     public function actionIndex() {
         echo "\n";
         // Yii::error('hello world');
-        $r= Dpp::where(['is', 'pp.pemenang', null])
-            ->joinWith(['paketpengadaan pp'])
+        $r= Dpp::find()
+        ->joinWith(['paketpengadaan pp'])
+        ->select(['tahun_anggaran','tanggal_paket','pejabat_pengadaan','admin_pengadaan','pp.pemenang'])
+        ->where(['is', 'pp.pemenang', null])
             ->andWhere(['pp.tahun_anggaran' => date('Y')])
-            ->select(['pejabat_pengadaan','admin_pengadaan','pp.pemenang'])
-            ->where(['pejabat_pengadaan' => 24])
+            // ->andWhere(['pejabat_pengadaan' => 40])
             ->asArray()->all();
             print_r($r);
         die;

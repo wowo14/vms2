@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
 use Yii;
+use yii\db\Expression;
 class Dpp extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
     public static function tableName() {
@@ -79,12 +80,17 @@ class Dpp extends \yii\db\ActiveRecord {
         return $this->hasOne(PenugasanPemilihanpenyedia::class, ['dpp_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_penugasanpemilihanpenyedia'));
     }
     private function getAllnonpemenang() {
-        return Dpp::where(['is', 'pp.pemenang', null])
-            ->joinWith(['paketpengadaan pp'])->asArray()->all();
+        return Dpp::where(['pp.pemenang' => null])
+        ->joinWith(['paketpengadaan pp'])
+        ->andWhere(['pp.tahun_anggaran' => new Expression("strftime('%Y', 'now')")])
+        ->andWhere(['pp.alasan_reject' => ''])
+        ->asArray()
+        ->all();
     }
     public function countPejabatWithNullPemenang($idpejabat) {
         if ($idpejabat == null) return '';
-        $countpp = collect($this->getAllnonpemenang())->pluck('pejabat_pengadaan')->countBy();
+        $countpp = collect($this->getAllnonpemenang())
+        ->pluck('pejabat_pengadaan')->countBy();
         if (!isset($countpp[$idpejabat])) return '';
         if ($countpp[$idpejabat] !== '') {
             return ' (' . $countpp[$idpejabat] . ')';
