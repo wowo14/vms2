@@ -314,6 +314,8 @@ class PaketpengadaanController extends Controller {
         }
     }
     public function actionNegoproduk($id) {
+        $id = Yii::$app->hashids->decode($id);
+        if (!$id) throw new NotFoundHttpException("Invalid ID");
         $paketdetails = PaketPengadaanDetails::findOne(['id' => $id]);
         $request = Yii::$app->request;
         $referrer = $request->referrer;
@@ -420,6 +422,8 @@ class PaketpengadaanController extends Controller {
     }
     public function actionPostpenawaran($id) {
         $request = Yii::$app->request;
+        $id = Yii::$app->hashids->decode($id);
+        if (!$id) throw new NotFoundHttpException("Invalid ID");
         $paketdetails = PaketPengadaanDetails::findOne($id);
         if (!$paketdetails) {
             throw new NotFoundHttpException('Data tidak ditemukan.');
@@ -508,6 +512,8 @@ class PaketpengadaanController extends Controller {
     }
     public function actionCeklistadmin($id) {
         $request = Yii::$app->request;
+        $id = Yii::$app->hashids->decode($id);
+        if (!$id) throw new NotFoundHttpException("Invalid ID");
         $title = "Kelengkapan DPP";
         $model = PaketPengadaan::find()->cache(false)->where(['id' => $id])->one();
         if ($request->isGet) {
@@ -743,6 +749,8 @@ class PaketpengadaanController extends Controller {
         }
     }
     protected function findModel($id) {
+        $id = Yii::$app->hashids->decode($id);
+        if (!$id) throw new NotFoundHttpException("Invalid ID");
         if (($model = PaketPengadaan::findOne($id)) !== null) {
             return $model;
         } else {

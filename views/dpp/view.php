@@ -1,6 +1,4 @@
 <?php
-
-use app\models\PaketPengadaan;
 use yii\bootstrap4\Tabs;
 use yii\widgets\DetailView;
 ?>
@@ -30,7 +28,7 @@ echo Tabs::widget([
         ],
         [
             'label' => 'Paket Pengadaan',
-            'content' => $this->render('/paketpengadaan/view', ['model' => PaketPengadaan::findOne($model->paket_id)]),
+            'content' => $this->render('/paketpengadaan/view', ['model' => $model->paketpengadaan]),
             'options' => ['id' => 'paketview' . $model->hash],
         ]
     ],

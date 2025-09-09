@@ -85,7 +85,8 @@ return [
             },
         ],
         'urlCreator' => function ($action, $model, $key, $index) {
-            return Url::to([$action, 'id' => $key]);
+            $encodedId = Yii::$app->hashids->encode($key);
+            return Url::to([$action, 'id' => $encodedId]);
         },
         'buttons' => [
             'ceklistadmin' => function ($url, $model, $key) {

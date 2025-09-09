@@ -125,6 +125,9 @@ $config = [
         'regions' => [
             'class' => 'app\widgets\Apiregion'
         ],
+        'hashids' => [
+            'class' => 'app\helpers\HashidsHelper',
+        ],
         'formatter' => [
             'class' => 'yii\i18n\Formatter',
             'nullDisplay' => '',
