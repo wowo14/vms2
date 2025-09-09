@@ -121,6 +121,7 @@ class PaketpengadaanController extends Controller {
         $request = Yii::$app->request;
         $pks = explode(',', $request->post('pks'));
         foreach ($pks as $pk) {
+            $pk=Yii::$app->hashids->encode($pk);
             $model = $this->findModel($pk);
             $jenisdokumen = Attachment::collectAll(['user_id' => $model->id])->pluck('jenis_dokumen')->toArray();
             sort($jenisdokumen);
@@ -718,6 +719,7 @@ class PaketpengadaanController extends Controller {
         $request = Yii::$app->request;
         $pks = explode(',', $request->post('pks'));
         foreach ($pks as $pk) {
+            $pk = Yii::$app->hashids->encode($pk);
             $model = $this->findModel($pk);
             if ($model->pemenang) {
                 Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada pemenang');
