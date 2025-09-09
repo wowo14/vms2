@@ -14,8 +14,8 @@ class PenawaranPengadaan extends \yii\db\ActiveRecord
         return [
             [['paket_id', 'penyedia_id', 'tanggal_mendaftar', 'masa_berlaku'], 'required'],
             [['paket_id', 'penyedia_id', 'penilaian', 'created_by', 'created_at', 'updated_by', 'updated_at'], 'integer'],
-            [['tanggal_mendaftar'], 'safe'],
-            [['lampiran_penawaran','nilai_penawaran', 'lampiran_penawaran_harga'], 'string'],
+            [['nilai_penawaran','tanggal_mendaftar'], 'safe'],
+            [['lampiran_penawaran', 'lampiran_penawaran_harga'], 'string'],
             [['nomor', 'kode'], 'string', 'max' => 50],
             [['ip_client', 'masa_berlaku'], 'string', 'max' => 255],
         ];

@@ -56,7 +56,7 @@ jQuery(function ($) {
         ],
     ]) ?>
     <?= $form->field($model, 'masa_berlaku')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'nilai_penawaran')->textInput(['maxlength' => true, 'type' => 'number']) ?>
+    <?= $form->field($model, 'nilai_penawaran')->textInput(['maxlength' => true, 'type' => 'number','step' => '0.01']) ?>
     <?= $form->field($model, 'lampiran_penawaran')->hiddenInput(['id' => 'lampiran_penawaran'])->label(false) ?>
     <div class="form-group ">
         <div class="row">
