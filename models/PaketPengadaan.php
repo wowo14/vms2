@@ -1,11 +1,8 @@
 <?php
-
 namespace app\models;
-
 use Yii;
 use yii\db\Query;
 use yii\db\Expression;
-
 class PaketPengadaan extends \yii\db\ActiveRecord {
     use GeneralModelsTrait;
     // public $oldrecord;
@@ -111,9 +108,9 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         return (new Query())
             ->select([
                 'paket_id',
-                'hps'       => new Expression('SUM(qty * volume * hps_satuan)'),
-                'penawaran' => new Expression('SUM(qty * volume * penawaran)'),
-                'hasilnego' => new Expression('SUM(qty * volume * negosiasi)'),
+                'hps'       => new Expression('ROUND(SUM(qty * volume * hps_satuan), 2)'),
+                'penawaran' => new Expression('ROUND(SUM(qty * volume * penawaran), 2)'),
+                'hasilnego' => new Expression('ROUND(SUM(qty * volume * negosiasi), 2)'),
             ])
             ->from(PaketPengadaanDetails::tableName())
             ->groupBy('paket_id');
@@ -229,10 +226,10 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         Dpp::invalidatecache('tag_' . Dpp::getModelname());
         return parent::beforeSave($insert);
     }
-    public function getrawData() {
+    public function getrawData($tahun = null) {
         $rawSettingkategori = collect(Setting::where(['type' => 'kategori_pengadaan'])->all())->pluck('id', 'value')->toArray();
         $rawSettingmetode = collect(Setting::where(['type' => 'metode_pengadaan'])->all())->pluck('id', 'value')->toArray();
-        return collect(self::where(['not', ['pp.id' => null]])
+        $query = self::where(['not', ['pp.id' => null]])
             ->alias('pp')
             ->joinWith([
                 'dpp d',
@@ -278,9 +275,13 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
                 ['pp.alasan_reject' => ''],
             ])
             ->groupBy('pp.id')
-            ->orderBy('pp.id')
-            ->asArray()
-            ->all())->map(function ($e) use ($rawSettingkategori, $rawSettingmetode) {
+            ->orderBy('pp.id');
+        if ($tahun) {
+            $query->andWhere(['year' => $tahun]);
+        }
+        $query->asArray();
+        $data = $query->all();
+        return collect($data)->map(function ($e) use ($rawSettingkategori, $rawSettingmetode) {
             // $e['metode_pengadaan']=$e['metode_pengadaan']=== 'E-Purchasing'? 'E-Katalog': $e['metode_pengadaan'];
             $e['metode_pengadaan_id'] = $rawSettingmetode[$e['metode_pengadaan']];
             $e['kategori_pengadaan_id'] = $rawSettingkategori[$e['kategori_pengadaan']];
@@ -411,8 +412,19 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             ->sortBy('bulan')
             ->values();
     }
+    public function getExistingYears() {
+        $query = PaketPengadaan::find()->cache(10)
+            ->select([
+                new Expression("strftime('%Y', paket_pengadaan.tanggal_paket) as year"),
+            ])
+            ->distinct()
+            ->asArray()
+            ->all();
+        return collect($query);
+    }
     public function getFilteredData($filters = null) { //collection all rekap
-        $data = $this->getrawData();
+        $filters=$filters??collect([]);
+        $data = $this->getrawData($filters->get('year'));
         if ($filters && $filters->isNotEmpty()) {
             $data = $data->filter(function ($item) use ($filters) {
                 foreach ($filters as $key => $value) {

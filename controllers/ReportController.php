@@ -106,7 +106,7 @@ class ReportController extends Controller {
             return $this->render('index', [
                 'action' => \yii\helpers\Url::to(['report/index']),
                 'model' => $model,
-                'raw' => $paketpengadaan->getrawData(),
+                'raw' => $paketpengadaan->getExistingYears(),
                 'paketpengadaan' => $paketpengadaan
             ]);
         } else if ($model->load($request->post())) {
@@ -226,7 +226,7 @@ class ReportController extends Controller {
             return $this->render('index', [
                 'action' => \yii\helpers\Url::to(['report/dppmasuk']),
                 'model' => $model,
-                'raw' => $paketpengadaan->getrawData(),
+                'raw' => $paketpengadaan->getExistingYears(),
                 'paketpengadaan' => $paketpengadaan
             ]);
         } else if ($model->load($request->post())) {

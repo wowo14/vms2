@@ -8,17 +8,15 @@ use yii\console\Controller;
 use yii\db\Expression;
 class HelloController extends Controller {
     public function actionIndex() {
-        echo "\n";
-        // Yii::error('hello world');
-        $r= Dpp::find()
-        ->joinWith(['paketpengadaan pp'])
-        ->select(['tahun_anggaran','tanggal_paket','pejabat_pengadaan','admin_pengadaan','pp.pemenang'])
-        ->where(['is', 'pp.pemenang', null])
-            ->andWhere(['pp.tahun_anggaran' => date('Y')])
-            // ->andWhere(['pejabat_pengadaan' => 40])
-            ->asArray()->all();
-            print_r($r);
-        die;
+       print_r('hello world');
+       $query=PaketPengadaan::find()->cache(10)
+            ->select([
+                new Expression("strftime('%Y', paket_pengadaan.tanggal_paket) as year"),
+            ])
+            ->distinct()
+            ->asArray()
+            ->all();
+        print_r(collect($query)->pluck('year','year')->toArray());
     }
     public function actionRemoverejectpaket($id){
         $pp=PaketPengadaan::findOne($id);

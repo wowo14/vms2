@@ -180,7 +180,9 @@ class PivotReportController extends Controller {
         return $years;
     }
     private function getRawData(ReportModel $model = null) {
-        $query = collect((new PaketPengadaan)->rawData);
+        $query = collect(
+            (new PaketPengadaan)->getRawData($model['tahun'] ?? null)
+        );
         if ($model) {
             if ($model->tahun) {
                 $query = $query->filter(fn($item) => $item['year'] == $model->tahun);
