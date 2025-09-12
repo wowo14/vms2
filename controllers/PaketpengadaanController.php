@@ -163,7 +163,8 @@ class PaketpengadaanController extends Controller {
     }
     public function actionDetails() {
         if (isset($_POST['expandRowKey'])) {
-            $model = $this->findModel($_POST['expandRowKey']);
+            $id=Yii::$app->hashids->encode($_POST['expandRowKey']);
+            $model = $this->findModel($id);
             $query = PaketPengadaanDetails::where(['paket_id' => $model->id]);
             $model = new ActiveDataProvider([
                 'query' => $query,
