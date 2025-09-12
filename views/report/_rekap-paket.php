@@ -1,36 +1,38 @@
 <?php
+
 use kartik\grid\GridView;
-$this->title=$title;
+
+$this->title = $title;
 $columns = [
-    ['class'=>'kartik\grid\SerialColumn','header'=>'No'],
+    ['class' => 'kartik\grid\SerialColumn', 'header' => 'No'],
     'nama_paket',
     'metode',
     'kategori',
     [
-        'attribute'=>'pagu',
-        'format'=>['decimal',0],
-        'hAlign'=>'right',
-        'pageSummary'=>true,
+        'attribute' => 'pagu',
+        'format' => ['decimal', 2],
+        'hAlign' => 'right',
+        'pageSummary' => true,
     ],
     [
-        'attribute'=>'hps',
-        'label'=>'HPS',
-        'format'=>['decimal',0],
-        'hAlign'=>'right',
-        'pageSummary'=>true,
+        'attribute' => 'hps',
+        'label' => 'HPS',
+        'format' => ['decimal', 2],
+        'hAlign' => 'right',
+        'pageSummary' => true,
     ],
     [
-        'attribute'=>'penawaran',
-        'format'=>['decimal',0],
-        'hAlign'=>'right',
-        'pageSummary'=>true,
+        'attribute' => 'penawaran',
+        'format' => ['decimal', 2],
+        'hAlign' => 'right',
+        'pageSummary' => true,
     ],
     [
-        'attribute'=>'hasilnego',
-        'label'=>'Hasil Nego',
-        'format'=>['decimal',0],
-        'hAlign'=>'right',
-        'pageSummary'=>true,
+        'attribute' => 'hasilnego',
+        'label' => 'Hasil Nego',
+        'format' => ['decimal', 2],
+        'hAlign' => 'right',
+        'pageSummary' => true,
     ],
     'pejabat',
     'admin',
@@ -64,12 +66,12 @@ echo GridView::widget([
         'txt' => ['filename' => str_replace(' ', '', $this->title)],
         'xls' => ['filename' => str_replace(' ', '', $this->title)],
         'pdf' => [
-            'filename' => str_replace(' ', '', $this->title).'_'.time(),
+            'filename' => str_replace(' ', '', $this->title) . '_' . time(),
             'config' => [
                 'methods' => [
                     'SetTitle' => $this->title,
                     'SetSubject' => 'Rekap Pengadaan',
-                    'SetHeader' => [$this->title.'||Generated On: ' . date("r")],
+                    'SetHeader' => [$this->title . '||Generated On: ' . date("r")],
                     'SetFooter' => ['|Page {PAGENO}|'],
                     'SetAuthor' => Yii::$app->user->identity->username,
                     'SetCreator' => Yii::$app->user->identity->username,
@@ -89,4 +91,3 @@ echo GridView::widget([
     // ],
     'showPageSummary' => true,
 ]);
-?>
