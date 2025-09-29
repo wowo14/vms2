@@ -61,7 +61,7 @@ class DppSearch extends Dpp{
             'updated_by' => $this->updated_by,
         ]);
         $query->andFilterWhere(['like', 'dpp.nomor_dpp', $this->nomor_dpp])
-            ->andFilterWhere(['like', 'dpp.bidang_bagian', $this->bidang_bagian])
+            ->andFilterWhere(['like', 'u.unit', $this->bidang_bagian])
             ->andFilterWhere(['like', 'p.nama_paket', $this->paket_id])
             ->andFilterWhere(['like', 'p2.nama', $this->pejabat_pengadaan])
             ->andFilterWhere(['between', 'datetime(dpp.tanggal_dpp)', ($this->range($this->tanggal_dpp, 's')), ($this->range($this->tanggal_dpp, 'e'))])

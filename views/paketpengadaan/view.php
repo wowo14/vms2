@@ -33,12 +33,18 @@ use yii\widgets\DetailView;
                         'attribute' => 'linksirup',
                         'format' => 'raw',
                         'value' => function ($model) {
-                            $links = explode(',', $model->linksirup);
+                            if (empty($model->linksirup)) {
+                                return null; // atau bisa return '-' kalau mau ditampilkan tanda strip
+                            }
+                            $links = explode(',', (string) $model->linksirup);
                             $html = '';
                             foreach ($links as $link) {
-                                $html .= Html::a($link, $link, ['target' => '_blank', 'data-pjax' => 0]) . ', ';
+                                $link = trim($link); // biar rapi kalau ada spasi
+                                if ($link !== '') {
+                                    $html .= Html::a($link, $link, ['target' => '_blank', 'data-pjax' => 0]) . ', ';
+                                }
                             }
-                            return rtrim($html, ', '); // untuk menghilangkan koma di akhir
+                            return rtrim($html, ', ');
                         },
                     ],
                     // ['attribute'=>'linksirup','format' => 'raw','value'=>Html::a($model->linksirup, $model->linksirup, ['target' => '_blank','data-pjax' => 0])],
