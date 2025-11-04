@@ -50,8 +50,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             'unit' => 'Unit_Bidang_Bagian',
             'dibatalkan' => 'Dibatalkan Oleh',
             'alasan_dibatalkan' => 'Alasan Dibatalkan',
-            'berita_acara_pembatalan'=>'Berita Acara Pembatalan',
-            'tanggal_dibatalkan'=>'Tanggal Pembatalan',
+            'berita_acara_pembatalan' => 'Berita Acara Pembatalan',
+            'tanggal_dibatalkan' => 'Tanggal Pembatalan',
         ];
     }
     public function getListpaketoutstanding() {
@@ -155,6 +155,105 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             ->andWhere(['IS NOT', 'alasan_reject', null])
             ->andWhere(['!=', 'alasan_reject', ''])
             ->count();
+    }
+    // public function getPaketrejects($params) {
+    //     $query = self::find()
+    //         ->alias('pp')
+    //         ->select([
+    //             'pp.*',
+    //             // new Expression("strftime('%Y', pp.tanggal_paket) AS year"),
+    //             new Expression("CAST(strftime('%m', pp.tanggal_paket) AS INTEGER) AS month"),
+    //         ])
+    //         ->joinWith(['dpp d'])
+    //         ->where(['not', ['pp.id' => null]])
+    //         ->andWhere(['IS NOT', 'pp.tanggal_reject', null])
+    //         ->andWhere(['!=', 'pp.tanggal_reject', ''])
+    //         ->andWhere(['IS NOT', 'pp.alasan_reject', null])
+    //         ->andWhere(['!=', 'pp.alasan_reject', '']);
+    //     // 🔹 Filter berdasarkan tahun
+    //     if (!empty($params['tahun'])) {
+    //         // $query->andWhere([
+    //         //     new Expression("strftime('%Y', pp.tanggal_paket)") =>$params['tahun'],
+    //         // ]);
+    //     }
+    //     // 🔹 Filter berdasarkan bulan
+    //     if (!empty($params['bulan'])) {
+    //         // Pastikan bulan dalam format 2 digit (01–12)
+    //         // $bulan = str_pad($params['bulan'], 2, '0', STR_PAD_LEFT);
+    //         $query->andWhere([
+    //             new Expression("CAST(strftime('%m', pp.tanggal_paket) AS INTEGER) AS month"),
+    //             // new Expression("strftime('%m', pp.tanggal_paket)") => $bulan,
+    //         ]);
+    //     }
+    //     return $query->asArray()->all();
+    // }
+    public function getRawDataReject($params = null) {
+        $rawSettingkategori = collect(Setting::where(['type' => 'kategori_pengadaan'])->all())
+            ->pluck('id', 'value')
+            ->toArray();
+        $rawSettingmetode = collect(Setting::where(['type' => 'metode_pengadaan'])->all())
+            ->pluck('id', 'value')
+            ->toArray();
+        $query = self::find() // gunakan find() biar konsisten
+            ->alias('pp')
+            ->joinWith([
+                'dpp d',
+                'penawaranpenyedia.negosiasi n',
+                'pejabatppkom ppkom',
+                'dpp.pejabat p',
+                'dpp.staffadmin s',
+                'dpp.unit u',
+            ])
+            ->leftJoin(['det' => $this->ctedetails], 'det.paket_id = pp.id')
+            ->select([
+                new Expression("strftime('%Y', pp.tanggal_paket)  AS year"),
+                new Expression("CAST(strftime('%m', pp.tanggal_paket) AS INTEGER) AS month"),
+                'pp.id',
+                'pp.nama_paket',
+                'pp.metode_pengadaan',
+                'pp.kategori_pengadaan',
+                'pp.pagu',
+                'p.id   AS pejabat_pengadaan_id',
+                'p.nama AS pejabat_pengadaan',
+                's.id   AS admin_pengadaan_id',
+                's.nama AS admin_pengadaan',
+                'ppkom.id   AS pejabat_ppkom_id',
+                'ppkom.nama AS pejabat_ppkom',
+                'u.id   AS bidang_bagian_id',
+                'u.unit AS bidang_bagian',
+                new Expression('COALESCE(det.hps,       0) AS hps'),
+                new Expression('COALESCE(det.penawaran, 0) AS penawaran'),
+                new Expression('COALESCE(det.hasilnego, 0) AS hasilnego'),
+                'pp.pemenang',
+                'pp.tanggal_reject',
+                'pp.alasan_reject',
+            ])
+            ->andWhere(['not', ['d.bidang_bagian' => null]])
+            ->andWhere(['IS NOT', 'pp.tanggal_reject', null])
+            ->andWhere(['!=', 'pp.tanggal_reject', ''])
+            ->andWhere(['IS NOT', 'pp.alasan_reject', null])
+            ->andWhere(['!=', 'pp.alasan_reject', '']);
+        // if (!empty($params['tahun'])) {
+        //     $query->andWhere([
+        //         new Expression("strftime('%Y', pp.tanggal_paket)") => '2025',
+        //     ]);
+        // }
+        // if (!empty($params['bulan'])) {
+        //     // $bulan = str_pad($params['bulan'], 2, '0', STR_PAD_LEFT);
+        //     $query->andWhere([
+        //         // new Expression("CAST(strftime('%m', pp.tanggal_paket) AS INTEGER) AS month"),
+        //         new Expression("strftime('%m', pp.tanggal_paket)") => $params['bulan'],
+        //     ]);
+        // }
+        $query->groupBy('pp.id')
+            ->orderBy('pp.id');
+        $data = $query->asArray()->all();
+        // 🔹 Map hasil untuk menambahkan ID referensi dari tabel Setting
+        return collect($data)->map(function ($e) use ($rawSettingkategori, $rawSettingmetode) {
+            $e['metode_pengadaan_id'] = $rawSettingmetode[$e['metode_pengadaan']] ?? null;
+            $e['kategori_pengadaan_id'] = $rawSettingkategori[$e['kategori_pengadaan']] ?? null;
+            return $e;
+        });
     }
     public function groupedData($field, $collection) { // part of dashboard
         return $collection->groupBy(function ($item) use ($field) {
@@ -423,7 +522,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         return collect($query);
     }
     public function getFilteredData($filters = null) { //collection all rekap
-        $filters=$filters??collect([]);
+        $filters = $filters ?? collect([]);
         $data = $this->getrawData($filters->get('year'));
         if ($filters && $filters->isNotEmpty()) {
             $data = $data->filter(function ($item) use ($filters) {

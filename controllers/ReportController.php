@@ -174,6 +174,29 @@ class ReportController extends Controller {
             // ]);
         }
     }
+    public function actionDppreject(){
+        $model = new ReportModel();
+        $paketpengadaan = new PaketPengadaan();
+        $request = \Yii::$app->request;
+        if ($request->isGet) {
+            return $this->render('index', [
+                'action' => \yii\helpers\Url::to(['//pivot-report/report-reject']),
+                'model' => $model,
+                'raw' => $paketpengadaan->getExistingYears(),
+                'paketpengadaan' => $paketpengadaan
+            ]);
+        }
+        // if($request->isPost){
+        //     $params = [
+        //         'tahun' => $model->tahun ?? '',
+        //         'bln' => $model->bulan,
+        //     ];
+        //     $result = $paketpengadaan->getPaketRejects($params);
+        //     return $this->render('_pivot_reject', [
+        //         'data' => $result,
+        //     ]);
+        // }
+    }
     public function actionMetodecount() {
         $model = new ReportModel();
         $paketpengadaan = new PaketPengadaan();

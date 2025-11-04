@@ -8,6 +8,8 @@ use app\models\ReportModel;
 use app\models\PaketPengadaan;
 use app\helpers\PivotReportHelper;
 use yii\helpers\ArrayHelper;
+use yii\helpers\VarDumper;
+
 class PivotReportController extends Controller {
     public function actionIndex() {
         $model = new ReportModel();
@@ -400,5 +402,192 @@ class PivotReportController extends Controller {
                 page-break-before: always;
             }
         ';
+    }
+    public function actionReportReject() {
+        $model = new ReportModel();
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            // Ambil data paket yang ditolak
+            $data = $this->getRawDataReject($model);
+            $all = $this->getAllReportConfigs();
+            // === Bagian filter & label tetap sama seperti actionReportAll() ===
+            $filters = [];
+            $filterLabels = [];
+            if ($model->kategori) {
+                $filters[] = 'kategori';
+                if ($model->kategori !== 'all') {
+                    $ar = array_filter(
+                        $model::optionsSettingtype('kategori_pengadaan', ['value', 'id']),
+                        fn($key) => strpos($key, $model->kategori) !== false,
+                        ARRAY_FILTER_USE_KEY
+                    );
+                    $filterLabels[] = 'Kategori: ' . reset($ar);
+                }
+            }
+            if ($model->metode) {
+                $filters[] = 'metode';
+                if ($model->metode !== 'all') {
+                    $ar = array_filter(
+                        $model::optionsSettingtype('metode_pengadaan', ['value', 'id']),
+                        fn($key) => strpos($key, $model->metode) !== false,
+                        ARRAY_FILTER_USE_KEY
+                    );
+                    $filterLabels[] = 'Metode: ' . reset($ar);
+                }
+            }
+            if ($model->pejabat) {
+                $filters[] = 'pejabat';
+                if ($model->pejabat !== 'all') {
+                    $ar = array_filter(
+                        $model::getAllpetugas(),
+                        fn($key) => strpos($key, $model->pejabat) !== false,
+                        ARRAY_FILTER_USE_KEY
+                    );
+                    $filterLabels[] = 'Pejabat: ' . reset($ar);
+                }
+            }
+            if ($model->admin) {
+                $filters[] = 'admin';
+                if ($model->admin !== 'all') {
+                    $ar = array_filter(
+                        $model::getAlladmin(),
+                        fn($key) => strpos($key, $model->admin) !== false,
+                        ARRAY_FILTER_USE_KEY
+                    );
+                    $filterLabels[] = 'Admin: ' . reset($ar);
+                }
+            }
+            if ($model->bidang) {
+                $filters[] = 'bidang';
+                if ($model->bidang !== 'all') {
+                    $ar = array_filter(
+                        \app\models\Unit::collectAll()->pluck('unit', 'id')->toArray(),
+                        fn($key) => strpos($key, $model->bidang) !== false,
+                        ARRAY_FILTER_USE_KEY
+                    );
+                    $filterLabels[] = 'Bidang: ' . reset($ar);
+                }
+            }
+            if ($model->ppkom) {
+                $filters[] = 'ppkom';
+                if ($model->ppkom !== 'all') {
+                    $ar = array_filter(
+                        $model::optionppkom(),
+                        fn($key) => strpos($key, $model->ppkom) !== false,
+                        ARRAY_FILTER_USE_KEY
+                    );
+                    $filterLabels[] = 'PPKOM: ' . reset($ar);
+                }
+            }
+            // === Konfigurasi report sama seperti versi all ===
+            $types = array_keys($all);
+            $configs = [];
+            $reports = [];
+            // VarDumper::dump($data,10,false);
+            // die;
+            foreach ($types as $type) {
+                $config = $this->getReportConfig($type);
+                $configs[$type] = $config;
+                if (isset($config['multi'])) {
+                    $multipleSumFields = ['hps', 'hasilnego', 'efisien'];
+                    $reports[$type] = PivotReportHelper::generatePivotReport(
+                        $data,
+                        $config['rowField'],
+                        $config['rowLabel'],
+                        'month',
+                        (new PaketPengadaan())->months,
+                        null,
+                        null,
+                        $multipleSumFields
+                    );
+                } else {
+                    $reports[$type] = PivotReportHelper::generatePivotReport(
+                        $data,
+                        $config['rowField'],
+                        $config['rowLabel'],
+                        'month',
+                        (new PaketPengadaan())->months,
+                        null,
+                        $config['sumField'] ?? null
+                    );
+                }
+            }
+            $viewData = [
+                'reports' => $reports,
+                'configs' => $configs,
+                'months' => (new PaketPengadaan())->months,
+                'year' => $model->tahun,
+                'model' => $model,
+                'filters' => $filters,
+                'filterLabels' => $filterLabels,
+            ];
+            if (Yii::$app->request->post('type') === 'pdf') {
+                $pdf = new Pdf([
+                    'mode' => Pdf::MODE_UTF8,
+                    'format' => Pdf::FORMAT_A4,
+                    'orientation' => Pdf::ORIENT_LANDSCAPE,
+                    'destination' => Pdf::DEST_BROWSER,
+                    'content' => $this->renderPartial('report_all', $viewData),
+                    'cssFile' => '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
+                    'cssInline' => $this->getPdfStyles(),
+                    'options' => ['title' => 'Laporan Paket Ditolak ' . $model->tahun],
+                    'methods' => [
+                        'SetHeader' => ['Laporan Paket Ditolak ' . $model->tahun . ' - ' . date('d/m/Y')],
+                        'SetFooter' => ['{PAGENO}'],
+                    ]
+                ]);
+                return $pdf->render();
+            }
+            return $this->render('report_all', $viewData);
+        }
+        return $this->redirect(['dppreject']);
+    }
+    public function actionDppreject(){
+        $model = new ReportModel();
+        $request = \Yii::$app->request;
+        if ($request->isGet) {
+            return $this->render('index', [
+                'action' => \yii\helpers\Url::to(['report-reject']),
+                'months' => (new PaketPengadaan())->months,
+                'years' => $this->getYearList(),
+                'model' => $model
+            ]);
+        }
+    }
+    private function getRawDataReject(ReportModel $model = null) {
+        $params = [];
+        if ($model) {
+            if ($model->tahun) {
+                $params['tahun'] = $model->tahun;
+            }
+            if ($model->bulan && $model->bulan != 0) {
+                $params['bulan'] = $model->bulan;
+            }
+        }
+        // Ambil data paket yang memiliki tanggal_reject dan alasan_reject
+        $query = collect(
+            (new PaketPengadaan)->getRawDataReject($params)
+        );
+        if ($model) {
+            // Filter tambahan sama seperti getRawData()
+            if ($model->kategori && $model->kategori !== 'all') {
+                $query = $query->filter(fn($item) => $item['kategori_pengadaan_id'] == $model->kategori);
+            }
+            if ($model->metode && $model->metode !== 'all') {
+                $query = $query->filter(fn($item) => $item['metode_pengadaan_id'] == $model->metode);
+            }
+            if ($model->pejabat && $model->pejabat !== 'all') {
+                $query = $query->filter(fn($item) => $item['pejabat_pengadaan_id'] == $model->pejabat);
+            }
+            if ($model->admin && $model->admin !== 'all') {
+                $query = $query->filter(fn($item) => $item['admin_pengadaan_id'] == $model->admin);
+            }
+            if ($model->bidang && $model->bidang !== 'all') {
+                $query = $query->filter(fn($item) => $item['bidang_bagian_id'] == $model->bidang);
+            }
+            if ($model->ppkom && $model->ppkom !== 'all') {
+                $query = $query->filter(fn($item) => $item['pejabat_ppkom_id'] == $model->ppkom);
+            }
+        }
+        return $query->toArray();
     }
 }
