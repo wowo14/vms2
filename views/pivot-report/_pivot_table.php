@@ -16,6 +16,10 @@ if (isset($model->bulan_awal) && isset($model->bulan_akhir) && $model->bulan_awa
     } else {
         $bulan = $months[$awal] . ' s/d ' . $months[$akhir];
     }
+} else {
+    // Default: Tampilkan semua bulan
+    $bulanRange = $months;
+    $bulan = 'Januari s/d Desember'; // Atau sembunyikan jika tidak perlu label
 }
 // Persiapan data laporan
 $pivotData = $report['pivotData'];
@@ -126,3 +130,4 @@ $grandTotalSingle = array_sum($totalPerBulanSingle);
         </tr>
     </tfoot>
 </table>
+<div style="page-break-before: always;"></div>

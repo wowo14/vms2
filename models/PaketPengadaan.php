@@ -238,11 +238,9 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             ->andWhere(['!=', 'pp.tanggal_reject', ''])
             ->andWhere(['IS NOT', 'pp.alasan_reject', null])
             ->andWhere(['!=', 'pp.alasan_reject', '']);
-        // if (!empty($params['tahun'])) {
-        //     $query->andWhere([
-        //         new Expression("strftime('%Y', pp.tanggal_paket)") => '2025',
-        //     ]);
-        // }
+        if (!empty($params['tahun'])) {
+            $query->andWhere(new Expression("strftime('%Y', pp.tanggal_paket) = :year", [':year' => $params['tahun']]));
+        }
         // if (!empty($params['bulan'])) {
         //     // $bulan = str_pad($params['bulan'], 2, '0', STR_PAD_LEFT);
         //     $query->andWhere([

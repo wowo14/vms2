@@ -519,14 +519,24 @@ class PivotReportController extends Controller {
                 'model' => $model,
                 'filters' => $filters,
                 'filterLabels' => $filterLabels,
+                'dataProvider' => new \yii\data\ArrayDataProvider([
+                    'allModels' => $data,
+                    'pagination' => [
+                        'pageSize' => 50,
+                    ],
+                    'sort' => [
+                        'attributes' => ['nama_paket', 'pagu', 'tanggal_reject'], 
+                    ],
+                ]),
             ];
+
             if (Yii::$app->request->post('type') === 'pdf') {
                 $pdf = new Pdf([
                     'mode' => Pdf::MODE_UTF8,
                     'format' => Pdf::FORMAT_A4,
                     'orientation' => Pdf::ORIENT_LANDSCAPE,
                     'destination' => Pdf::DEST_BROWSER,
-                    'content' => $this->renderPartial('report_all', $viewData),
+                    'content' => $this->renderPartial('_report_reject_pdf', $viewData), // Render dedicated PDF view
                     'cssFile' => '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
                     'cssInline' => $this->getPdfStyles(),
                     'options' => ['title' => 'Laporan Paket Ditolak ' . $model->tahun],
@@ -537,7 +547,7 @@ class PivotReportController extends Controller {
                 ]);
                 return $pdf->render();
             }
-            return $this->render('report_all', $viewData);
+            return $this->render('report_reject', $viewData);
         }
         return $this->redirect(['dppreject']);
     }
@@ -568,6 +578,18 @@ class PivotReportController extends Controller {
             (new PaketPengadaan)->getRawDataReject($params)
         );
         if ($model) {
+            // Tambahan filter periode (Month Range)
+            if ($model->bulan_awal && $model->bulan_akhir && $model->bulan_awal != 0 && $model->bulan_akhir != 0) {
+                $awal = (int)$model->bulan_awal;
+                $akhir = (int)$model->bulan_akhir;
+                if ($awal > $akhir) {
+                    [$awal, $akhir] = [$akhir, $awal];
+                }
+                $query = $query->filter(fn($item) => (int)$item['month'] >= $awal && (int)$item['month'] <= $akhir);
+            } else if ($model->bulan && $model->bulan != 0) {
+                $query = $query->filter(fn($item) => $item['month'] == $model->bulan);
+            }
+
             // Filter tambahan sama seperti getRawData()
             if ($model->kategori && $model->kategori !== 'all') {
                 $query = $query->filter(fn($item) => $item['kategori_pengadaan_id'] == $model->kategori);
