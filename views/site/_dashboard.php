@@ -43,6 +43,25 @@ JS;
 $this->registerJs($JS);
 ?>
 <div class="row">
+    <div class="col-md-3">
+        <form method="get" action="<?= \yii\helpers\Url::to(['site/dashboard']) ?>">
+            <div class="form-group">
+                <label>Filter Tahun:</label>
+                <select name="year" class="form-control" onchange="this.form.submit()">
+                    <option value="">Semua Tahun</option>
+                    <?php if(isset($params['allYears'])): ?>
+                        <?php foreach($params['allYears'] as $y): ?>
+                            <option value="<?= $y ?>" <?= (isset($params['selectedYear']) && $y == $params['selectedYear']) ? 'selected' : '' ?>><?= $y ?></option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </select>
+            </div>
+        </form>
+    </div>
+</div>
+<?php /* Separator */ ?>
+
+<div class="row">
     <div class="col-md-6">
         <!-- <div id="bymetode"></div> -->
     </div>

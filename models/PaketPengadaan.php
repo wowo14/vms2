@@ -115,8 +115,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             ->from(PaketPengadaanDetails::tableName())
             ->groupBy('paket_id');
     }
-    public function getDashboard() {
-        return self::where(['not', ['paket_pengadaan.id' => null]])
+    public function getDashboard($year = null) {
+        $query = self::where(['not', ['paket_pengadaan.id' => null]])
             ->joinWith(['dpp d', 'penawaranpenyedia.negosiasi n', 'pejabatppkom ppkom', 'dpp.pejabat p', 'dpp.staffadmin s', 'dpp.unit u'])
             ->leftJoin(['pd' => $this->ctedetails], 'pd.paket_id = paket_pengadaan.id')
             ->select([
@@ -135,9 +135,14 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
                 new Expression("COALESCE((pd.hasilnego), 0) AS hasilnego"),
                 'paket_pengadaan.pemenang'
             ])
-            ->andWhere(['not', ['d.bidang_bagian' => null]])
+            ->andWhere(['not', ['d.bidang_bagian' => null]]);
+            
+            if ($year) {
+                $query->andWhere(new Expression("strftime('%Y', paket_pengadaan.tanggal_paket) = :year", [':year' => $year]));
+            }
+
             // ->orWhere(['n.penyedia_accept' => 1,'n.pp_accept'=>1])
-            ->groupBy(['year', 'month', 'paket_pengadaan.id'])
+            return $query->groupBy(['year', 'month', 'paket_pengadaan.id'])
             ->orderBy('year', 'id')
             ->asArray()
             ->all();

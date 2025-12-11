@@ -90,6 +90,18 @@ foreach ($params['kategori'] as $row) {
     $categories[$kategori]['total_jml'] += $row['jml'];
     $categories[$kategori]['total_pagu'] += $row['ammount'];
 }
+
+// Calculate Yearly Totals
+$yearlyTotals = [];
+foreach ($years as $year) {
+     $yearlyTotals[$year] = 0;
+}
+foreach ($params['kategori'] as $row) {
+     if (isset($yearlyTotals[$row['year']])) {
+         $yearlyTotals[$row['year']] += $row['jml'];
+     }
+}
+
 if ($totalkategori > 0) {
     $no = 1;
     foreach ($categories as $kategori => $data) {
@@ -104,7 +116,10 @@ if ($totalkategori > 0) {
         echo '</tr>';
     }
     echo '<tfoot><tr>';
-    echo '<td colspan="' . (count($years) + 2) . '">Total</td>';
+    echo '<td colspan="2">Total</td>';
+    foreach ($years as $year) {
+        echo '<td>' . $yearlyTotals[$year] . '</td>';
+    }
     echo '<td>' . array_sum(array_column($categories, 'total_jml')) . '</td>';
     echo '<td>' . \Yii::$app->formatter->asCurrency($totalkategori) . '</td>';
     echo '<td>' . \Yii::$app->formatter->asPercent(1) . '</td>';

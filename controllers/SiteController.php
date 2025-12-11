@@ -138,9 +138,16 @@ class SiteController extends Controller
     }
     public function actionDashboard() {
         $model=new PaketPengadaan();
-        $collection = collect($model->dashboard);
+        $year = Yii::$app->request->get('year');
+        // Get all available years for the dropdown
+        $allYears = $model->getExistingYears()->pluck('year')->sortDesc()->values()->toArray();
+
+        $collection = collect($model->getDashboard($year));
+        
         $params = [
             'years' => $collection->unique('year')->pluck('year')->toArray(),
+            'allYears' => $allYears,
+            'selectedYear' => $year,
             'yearData' => $collection->groupBy('year')->map->count()->values()->toArray(),
             'paketselesai' => $collection->whereNotNull('pemenang')->count(),
             'paketbelom' => $collection->whereNull('pemenang')->count(),

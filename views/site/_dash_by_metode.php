@@ -91,6 +91,18 @@ $this->registerJs($js);
             $methods[$metode]['total_jml'] += $row['jml'];
             $methods[$metode]['total_pagu'] += $row['ammount'];
         }
+
+        // Calculate Yearly Totals
+        $yearlyTotals = [];
+        foreach ($years as $year) {
+             $yearlyTotals[$year] = 0;
+        }
+        foreach ($params['metode'] as $row) {
+             if (isset($yearlyTotals[$row['year']])) {
+                 $yearlyTotals[$row['year']] += $row['jml'];
+             }
+        }
+
         if ($totalmetode > 0) {
             $no = 1;
             foreach ($methods as $metode => $data) {
@@ -106,7 +118,10 @@ $this->registerJs($js);
                 echo '</tr>';
             }
             echo '<tfoot><tr>';
-            echo '<td colspan="' . (count($years) + 2) . '">Total</td>';
+            echo '<td colspan="2">Total</td>';
+            foreach ($years as $year) {
+                echo '<td>' . $yearlyTotals[$year] . '</td>';
+            }
             echo '<td>' . array_sum(array_column($methods, 'total_jml')) . '</td>';
             echo '<td>' . \Yii::$app->formatter->asCurrency($totalmetode) . '</td>';
             echo '<td>' . \Yii::$app->formatter->asPercent(1) . '</td>';
