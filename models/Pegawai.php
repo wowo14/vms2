@@ -113,4 +113,7 @@ class Pegawai extends \yii\db\ActiveRecord {
         parent::afterDelete();
         self::invalidatecache('tag_' . self::getModelname());
     }
+    public function getUser() {
+        return $this->hasOne(User::class, ['id' => 'id_user']);
+    }
 }

@@ -318,4 +318,250 @@ class ReportController extends Controller {
         ]);
         return $this->render('template_penetapan', ['model' => $model]);
     }
+    public function actionPenilaianPenyedia() {
+        $model = new ReportModel();
+        $paketpengadaan = new PaketPengadaan(); // For years retrieval
+        $request = \Yii::$app->request;
+
+        if ($request->isGet) {
+            return $this->render('index', [
+                'action' => \yii\helpers\Url::to(['report/penilaian-penyedia']),
+                'model' => $model,
+                'raw' => $paketpengadaan->getExistingYears(), // Reuse this for year dropdown
+                'paketpengadaan' => $paketpengadaan
+            ]);
+        } else if ($model->load($request->post())) {
+            // Build Query
+            $query = \app\models\PenilaianPenyedia::find()
+                ->alias('p')
+                ->joinWith(['dpp d' => function($q) {
+                    $q->joinWith(['paketpengadaan pp']);
+                }]);
+
+            // Apply Filters
+            if ($model->tahun) {
+                $query->andWhere(['pp.tahun_anggaran' => $model->tahun]);
+            }
+            if ($model->bulan && $model->bulan != 0) {
+                 $query->andWhere(new \yii\db\Expression("strftime('%m', p.tanggal_kontrak) = :month", [':month' => sprintf('%02d', $model->bulan)]));
+            }
+            if ($model->kategori && $model->kategori !== 'all') {
+                $setting = \app\models\Setting::findOne($model->kategori);
+                if ($setting) {
+                    $query->andWhere(['pp.kategori_pengadaan' => $setting->value]);
+                }
+            }
+            if ($model->metode && $model->metode !== 'all') {
+                $setting = \app\models\Setting::findOne($model->metode);
+                if ($setting) {
+                    $query->andWhere(['p.metode_pemilihan' => $setting->value]);
+                }
+            }
+            if ($model->pejabat && $model->pejabat !== 'all') {
+                $query->andWhere(['d.pejabat_pengadaan' => $model->pejabat]);
+            }
+            if ($model->pejabat && $model->pejabat !== 'all' && $model::isAdmin()) {
+                $query->andWhere(['d.pejabat_pengadaan' => $model->pejabat]);
+            }
+            if ($model->ppkom && $model->ppkom !== 'all' && $model::isAdmin()) {
+                $query->andWhere(['pp.ppkom' => $model->ppkom]);
+            }
+            if($model::isPP()){
+                $query->andWhere(['d.pejabat_pengadaan' => \Yii::$app->user->identity->userpegawai->id]);
+            }
+            if($model::isPPK()){
+                $query->andWhere(['pp.ppkom' => \Yii::$app->user->identity->userpegawai->id]);
+            }
+            if ($model->admin && $model->admin !== 'all') {
+                $query->andWhere(['d.admin_pengadaan' => $model->admin]);
+            }
+            if ($model->bidang && $model->bidang !== 'all') {
+                $query->andWhere(['d.bidang_bagian' => $model->bidang]);
+            }
+
+            $data = $query->all();
+            
+            // Format data for the view
+            $rows = [];
+            foreach ($data as $i => $item) {
+                // Parse details
+                $details = [];
+                if ($item->details) {
+                    $details = json_decode($item->details, true);
+                }
+                
+                $scores = $details['skor'] ?? [];
+                
+                // Filter: Only include if it has 5 scores (PP Assessment)
+                if (count($scores) !== 5) {
+                    continue;
+                }
+
+                $total = $details['total'] ?? 0;
+                $rata = $details['nilaiakhir'] ?? 0;
+                $eval = $details['hasil_evaluasi'] ?? '-';
+                $ket = $details['ulasan_pejabat_pengadaan'] ?? '';
+
+                $rows[] = [
+                    'id' => $item->id,
+                    'no' => count($rows) + 1,
+                    'nama_penyedia' => $item->nama_perusahaan,
+                    'alamat' => $item->alamat_perusahaan,
+                    'kategori' => $item->dpp->paketpengadaan->kategori_pengadaan ?? '-',
+                    'nama_kegiatan' => $item->paket_pekerjaan,
+                    'bidang' => $item->unit_kerja,
+                    'metode' => $item->metode_pemilihan,
+                    'tanggal_kontrak' => $item->tanggal_kontrak,
+                    'nilai_kontrak' => $item->nilai_kontrak,
+                    'pejabat_pengadaan' => $item->dpp->pejabat->nama ?? '-',
+                    'scores' => $scores,
+                    'total' => $total,
+                    'rata' => $rata,
+                    'hasil_evaluasi' => $eval,
+                    'keterangan' => $ket
+                ];
+            }
+            
+            $dataProvider = new \yii\data\ArrayDataProvider([
+                'allModels' => $rows,
+                'pagination' => false,
+                'sort' => [
+                    'attributes' => ['nama_penyedia', 'tanggal_kontrak', 'nilai_kontrak', 'pejabat_pengadaan'],
+                ],
+            ]);
+
+            $title = 'Rekapitulasi Penilaian Penyedia Barang Oleh Pejabat Pengadaan';
+
+            return $this->render('_rekap_penilaian', [
+                'dataProvider' => $dataProvider,
+                'title' => $title
+            ]);
+        }
+    }
+
+    public function actionPenilaianPenyediaPpk() {
+        $model = new ReportModel();
+        $paketpengadaan = new PaketPengadaan(); // For years retrieval
+        $request = \Yii::$app->request;
+
+        if ($request->isGet) {
+            return $this->render('index', [
+                'action' => \yii\helpers\Url::to(['report/penilaian-penyedia-ppk']),
+                'model' => $model,
+                'raw' => $paketpengadaan->getExistingYears(), // Reuse this for year dropdown
+                'paketpengadaan' => $paketpengadaan
+            ]);
+        } else if ($model->load($request->post())) {
+            $query = \app\models\PenilaianPenyedia::find()
+                ->alias('p')
+                ->joinWith(['dpp d' => function($q) {
+                    $q->joinWith(['paketpengadaan pp']);
+                }]);
+
+            // Apply Filters
+            if ($model->tahun) {
+                $query->andWhere(['pp.tahun_anggaran' => $model->tahun]);
+            }
+            if ($model->bulan && $model->bulan != 0) {
+                 $query->andWhere(new \yii\db\Expression("strftime('%m', p.tanggal_kontrak) = :month", [':month' => sprintf('%02d', $model->bulan)]));
+            }
+            if ($model->kategori && $model->kategori !== 'all') {
+                $setting = \app\models\Setting::findOne($model->kategori);
+                if ($setting) {
+                    $query->andWhere(['pp.kategori_pengadaan' => $setting->value]);
+                }
+            }
+            if ($model->metode && $model->metode !== 'all') {
+                $setting = \app\models\Setting::findOne($model->metode);
+                if ($setting) {
+                    $query->andWhere(['p.metode_pemilihan' => $setting->value]);
+                }
+            }
+            if ($model->pejabat && $model->pejabat !== 'all' && $model::isAdmin()) {
+                $query->andWhere(['d.pejabat_pengadaan' => $model->pejabat]);
+            }
+            if ($model->ppkom && $model->ppkom !== 'all' && $model::isAdmin()) {
+                $query->andWhere(['pp.ppkom' => $model->ppkom]);
+            }
+            if($model::isPP()){
+                $query->andWhere(['d.pejabat_pengadaan' => \Yii::$app->user->identity->userpegawai->id]);
+            }
+            if($model::isPPK()){
+                $query->andWhere(['pp.ppkom' => \Yii::$app->user->identity->userpegawai->id]);
+            }
+            if ($model->admin && $model->admin !== 'all') {
+                $query->andWhere(['d.admin_pengadaan' => $model->admin]);
+            }
+            if ($model->bidang && $model->bidang !== 'all') {
+                $query->andWhere(['d.bidang_bagian' => $model->bidang]);
+            }
+            
+            $data = $query->all();
+            
+            // Format data for the view
+            $rows = [];
+            foreach ($data as $i => $item) {
+                // Parse details
+                $details = [];
+                if ($item->details) {
+                    $details = json_decode($item->details, true);
+                }
+                
+                $scores = $details['skor'] ?? [];
+                
+                // Weights: 20%, 20%, 30%, 30%
+                $weights = [0.2, 0.2, 0.3, 0.3];
+                $weightedScores = [];
+                $nilaiKinerja = 0;
+                
+                for($k=0; $k<4; $k++) {
+                    $s = isset($scores[$k]) ? floatval($scores[$k]) : 0;
+                    $w = $s * ($weights[$k] ?? 0);
+                    $weightedScores[] = $w;
+                    $nilaiKinerja += $w;
+                }
+                
+                // Override calculated if stored in details
+                if (isset($details['nilai_kinerja'])) {
+                    $nilaiKinerja = $details['nilai_kinerja'];
+                }
+
+                $eval = $details['hasil_evaluasi'] ?? '-';
+                $ket = $details['keterangan'] ?? ($details['ulasan_pejabat_pengadaan'] ?? ''); // Fallback
+
+                $rows[] = [
+                    'id' => $item->id,
+                    'no' => count($rows) + 1,
+                    'nama_penyedia' => $item->nama_perusahaan,
+                    'alamat' => $item->alamat_perusahaan,
+                    'kategori' => $item->dpp->paketpengadaan->kategori_pengadaan ?? '-',
+                    'nama_kegiatan' => $item->paket_pekerjaan,
+                    'bidang' => $item->unit_kerja,
+                    'metode' => $item->metode_pemilihan,
+                    'tanggal_kontrak' => $item->tanggal_kontrak,
+                    'nilai_kontrak' => $item->nilai_kontrak,
+                    'ppk_nama' => $item->dpp->paketpengadaan->pejabatppkom->nama ?? ($item->pejabat_pembuat_komitmen ?? '-'),
+                    'scores' => $scores,
+                    'weighted_scores' => $weightedScores,
+                    'nilai_kinerja' => $nilaiKinerja,
+                    'hasil_evaluasi' => $eval,
+                    'keterangan' => $ket
+                ];
+            }
+            $dataProvider = new \yii\data\ArrayDataProvider([
+                'allModels' => $rows,
+                'pagination' => false,
+                'sort' => [
+                    'attributes' => ['nama_penyedia', 'tanggal_kontrak', 'nilai_kontrak', 'ppk_nama'],
+                ],
+            ]);
+            
+            $title = 'Rekapitulasi Penilaian Penyedia Barang Oleh Pejabat Pembuat Komitmen';
+
+            return $this->render('_rekap_penilaian_ppk', [
+                'dataProvider' => $dataProvider,
+                'title' => $title
+            ]);
+        }
+    }
 }

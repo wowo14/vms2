@@ -13,4 +13,7 @@ class User extends U {
     public function getUservendor(){
         return $this->hasOne(Contacts::class,['user_id' => 'id'])->cache(24 * 60 * 60, self::settagdep('tag_contacts'));
     }
+    public function getUserpegawai(){
+        return $this->hasOne(Pegawai::class,['id_user' => 'id'])->cache(24 * 60 * 60, self::settagdep('tag_pegawai'));
+    }
 }

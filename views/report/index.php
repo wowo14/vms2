@@ -21,6 +21,7 @@ $kategori = $all + $model::optionsSettingtype('kategori_pengadaan', ['value', 'i
 $metode = $all + $model::optionsSettingtype('metode_pengadaan', ['value', 'id']);
 // $pejabat = array_merge(['' => '', 'all' => 'all'], $model::getAllpetugas());
 $pejabat = $all + $model::getAllpetugas();
+$ppkom = $all + $model::optionppkom();
 // $admin = array_merge(['' => '', 'all' => 'all'], $model::getAlladmin());
 $admin = $all + $model::getAlladmin();
 $bidang = array_merge(['' => '', 'all' => 'all'], Unit::collectAll()->pluck('unit', 'id')->toArray());
@@ -61,6 +62,13 @@ echo $form->field($model, 'pejabat')->widget(Select2::class, [
     'data' => $pejabat,
     'pluginOptions' => [
         'placeholder' => 'Pilih Pejabat',
+        'allowClear' => true
+    ]
+]);
+echo $form->field($model, 'ppkom')->widget(Select2::class, [
+    'data' => $ppkom,
+    'pluginOptions' => [
+        'placeholder' => 'Pilih PPKOM',
         'allowClear' => true
     ]
 ]);

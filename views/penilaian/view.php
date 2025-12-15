@@ -38,7 +38,12 @@ $details= GridView::widget([
     'summary' => false,
     'columns' => [
         'uraian',
-        'skor',
+        [
+            'attribute' => 'skor',
+            'value' => function ($data) {
+                return \app\models\PenilaianPenyedia::getScoreDescription($data['uraian'], $data['skor']);
+            }
+        ],
     ],
 ]);
 

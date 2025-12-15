@@ -83,4 +83,25 @@ class PenilaianPenyedia extends \yii\db\ActiveRecord {
         // Merge the main rows and summary rows
         return array_merge($rows, $summary);
     }
+    public static function getScoreDescription($uraian, $score) {
+        $types = ['evaluasi_suplier_ppk', 'evaluasi_suplier_pejabat'];
+        
+        foreach ($types as $type) {
+            $setting = \app\models\Setting::findOne(['type' => $type, 'active' => 1]);
+            if ($setting) {
+                $config = json_decode($setting->value, true);
+                if (isset($config['kriteria'])) {
+                    foreach ($config['kriteria'] as $criteria) {
+                        if (strcasecmp(trim($criteria['name']), trim($uraian)) === 0) {
+                            if (isset($criteria['description'][$score])) {
+                                return $score . ' (' . $criteria['description'][$score] . ')';
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $score;
+    }
 }
