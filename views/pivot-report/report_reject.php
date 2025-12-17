@@ -3,17 +3,7 @@ use yii\helpers\Html;
 use kartik\grid\GridView;
 use yii\bootstrap4\Tabs;
 
-/* @var $this yii\web\View */
-/* @var $dataProvider yii\data\ArrayDataProvider */
-/* @var $filters array */
-/* @var $filterLabels array */
-/* @var $year string */
-/* @var $reports array */
-/* @var $configs array */
-/* @var $months array */
-/* @var $model app\models\ReportModel */
-
-$this->title = 'Laporan & Monitoring Paket Ditolak Tahun ' . Html::encode($year);
+$this->title = 'Laporan & Monitoring Review Paket Tahun ' . Html::encode($year);
 
 if (!empty($filters)) {
     $subtitle = 'Filter berdasarkan ';

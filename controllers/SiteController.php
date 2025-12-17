@@ -1,12 +1,13 @@
 <?php
 namespace app\controllers;
-use app\models\{Dpp,BackupUpload,User,LoginForm, ContactForm,PaketPengadaan};
+use app\models\{Dpp,Setting,BackupUpload,User,LoginForm, ContactForm,PaketPengadaan};
 use app\widgets\ImageConverter;
 use Yii;
 use yii\db\Expression;
 use yii\filters\{AccessControl, VerbFilter};
 use yii\helpers\{FileHelper,Url, Html, ArrayHelper, Json};
 use yii\web\{Response,UploadedFile};
+use yii\base\DynamicModel;
 class SiteController extends Controller
 {
     public function behaviors()
@@ -174,8 +175,80 @@ class SiteController extends Controller
         ];
         return $params;
     }
-    public function actionBackup()
-    {
+    public function actionPaktaIntegritas(){
+        $model = new DynamicModel([
+            'tahun', 'user_id','status'
+        ]);
+        $model->addRule(['tahun'], 'required')
+            ->addRule(['tahun'], 'integer')
+            ->addRule(['user_id'], 'required')
+            ->addRule(['status'], 'required'); // user_id wajib
+        // Ambil isi pakta integritas dari table setting
+        $setting = Setting::findOne(['type' => 'splash_paktaintegritas']);
+        $paktaText = $setting ? $setting->value : 'Belum ada isi pakta integritas.';
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $record = Setting::findOne(['type' => 'persetujuan_paktaintegritas']);
+            $now = date('Y-m-d H:i:s');
+            // data baru untuk user yang klik
+            $newEntry = [
+                $model->user_id => [
+                    [
+                        'timestamp' => $now,
+                        'status'    => $model->status
+                    ]
+                ]
+            ];
+            if ($record) {
+                $json = json_decode($record->value, true);
+                // cek tahun
+                if ($json['tahun'] != $model->tahun) {
+                    // kalau beda tahun, reset struktur
+                    $json = [
+                        'tahun'   => $model->tahun,
+                        'user_id' => [$newEntry]
+                    ];
+                } else {
+                    // merge dengan user lain
+                    if (isset($json['user_id'][0][$model->user_id])) {
+                        // GANTI seluruh data user_id dengan entry baru (bukan append)
+                        $json['user_id'][0][$model->user_id] = [
+                            [
+                                'timestamp' => $now,
+                                'status'    => $model->status
+                            ]
+                        ];
+                    } else {
+                        // tambahkan user baru
+                        $json['user_id'][0][$model->user_id] = [
+                            [
+                                'timestamp' => $now,
+                                'status'    => $model->status
+                            ]
+                        ];
+                    }
+                }
+                $record->value = json_encode($json);
+            } else {
+                // record baru
+                $json = [
+                    'tahun'   => $model->tahun,
+                    'user_id' => [$newEntry]
+                ];
+                $record = new Setting();
+                $record->type  = 'persetujuan_paktaintegritas';
+                $record->value = json_encode($json);
+            }
+            if ($record->save(false)) {
+                Yii::$app->session->setFlash('success', 'Persetujuan Pakta Integritas tersimpan');
+                return $this->redirect(['site/dashboard']);
+            }
+        }
+        return $this->render('pakta-integritas', [
+            'model' => $model,
+            'paktaText' => $paktaText
+        ]);
+    }
+    public function actionBackup(){
         $dbPath = Yii::$app->db->dsn;
         preg_match('/sqlite:(.*)/', $dbPath, $matches);
         if (isset($matches[1])) {

@@ -11,7 +11,7 @@ use yii\helpers\Html;
 /* @var $filters array */
 /* @var $filterLabels array */
 
-$this->title = 'Laporan & Monitoring Paket Ditolak Tahun ' . Html::encode($year);
+$this->title = 'Laporan & Monitoring Review Paket Tahun ' . Html::encode($year);
 
 if (!empty($filters)) {
     $subtitle = 'Filter berdasarkan ';

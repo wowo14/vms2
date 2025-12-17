@@ -17,6 +17,8 @@ $soundpath = $base . 'uploads/notif.mp3';
 $this->registerJs('
 const baseurl="'.$base.'";
 ', yii\web\View::POS_HEAD);
+$currentAction = Yii::$app->controller->action->id;
+if ($currentAction !== 'pakta-integritas'):
 $js=<<< JS
 $(document).ready(function() {
 var notif1=0;
@@ -63,10 +65,11 @@ var totalnotif1=0;
             // play();
             totalnotif1=notif1;
         }
-    },6600);
+    },9600);
 });
 JS;
 $this->registerJs($js, yii\web\View::POS_END);
+endif;
 $this->registerCssFile('/css/site.css');
 ?>
 <?php $this->beginPage() ?>

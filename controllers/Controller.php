@@ -6,6 +6,7 @@ use yii\helpers\BaseStringHelper;
 use yii\web\Controller as C;
 use yii\web\Response;
 use yii\web\ForbiddenHttpException;
+use app\models\Setting;
 class Controller extends C{
     public static function hashurl($params){//array params urls
         return BaseStringHelper::base64Urlencode(
@@ -28,5 +29,44 @@ class Controller extends C{
     }
     public function isAdminOrVendor(){
         return Yii::$app->tools->isAdminOrVendor();
+    }
+    public function beforeAction($action)
+    {
+        if (!parent::beforeAction($action)) {
+            return false;
+        }
+
+        if (!Yii::$app->user->isGuest) {
+            $userId = Yii::$app->user->id;
+            $setting = Setting::findOne(['type' => 'persetujuan_paktaintegritas']);
+            if ($setting) {
+                $json = json_decode($setting->value, true);
+                $approved = false;
+                if (isset($json['user_id'][0][$userId])) {
+                    foreach ($json['user_id'][0][$userId] as $log) {
+                        if ($log['status'] === 'accept') {
+                            $approved = true;
+                            break;
+                        }
+                    }
+                }
+
+                // Jika belum approve → redirect ke halaman pakta integritas
+                if (!$approved && !in_array($action->id, ['pakta-integritas','logout','login'])) {
+                    return $this->redirect(['site/pakta-integritas']);
+                }
+            }else{
+                $json = [
+                    'tahun'   => date('Y'),
+                    'user_id' => []
+                ];
+                $record = new Setting();
+                $record->type  = 'persetujuan_paktaintegritas';
+                $record->value = json_encode($json);
+                $record->active = 1;
+                $record->save(false);
+            }
+        }
+        return true;
     }
 }
