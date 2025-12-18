@@ -564,4 +564,144 @@ class ReportController extends Controller {
             ]);
         }
     }
+
+    public function actionStatistikPenyedia() {
+        $model = new ReportModel();
+        $paketpengadaan = new PaketPengadaan();
+        $request = \Yii::$app->request;
+
+        if ($request->isGet) {
+            return $this->render('index', [
+                'action' => \yii\helpers\Url::to(['report/statistik-penyedia']),
+                'model' => $model,
+                'raw' => $paketpengadaan->getExistingYears(),
+                'paketpengadaan' => $paketpengadaan
+            ]);
+        } else if ($model->load($request->post())) {
+            // Build Query - Group by vendor to get statistics
+            $query = \app\models\PenilaianPenyedia::find()
+                ->alias('p')
+                ->joinWith(['dpp d' => function($q) {
+                    $q->joinWith(['paketpengadaan pp']);
+                }])
+                ->select([
+                    'p.nama_perusahaan',
+                    'p.alamat_perusahaan',
+                    new \yii\db\Expression('COUNT(DISTINCT p.id) as jumlah_kontrak'),
+                    new \yii\db\Expression('GROUP_CONCAT(DISTINCT pp.ppkom) as ppk_ids'),
+                    new \yii\db\Expression('SUM(p.nilai_kontrak) as total_nilai_kontrak'),
+                    new \yii\db\Expression('AVG(CAST(json_extract(p.details, "$.nilaiakhir") AS REAL)) as rata_nilai_evaluasi'),
+                    new \yii\db\Expression('p.unit_kerja'),
+                    new \yii\db\Expression('p.metode_pemilihan'),
+                ])
+                ->groupBy(['p.nama_perusahaan', 'p.alamat_perusahaan']);
+
+            // Apply Filters
+            if ($model->tahun) {
+                $query->andWhere(['pp.tahun_anggaran' => $model->tahun]);
+            }
+            if ($model->bulan && $model->bulan != 0) {
+                $query->andWhere(new \yii\db\Expression("strftime('%m', p.tanggal_kontrak) = :month", [':month' => sprintf('%02d', $model->bulan)]));
+            }
+            if ($model->kategori && $model->kategori !== 'all') {
+                $setting = \app\models\Setting::findOne($model->kategori);
+                if ($setting) {
+                    $query->andWhere(['pp.kategori_pengadaan' => $setting->value]);
+                }
+            }
+            if ($model->metode && $model->metode !== 'all') {
+                $setting = \app\models\Setting::findOne($model->metode);
+                if ($setting) {
+                    $query->andWhere(['p.metode_pemilihan' => $setting->value]);
+                }
+            }
+            if ($model->pejabat && $model->pejabat !== 'all' && $model::isAdmin()) {
+                $query->andWhere(['d.pejabat_pengadaan' => $model->pejabat]);
+            }
+            if ($model->ppkom && $model->ppkom !== 'all' && $model::isAdmin()) {
+                $query->andWhere(['pp.ppkom' => $model->ppkom]);
+            }
+            if($model::isPP()){
+                $query->andWhere(['d.pejabat_pengadaan' => \Yii::$app->user->identity->userpegawai->id]);
+            }
+            if($model::isPPK()){
+                $query->andWhere(['pp.ppkom' => \Yii::$app->user->identity->userpegawai->id]);
+            }
+            if ($model->admin && $model->admin !== 'all') {
+                $query->andWhere(['d.admin_pengadaan' => $model->admin]);
+            }
+            if ($model->bidang && $model->bidang !== 'all') {
+                $query->andWhere(['d.bidang_bagian' => $model->bidang]);
+            }
+
+            $data = $query->asArray()->all();
+            
+            // Format data for the view
+            $rows = [];
+            foreach ($data as $i => $item) {
+                // Get PPK names from IDs
+                $ppkIds = array_filter(array_unique(explode(',', $item['ppk_ids'] ?? '')));
+                $ppkNames = [];
+                foreach ($ppkIds as $ppkId) {
+                    $pegawai = \app\models\Pegawai::findOne($ppkId);
+                    if ($pegawai) {
+                        $ppkNames[] = $pegawai->nama;
+                    }
+                }
+
+                $rows[] = [
+                    'no' => $i + 1,
+                    'nama_penyedia' => $item['nama_perusahaan'],
+                    'alamat' => $item['alamat_perusahaan'],
+                    'unit_bidang' => $item['unit_kerja'],
+                    'metode' => $item['metode_pemilihan'],
+                    'jumlah_kontrak' => $item['jumlah_kontrak'],
+                    'total_nilai_kontrak' => $item['total_nilai_kontrak'],
+                    'rata_nilai_evaluasi' => round($item['rata_nilai_evaluasi'] ?? 0, 2),
+                    'ppk' => implode(', ', $ppkNames),
+                ];
+            }
+            
+            $dataProvider = new \yii\data\ArrayDataProvider([
+                'allModels' => $rows,
+                'pagination' => false,
+                'sort' => [
+                    'attributes' => ['nama_penyedia', 'jumlah_kontrak', 'total_nilai_kontrak', 'rata_nilai_evaluasi'],
+                    'defaultOrder' => ['jumlah_kontrak' => SORT_DESC],
+                ],
+            ]);
+
+            $title = 'Statistik Penyedia Berdasarkan Kontrak';
+
+            // Handle PDF or HTML output
+            if ($request->post('type') === 'pdf') {
+                $pdf = new \kartik\mpdf\Pdf([
+                    'mode' => \kartik\mpdf\Pdf::MODE_UTF8,
+                    'format' => \kartik\mpdf\Pdf::FORMAT_A4,
+                    'orientation' => \kartik\mpdf\Pdf::ORIENT_LANDSCAPE,
+                    'destination' => \kartik\mpdf\Pdf::DEST_BROWSER,
+                    'content' => $this->renderPartial('_pdf_statistik_penyedia', [
+                        'dataProvider' => $dataProvider,
+                        'title' => $title,
+                        'rows' => $rows
+                    ]),
+                    'options' => [
+                        'title' => $title,
+                        'subject' => $title,
+                    ],
+                    'methods' => [
+                        'SetHeader' => [$title],
+                        'SetFooter' => ['{PAGENO}'],
+                    ]
+                ]);
+                return $pdf->render();
+            }
+
+            return $this->render('_statistik_penyedia', [
+                'dataProvider' => $dataProvider,
+                'title' => $title,
+                'rows' => $rows
+            ]);
+        }
+    }
 }
