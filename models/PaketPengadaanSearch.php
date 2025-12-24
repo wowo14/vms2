@@ -8,8 +8,8 @@ class PaketPengadaanSearch extends PaketPengadaan{
     public function rules()
     {
         return [
-            [['id', 'created_by', 'unit','tahun_anggaran', 'approval_by'], 'integer'],
-            [['nomor','admin_ppkom', 'linksirup','created_at','updated_at', 'tanggal_dpp','tanggal_persetujuan','nomor_persetujuan','kategori_pengadaan','addition','tanggal_paket', 'tanggal_reject','alasan_reject', 'nama_paket', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'metode_pengadaan'], 'safe'],
+            [['id', 'created_by','tahun_anggaran', 'approval_by'], 'integer'],
+            [['nomor','admin_ppkom','unit', 'linksirup','created_at','updated_at', 'tanggal_dpp','tanggal_persetujuan','nomor_persetujuan','kategori_pengadaan','addition','tanggal_paket', 'tanggal_reject','alasan_reject', 'nama_paket', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'metode_pengadaan'], 'safe'],
             [['pagu'], 'number'],
         ];
     }
@@ -35,6 +35,7 @@ class PaketPengadaanSearch extends PaketPengadaan{
             $query->joinWith('dpp.staffadmin s');
             $query->andWhere(['s.id_user'=> Yii::$app->user->identity->id]);
         }
+        $query->joinWith('unitnya u');
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
@@ -55,6 +56,7 @@ class PaketPengadaanSearch extends PaketPengadaan{
         ]);
         $query->andFilterWhere(['like', 'nomor', $this->nomor])
             ->andFilterWhere(['between', 'datetime(tanggal_paket)', ($this->range($this->tanggal_paket, 's')), ($this->range($this->tanggal_paket, 'e'))])
+            ->andFilterWhere(['like', 'u.unit', $this->unit])
             ->andFilterWhere(['like', 'nama_paket', $this->nama_paket])
             ->andFilterWhere(['like', 'linksirup', $this->linksirup])
             ->andFilterWhere(['like', 'kode_program', $this->kode_program])

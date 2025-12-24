@@ -47,7 +47,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             'tanggal_reject' => 'Tanggal Reject', //not null ditolak
             'pemenang' => 'Pemenang', // id vendor pemenang
             'addition' => 'Addition', // kolom tambahan
-            'unit' => 'Unit_Bidang_Bagian',
+            'unit' => 'Unit /Bidang / Bagian',
             'dibatalkan' => 'Dibatalkan Oleh',
             'alasan_dibatalkan' => 'Alasan Dibatalkan',
             'berita_acara_pembatalan' => 'Berita Acara Pembatalan',

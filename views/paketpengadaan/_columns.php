@@ -46,6 +46,12 @@ return [
         'attribute' => 'nama_paket',
     ],
     [
+        'attribute'=>'unit',
+        'value'=>function($model){
+            return $model->unitnya->unit;
+        }
+    ],
+    [
         'class' => '\kartik\grid\DataColumn',
         'attribute' => 'kode_program',
     ],
