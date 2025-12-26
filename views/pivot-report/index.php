@@ -21,7 +21,8 @@ $pejabat = $all + $model::getAllpetugas();
 // $admin = array_merge(['' => '', 'all' => 'all'], $model::getAlladmin());
 $admin = $all + $model::getAlladmin();
 $ppkom = $all + $model::optionppkom();
-$bidang = array_merge(['' => '', 'all' => 'all'], Unit::collectAll()->pluck('unit', 'id')->toArray());
+$unitnya=Unit::collectAll()->pluck('unit', 'id')->toArray();
+$bidang = (['' => '', 'all' => 'all'])+$unitnya;
 $form = ActiveForm::begin([
     'id' => 'rpt-form',
     'action' =>$action??$link,
