@@ -97,7 +97,7 @@ AppAsset::register($this);
                             'data-original-title' => Yii::t('yii2-ajaxcrud', 'Kirim DPP'),
                         ]
                     ),
-                ]) : ''),
+                ]) : Url::a('<i class="fa fa-file"></i>&nbsp; ' . Yii::t('yii2-ajaxcrud', 'File Template Pengadaan Terbaru'), ['site/downloads'], ['class' => 'btn btn-primary btn-xs']) ),
                 'after' => BulkButtonWidget::widget([
                     'buttons' => Html::a(
                         '<i class="fa fa-trash"></i>&nbsp; ' . Yii::t('yii2-ajaxcrud', 'Delete All'),
