@@ -69,6 +69,26 @@ class SiteController extends Controller
         return $this->redirect('/site/dashboard');
         // return $this->render('index');
     }
+    public function actionDownloads()
+    {
+        $path = Yii::getAlias('@app/web/downloads');
+        $files = [];
+        $title = 'File Template Pengadaan Terbaru';
+        if (is_dir($path)) {
+            $files = FileHelper::findFiles($path, ['recursive' => false]);
+        }
+        return $this->render('downloads', [
+            'files' => $files,'title'=>$title
+        ]);
+    }
+    public function actionDownloadFile($file)
+    {
+        $path = Yii::getAlias('@app/web/downloads') . '/' . $file;
+        if (file_exists($path)) {
+            return Yii::$app->response->sendFile($path);
+        }
+        throw new \yii\web\NotFoundHttpException("File not found.");
+    }
     public function actionLogin()
     {
         $this->layout = 'main-login';
