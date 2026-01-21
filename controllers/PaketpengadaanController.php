@@ -125,9 +125,9 @@ class PaketpengadaanController extends Controller {
             $model = $this->findModel($pk);
             $jenisdokumen = Attachment::collectAll(['user_id' => $model->id])->pluck('jenis_dokumen')->toArray();
             sort($jenisdokumen);
-            if ($jenisdokumen !== $model->requiredlampiran) {
-                throw new ServerErrorHttpException('Paket Pengadaan: Lampiran belum diupload semua');
-            }
+            // if ($jenisdokumen !== $model->requiredlampiran) {
+            //     throw new ServerErrorHttpException('Paket Pengadaan: Lampiran belum diupload semua');
+            // }
             $dp = Dpp::where(['paket_id' => $model->id])->one();
             if ($dp) {
                 if ($model->tanggal_reject && $model->alasan_reject) {

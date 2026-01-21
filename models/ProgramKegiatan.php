@@ -58,6 +58,7 @@ use yii\helpers\ArrayHelper;class ProgramKegiatan extends \yii\db\ActiveRecord {
         if (!$exists) {
             $old = self::where(['tahun_anggaran' => $from])->all();
             if ($old) {
+                try {
                 foreach ($old as $o) {
                     $to = new ProgramKegiatan();
                     $to->attributes = $o->attributes;
@@ -66,6 +67,9 @@ use yii\helpers\ArrayHelper;class ProgramKegiatan extends \yii\db\ActiveRecord {
                 }
                 $message = 'success copy ' . $from . ' to ' . $target;
                 $status = 'success';
+                }catch(\Throwable $e){
+                    Yii::error('failed copy ' . $from . ' to ' . $target . ' because ' . $e->getMessage());
+                }
             } else {
                 $message = 'failed copy ' . $from . ' to ' . $target . ' because ' . $from . ' not found';
                 $status = 'error';

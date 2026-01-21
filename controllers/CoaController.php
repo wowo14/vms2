@@ -52,10 +52,14 @@ class CoaController extends Controller {
                 ];
             }
             if ($model->load($request->post())) {
-                $req = $request->post('KodeRekening')['tahun_anggaran']; // array from multipleinput
-                $res = [];
-                foreach ($req as $key => $val) {
-                    $res = $model::copyto($val['from'], $val['to']);
+                try{
+                    $req = $request->post('KodeRekening')['tahun_anggaran']; // array from multipleinput
+                    $res = [];
+                    foreach ($req as $key => $val) {
+                        $res = $model::copyto($val['from'], $val['to']);
+                    }
+                }catch(\Throwable $e){
+                    Yii::error('failed copy coa because ' . $e->getMessage());
                 }
                 if ($res['status'] == 'success') {
                     return [
