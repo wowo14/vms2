@@ -20,6 +20,8 @@ composer.phar
 composer.lock
 # Mac DS_Store Files
 .DS_Store
+# Mac AppleDouble files
+._*
 # phpunit itself is not needed
 phpunit.phar
 # local phpunit config /Users/rsis/Documents/project/yii2-stanmin
