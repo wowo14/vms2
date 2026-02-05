@@ -53,7 +53,7 @@ use yii\helpers\{Url, ArrayHelper};
             ];
             // (Yii::$app->user->isGuest) ?ArrayHelper::merge($menu, ['items'=>MenuHelper::getAssignedMenu(Yii::$app->user->id)]) : $menu;
             $menu = ArrayHelper::merge(['items' => MenuHelper::getAssignedMenu(Yii::$app->user->id)], $menu);
-            $menu['items'][] = ['label' => 'Report Penyedia', 'url' => ['/report-penyedia/index'], 'icon' => 'file-alt'];
+            // $menu['items'][] = ['label' => 'Report Penyedia', 'url' => ['/report-penyedia/index'], 'icon' => 'file-alt'];
             $menu = collect($menu['items'])->map(function ($item) {
                 if (isset($item['url']))
                     if ($item['url'] == ['site/logout'])
