@@ -1,12 +1,15 @@
 <?php
 namespace app\models;
 use Yii;
-class PenilaianPenyedia extends \yii\db\ActiveRecord {
+class PenilaianPenyedia extends \yii\db\ActiveRecord
+{
     use GeneralModelsTrait;
-    public static function tableName() {
+    public static function tableName()
+    {
         return 'penilaian_penyedia';
     }
-    public function rules() {
+    public function rules()
+    {
         return [
             [['unit_kerja', 'bast', 'bast_diterimagudang', 'created_at', 'updated_at', 'nama_perusahaan', 'alamat_perusahaan', 'paket_pekerjaan', 'lokasi_pekerjaan', 'nomor_kontrak', 'jangka_waktu', 'tanggal_kontrak', 'metode_pemilihan', 'details', 'pengguna_anggaran', 'pejabat_pembuat_komitmen'], 'string'],
             [['alamat_perusahaan', 'paket_pekerjaan', 'nilai_kontrak', 'nomor_kontrak'], 'required'],
@@ -14,7 +17,8 @@ class PenilaianPenyedia extends \yii\db\ActiveRecord {
             [['dpp_id', 'created_by', 'updated_by'], 'integer'],
         ];
     }
-    public function attributeLabels() {
+    public function attributeLabels()
+    {
         return [
             'id' => 'ID',
             'dpp_id' => 'Dpp',
@@ -39,22 +43,29 @@ class PenilaianPenyedia extends \yii\db\ActiveRecord {
             'bast_diterimagudangan' => 'BAST Diterima Gudang',
         ];
     }
-    public function getDpp() {
+    public function getDpp()
+    {
         return $this->hasOne(Dpp::class, ['id' => 'dpp_id'])->cache(self::cachetime(), self::settagdep('tag_dpp'));
     }
-    public function store() {
+    public function store()
+    {
     }
-    public function beforeSave($insert) {
+    public function beforeSave($insert)
+    {
         if (parent::beforeSave($insert)) {
             if ($insert) {
                 $this->created_at = date('Y-m-d H:i:s');
-                $this->created_by = Yii::$app->user->id;
+                if (isset(Yii::$app->user) && Yii::$app->user->identity) {
+                    $this->created_by = Yii::$app->user->id;
+                }
                 if (isset($this->bast)) {
                     $this->bast = !empty($this->bast) ? $this->upload($this->bast, 'bast_' . $this->dpp_id . '_' . time()) : '';
                 }
             } else {
                 $this->updated_at = date('Y-m-d H:i:s');
-                $this->updated_by = Yii::$app->user->id;
+                if (isset(Yii::$app->user) && Yii::$app->user->identity) {
+                    $this->updated_by = Yii::$app->user->id;
+                }
                 $this->bast = !empty($this->bast) && self::isBase64Encoded($this->bast) ? $this->upload($this->bast, 'bast_' . $this->dpp_id . '_' . time()) : $this->bast;
             }
             return true;
@@ -62,7 +73,8 @@ class PenilaianPenyedia extends \yii\db\ActiveRecord {
             return false;
         }
     }
-    public function getGriddetail() {
+    public function getGriddetail()
+    {
         $data = json_decode($this->details, true);
         $rows = [];
         //add check isset key uraian
@@ -83,9 +95,10 @@ class PenilaianPenyedia extends \yii\db\ActiveRecord {
         // Merge the main rows and summary rows
         return array_merge($rows, $summary);
     }
-    public static function getScoreDescription($uraian, $score) {
+    public static function getScoreDescription($uraian, $score)
+    {
         $types = ['evaluasi_suplier_ppk', 'evaluasi_suplier_pejabat'];
-        
+
         foreach ($types as $type) {
             $setting = \app\models\Setting::findOne(['type' => $type, 'active' => 1]);
             if ($setting) {

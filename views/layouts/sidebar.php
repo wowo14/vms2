@@ -5,7 +5,8 @@ use yii\helpers\{Url, ArrayHelper};
 <aside class="main-sidebar sidebar-dark-navy elevation-4">
     <!-- Brand Logo -->
     <a href="" class="brand-link">
-        <img src="/images/logoupbj.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+        <img src="/images/logoupbj.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+            style="opacity: .8">
         <span class="brand-text font-weight-light"><?= \Yii::$app->name ?></span>
     </a>
     <!-- Sidebar -->
@@ -52,6 +53,7 @@ use yii\helpers\{Url, ArrayHelper};
             ];
             // (Yii::$app->user->isGuest) ?ArrayHelper::merge($menu, ['items'=>MenuHelper::getAssignedMenu(Yii::$app->user->id)]) : $menu;
             $menu = ArrayHelper::merge(['items' => MenuHelper::getAssignedMenu(Yii::$app->user->id)], $menu);
+            $menu['items'][] = ['label' => 'Report Penyedia', 'url' => ['/report-penyedia/index'], 'icon' => 'file-alt'];
             $menu = collect($menu['items'])->map(function ($item) {
                 if (isset($item['url']))
                     if ($item['url'] == ['site/logout'])
