@@ -399,30 +399,26 @@ class DppController extends Controller
             return $this->redirect(['index']);
         }
     }
+    // PERBAIKAN FUNGSI UPDATE NAMES
     private function updateNamesWithCounts($data, $names, $keyField, $excludeId = null)
     {
-        // Yii::info("DPP DEBUG: updateNamesWithCounts started for field: $keyField, excludeId: $excludeId", 'dpp');
+        // Hitung jumlah pekerjaan per pejabat/admin
         $counts = collect($data)->filter(function ($item) use ($excludeId) {
-            // Exclude current task if excludeId is provided
+            // Exclude DPP yang sedang diedit agar hitungan tidak termasuk dirinya sendiri
             if ($excludeId && isset($item['id']) && $item['id'] == $excludeId) {
                 return false;
             }
-            // Ensure the task has a valid paketpengadaan (handle orphans)
+            // Pastikan ada data paketpengadaan
             if (!isset($item['paketpengadaan'])) {
                 return false;
             }
             return true;
         })->pluck($keyField)->countBy();
-        // Yii::info("DPP DEBUG: Counts result: " . json_encode($counts->toArray()), 'dpp');
 
-        $filtered = $counts->mapWithKeys(function ($count, $id) use ($names) {
-            $name = $names[$id] ?? 'Unknown'; // Default to 'Unknown' if the name is not in the array
-            return [$id => "$name ($count)"];
-        })->toArray();
-        // Yii::info("DPP DEBUG: Filtered results: " . json_encode($filtered), 'dpp');
-        foreach ($filtered as $key => $value) {
-            if (isset($names[$key])) {
-                $names[$key] = $value; // Update the value in array1 with array2's value
+        // Update nama dengan format: "Nama (jumlah)"
+        foreach ($names as $id => $name) {
+            if (isset($counts[$id]) && $counts[$id] > 0) {
+                $names[$id] = "$name ({$counts[$id]})";
             }
         }
         return $names;
@@ -457,30 +453,26 @@ class DppController extends Controller
                 $model->save();
             }
             $dataPaket = $model::collectAll(['approval_by' => null, 'pemenang' => null, 'id' => $model->id])->pluck('nomornamapaket', 'id')->toArray();
-            //penugasan
-            // Base query for non-winners
-            $baseQuery = Dpp::where(['is', 'pp.pemenang', null])
-                ->joinWith(['paketpengadaan pp']);
+            //penugasan - PERBAIKAN QUERY
+            // Base query untuk DPP yang belum ada pemenang
+            $baseQuery = Dpp::where(['pp.pemenang' => null])
+                ->joinWith(['paketpengadaan pp'])
+                ->andWhere(['pp.tahun_anggaran' => new Expression("strftime('%Y', 'now')")])
+                ->andWhere(['pp.alasan_reject' => '']);
 
-            // Data for workload counts:
-            // 1. Filter by current year (using current system date)
-            // 2. Filter out rejected packages
-            // 3. Filter only those WITHOUT a Penugasan record (requested: "belum ditugaskan")
-            $dt = (clone $baseQuery)
-                ->joinWith('penugasan pt')
-                ->andWhere(['is', 'pt.id', null])
-                ->andWhere(['pp.tahun_anggaran' => date('Y')])
-                ->andWhere(['or', ['pp.alasan_reject' => ''], ['pp.alasan_reject' => null]])
-                ->asArray()
-                ->all();
+            // Data untuk hitung workload (tidak perlu exclude ID di sini, nanti dihitung di fungsi update)
+            $dt = (clone $baseQuery)->asArray()->all();
 
-            // Query for the DPP selection dropdown on this page (might need more flexibility)
+            // Query untuk dropdown DPP selection
             $query = clone $baseQuery;
             if ($id !== null) {
                 $query->andWhere(['dpp.id' => $id]);
             }
+
             $pejabatNames = $model::getAllpetugas();
             $adminnames = $model::getAlladmin();
+           
+            // PERBAIKAN: Gunakan fungsi update yang benar
             $pejabatNames = $this->updateNamesWithCounts($dt, $pejabatNames, 'pejabat_pengadaan', $id);
             $adminnames = $this->updateNamesWithCounts($dt, $adminnames, 'admin_pengadaan', $id);
             $datapenugasan = [
