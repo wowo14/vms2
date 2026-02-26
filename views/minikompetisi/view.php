@@ -14,31 +14,146 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
 ?>
 
 <style>
-/* ===== Panel simulasi ===== */
-.sim-card { border-left: 4px solid #6c5ffc; }
-.sim-slider { -webkit-appearance: none; appearance: none; height: 6px; border-radius: 3px; background: #dee2e6; outline: none; }
-.sim-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #6c5ffc; cursor: pointer; }
-.badge-rank { display: inline-block; min-width: 22px; padding: 2px 5px; border-radius: 99px; font-size: 10px; font-weight: 700; text-align: center; }
-.rank-1  { background:#ffc107; color:#212529; }
-.rank-2  { background:#adb5bd; color:#212529; }
-.rank-3  { background:#cd7f32; color:#fff; }
-.rank-n  { background:#e9ecef; color:#495057; }
+    /* ===== Panel simulasi ===== */
+    .sim-card {
+        border-left: 4px solid #6c5ffc;
+    }
 
-/* ===== Matrix table ===== */
-#matrix-wrap { overflow-x: auto; }
-#matrix-table { min-width: 700px; border-collapse: collapse; font-size: 13px; }
-#matrix-table thead tr.vendor-header th { vertical-align: top; text-align: center; padding: 8px 6px; }
-#matrix-table thead tr.vendor-header th.winner-col { background: #fff3cd; border-top: 3px solid #ffc107; }
-#matrix-table tbody tr td { padding: 6px 8px; vertical-align: middle; }
-#matrix-table tbody tr:hover td { background: rgba(0,0,0,.03); }
-.cell-best  { background: #d4edda !important; }
-.cell-worst { background: #f8d7da !important; }
-.cell-winner-vendor { background: rgba(255,243,205,.5) !important; }
-.item-name-col { min-width: 160px; font-weight: 600; }
-.harga-cell { text-align: right; white-space: nowrap; }
-.footer-row td { font-weight: 700; background: #f8f9fa; }
-.skor-row td { font-size: 12px; background: #f1f3f5; }
-.winner-badge { font-size: 11px; }
+    .sim-slider {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 6px;
+        border-radius: 3px;
+        background: #dee2e6;
+        outline: none;
+    }
+
+    .sim-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #6c5ffc;
+        cursor: pointer;
+    }
+
+    .badge-rank {
+        display: inline-block;
+        min-width: 22px;
+        padding: 2px 5px;
+        border-radius: 99px;
+        font-size: 10px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .rank-1 {
+        background: #ffc107;
+        color: #212529;
+    }
+
+    .rank-2 {
+        background: #adb5bd;
+        color: #212529;
+    }
+
+    .rank-3 {
+        background: #cd7f32;
+        color: #fff;
+    }
+
+    .rank-n {
+        background: #e9ecef;
+        color: #495057;
+    }
+
+    /* ===== Item ranking panel ===== */
+    #item-rank-panel .irp-card { border-radius: 8px; overflow: hidden; border: 1px solid #dee2e6; }
+    #item-rank-panel .irp-head { background: #343a40; color: #fff; padding: 10px 14px; display: flex; gap: 10px; font-size: 12px; font-weight: 700; }
+    #item-rank-panel .irp-head .col-v { flex: 1; }
+    #item-rank-panel .irp-head .col-p { min-width: 120px; text-align: right; }
+    #item-rank-panel .irp-head .col-t { min-width: 120px; text-align: right; }
+    #item-rank-panel .irp-head .col-pct { min-width: 75px; text-align: right; }
+    #item-rank-panel .irp-head .col-r { min-width: 50px; text-align: center; }
+    #item-rank-panel .irp-row { display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+    #item-rank-panel .irp-row:last-child { border-bottom: none; }
+    #item-rank-panel .irp-row .col-v { flex: 1; font-weight: 600; }
+    #item-rank-panel .irp-row .col-p { min-width: 120px; text-align: right; }
+    #item-rank-panel .irp-row .col-t { min-width: 120px; text-align: right; color: #6c757d; font-size: 12px; }
+    #item-rank-panel .irp-row .col-pct { min-width: 75px; text-align: right; font-size: 12px; }
+    #item-rank-panel .irp-row .col-r { min-width: 50px; text-align: center; }
+    #item-rank-panel .irp-row.best-item { background: #d4edda; }
+    #item-rank-panel .irp-row.worst-item { background: #f8d7da; }
+    #item-rank-panel .irp-row.winner-vendor { background: #fff9db; }
+    #item-rank-panel .irp-title { font-size: 14px; font-weight: 700; padding: 8px 14px; background: #f8f9fa;
+        border-bottom: 2px solid #dee2e6; display: flex; align-items: center; gap: 8px; }
+
+    /* ===== Matrix table ===== */
+    #matrix-wrap {
+        overflow-x: auto;
+    }
+
+    #matrix-table {
+        min-width: 700px;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    #matrix-table thead tr.vendor-header th {
+        vertical-align: top;
+        text-align: center;
+        padding: 8px 6px;
+    }
+
+    #matrix-table thead tr.vendor-header th.winner-col {
+        background: #fff3cd;
+        border-top: 3px solid #ffc107;
+    }
+
+    #matrix-table tbody tr td {
+        padding: 6px 8px;
+        vertical-align: middle;
+    }
+
+    #matrix-table tbody tr:hover td {
+        background: rgba(0, 0, 0, .03);
+    }
+
+    .cell-best {
+        background: #d4edda !important;
+    }
+
+    .cell-worst {
+        background: #f8d7da !important;
+    }
+
+    .cell-winner-vendor {
+        background: rgba(255, 243, 205, .5) !important;
+    }
+
+    .item-name-col {
+        min-width: 160px;
+        font-weight: 600;
+    }
+
+    .harga-cell {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .footer-row td {
+        font-weight: 700;
+        background: #f8f9fa;
+    }
+
+    .skor-row td {
+        font-size: 12px;
+        background: #f1f3f5;
+    }
+
+    .winner-badge {
+        font-size: 11px;
+    }
 </style>
 
 <div class="minikompetisi-view">
@@ -92,7 +207,7 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
                         <select name="vendor_id" class="form-control" required>
                             <option value="">- Pilih Vendor -</option>
                             <?php foreach ($vendors as $v): ?>
-                                    <option value="<?= $v->id ?>"><?= Html::encode($v->nama_vendor) ?></option>
+                                <option value="<?= $v->id ?>"><?= Html::encode($v->nama_vendor) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -102,7 +217,8 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
                         <input type="file" name="file_excel" class="form-control" accept=".xlsx, .xls" required>
                     </div>
 
-                    <button class="btn btn-success btn-block" type="submit"><i class="fas fa-upload"></i> Proses &amp; Hitung Skor</button>
+                    <button class="btn btn-success btn-block" type="submit"><i class="fas fa-upload"></i> Proses &amp;
+                        Hitung Skor</button>
                     <?php ActiveForm::end(); ?>
                 </div>
             </div>
@@ -164,24 +280,26 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
                         </thead>
                         <tbody>
                             <?php if (empty($penawarans)): ?>
-                                    <tr><td colspan="6" class="text-center text-muted py-3">Belum ada penawaran diproses</td></tr>
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-3">Belum ada penawaran diproses</td>
+                                </tr>
                             <?php else: ?>
-                                    <?php foreach ($penawarans as $p): ?>
-                                        <tr class="<?= $p->is_winner ? 'table-warning' : '' ?>">
-                                            <td class="text-center">
-                                                <?php if ($p->ranking == 1): ?><span class="badge-rank rank-1">🥇 1</span>
-                                                <?php elseif ($p->ranking == 2): ?><span class="badge-rank rank-2">🥈 2</span>
-                                                <?php elseif ($p->ranking == 3): ?><span class="badge-rank rank-3">🥉 3</span>
-                                                <?php else: ?><span class="badge-rank rank-n"><?= $p->ranking ?></span>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td><?= Html::encode($p->vendor->nama_vendor) ?></td>
-                                            <td class="text-right"><?= Yii::$app->formatter->asCurrency($p->total_harga) ?></td>
-                                            <td class="text-right"><?= round($p->total_skor_harga, 2) ?></td>
-                                            <td class="text-right"><?= round($p->total_skor_kualitas, 2) ?></td>
-                                            <td class="text-right font-weight-bold"><?= round($p->total_skor_akhir, 2) ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
+                                <?php foreach ($penawarans as $p): ?>
+                                    <tr class="<?= $p->is_winner ? 'table-warning' : '' ?>">
+                                        <td class="text-center">
+                                            <?php if ($p->ranking == 1): ?><span class="badge-rank rank-1">🥇 1</span>
+                                            <?php elseif ($p->ranking == 2): ?><span class="badge-rank rank-2">🥈 2</span>
+                                            <?php elseif ($p->ranking == 3): ?><span class="badge-rank rank-3">🥉 3</span>
+                                            <?php else: ?><span class="badge-rank rank-n"><?= $p->ranking ?></span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?= Html::encode($p->vendor->nama_vendor) ?></td>
+                                        <td class="text-right"><?= Yii::$app->formatter->asCurrency($p->total_harga) ?></td>
+                                        <td class="text-right"><?= round($p->total_skor_harga, 2) ?></td>
+                                        <td class="text-right"><?= round($p->total_skor_kualitas, 2) ?></td>
+                                        <td class="text-right font-weight-bold"><?= round($p->total_skor_akhir, 2) ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -207,7 +325,8 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
             <!-- PANEL SIMULASI -->
             <div class="card sim-card shadow-sm">
                 <div class="card-header bg-white d-flex align-items-center flex-wrap" style="gap:12px;">
-                    <h3 class="card-title mb-0 mr-3"><i class="fas fa-sliders-h text-primary mr-1"></i> Simulasi Evaluasi (Hot-Reload)</h3>
+                    <h3 class="card-title mb-0 mr-3"><i class="fas fa-sliders-h text-primary mr-1"></i> Simulasi
+                        Evaluasi (Hot-Reload)</h3>
 
                     <div class="d-flex align-items-center" style="gap:8px;">
                         <label class="mb-0 font-weight-bold text-muted" style="font-size:13px;">Metode:</label>
@@ -221,29 +340,54 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
                     <div id="sim-bobot-section" class="d-flex align-items-center flex-wrap" style="gap:12px;">
                         <div class="d-flex align-items-center" style="gap:8px;">
                             <label class="mb-0 text-muted" style="font-size:13px;">Bobot Kualitas:</label>
-                            <input type="range" id="sim-kualitas" class="sim-slider" min="0" max="100" step="5" value="50" style="width:110px;">
-                            <span id="sim-kualitas-val" class="badge badge-secondary" style="min-width:40px;font-size:13px;">50%</span>
+                            <input type="range" id="sim-kualitas" class="sim-slider" min="0" max="100" step="5"
+                                value="50" style="width:110px;">
+                            <span id="sim-kualitas-val" class="badge badge-secondary"
+                                style="min-width:40px;font-size:13px;">50%</span>
                         </div>
                         <div class="d-flex align-items-center" style="gap:8px;">
                             <label class="mb-0 text-muted" style="font-size:13px;">Bobot Harga:</label>
-                            <input type="range" id="sim-harga" class="sim-slider" min="0" max="100" step="5" value="50" style="width:110px;" disabled>
-                            <span id="sim-harga-val" class="badge badge-secondary" style="min-width:40px;font-size:13px;">50%</span>
+                            <input type="range" id="sim-harga" class="sim-slider" min="0" max="100" step="5" value="50"
+                                style="width:110px;" disabled>
+                            <span id="sim-harga-val" class="badge badge-secondary"
+                                style="min-width:40px;font-size:13px;">50%</span>
                         </div>
                     </div>
 
-                    <button id="sim-reset" class="btn btn-outline-secondary btn-sm ml-auto"><i class="fas fa-undo"></i> Reset ke Asal</button>
+                    <button id="sim-reset" class="btn btn-outline-secondary btn-sm ml-auto"><i class="fas fa-undo"></i>
+                        Reset ke Asal</button>
                 </div>
             </div>
 
             <!-- MATRIX KONSOLIDASI -->
             <div class="card card-outline card-dark mt-2">
-                <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-table mr-1"></i> Matriks Konsolidasi Penawaran</h3>
-                    <span class="badge badge-light ml-2" style="font-size:11px;">Kolom diurutkan dari terbaik (kiri) ke terburuk (kanan) secara live</span>
+                <div class="card-header d-flex align-items-center flex-wrap" style="gap:8px;">
+                    <h3 class="card-title mb-0"><i class="fas fa-table mr-1"></i> Matriks Konsolidasi Penawaran</h3>
+                    <span class="badge badge-light ml-2" style="font-size:11px;">Kolom diurutkan dari terbaik (kiri) ke
+                        terburuk (kanan) secara live</span>
+                    <button id="btn-export-excel" class="btn btn-success btn-sm ml-auto" disabled>
+                        <i class="fas fa-file-excel mr-1"></i> Export Excel
+                    </button>
                 </div>
                 <div class="card-body p-2">
+                    <!-- FILTER PER ITEM -->
+                    <div id="item-filter-bar"
+                        class="d-none mb-2 p-2 bg-light rounded border d-flex align-items-center flex-wrap"
+                        style="gap:10px;">
+                        <i class="fas fa-filter text-primary"></i>
+                        <strong style="font-size:13px;">Filter Item:</strong>
+                        <select id="item-filter-select" class="form-control form-control-sm" style="max-width:280px;">
+                            <option value="">-- Tampilkan Semua Item --</option>
+                        </select>
+                        <small class="text-muted">Pilih item untuk melihat ranking harga antar penyedia</small>
+                    </div>
+
+                    <!-- ITEM RANKING DETAIL (muncul saat item dipilih) -->
+                    <div id="item-rank-panel" class="d-none mb-2"></div>
+
                     <div id="matrix-wrap">
-                        <div id="matrix-loading" class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin mr-1"></i> Memuat data...</div>
+                        <div id="matrix-loading" class="text-center py-4 text-muted"><i
+                                class="fas fa-spinner fa-spin mr-1"></i> Memuat data...</div>
                         <table id="matrix-table" class="table table-bordered" style="display:none;"></table>
                     </div>
                 </div>
@@ -255,6 +399,7 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
 </div><!-- /minikompetisi-view -->
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <?php
 // Static chart (PHP-rendered, no hot-reload needed here)
 $hps_total = 0;
@@ -327,6 +472,32 @@ $(function () {
         syncSliderLabels();
         toggleBobotSection();
         renderMatrix(calcRanking(data.metode, parseFloat(data.bobot_kualitas), parseFloat(data.bobot_harga)));
+
+        // Populate item filter dropdown
+        var sel = $('#item-filter-select');
+        data.items.forEach(function(item) {
+            sel.append('<option value="' + item.id + '">' + $('<div>').text(item.nama_produk).html() + ' (' + item.qty + ' ' + (item.satuan || '') + ')</option>');
+        });
+        $('#item-filter-bar').removeClass('d-none');
+    });
+
+    // Filter change handler
+    $('#item-filter-select').on('change', function() {
+        var itemId = parseInt($(this).val());
+        if (!itemId || !_lastVendors.length) {
+            $('#item-rank-panel').addClass('d-none').empty();
+            $('#matrix-wrap').show();
+            return;
+        }
+        renderItemRanking(itemId, _lastVendors);
+        // Highlight row in matrix
+        $('#matrix-table tbody tr').css('opacity', '0.4');
+        $('#matrix-table tbody tr').filter(function() {
+            return $(this).find('td.item-name-col').length > 0;
+        }).each(function() {
+            // we can't easily match by item name reliably; just show the panel
+        });
+        $('#matrix-table tbody tr').css('opacity', '');
     });
 
     /* ─────────────── SIMULASI CONTROLS ─────────────── */
@@ -371,7 +542,11 @@ $(function () {
         var metode = parseInt($('#sim-metode').val());
         var bk = parseFloat($('#sim-kualitas').val());
         var bh = parseFloat($('#sim-harga').val());
-        renderMatrix(calcRanking(metode, bk, bh));
+        var vendors = calcRanking(metode, bk, bh);
+        renderMatrix(vendors);
+        // Refresh item panel if item is selected
+        var selectedItem = parseInt($('#item-filter-select').val());
+        if (selectedItem) renderItemRanking(selectedItem, vendors);
     }
 
     /* ─────────────── CALCULATION ENGINE ─────────────── */
@@ -428,6 +603,9 @@ $(function () {
     }
 
     function renderMatrix(vendors) {
+        _lastVendors = vendors || [];
+        $('#btn-export-excel').prop('disabled', !_lastVendors.length);
+
         var tbl = $('#matrix-table');
         tbl.empty();
 
@@ -542,6 +720,167 @@ $(function () {
     function htmlEnc(str) {
         return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
+
+    /* ─────────────── ITEM RANKING ─────────────── */
+    function renderItemRanking(itemId, vendors) {
+        var item = _raw.items.find(function(i) { return i.id === itemId; });
+        if (!item) return;
+
+        // Collect vendor prices for this item, then sort ASC (cheapest = rank 1)
+        var rows = [];
+        vendors.forEach(function(v) {
+            var pi = v.items.find(function(i) { return i.item_id === itemId; });
+            rows.push({
+                nama_vendor : v.nama_vendor,
+                harga       : pi ? pi.harga_penawaran : null,
+                total       : (pi && pi.harga_penawaran) ? pi.harga_penawaran * item.qty : null,
+                is_winner   : v._is_winner,
+                vendor_rank : v._ranking,
+            });
+        });
+
+        // Sort by harga ASC, nulls last
+        rows.sort(function(a, b) {
+            if (a.harga === null && b.harga === null) return 0;
+            if (a.harga === null) return 1;
+            if (b.harga === null) return -1;
+            return a.harga - b.harga;
+        });
+
+        var minH = null, maxH = null;
+        rows.forEach(function(r) {
+            if (r.harga > 0) {
+                if (minH === null || r.harga < minH) minH = r.harga;
+                if (maxH === null || r.harga > maxH) maxH = r.harga;
+            }
+        });
+
+        var hpsTotal = item.harga_hps ? item.harga_hps * item.qty : null;
+
+        var html = '<div class="irp-card">';
+        html += '<div class="irp-title"><i class="fas fa-box-open text-info mr-1"></i>' +
+            htmlEnc(item.nama_produk) +
+            ' &nbsp;<small class="text-muted font-weight-normal">' + item.qty + ' ' + htmlEnc(item.satuan || '') +
+            (item.harga_hps ? ' | HPS Satuan: ' + fmt(item.harga_hps) + ' | HPS Total: ' + fmt(hpsTotal) : '') +
+            '</small></div>';
+        html += '<div class="irp-head">' +
+            '<span class="col-r">Rank Item</span>' +
+            '<span class="col-v">Penyedia</span>' +
+            '<span class="col-p">Harga/Satuan</span>' +
+            '<span class="col-t">Total (×' + item.qty + ')</span>' +
+            '<span class="col-pct">% vs HPS</span>' +
+            '<span class="col-r">Rank Total</span>' +
+            '</div>';
+
+        rows.forEach(function(r, idx) {
+            if (r.harga === null) return; // skip vendors without offer for this item
+            var itemRank = idx + 1;
+            var rowClass = '';
+            if (r.is_winner) rowClass = 'winner-vendor';
+            if (r.harga === minH && rows.filter(function(x){ return x.harga > 0; }).length > 1) rowClass = 'best-item';
+            if (r.harga === maxH && rows.filter(function(x){ return x.harga > 0; }).length > 1) rowClass = 'worst-item';
+
+            var pctVsHps = (item.harga_hps && item.harga_hps > 0)
+                ? ((r.harga / item.harga_hps) * 100).toFixed(1) + '%'
+                : '-';
+            var pctClass = (item.harga_hps && r.harga <= item.harga_hps) ? 'text-success font-weight-bold' : 'text-danger';
+
+            html += '<div class="irp-row ' + rowClass + '">' +
+                '<span class="col-r">' + rankBadge(itemRank) + '</span>' +
+                '<span class="col-v">' + htmlEnc(r.nama_vendor) + (r.is_winner ? ' <span class="badge badge-warning" style="font-size:10px;">🏆</span>' : '') + '</span>' +
+                '<span class="col-p">' + fmt(r.harga) + '</span>' +
+                '<span class="col-t">' + fmt(r.total) + '</span>' +
+                '<span class="col-pct ' + pctClass + '">' + pctVsHps + '</span>' +
+                '<span class="col-r">' + rankBadge(r.vendor_rank) + '</span>' +
+                '</div>';
+        });
+
+        html += '</div>';
+
+        $('#item-rank-panel').html(html).removeClass('d-none');
+    }
+
+    /* ─────────────── EXPORT EXCEL ─────────────── */
+    var _lastVendors = [];
+
+    function exportToExcel(vendors) {
+        if (!vendors || !vendors.length || !_raw) {
+            alert('Belum ada data untuk diexport.');
+            return;
+        }
+
+        var items   = _raw.items;
+        var metode  = parseInt($('#sim-metode').val());
+        var bk      = parseFloat($('#sim-kualitas').val());
+        var bh      = parseFloat($('#sim-harga').val());
+
+        // Map metode label
+        var metodeLabel = metode === 1 ? 'Harga Terendah' : (metode === 2 ? 'Kualitas & Harga (BK:' + bk + '% BH:' + bh + '%)' : 'Lumpsum');
+
+        var wb = XLSX.utils.book_new();
+        var wsData = [];
+
+        // Header info rows
+        wsData.push(['Matriks Konsolidasi Penawaran']);
+        wsData.push(['Metode Evaluasi:', metodeLabel]);
+        wsData.push([]);
+
+        // Column headers: Item, then vendor names + rank
+        var headerRow = ['Item Produk', 'Qty', 'Satuan', 'HPS/Satuan', 'Existing/Satuan'];
+        vendors.forEach(function(v) {
+            headerRow.push('[Rank #' + v._ranking + '] ' + v.nama_vendor);
+        });
+        wsData.push(headerRow);
+
+        // Item rows
+        items.forEach(function(item) {
+            var row = [item.nama_produk, item.qty, item.satuan || '', item.harga_hps, item.harga_existing];
+            vendors.forEach(function(v) {
+                var pi = v.items.find(function(i) { return i.item_id === item.id; });
+                row.push(pi ? pi.harga_penawaran : '');
+            });
+            wsData.push(row);
+        });
+
+        // Blank separator
+        wsData.push([]);
+
+        // Total harga row
+        var totalRow = ['TOTAL HARGA', '', '', '', ''];
+        vendors.forEach(function(v) { totalRow.push(v.total_harga); });
+        wsData.push(totalRow);
+
+        // Skor harga row
+        var skorHargaRow = ['SKOR HARGA', '', '', '', ''];
+        vendors.forEach(function(v) { skorHargaRow.push(parseFloat(v._skor_harga.toFixed(2))); });
+        wsData.push(skorHargaRow);
+
+        if (metode === 2) {
+            var skorKualRow = ['SKOR KUALITAS', '', '', '', ''];
+            vendors.forEach(function(v) { skorKualRow.push(parseFloat(v.total_skor_kualitas.toFixed(2))); });
+            wsData.push(skorKualRow);
+        }
+
+        // Skor akhir row
+        var skorAkhirRow = ['SKOR AKHIR', '', '', '', ''];
+        vendors.forEach(function(v) { skorAkhirRow.push(parseFloat(v._skor_akhir.toFixed(2))); });
+        wsData.push(skorAkhirRow);
+
+        var ws = XLSX.utils.aoa_to_sheet(wsData);
+
+        // Column widths
+        ws['!cols'] = [{wch: 28}, {wch: 7}, {wch: 8}, {wch: 14}, {wch: 14}];
+        vendors.forEach(function() { ws['!cols'].push({wch: 20}); });
+
+        XLSX.utils.book_append_sheet(wb, ws, 'Konsolidasi');
+
+        var fileName = 'Konsolidasi_Penawaran_' + (_raw.id) + '.xlsx';
+        XLSX.writeFile(wb, fileName);
+    }
+
+    $('#btn-export-excel').on('click', function() {
+        exportToExcel(_lastVendors);
+    });
 
 });
 JS;
