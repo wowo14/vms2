@@ -114,4 +114,21 @@ class Minikompetisi extends \yii\db\ActiveRecord
         ];
         return isset($options[$this->status]) ? $options[$this->status] : 'Unknown';
     }
+    public function ubahmetode(){
+        if($this->metode==1 || $this->metode==3){
+            $this->bobot_kualitas = NULL;
+            $this->bobot_harga = NULL;
+        }
+    }
+    public function beforeSave($insert)
+    {
+        if ($this->isNewRecord) {
+            $this->created_at = date('Y-m-d H:i:s');
+            $this->created_by = Yii::$app->user->identity->id;
+        } else {
+            $this->updated_at = date('Y-m-d H:i:s');
+            $this->ubahmetode();
+        }
+        return parent::beforeSave($insert);
+    }
 }

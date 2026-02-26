@@ -305,6 +305,60 @@ class MinikompetisiController extends Controller
         }
     }
 
+    public function actionKonsolidasi($id)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $model = $this->findModel($id);
+
+        // Items
+        $itemRows = [];
+        foreach ($model->minikompetisiItems as $item) {
+            $itemRows[] = [
+                'id' => (int) $item->id,
+                'nama_produk' => $item->nama_produk,
+                'qty' => (float) $item->qty,
+                'satuan' => $item->satuan,
+                'harga_hps' => (float) $item->harga_hps,
+                'harga_existing' => (float) $item->harga_existing,
+            ];
+        }
+
+        // Penawarans with their items
+        $penawaranRows = [];
+        foreach ($model->minikompetisiPenawarans as $p) {
+            $pItems = [];
+            foreach ($p->minikompetisiPenawaranItems as $pi) {
+                $pItems[] = [
+                    'item_id' => (int) $pi->item_id,
+                    'harga_penawaran' => (float) $pi->harga_penawaran,
+                    'skor_kualitas' => (float) $pi->skor_kualitas,
+                    'keterangan' => $pi->keterangan,
+                ];
+            }
+            $penawaranRows[] = [
+                'id' => (int) $p->id,
+                'vendor_id' => (int) $p->vendor_id,
+                'nama_vendor' => $p->vendor->nama_vendor,
+                'total_harga' => (float) $p->total_harga,
+                'total_skor_kualitas' => (float) $p->total_skor_kualitas,
+                'total_skor_harga' => (float) $p->total_skor_harga,
+                'total_skor_akhir' => (float) $p->total_skor_akhir,
+                'ranking' => (int) $p->ranking,
+                'is_winner' => (int) $p->is_winner,
+                'items' => $pItems,
+            ];
+        }
+
+        return [
+            'id' => (int) $model->id,
+            'metode' => (int) $model->metode,
+            'bobot_kualitas' => (float) $model->bobot_kualitas,
+            'bobot_harga' => (float) $model->bobot_harga,
+            'items' => $itemRows,
+            'penawarans' => $penawaranRows,
+        ];
+    }
+
     protected function findModel($id)
     {
         if (($model = Minikompetisi::findOne($id)) !== null) {
