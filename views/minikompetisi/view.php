@@ -68,25 +68,109 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
     }
 
     /* ===== Item ranking panel ===== */
-    #item-rank-panel .irp-card { border-radius: 8px; overflow: hidden; border: 1px solid #dee2e6; }
-    #item-rank-panel .irp-head { background: #343a40; color: #fff; padding: 10px 14px; display: flex; gap: 10px; font-size: 12px; font-weight: 700; }
-    #item-rank-panel .irp-head .col-v { flex: 1; }
-    #item-rank-panel .irp-head .col-p { min-width: 120px; text-align: right; }
-    #item-rank-panel .irp-head .col-t { min-width: 120px; text-align: right; }
-    #item-rank-panel .irp-head .col-pct { min-width: 75px; text-align: right; }
-    #item-rank-panel .irp-head .col-r { min-width: 50px; text-align: center; }
-    #item-rank-panel .irp-row { display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
-    #item-rank-panel .irp-row:last-child { border-bottom: none; }
-    #item-rank-panel .irp-row .col-v { flex: 1; font-weight: 600; }
-    #item-rank-panel .irp-row .col-p { min-width: 120px; text-align: right; }
-    #item-rank-panel .irp-row .col-t { min-width: 120px; text-align: right; color: #6c757d; font-size: 12px; }
-    #item-rank-panel .irp-row .col-pct { min-width: 75px; text-align: right; font-size: 12px; }
-    #item-rank-panel .irp-row .col-r { min-width: 50px; text-align: center; }
-    #item-rank-panel .irp-row.best-item { background: #d4edda; }
-    #item-rank-panel .irp-row.worst-item { background: #f8d7da; }
-    #item-rank-panel .irp-row.winner-vendor { background: #fff9db; }
-    #item-rank-panel .irp-title { font-size: 14px; font-weight: 700; padding: 8px 14px; background: #f8f9fa;
-        border-bottom: 2px solid #dee2e6; display: flex; align-items: center; gap: 8px; }
+    #item-rank-panel .irp-card {
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+    }
+
+    #item-rank-panel .irp-head {
+        background: #343a40;
+        color: #fff;
+        padding: 10px 14px;
+        display: flex;
+        gap: 10px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    #item-rank-panel .irp-head .col-v {
+        flex: 1;
+    }
+
+    #item-rank-panel .irp-head .col-p {
+        min-width: 120px;
+        text-align: right;
+    }
+
+    #item-rank-panel .irp-head .col-t {
+        min-width: 120px;
+        text-align: right;
+    }
+
+    #item-rank-panel .irp-head .col-pct {
+        min-width: 75px;
+        text-align: right;
+    }
+
+    #item-rank-panel .irp-head .col-r {
+        min-width: 50px;
+        text-align: center;
+    }
+
+    #item-rank-panel .irp-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 14px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 13px;
+    }
+
+    #item-rank-panel .irp-row:last-child {
+        border-bottom: none;
+    }
+
+    #item-rank-panel .irp-row .col-v {
+        flex: 1;
+        font-weight: 600;
+    }
+
+    #item-rank-panel .irp-row .col-p {
+        min-width: 120px;
+        text-align: right;
+    }
+
+    #item-rank-panel .irp-row .col-t {
+        min-width: 120px;
+        text-align: right;
+        color: #6c757d;
+        font-size: 12px;
+    }
+
+    #item-rank-panel .irp-row .col-pct {
+        min-width: 75px;
+        text-align: right;
+        font-size: 12px;
+    }
+
+    #item-rank-panel .irp-row .col-r {
+        min-width: 50px;
+        text-align: center;
+    }
+
+    #item-rank-panel .irp-row.best-item {
+        background: #d4edda;
+    }
+
+    #item-rank-panel .irp-row.worst-item {
+        background: #f8d7da;
+    }
+
+    #item-rank-panel .irp-row.winner-vendor {
+        background: #fff9db;
+    }
+
+    #item-rank-panel .irp-title {
+        font-size: 14px;
+        font-weight: 700;
+        padding: 8px 14px;
+        background: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
     /* ===== Matrix table ===== */
     #matrix-wrap {
@@ -230,6 +314,17 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
             <div class="card card-outline card-info">
                 <div class="card-header">
                     <h3 class="card-title">Daftar Kebutuhan (Item)</h3>
+                    <div class="card-tools">
+                        <?= Html::a('<i class="fas fa-file-excel"></i> Template Excel', ['download-template-item'], [
+                            'class' => 'btn btn-outline-success btn-sm mr-1',
+                            'target' => '_blank',
+                            'title' => 'Download template Excel untuk import item produk',
+                        ]) ?>
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal"
+                            data-target="#modalImportItemView">
+                            <i class="fas fa-file-upload"></i> Import Item
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body p-0 table-responsive">
                     <table class="table table-sm table-striped">
@@ -257,6 +352,48 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- Modal Import Item (dari halaman view) -->
+            <div class="modal fade" id="modalImportItemView" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title"><i class="fas fa-file-upload mr-1"></i> Import Item dari Excel</h5>
+                            <button type="button" class="close text-white"
+                                data-dismiss="modal"><span>&times;</span></button>
+                        </div>
+                        <?php $importFormView = \yii\bootstrap4\ActiveForm::begin([
+                            'action' => ['import-item', 'id' => $model->id],
+                            'options' => ['enctype' => 'multipart/form-data'],
+                        ]); ?>
+                        <div class="modal-body">
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                <strong>Perhatian:</strong> Import Excel akan <strong>mengganti semua item</strong> yang
+                                ada saat ini.
+                            </div>
+                            <div class="form-group">
+                                <label>File Excel <span class="text-danger">*</span></label>
+                                <input type="file" name="file_item_excel" class="form-control-file" accept=".xlsx,.xls"
+                                    required>
+                                <small class="form-text text-muted">Format: .xlsx atau .xls sesuai template
+                                    sistem</small>
+                            </div>
+                            <div class="alert alert-info p-2 mb-0" style="font-size:12px;">
+                                <strong>Format kolom (mulai baris ke-4):</strong><br>
+                                A: Nama Produk &nbsp;|&nbsp; B: Qty &nbsp;|&nbsp; C: Satuan &nbsp;|&nbsp; D: Harga HPS
+                                &nbsp;|&nbsp; E: Harga Existing
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-upload mr-1"></i> Proses
+                                Import</button>
+                        </div>
+                        <?php \yii\bootstrap4\ActiveForm::end(); ?>
+                    </div>
                 </div>
             </div>
 

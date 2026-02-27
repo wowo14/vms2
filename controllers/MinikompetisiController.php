@@ -168,6 +168,129 @@ class MinikompetisiController extends Controller
         return $this->redirect(['index']);
     }
 
+    /**
+     * Download template Excel untuk diisi item produk.
+     */
+    public function actionDownloadTemplateItem()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Template Item');
+
+        // Header info
+        $sheet->setCellValue('A1', 'TEMPLATE IMPORT ITEM MINIKOMPETISI');
+        $sheet->setCellValue('A2', 'Isi data item mulai dari baris ke-4. Jangan ubah baris header (baris 3).');
+        $sheet->setCellValue('A3', 'Nama Produk');
+        $sheet->setCellValue('B3', 'Qty');
+        $sheet->setCellValue('C3', 'Satuan');
+        $sheet->setCellValue('D3', 'Harga HPS (Satuan)');
+        $sheet->setCellValue('E3', 'Harga Beli Existing');
+
+        // Style header row
+        $headerStyle = [
+            'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF1F6FEB']],
+        ];
+        $sheet->getStyle('A3:E3')->applyFromArray($headerStyle);
+
+        // Column widths
+        $sheet->getColumnDimension('A')->setWidth(35);
+        $sheet->getColumnDimension('B')->setWidth(12);
+        $sheet->getColumnDimension('C')->setWidth(15);
+        $sheet->getColumnDimension('D')->setWidth(22);
+        $sheet->getColumnDimension('E')->setWidth(22);
+
+        // Contoh baris
+        $sheet->setCellValue('A4', 'Contoh: Pipa PVC 4 inch');
+        $sheet->setCellValue('B4', 10);
+        $sheet->setCellValue('C4', 'batang');
+        $sheet->setCellValue('D4', 150000);
+        $sheet->setCellValue('E4', 140000);
+        $sheet->getStyle('A4:E4')->getFont()->setItalic(true);
+        $sheet->getStyle('A4:E4')->getFont()->getColor()->setARGB('FF888888');
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Template_Import_Item_Minikompetisi.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit;
+    }
+
+    /**
+     * Import item produk dari file Excel.
+     * Mengganti semua item yang ada untuk minikompetisi_id ini.
+     */
+    public function actionImportItem($id)
+    {
+        $model = $this->findModel($id);
+
+        if (Yii::$app->request->isPost) {
+            $file = UploadedFile::getInstanceByName('file_item_excel');
+
+            if ($file) {
+                $spreadsheet = IOFactory::load($file->tempName);
+                $sheet = $spreadsheet->getActiveSheet();
+                $highestRow = $sheet->getHighestRow();
+
+                // Validate minimal ada satu baris data (mulai row 4)
+                if ($highestRow < 4) {
+                    Yii::$app->session->setFlash('error', 'File Excel kosong atau format tidak valid.');
+                    return $this->redirect(['update', 'id' => $id]);
+                }
+
+                // Hapus semua item lama
+                MinikompetisiItem::deleteAll(['minikompetisi_id' => $id]);
+
+                $imported = 0;
+                $errors = [];
+
+                for ($row = 4; $row <= $highestRow; $row++) {
+                    $namaProduk = trim((string) $sheet->getCell('A' . $row)->getValue());
+                    if ($namaProduk === '')
+                        continue; // skip baris kosong
+
+                    $qty = (float) $sheet->getCell('B' . $row)->getValue();
+                    $satuan = trim((string) $sheet->getCell('C' . $row)->getValue());
+                    $hargaHps = (float) $sheet->getCell('D' . $row)->getValue();
+                    $hargaExisting = (float) $sheet->getCell('E' . $row)->getValue();
+
+                    if ($qty <= 0) {
+                        $errors[] = 'Baris ' . $row . ': Qty harus lebih dari 0.';
+                        continue;
+                    }
+
+                    $item = new MinikompetisiItem();
+                    $item->minikompetisi_id = $id;
+                    $item->nama_produk = $namaProduk;
+                    $item->qty = $qty;
+                    $item->satuan = $satuan;
+                    $item->harga_hps = $hargaHps;
+                    $item->harga_existing = $hargaExisting;
+
+                    if ($item->save()) {
+                        $imported++;
+                    } else {
+                        $errors[] = 'Baris ' . $row . ': ' . implode(', ', $item->getFirstErrors());
+                    }
+                }
+
+                if (!empty($errors)) {
+                    Yii::$app->session->setFlash('warning', 'Import selesai dengan peringatan: ' . implode(' | ', $errors));
+                } else {
+                    Yii::$app->session->setFlash('success', $imported . ' item berhasil diimport dari Excel.');
+                }
+            } else {
+                Yii::$app->session->setFlash('error', 'File Excel belum dipilih.');
+            }
+        }
+
+        return $this->redirect(['view', 'id' => $id]);
+    }
+
     public function actionTemplate($id)
     {
         $model = $this->findModel($id);

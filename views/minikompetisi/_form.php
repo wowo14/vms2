@@ -40,7 +40,69 @@ use yii\web\JsExpression;
         </div>
 
         <hr>
-        <h4>Data Item Produk</h4>
+        <h4>
+            Data Item Produk
+            <small class="ml-2">
+                <?= Html::a('<i class="fas fa-file-excel"></i> Download Template', ['download-template-item'], [
+                    'class' => 'btn btn-outline-success btn-sm',
+                    'target' => '_blank',
+                    'title' => 'Download template Excel untuk import item produk',
+                ]) ?>
+                <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal"
+                    data-target="#modalImportItem">
+                    <i class="fas fa-file-upload"></i> Import dari Excel
+                </button>
+            </small>
+        </h4>
+
+        <?php if (!$model->isNewRecord): ?>
+            <!-- Modal Import Item -->
+            <div class="modal fade" id="modalImportItem" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title"><i class="fas fa-file-upload mr-1"></i> Import Item dari Excel</h5>
+                            <button type="button" class="close text-white"
+                                data-dismiss="modal"><span>&times;</span></button>
+                        </div>
+                        <?php $importForm = \yii\bootstrap4\ActiveForm::begin([
+                            'action' => ['import-item', 'id' => $model->id],
+                            'options' => ['enctype' => 'multipart/form-data'],
+                            'id' => 'form-import-item',
+                        ]); ?>
+                        <div class="modal-body">
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                <strong>Perhatian:</strong> Import Excel akan <strong>mengganti semua item</strong> yang ada
+                                saat ini.
+                            </div>
+                            <div class="form-group">
+                                <label>File Excel <span class="text-danger">*</span></label>
+                                <input type="file" name="file_item_excel" class="form-control-file" accept=".xlsx,.xls"
+                                    required>
+                                <small class="form-text text-muted">Format: .xlsx atau .xls sesuai template sistem</small>
+                            </div>
+                            <div class="alert alert-info p-2 mb-0" style="font-size:12px;">
+                                <strong>Format kolom (mulai baris ke-4):</strong><br>
+                                A: Nama Produk &nbsp;|&nbsp; B: Qty &nbsp;|&nbsp; C: Satuan &nbsp;|&nbsp; D: Harga HPS
+                                &nbsp;|&nbsp; E: Harga Existing
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-upload mr-1"></i> Proses
+                                Import</button>
+                        </div>
+                        <?php \yii\bootstrap4\ActiveForm::end(); ?>
+                    </div>
+                </div>
+            </div>
+        <?php else: ?>
+            <div class="alert alert-info py-2 mb-2" style="font-size:13px;">
+                <i class="fas fa-info-circle mr-1"></i> Simpan data terlebih dahulu sebelum menggunakan fitur Import Excel.
+            </div>
+        <?php endif; ?>
+
         <?= MultipleInput::widget([
             'name' => 'MinikompetisiItem',
             'data' => $model->minikompetisiItems,
