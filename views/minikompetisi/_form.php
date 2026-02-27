@@ -48,17 +48,13 @@ use yii\web\JsExpression;
                     'target' => '_blank',
                     'title' => 'Download template Excel untuk import item produk',
                 ]) ?>
-                <button type="button" id="btn-open-import-item" class="btn btn-outline-primary btn-sm">
-                    <i class="fas fa-file-upload"></i> Import dari Excel
-                </button>
+                <?php if (!$model->isNewRecord): ?>
+                    <?= Html::a('<i class="fas fa-file-upload"></i> Import dari Excel', ['import-item-form', 'id' => $model->id], ['class' => 'btn btn-outline-primary btn-sm']) ?>
+                <?php endif; ?>
             </small>
         </h4>
 
-        <?php if ($model->isNewRecord): ?>
-            <div class="alert alert-info py-2 mb-2" style="font-size:13px;">
-                <i class="fas fa-info-circle mr-1"></i> Simpan data terlebih dahulu sebelum menggunakan fitur Import Excel.
-            </div>
-        <?php endif; ?>
+
 
         <?= MultipleInput::widget([
             'name' => 'MinikompetisiItem',

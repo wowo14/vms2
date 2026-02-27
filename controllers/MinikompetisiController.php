@@ -169,6 +169,15 @@ class MinikompetisiController extends Controller
     }
 
     /**
+     * Halaman form dedicated untuk import item dari Excel.
+     */
+    public function actionImportItemForm($id)
+    {
+        $model = $this->findModel($id);
+        return $this->render('import-item', ['model' => $model]);
+    }
+
+    /**
      * Download template Excel untuk diisi item produk.
      */
     public function actionDownloadTemplateItem()

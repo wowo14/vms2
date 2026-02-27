@@ -320,9 +320,7 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
                             'target' => '_blank',
                             'title' => 'Download template Excel untuk import item produk',
                         ]) ?>
-                        <button type="button" id="btn-open-import-item-view" class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-file-upload"></i> Import Item
-                        </button>
+                        <?= Html::a('<i class="fas fa-file-upload"></i> Import Item', ['import-item-form', 'id' => $model->id], ['class' => 'btn btn-outline-primary btn-sm']) ?>
                     </div>
                 </div>
                 <div class="card-body p-0 table-responsive">
@@ -351,48 +349,6 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                </div>
-            </div>
-
-            <!-- Modal Import Item (dari halaman view) -->
-            <div class="modal fade" id="modalImportItemView" tabindex="-1" role="dialog">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header bg-primary text-white">
-                            <h5 class="modal-title"><i class="fas fa-file-upload mr-1"></i> Import Item dari Excel</h5>
-                            <button type="button" class="close text-white"
-                                data-dismiss="modal"><span>&times;</span></button>
-                        </div>
-                        <?php $importFormView = \yii\bootstrap4\ActiveForm::begin([
-                            'action' => ['import-item', 'id' => $model->id],
-                            'options' => ['enctype' => 'multipart/form-data'],
-                        ]); ?>
-                        <div class="modal-body">
-                            <div class="alert alert-warning">
-                                <i class="fas fa-exclamation-triangle mr-1"></i>
-                                <strong>Perhatian:</strong> Import Excel akan <strong>mengganti semua item</strong> yang
-                                ada saat ini.
-                            </div>
-                            <div class="form-group">
-                                <label>File Excel <span class="text-danger">*</span></label>
-                                <input type="file" name="file_item_excel" class="form-control-file" accept=".xlsx,.xls"
-                                    required>
-                                <small class="form-text text-muted">Format: .xlsx atau .xls sesuai template
-                                    sistem</small>
-                            </div>
-                            <div class="alert alert-info p-2 mb-0" style="font-size:12px;">
-                                <strong>Format kolom (mulai baris ke-4):</strong><br>
-                                A: Nama Produk &nbsp;|&nbsp; B: Qty &nbsp;|&nbsp; C: Satuan &nbsp;|&nbsp; D: Harga HPS
-                                &nbsp;|&nbsp; E: Harga Existing
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-primary"><i class="fas fa-upload mr-1"></i> Proses
-                                Import</button>
-                        </div>
-                        <?php \yii\bootstrap4\ActiveForm::end(); ?>
-                    </div>
                 </div>
             </div>
 
