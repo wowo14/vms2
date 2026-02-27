@@ -48,8 +48,7 @@ use yii\web\JsExpression;
                     'target' => '_blank',
                     'title' => 'Download template Excel untuk import item produk',
                 ]) ?>
-                <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal"
-                    data-target="#modalImportItem">
+                <button type="button" id="btn-open-import-item" class="btn btn-outline-primary btn-sm">
                     <i class="fas fa-file-upload"></i> Import dari Excel
                 </button>
             </small>
@@ -145,40 +144,45 @@ use yii\web\JsExpression;
 </div>
 
 <?php if (!$model->isNewRecord): ?>
-<!-- Modal Import Item — di luar ActiveForm utama agar tidak nested -->
-<div class="modal fade" id="modalImportItem" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title"><i class="fas fa-file-upload mr-1"></i> Import Item dari Excel</h5>
-                <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+    <!-- Modal Import Item — di luar ActiveForm utama agar tidak nested -->
+    <div class="modal fade" id="modalImportItem" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="fas fa-file-upload mr-1"></i> Import Item dari Excel</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+                <form action="<?= \yii\helpers\Url::to(['import-item', 'id' => $model->id]) ?>" method="post"
+                    enctype="multipart/form-data">
+                    <input type="hidden" name="<?= Yii::$app->request->csrfParam ?>"
+                        value="<?= Yii::$app->request->csrfToken ?>">
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            <strong>Perhatian:</strong> Import Excel akan <strong>mengganti semua item</strong> yang ada
+                            saat ini.
+                        </div>
+                        <div class="form-group">
+                            <label>File Excel <span class="text-danger">*</span></label>
+                            <input type="file" name="file_item_excel" class="form-control-file" accept=".xlsx,.xls"
+                                required>
+                            <small class="form-text text-muted">Format: .xlsx atau .xls sesuai template sistem</small>
+                        </div>
+                        <div class="alert alert-info p-2 mb-0" style="font-size:12px;">
+                            <strong>Format kolom (mulai baris ke-4):</strong><br>
+                            A: Nama Produk &nbsp;|&nbsp; B: Qty &nbsp;|&nbsp; C: Satuan &nbsp;|&nbsp; D: Harga HPS
+                            &nbsp;|&nbsp; E: Harga Existing
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-upload mr-1"></i> Proses
+                            Import</button>
+                    </div>
+                </form>
             </div>
-            <form action="<?= \yii\helpers\Url::to(['import-item', 'id' => $model->id]) ?>" method="post"
-                  enctype="multipart/form-data">
-                <input type="hidden" name="<?= Yii::$app->request->csrfParam ?>" value="<?= Yii::$app->request->csrfToken ?>">
-                <div class="modal-body">
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-triangle mr-1"></i>
-                        <strong>Perhatian:</strong> Import Excel akan <strong>mengganti semua item</strong> yang ada saat ini.
-                    </div>
-                    <div class="form-group">
-                        <label>File Excel <span class="text-danger">*</span></label>
-                        <input type="file" name="file_item_excel" class="form-control-file" accept=".xlsx,.xls" required>
-                        <small class="form-text text-muted">Format: .xlsx atau .xls sesuai template sistem</small>
-                    </div>
-                    <div class="alert alert-info p-2 mb-0" style="font-size:12px;">
-                        <strong>Format kolom (mulai baris ke-4):</strong><br>
-                        A: Nama Produk &nbsp;|&nbsp; B: Qty &nbsp;|&nbsp; C: Satuan &nbsp;|&nbsp; D: Harga HPS &nbsp;|&nbsp; E: Harga Existing
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-upload mr-1"></i> Proses Import</button>
-                </div>
-            </form>
         </div>
     </div>
-</div>
 <?php endif; ?>
 
 <?php
@@ -190,6 +194,24 @@ $('#metode-select').change(function() {
         $('#bobot-container').hide();
     }
 }).trigger('change');
+
+// Trigger modal import item — kompatibel Bootstrap 4 & 5
+$('#btn-open-import-item').on('click', function() {
+    var el = document.getElementById('modalImportItem');
+    if (!el) return;
+    // Bootstrap 5
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        (new bootstrap.Modal(el)).show();
+    } else if (typeof $ !== 'undefined' && $.fn.modal) {
+        // Bootstrap 4 / jQuery
+        $(el).modal('show');
+    } else {
+        // Fallback: tampilkan manual
+        el.style.display = 'block';
+        el.classList.add('show');
+        document.body.classList.add('modal-open');
+    }
+});
 JS;
 $this->registerJs($js);
 ?>

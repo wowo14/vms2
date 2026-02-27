@@ -320,8 +320,7 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
                             'target' => '_blank',
                             'title' => 'Download template Excel untuk import item produk',
                         ]) ?>
-                        <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal"
-                            data-target="#modalImportItemView">
+                        <button type="button" id="btn-open-import-item-view" class="btn btn-outline-primary btn-sm">
                             <i class="fas fa-file-upload"></i> Import Item
                         </button>
                     </div>
@@ -1017,6 +1016,21 @@ $(function () {
 
     $('#btn-export-excel').on('click', function() {
         exportToExcel(_lastVendors);
+    });
+
+    // Trigger modal import item — kompatibel Bootstrap 4 & 5
+    $('#btn-open-import-item-view').on('click', function() {
+        var el = document.getElementById('modalImportItemView');
+        if (!el) return;
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            (new bootstrap.Modal(el)).show();
+        } else if (typeof $ !== 'undefined' && $.fn.modal) {
+            $(el).modal('show');
+        } else {
+            el.style.display = 'block';
+            el.classList.add('show');
+            document.body.classList.add('modal-open');
+        }
     });
 
 });
