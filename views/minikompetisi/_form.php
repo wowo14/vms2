@@ -1,7 +1,10 @@
 <?php
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use unclead\multipleinput\MultipleInput;
+use kartik\select2\Select2;
+use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Minikompetisi */
@@ -36,56 +39,82 @@ use unclead\multipleinput\MultipleInput;
             </div>
         </div>
 
-        <?php if ($model->isNewRecord): ?>
-            <hr>
-            <h4>Data Item Produk</h4>
-            <?= MultipleInput::widget([
-                'name' => 'MinikompetisiItem',
-                'columns' => [
-                    [
-                        'name' => 'nama_produk',
-                        'title' => 'Nama Produk',
-                        // 'enableError' => true,
-                    ],
-                    [
-                        'name' => 'qty',
-                        'title' => 'Kuantitas',
-                        // 'enableError' => true,
-                    ],
-                    [
-                        'name' => 'satuan',
-                        'title' => 'Satuan',
-                    ],
-                    [
-                        'name' => 'harga_hps',
-                        'title' => 'Harga HPS (Satuan)',
-                    ],
-                    [
-                        'name' => 'harga_existing',
-                        'title' => 'Harga Beli Existing',
-                    ],
+        <hr>
+        <h4>Data Item Produk</h4>
+        <?= MultipleInput::widget([
+            'name' => 'MinikompetisiItem',
+            'data' => $model->minikompetisiItems,
+            'columns' => [
+                [
+                    'name' => 'id',
+                    'type' => 'hiddenInput',
                 ],
-            ]) ?>
+                [
+                    'name' => 'nama_produk',
+                    'title' => 'Nama Produk',
+                ],
+                [
+                    'name' => 'qty',
+                    'title' => 'Kuantitas',
+                ],
+                [
+                    'name' => 'satuan',
+                    'title' => 'Satuan',
+                ],
+                [
+                    'name' => 'harga_hps',
+                    'title' => 'Harga HPS (Satuan)',
+                ],
+                [
+                    'name' => 'harga_existing',
+                    'title' => 'Harga Beli Existing',
+                ],
+            ],
+        ]) ?>
 
-            <hr>
-            <h4>Daftar Vendor Diundang</h4>
-            <?= MultipleInput::widget([
-                'name' => 'MinikompetisiVendor',
-                'columns' => [
-                    [
-                        'name' => 'nama_vendor',
-                        'title' => 'Nama Vendor',
-                    ],
-                    [
-                        'name' => 'email_vendor',
-                        'title' => 'Email Vendor',
-                    ],
-                ]
-            ]) ?>
-        <?php else: ?>
-            <p class="text-muted"><i>Untuk mengubah item dan vendor, fitur diupdate menyusul atau dari menu detail
-                    aslinya.</i></p>
-        <?php endif; ?>
+        <hr>
+        <h4>Daftar Vendor Diundang</h4>
+        <?= MultipleInput::widget([
+            'name' => 'MinikompetisiVendor',
+            'data' => $model->minikompetisiVendors,
+            'columns' => [
+                [
+                    'name' => 'id',
+                    'type' => 'hiddenInput',
+                ],
+                [
+                    'name' => 'nama_vendor',
+                    'title' => 'Nama Vendor',
+                    'type' => Select2::class,
+                    'options' => [
+                        'pluginOptions' => [
+                            'allowClear' => true,
+                            'tags' => true,
+                            'ajax' => [
+                                'url' => Url::to(['penyedia-list']),
+                                'dataType' => 'json',
+                                'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                            ],
+                            'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                            'templateResult' => new JsExpression('function(res) { return res.text; }'),
+                            'templateSelection' => new JsExpression('function (res) { return res.text; }'),
+                        ],
+                        'pluginEvents' => [
+                            "select2:select" => "function(e) { 
+                                var data = e.params.data;
+                                if(data.email) {
+                                    $(this).closest('tr').find('input[name*=\"email_vendor\"]').val(data.email);
+                                }
+                            }",
+                        ]
+                    ]
+                ],
+                [
+                    'name' => 'email_vendor',
+                    'title' => 'Email Vendor',
+                ],
+            ]
+        ]) ?>
 
         <div class="form-group mb-0 mt-3">
             <?= Html::submitButton('<i class="fas fa-save"></i> Simpan', ['class' => 'btn btn-success']) ?>

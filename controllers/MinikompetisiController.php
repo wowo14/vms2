@@ -118,6 +118,39 @@ class MinikompetisiController extends Controller
         if ($model->load(Yii::$app->request->post())) {
             $model->updated_at = date('Y-m-d H:i:s');
             if ($model->save()) {
+                // handle items
+                $items = Yii::$app->request->post('MinikompetisiItem', []);
+                $itemIds = array_filter(array_column($items, 'id'));
+                MinikompetisiItem::deleteAll(['AND', ['minikompetisi_id' => $model->id], ['NOT IN', 'id', $itemIds]]);
+
+                foreach ($items as $itemData) {
+                    if (!empty($itemData['nama_produk'])) {
+                        $item = !empty($itemData['id']) ? MinikompetisiItem::findOne($itemData['id']) : new MinikompetisiItem();
+                        $item->minikompetisi_id = $model->id;
+                        $item->nama_produk = $itemData['nama_produk'];
+                        $item->qty = $itemData['qty'];
+                        $item->satuan = $itemData['satuan'];
+                        $item->harga_hps = str_replace(',', '', $itemData['harga_hps'] ?? 0);
+                        $item->harga_existing = str_replace(',', '', $itemData['harga_existing'] ?? 0);
+                        $item->save();
+                    }
+                }
+
+                // handle vendors
+                $vendors = Yii::$app->request->post('MinikompetisiVendor', []);
+                $vendorIds = array_filter(array_column($vendors, 'id'));
+                MinikompetisiVendor::deleteAll(['AND', ['minikompetisi_id' => $model->id], ['NOT IN', 'id', $vendorIds]]);
+
+                foreach ($vendors as $vendorData) {
+                    if (!empty($vendorData['nama_vendor'])) {
+                        $vendor = !empty($vendorData['id']) ? MinikompetisiVendor::findOne($vendorData['id']) : new MinikompetisiVendor();
+                        $vendor->minikompetisi_id = $model->id;
+                        $vendor->nama_vendor = $vendorData['nama_vendor'];
+                        $vendor->email_vendor = $vendorData['email_vendor'];
+                        $vendor->save();
+                    }
+                }
+
                 Yii::$app->session->setFlash('success', 'Minikompetisi berhasil diupdate.');
                 return $this->redirect(['view', 'id' => $model->id]);
             }
@@ -357,6 +390,23 @@ class MinikompetisiController extends Controller
             'items' => $itemRows,
             'penawarans' => $penawaranRows,
         ];
+    }
+
+    public function actionPenyediaList($q = null)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = ['results' => ['id' => '', 'text' => '']];
+        if (!is_null($q)) {
+            $query = new \yii\db\Query;
+            $query->select('nama_perusahaan as id, nama_perusahaan AS text, email_perusahaan AS email')
+                ->from('penyedia')
+                ->where(['like', 'nama_perusahaan', $q])
+                ->limit(20);
+            $command = $query->createCommand();
+            $data = $command->queryAll();
+            $out['results'] = array_values($data);
+        }
+        return $out;
     }
 
     protected function findModel($id)
