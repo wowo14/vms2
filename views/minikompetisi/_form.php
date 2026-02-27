@@ -59,6 +59,13 @@ use yii\web\JsExpression;
         <?= MultipleInput::widget([
             'name' => 'MinikompetisiItem',
             'data' => $model->minikompetisiItems,
+            'addButtonOptions' => [
+                'class' => 'btn btn-success',
+                'label' => '+'
+            ],
+            'removeButtonOptions' => [
+                'label' => 'x'
+            ],
             'columns' => [
                 [
                     'name' => 'id',
@@ -91,6 +98,13 @@ use yii\web\JsExpression;
         <h4>Daftar Vendor Diundang</h4>
         <?= MultipleInput::widget([
             'name' => 'MinikompetisiVendor',
+            'addButtonOptions' => [
+                'class' => 'btn btn-success',
+                'label' => '+'
+            ],
+            'removeButtonOptions' => [
+                'label' => 'x'
+            ],
             'data' => $model->minikompetisiVendors,
             'columns' => [
                 [
