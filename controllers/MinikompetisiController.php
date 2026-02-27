@@ -527,17 +527,31 @@ class MinikompetisiController extends Controller
     public function actionPenyediaList($q = null)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $out = ['results' => ['id' => '', 'text' => '']];
+        $out = ['results' => []];
+
         if (!is_null($q)) {
-            $query = new \yii\db\Query;
-            $query->select('nama_perusahaan as id, nama_perusahaan AS text, email_perusahaan AS email')
+            // Query dari Master Penyedia
+            $query1 = (new \yii\db\Query())
+                ->select('nama_perusahaan AS id, nama_perusahaan AS text, email_perusahaan AS email')
                 ->from('penyedia')
-                ->where(['like', 'nama_perusahaan', $q])
+                ->where(['like', 'nama_perusahaan', $q]);
+
+            // Query dari Riwayat Vendor Minikompetisi
+            $query2 = (new \yii\db\Query())
+                ->select('nama_vendor AS id, nama_vendor AS text, email_vendor AS email')
+                ->from('minikompetisi_vendor')
+                ->where(['like', 'nama_vendor', $q]);
+
+            // Gabungkan (Union)
+            $unionQuery = (new \yii\db\Query())
+                ->from(['u' => $query1->union($query2)])
+                ->groupBy('id') // Deduplikasi berdasarkan nama (id)
                 ->limit(20);
-            $command = $query->createCommand();
-            $data = $command->queryAll();
+
+            $data = $unionQuery->all();
             $out['results'] = array_values($data);
         }
+
         return $out;
     }
 
