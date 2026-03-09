@@ -405,9 +405,9 @@ class DppController extends Controller
         // Hitung jumlah pekerjaan per pejabat/admin
         $counts = collect($data)->filter(function ($item) use ($excludeId) {
             // Exclude DPP yang sedang diedit agar hitungan tidak termasuk dirinya sendiri
-            if ($excludeId && isset($item['id']) && $item['id'] == $excludeId) {
-                return false;
-            }
+            // if ($excludeId && isset($item['id']) && $item['id'] == $excludeId) {
+            //     return false;
+            // }
             // Pastikan ada data paketpengadaan
             if (!isset($item['paketpengadaan'])) {
                 return false;
@@ -480,6 +480,7 @@ class DppController extends Controller
                 'pejabat' => $pejabatNames,
                 'admin' => $adminnames,
             ];
+            Yii::error(json_encode($datapenugasan));
             //endpenugasan
             //auto generate
             $nomortugas = (int) $set->value + 1;
