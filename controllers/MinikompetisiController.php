@@ -9,6 +9,16 @@ use app\models\MinikompetisiItem;
 use app\models\MinikompetisiVendor;
 use app\models\MinikompetisiPenawaran;
 use app\models\MinikompetisiPenawaranItem;
+use app\models\QuotationVersion;
+use app\models\QuotationItem;
+use app\models\PricingDataset;
+use app\models\PriceAnalyticsSummary;
+use app\models\VendorPriceIndex;
+use app\models\ProductCatalog;
+use app\models\ProductAlias;
+use app\services\QuotationVersionService;
+use app\services\PricingDatasetService;
+use app\services\ProductNormalizerService;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -343,33 +353,44 @@ class MinikompetisiController extends Controller
         exit;
     }
 
+    /**
+     * Import vendor quotation — VERSIONED (no delete, append-only).
+     * Each upload creates a new quotation_version and quotation_item rows.
+     * Also feeds pricing_dataset for analytics.
+     */
     public function actionImport($id)
     {
         $model = $this->findModel($id);
 
         if (Yii::$app->request->isPost) {
             $file = UploadedFile::getInstanceByName('file_excel');
-            $vendor_id = Yii::$app->request->post('vendor_id');
+            $vendor_id = (int) Yii::$app->request->post('vendor_id');
+            $revisionNote = trim(Yii::$app->request->post('revision_note', ''));
 
             if ($file && $vendor_id) {
-                // Delete previous offer from this vendor if exist
-                MinikompetisiPenawaran::deleteAll(['minikompetisi_id' => $id, 'vendor_id' => $vendor_id]);
+                $transaction = Yii::$app->db->beginTransaction();
+                try {
+                    // ── 1. Parse Excel ──
+                    $spreadsheet = IOFactory::load($file->tempName);
+                    $sheet = $spreadsheet->getActiveSheet();
+                    $highestRow = $sheet->getHighestRow();
 
-                $spreadsheet = IOFactory::load($file->tempName);
-                $sheet = $spreadsheet->getActiveSheet();
+                    // ── 2. Create new quotation_version (no DELETE!) ──
+                    $versionSvc = new QuotationVersionService();
+                    $version = $versionSvc->createVersion(
+                        $id,
+                        $vendor_id,
+                        null,         // file_path: optional, can save to uploads if needed
+                        $revisionNote,
+                        Yii::$app->user->isGuest ? null : Yii::$app->user->id
+                    );
 
-                $highestRow = $sheet->getHighestRow();
+                    // ── 3. Parse rows into structured items ──
+                    $rows = [];
+                    $total_harga = 0;
+                    $total_skor_kualitas = 0;
+                    $jumlah_item = 0;
 
-                $penawaran = new MinikompetisiPenawaran();
-                $penawaran->minikompetisi_id = $id;
-                $penawaran->vendor_id = $vendor_id;
-                $penawaran->created_at = date('Y-m-d H:i:s');
-
-                $total_harga = 0;
-                $total_skor_kualitas = 0;
-                $jumlah_item = 0;
-
-                if ($penawaran->save()) {
                     for ($row = 6; $row <= $highestRow; $row++) {
                         $item_id = $sheet->getCell('A' . $row)->getValue();
                         if (!$item_id)
@@ -381,43 +402,268 @@ class MinikompetisiController extends Controller
 
                         if ($model->metode == 2) {
                             $skor_kualitas = (float) $sheet->getCell('F' . $row)->getValue();
-                            $keterangan = $sheet->getCell('G' . $row)->getValue();
+                            $keterangan = (string) $sheet->getCell('G' . $row)->getValue();
                         }
 
-                        // find item
                         $mItem = MinikompetisiItem::findOne($item_id);
                         if ($mItem) {
+                            $rows[] = [
+                                'item_id' => (int) $item_id,
+                                'harga_penawaran' => $harga,
+                                'skor_kualitas' => $skor_kualitas,
+                                'keterangan' => $keterangan,
+                            ];
+                            $total_harga += $harga * $mItem->qty;
+                            $total_skor_kualitas += $skor_kualitas;
+                            $jumlah_item++;
+
+                            // Also write to old table for backward compat (view.php still reads from it)
+                            // This block will be removed after Phase 5 view migration is complete
                             $pItem = new MinikompetisiPenawaranItem();
-                            $pItem->penawaran_id = $penawaran->id;
-                            $pItem->item_id = $item_id;
+                            $pItem->penawaran_id = 0; // placeholder — legacy compat
+                            $pItem->item_id = (int) $item_id;
                             $pItem->harga_penawaran = $harga;
                             $pItem->skor_kualitas = $skor_kualitas;
                             $pItem->keterangan = $keterangan;
-                            $pItem->save();
-
-                            $total_harga += ($harga * $mItem->qty);
-                            $total_skor_kualitas += $skor_kualitas;
-                            $jumlah_item++;
+                            // NOT saved here — handled through legacy penawaran below
                         }
                     }
 
-                    $penawaran->total_harga = $total_harga;
-                    if ($jumlah_item > 0 && $model->metode == 2) {
-                        $penawaran->total_skor_kualitas = $total_skor_kualitas / $jumlah_item;
-                    }
-                    $penawaran->save();
+                    // ── 4. Attach structured items to version ──
+                    $versionSvc->attachItems($version, $rows);
 
-                    // Trigger Calculation
+                    // ── 5. Update version aggregate scores ──
+                    $version->total_harga = $total_harga;
+                    if ($jumlah_item > 0 && $model->metode == 2) {
+                        $version->total_skor_kualitas = round($total_skor_kualitas / $jumlah_item, 2);
+                    }
+                    $version->save(false);
+
+                    // ── 6. Legacy: also update old penawaran table for backward compat ──
+                    // Delete old and recreate so existing view.php still works
+                    MinikompetisiPenawaran::deleteAll([
+                        'minikompetisi_id' => $id,
+                        'vendor_id' => $vendor_id
+                    ]);
+                    $penawaran = new MinikompetisiPenawaran();
+                    $penawaran->minikompetisi_id = $id;
+                    $penawaran->vendor_id = $vendor_id;
+                    $penawaran->created_at = date('Y-m-d H:i:s');
+                    $penawaran->total_harga = $total_harga;
+                    $penawaran->total_skor_kualitas = ($jumlah_item > 0 && $model->metode == 2)
+                        ? round($total_skor_kualitas / $jumlah_item, 2)
+                        : 0;
+                    if ($penawaran->save()) {
+                        foreach ($rows as $r) {
+                            $pItem = new MinikompetisiPenawaranItem();
+                            $pItem->penawaran_id = $penawaran->id;
+                            $pItem->item_id = $r['item_id'];
+                            $pItem->harga_penawaran = $r['harga_penawaran'];
+                            $pItem->skor_kualitas = $r['skor_kualitas'];
+                            $pItem->keterangan = $r['keterangan'];
+                            $pItem->save(false);
+                        }
+                    }
+
+                    // ── 7. Recalculate ranking (on latest versions only) ──
                     $this->calculateRanking($model);
 
-                    Yii::$app->session->setFlash('success', 'Penawaran berhasil diimport dan dihitung ulang.');
-                    return $this->redirect(['view', 'id' => $id]);
+                    // Sync winner status to quotation_version
+                    $latestVersions = QuotationVersion::find()
+                        ->where(['minikompetisi_id' => $id, 'is_latest' => 1])
+                        ->all();
+                    foreach ($latestVersions as $lv) {
+                        $p = MinikompetisiPenawaran::find()
+                            ->where(['minikompetisi_id' => $id, 'vendor_id' => $lv->vendor_id])
+                            ->one();
+                        if ($p) {
+                            $lv->total_skor_harga = $p->total_skor_harga;
+                            $lv->total_skor_akhir = $p->total_skor_akhir;
+                            $lv->ranking = $p->ranking;
+                            $lv->is_winner = $p->is_winner;
+                            $lv->save(false);
+                        }
+                    }
+
+                    // ── 8. Ingest into pricing_dataset ──
+                    // Refresh version from DB to get updated winner status
+                    $version->refresh();
+                    $datasetSvc = new PricingDatasetService();
+                    $datasetSvc->ingest($version);
+
+                    $transaction->commit();
+                    Yii::$app->session->setFlash(
+                        'success',
+                        "Penawaran versi {$version->version_number} berhasil disimpan dan diranking."
+                    );
+
+                } catch (\Exception $e) {
+                    $transaction->rollBack();
+                    Yii::$app->session->setFlash('error', 'Error: ' . $e->getMessage());
                 }
+
             } else {
                 Yii::$app->session->setFlash('error', 'Vendor atau File Excel belum dipilih.');
             }
         }
         return $this->redirect(['view', 'id' => $id]);
+    }
+
+    /**
+     * Show revision history for a specific vendor in a procurement event.
+     * Returns JSON for AJAX or renders partial view.
+     */
+    public function actionVersionHistory($id, $vendor_id)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $model = $this->findModel($id);
+
+        $versions = QuotationVersion::find()
+            ->where(['minikompetisi_id' => $id, 'vendor_id' => $vendor_id])
+            ->orderBy(['version_number' => SORT_ASC])
+            ->all();
+
+        $vendor = MinikompetisiVendor::findOne($vendor_id);
+
+        return [
+            'vendor' => $vendor ? $vendor->nama_vendor : 'Unknown',
+            'versions' => array_map(fn($v) => [
+                'id' => $v->id,
+                'version_number' => $v->version_number,
+                'version_label' => $v->version_label,
+                'revision_note' => $v->revision_note,
+                'total_harga' => (float) $v->total_harga,
+                'skor_akhir' => (float) $v->total_skor_akhir,
+                'ranking' => $v->ranking,
+                'is_winner' => (int) $v->is_winner,
+                'is_latest' => (int) $v->is_latest,
+                'uploaded_at' => $v->uploaded_at,
+                'status' => $v->getStatusText(),
+            ], $versions),
+        ];
+    }
+
+    /**
+     * Price Intelligence Dashboard.
+     * Search historical pricing data, vendor competitiveness, price trends.
+     */
+    public function actionPriceIntelligence()
+    {
+        $q = Yii::$app->request->get('q', '');
+        $companyId = 1; // extend to dynamic if multi-tenant needed
+        $results = [];
+        $priceRange = null;
+        $trend = [];
+        $cheapest = [];
+
+        if (!empty($q)) {
+            $normQ = ProductNormalizerService::normalize($q);
+            $cheapest = PricingDataset::findCheapestVendors($normQ, $companyId);
+            $priceRange = PricingDataset::getPriceRange($normQ, $companyId);
+            $trend = PricingDataset::getPriceTrend($normQ, $companyId);
+        }
+
+        // Recent products from summary (for autocomplete / featured)
+        $recentProducts = PriceAnalyticsSummary::find()
+            ->where(['company_id' => $companyId])
+            ->orderBy(['last_seen_at' => SORT_DESC, 'sample_count' => SORT_DESC])
+            ->limit(20)
+            ->all();
+
+        return $this->render('price-intelligence/index', [
+            'q' => $q,
+            'cheapest' => $cheapest,
+            'priceRange' => $priceRange,
+            'trend' => $trend,
+            'recentProducts' => $recentProducts,
+        ]);
+    }
+
+    /**
+     * Vendor Competitiveness Ranking.
+     */
+    public function actionVendorRanking()
+    {
+        $companyId = 1;
+        $fiscalYear = (int) Yii::$app->request->get('year', date('Y'));
+
+        $leaderboard = VendorPriceIndex::getLeaderboard($companyId, $fiscalYear);
+
+        // Available years
+        $years = (new \yii\db\Query())
+            ->select('DISTINCT fiscal_year')
+            ->from('pricing_dataset')
+            ->where(['company_id' => $companyId])
+            ->andWhere(['IS NOT', 'fiscal_year', null])
+            ->orderBy(['fiscal_year' => SORT_DESC])
+            ->column();
+
+        return $this->render('price-intelligence/vendor-ranking', [
+            'leaderboard' => $leaderboard,
+            'fiscalYear' => $fiscalYear,
+            'years' => $years,
+        ]);
+    }
+
+    /**
+     * Product Catalog CRUD (for manual normalization).
+     * GET: list + search; POST: create new catalog entry.
+     */
+    public function actionProductCatalog()
+    {
+        $companyId = 1;
+        $q = Yii::$app->request->get('q', '');
+
+        $query = ProductCatalog::find()->where(['company_id' => $companyId, 'is_active' => 1]);
+        if (!empty($q)) {
+            $query->andWhere(['like', 'canonical_name', $q]);
+        }
+        $catalog = $query->with('aliases')->orderBy(['canonical_name' => SORT_ASC])->all();
+
+        // Handle AJAX save
+        if (Yii::$app->request->isPost) {
+            $data = Yii::$app->request->post();
+            $pc = new ProductCatalog();
+            $pc->company_id = $companyId;
+            $pc->canonical_name = trim($data['canonical_name'] ?? '');
+            $pc->category = trim($data['category'] ?? '');
+            $pc->default_unit = trim($data['default_unit'] ?? '');
+            if ($pc->save()) {
+                // Save aliases
+                $aliases = array_filter(array_map('trim', explode(',', $data['aliases'] ?? '')));
+                foreach ($aliases as $alias) {
+                    ProductAlias::upsert($pc->id, $alias);
+                }
+                Yii::$app->session->setFlash('success', 'Katalog produk berhasil ditambahkan.');
+            } else {
+                Yii::$app->session->setFlash('error', 'Gagal: ' . json_encode($pc->errors));
+            }
+            return $this->redirect(['product-catalog']);
+        }
+
+        return $this->render('price-intelligence/product-catalog', [
+            'catalog' => $catalog,
+            'q' => $q,
+        ]);
+    }
+
+    /**
+     * Confirm an alias suggestion (after fuzzy match).
+     * Called via AJAX POST: {catalog_id, raw_name}
+     */
+    public function actionConfirmAlias()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $catalogId = (int) Yii::$app->request->post('catalog_id');
+        $rawName = trim(Yii::$app->request->post('raw_name', ''));
+
+        if (!$catalogId || !$rawName) {
+            return ['success' => false, 'message' => 'Parameter tidak lengkap.'];
+        }
+
+        ProductAlias::upsert($catalogId, $rawName);
+
+        return ['success' => true, 'message' => 'Alias berhasil disimpan.'];
     }
 
     protected function calculateRanking($model)

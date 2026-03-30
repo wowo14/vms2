@@ -288,7 +288,7 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
 
                     <div class="form-group">
                         <label>Pilih Vendor</label>
-                        <select name="vendor_id" class="form-control" required>
+                        <select name="vendor_id" id="upload-vendor-select" class="form-control" required>
                             <option value="">- Pilih Vendor -</option>
                             <?php foreach ($vendors as $v): ?>
                                 <option value="<?= $v->id ?>"><?= Html::encode($v->nama_vendor) ?></option>
@@ -299,6 +299,16 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
                     <div class="form-group">
                         <label>File Excel Penawaran</label>
                         <input type="file" name="file_excel" class="form-control" accept=".xlsx, .xls" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Catatan Revisi <small class="text-muted">(opsional)</small></label>
+                        <input type="text" name="revision_note" class="form-control"
+                               placeholder="Contoh: Update harga Q2 2025, koreksi item no.3">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle"></i>
+                            Setiap upload akan membuat <strong>versi baru</strong>. Riwayat penawaran tetap tersimpan.
+                        </small>
                     </div>
 
                     <button class="btn btn-success btn-block" type="submit"><i class="fas fa-upload"></i> Proses &amp;
@@ -357,6 +367,9 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
                 <div class="card-header">
                     <h3 class="card-title">Rangking Tersimpan</h3>
                     <small class="text-muted ml-2">(berdasarkan data terakhir diimport)</small>
+                    <div class="card-tools">
+                        <?= Html::a('<i class="fas fa-chart-line mr-1"></i>Price Intelligence', ['price-intelligence'], ['class' => 'btn btn-outline-info btn-sm', 'target' => '_blank']) ?>
+                    </div>
                 </div>
                 <div class="card-body p-0 table-responsive">
                     <table class="table table-bordered table-sm table-striped">
@@ -368,12 +381,13 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
                                 <th>Skor Harga</th>
                                 <th>Skor Kualitas</th>
                                 <th>Skor Akhir</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($penawarans)): ?>
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted py-3">Belum ada penawaran diproses</td>
+                                    <td colspan="7" class="text-center text-muted py-3">Belum ada penawaran diproses</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($penawarans as $p): ?>
@@ -390,11 +404,31 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
                                         <td class="text-right"><?= round($p->total_skor_harga, 2) ?></td>
                                         <td class="text-right"><?= round($p->total_skor_kualitas, 2) ?></td>
                                         <td class="text-right font-weight-bold"><?= round($p->total_skor_akhir, 2) ?></td>
+                                        <td class="text-center">
+                                            <button class="btn btn-xs btn-outline-secondary btn-history"
+                                                    style="font-size:11px;padding:2px 6px;"
+                                                    data-mk="<?= $model->id ?>" data-vendor="<?= $p->vendor_id ?>">
+                                                <i class="fas fa-history"></i> Riwayat
+                                            </button>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- VERSION HISTORY PANEL (shown via AJAX) -->
+            <div id="version-history-panel" class="d-none mt-3">
+                <div class="card card-outline card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-history mr-1"></i>Riwayat Versi: <span id="vh-vendor-name"></span></h3>
+                        <div class="card-tools"><button class="btn btn-xs btn-secondary" onclick="$('#version-history-panel').addClass('d-none')">✕</button></div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="vh-content"><div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i></div></div>
+                    </div>
                 </div>
             </div>
 
@@ -987,6 +1021,46 @@ $(function () {
             el.classList.add('show');
             document.body.classList.add('modal-open');
         }
+    });
+
+    /* ─── VERSION HISTORY ─── */
+    $(document).on('click', '.btn-history', function() {
+        var mkId     = $(this).data('mk');
+        var vendorId = $(this).data('vendor');
+        var url      = '/minikompetisi/version-history?id=' + mkId + '&vendor_id=' + vendorId;
+
+        $('#version-history-panel').removeClass('d-none');
+        $('#vh-vendor-name').text('Loading...');
+        $('#vh-content').html('<div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i></div>');
+
+        $.getJSON(url, function(data) {
+            $('#vh-vendor-name').text(data.vendor || '');
+            var fmt = function(n) {
+                return 'Rp ' + parseFloat(n || 0).toLocaleString('id-ID', {minimumFractionDigits:0});
+            };
+            var html = '<div class="table-responsive"><table class="table table-sm table-bordered mb-0" style="font-size:13px;">';
+            html += '<thead class="thead-light"><tr><th>Versi</th><th>Label</th><th>Catatan Revisi</th><th class="text-right">Total Harga</th><th class="text-right">Skor Akhir</th><th class="text-center">Rank</th><th class="text-center">Waktu Upload</th><th class="text-center">Status</th></tr></thead><tbody>';
+            (data.versions || []).forEach(function(v) {
+                var rowCls = v.is_latest ? 'table-success' : (v.is_winner ? 'table-warning' : '');
+                html += '<tr class="' + rowCls + '">';
+                html += '<td><span class="badge badge-' + (v.is_latest ? 'success' : 'secondary') + '">v' + v.version_number + (v.is_latest ? ' ✓ Latest' : '') + '</span></td>';
+                html += '<td>' + (v.version_label || '') + '</td>';
+                html += '<td>' + (v.revision_note ? '<em>' + $('<span>').text(v.revision_note).html() + '</em>' : '<span class="text-muted">-</span>') + '</td>';
+                html += '<td class="text-right">' + fmt(v.total_harga) + '</td>';
+                html += '<td class="text-right">' + (v.skor_akhir ? parseFloat(v.skor_akhir).toFixed(2) : '-') + '</td>';
+                html += '<td class="text-center">' + (v.ranking || '-') + (v.is_winner ? ' 🏆' : '') + '</td>';
+                html += '<td class="text-center" style="font-size:11px;">' + (v.uploaded_at || '') + '</td>';
+                html += '<td class="text-center"><span class="badge badge-info">' + (v.status || '') + '</span></td>';
+                html += '</tr>';
+            });
+            if (!data.versions || !data.versions.length) {
+                html += '<tr><td colspan="8" class="text-center text-muted py-3">Belum ada riwayat versi.</td></tr>';
+            }
+            html += '</tbody></table></div>';
+            $('#vh-content').html(html);
+        }).fail(function() {
+            $('#vh-content').html('<div class="alert alert-danger m-2">Gagal memuat riwayat versi.</div>');
+        });
     });
 
 });
