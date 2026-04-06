@@ -3,6 +3,7 @@ namespace app\commands;
 use app\models\Dpp;
 use app\models\HistoriReject;
 use app\models\PaketPengadaan;
+use app\models\PaketPengadaanDetails;
 use Yii;
 use yii\console\Controller;
 use yii\db\Expression;
@@ -198,9 +199,12 @@ class HelloController extends Controller {
             Yii::$app->db->createCommand()->insert('setting', ['active' => 1, 'type' => 'jenis_peralihan', 'value' => $value])->execute();
         }
     }
-    // public function actionTes2() {
-    //     $formattedAmount = 'Rp 2.440.000,00';
-    //     $res = (new \app\widgets\Tools)->reverseCurrency($formattedAmount);
-    //     // print_r($res);
-    // }
+    public function actionUpdatepaketppn($paket_id){
+        foreach(PaketPengadaanDetails::find()->where(['paket_id' => $paket_id])->all() as $detail){
+            $detail->hps_satuan += $detail->hps_satuan * 0.11;
+            $detail->save();
+        }
+        Yii::$app->cache->flush();
+        Yii::$app->db->schema->refresh();
+    }
 }
