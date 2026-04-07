@@ -207,4 +207,11 @@ class HelloController extends Controller {
         Yii::$app->cache->flush();
         Yii::$app->db->schema->refresh();
     }
+    public function actionPindahkategori($paket_id,$kategori){
+        $paket = PaketPengadaan::findOne($paket_id);
+        $paket->kategori_pengadaan = $kategori;
+        $paket->save();
+        Yii::$app->cache->flush();
+        Yii::$app->db->schema->refresh();
+    }
 }
