@@ -108,7 +108,7 @@ class PivotReportController extends Controller {
                 $configs[$type] = $config;
                 // Jika config punya sumField, dan multi gunakan multiSumFields
                 if (isset($config['multi'])) {
-                    $multipleSumFields = ['hps', 'hasilnego', 'efisien'];
+                    $multipleSumFields = ['hps', 'hasilnego']; // 'efisien' adalah kalkulasi turunan (hps-hasilnego), bukan field DB
                     $reports[$type] = PivotReportHelper::generatePivotReport(
                         $data,
                         $config['rowField'],
@@ -488,7 +488,7 @@ class PivotReportController extends Controller {
                 $config = $this->getReportConfig($type);
                 $configs[$type] = $config;
                 if (isset($config['multi'])) {
-                    $multipleSumFields = ['hps', 'hasilnego', 'efisien'];
+                    $multipleSumFields = ['hps', 'hasilnego']; // 'efisien' adalah kalkulasi turunan (hps-hasilnego), bukan field DB
                     $reports[$type] = PivotReportHelper::generatePivotReport(
                         $data,
                         $config['rowField'],

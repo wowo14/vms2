@@ -33,6 +33,12 @@ class PivotReportHelper {
                     }
                     $pivot[$rowValue][$colValue][$field] += isset($row[$field]) ? $row[$field] : 0;
                 }
+                // Akumulasi 'efisien' dari field DB (sudah dihitung per paket di SQL)
+                // Terpisah dari multiSumFields agar tidak ikut loop kolom definisi
+                if (!isset($pivot[$rowValue][$colValue]['efisien'])) {
+                    $pivot[$rowValue][$colValue]['efisien'] = 0;
+                }
+                $pivot[$rowValue][$colValue]['efisien'] += isset($row['efisien']) ? (float)$row['efisien'] : 0;
             } else {
                 // Track unique column values
                 $columns[$colValue] = $colValue;
@@ -63,14 +69,11 @@ class PivotReportHelper {
                     foreach ($multiSumFields as $field) {
                         $entry[$field . '_' . $colValue] = isset($rowData[$colValue][$field]) ? $rowData[$colValue][$field] : 0;
                     }
-                    // Efisien khusus: jika ada hps dan hasilnego
+                    // Efisien: gunakan field 'efisien' yang sudah dihitung per paket di SQL
+                    // (CASE WHEN hasilnego > 0 THEN hps - hasilnego ELSE 0)
+                    // Ini memastikan paket yang belum selesai negosiasi tidak membengkakkan total efisiensi
                     if (in_array('hps', $multiSumFields) && in_array('hasilnego', $multiSumFields)) {
-                        $hasilnego = ($entry['hasilnego_' . $colValue] ?? 0);
-                        if ($hasilnego > 0) {
-                            $entry['efisien_' . $colValue] = ($entry['hps_' . $colValue] ?? 0) - $hasilnego;
-                        } else {
-                            $entry['efisien_' . $colValue] = 0;
-                        }
+                        $entry['efisien_' . $colValue] = isset($rowData[$colValue]['efisien']) ? $rowData[$colValue]['efisien'] : 0;
                     }
                 }
                 $pivotRows[] = $entry;
@@ -84,10 +87,11 @@ class PivotReportHelper {
                 ]
             ];
             foreach ($allMonths as $colValue) {
+                // Loop hanya field DB (hps, hasilnego) — 'efisien' BUKAN field DB
                 foreach ($multiSumFields as $field) {
+                    if ($field === 'efisien') continue; // skip, ditambahkan terpisah
                     $colLabel = isset($monthLabels[$colValue]) ? $monthLabels[$colValue] : $colValue;
                     $label = strtoupper($field);
-                    if ($field === 'efisien') $label = 'Efisien';
                     $columnDefinitions[] = [
                         'attribute' => $field . '_' . $colValue,
                         'label' => $colLabel . ' ' . $label,

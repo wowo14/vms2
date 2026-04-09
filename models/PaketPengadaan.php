@@ -229,6 +229,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
                 new Expression('COALESCE(det.hps,       0) AS hps'),
                 new Expression('COALESCE(det.penawaran, 0) AS penawaran'),
                 new Expression('COALESCE(det.hasilnego, 0) AS hasilnego'),
+                // Efisien per paket: hanya valid jika hasilnego > 0 (negosiasi sudah selesai)
+                new Expression('CASE WHEN COALESCE(det.hasilnego, 0) > 0 THEN COALESCE(det.hps, 0) - COALESCE(det.hasilnego, 0) ELSE 0 END AS efisien'),
                 'pp.pemenang',
                 'pp.tanggal_reject',
                 'pp.alasan_reject',
@@ -363,6 +365,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
                 new Expression('COALESCE(det.hps,       0) AS hps'),
                 new Expression('COALESCE(det.penawaran, 0) AS penawaran'),
                 new Expression('COALESCE(det.hasilnego, 0) AS hasilnego'),
+                // Efisien per paket: hanya valid jika hasilnego > 0 (negosiasi sudah selesai)
+                new Expression('CASE WHEN COALESCE(det.hasilnego, 0) > 0 THEN COALESCE(det.hps, 0) - COALESCE(det.hasilnego, 0) ELSE 0 END AS efisien'),
                 'pp.pemenang',
             ])
             ->andWhere(['not', ['d.bidang_bagian' => null]])
