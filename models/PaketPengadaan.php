@@ -3,14 +3,17 @@ namespace app\models;
 use Yii;
 use yii\db\Query;
 use yii\db\Expression;
-class PaketPengadaan extends \yii\db\ActiveRecord {
+class PaketPengadaan extends \yii\db\ActiveRecord
+{
     use GeneralModelsTrait;
     // public $oldrecord;
     // public $statusPengadaan;
-    public static function tableName() {
+    public static function tableName()
+    {
         return 'paket_pengadaan';
     }
-    public function rules() {
+    public function rules()
+    {
         return [
             [['nomor', 'tanggal_paket', 'tanggal_dpp', 'tanggal_persetujuan', 'nomor_persetujuan', 'nama_paket', 'tahun_anggaran', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'unit', 'pagu', 'metode_pengadaan', 'kategori_pengadaan'], 'required'],
             [['tanggal_paket', 'created_at', 'updated_at', 'tanggal_reject', 'alasan_reject', 'addition'], 'string'],
@@ -20,7 +23,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             [['nomor', 'kategori_pengadaan', 'nama_paket', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'metode_pengadaan'], 'string', 'max' => 255],
         ];
     }
-    public function attributeLabels() {
+    public function attributeLabels()
+    {
         return [
             'id' => 'ID',
             'nomor' => 'Nomor DPP',
@@ -54,68 +58,86 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             'tanggal_dibatalkan' => 'Tanggal Pembatalan',
         ];
     }
-    public function getListpaketoutstanding() {
+    public function getListpaketoutstanding()
+    {
         return PaketPengadaan::where(['approval_by' => null])->all();
     }
-    public function getNomornamapaket() {
+    public function getNomornamapaket()
+    {
         return $this->nomor . '||' . $this->nama_paket;
     }
-    public function getDetails() {
+    public function getDetails()
+    {
         return $this->hasMany(PaketPengadaanDetails::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_paketpengadaandetails'));
     }
-    public function getUnitnya() {
+    public function getUnitnya()
+    {
         return $this->hasOne(Unit::class, ['id' => 'unit'])->cache(self::cachetime(), self::settagdep('tag_unit'));
     }
-    public function getKurirnya() {
+    public function getKurirnya()
+    {
         return $this->hasOne(Pegawai::class, ['id_user' => 'created_by'])->cache(self::cachetime(), self::settagdep('tag_pegawai'));
     }
-    public function getAttachments() {
+    public function getAttachments()
+    {
         return $this->hasMany(Attachment::class, ['user_id' => 'id'])
             ->andWhere(['<>', 'jenis_dokumen', 0])
             ->cache(self::cachetime(), self::settagdep('tag_attachment'));
     }
-    public function getRequiredlampiran() { //array id
+    public function getRequiredlampiran()
+    { //array id
         return collect(self::settingType('jenis_dokumen'))->where('param', 'lampiran')->pluck('id')->toArray();
     }
-    public function getDpp() {
+    public function getDpp()
+    {
         return $this->hasOne(Dpp::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_dpp'));
     }
-    public function getSubmitedpenawaran() {
+    public function getSubmitedpenawaran()
+    {
         return $this->hasMany(PenawaranPengadaan::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_penawaranpengadaan'));
     }
-    public function getPenawaranpenyedia() {
+    public function getPenawaranpenyedia()
+    {
         return $this->hasOne(PenawaranPengadaan::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_penawaranpengadaan'));
     }
-    public function getPejabatppkom() {
+    public function getPejabatppkom()
+    {
         return $this->hasOne(Pegawai::class, ['id' => 'ppkom'])->cache(self::cachetime(), self::settagdep('tag_pegawai'));
     }
-    public function getProgramnya() {
+    public function getProgramnya()
+    {
         return $this->hasOne(ProgramKegiatan::class, ['code' => 'kode_program'])->cache(self::cachetime(), self::settagdep('tag_programkegiatan'));
     }
-    public function getKegiatannya() {
+    public function getKegiatannya()
+    {
         return $this->hasOne(ProgramKegiatan::class, ['code' => 'kode_kegiatan'])->cache(self::cachetime(), self::settagdep('tag_programkegiatan'));
     }
-    public function getRekeningnya() {
+    public function getRekeningnya()
+    {
         return $this->hasOne(KodeRekening::class, ['kode' => 'kode_rekening'])->cache(self::cachetime(), self::settagdep('tag_koderekening'));
     }
-    public function getHistorireject() {
+    public function getHistorireject()
+    {
         return $this->hasOne(HistoriReject::class, ['paket_id' => 'id'])->orderBy(['id' => SORT_DESC])->cache(self::cachetime(), self::settagdep('tag_historireject'));
     }
-    public function getHistorirejects() {
+    public function getHistorirejects()
+    {
         return $this->hasMany(HistoriReject::class, ['paket_id' => 'id'])->cache(self::cachetime(), self::settagdep('tag_historireject'));
     }
-    public function getCtedetails() { //Query
+    public function getCtedetails()
+    { //Query
         return (new Query())
             ->select([
                 'paket_id',
-                'hps'       => new Expression('ROUND(SUM(qty * volume * hps_satuan), 2)'),
+                'hps' => new Expression('ROUND(SUM(qty * volume * hps_satuan), 2)'),
                 'penawaran' => new Expression('ROUND(SUM(qty * volume * penawaran), 2)'),
                 'hasilnego' => new Expression('ROUND(SUM(qty * volume * negosiasi), 2)'),
             ])
             ->from(PaketPengadaanDetails::tableName())
             ->groupBy('paket_id');
     }
-    public function getDashboard($year = null) {
+    public function getDashboard($year = null)
+    {
         $query = self::where(['not', ['paket_pengadaan.id' => null]])
             ->joinWith(['dpp d', 'penawaranpenyedia.negosiasi n', 'pejabatppkom ppkom', 'dpp.pejabat p', 'dpp.staffadmin s', 'dpp.unit u'])
             ->leftJoin(['pd' => $this->ctedetails], 'pd.paket_id = paket_pengadaan.id')
@@ -126,35 +148,42 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
                 'paket_pengadaan.metode_pengadaan',
                 'paket_pengadaan.kategori_pengadaan',
                 'paket_pengadaan.pagu',
-                'p.nama as pejabat_pengadaan',
-                's.nama as admin_pengadaan',
-                'ppkom.nama as pejabat_ppkom',
-                'u.unit as bidang_bagian',
+                new Expression("COALESCE(p.nama, 'Belum Ditugaskan') as pejabat_pengadaan"),
+                new Expression("COALESCE(s.nama, 'Belum Ditugaskan') as admin_pengadaan"),
+                new Expression("COALESCE(ppkom.nama, 'Belum Ditugaskan') as pejabat_ppkom"),
+                new Expression("COALESCE(u.unit, 'Tanpa Unit') as bidang_bagian"),
                 new Expression("COALESCE((pd.hps), 0) AS hps"),
                 new Expression("COALESCE((pd.penawaran), 0) AS penawaran"),
                 new Expression("COALESCE((pd.hasilnego), 0) AS hasilnego"),
                 'paket_pengadaan.pemenang'
             ])
-            ->andWhere(['not', ['d.bidang_bagian' => null]]);
-            
-            if ($year) {
-                $query->andWhere(new Expression("strftime('%Y', paket_pengadaan.tanggal_paket) = :year", [':year' => $year]));
-            }
+            // ✅ FILTER UTAMA (perbaikan)
+            ->andWhere(['not', ['d.id' => null]])
+            ->andWhere(['not', ['d.admin_pengadaan' => null]])
+            ->andWhere(['!=', 'd.admin_pengadaan', 0])
+            ->andWhere(['not', ['d.pejabat_pengadaan' => null]])
+            ->andWhere(['!=', 'd.pejabat_pengadaan', 0]);
 
-            // ->orWhere(['n.penyedia_accept' => 1,'n.pp_accept'=>1])
-            return $query->groupBy(['year', 'month', 'paket_pengadaan.id'])
+        if ($year) {
+            $query->andWhere(new Expression("strftime('%Y', paket_pengadaan.tanggal_paket) = :year", [':year' => $year]));
+        }
+
+        // ->orWhere(['n.penyedia_accept' => 1,'n.pp_accept'=>1])
+        return $query->groupBy(['year', 'month', 'paket_pengadaan.id'])
             ->orderBy('year', 'id')
             ->asArray()
             ->all();
     }
-    public function getNotifpaketbaru() {
+    public function getNotifpaketbaru()
+    {
         return self::where(['not', ['paket_pengadaan.id' => null]])
             ->joinWith('dpp d')
             ->andWhere(['is', 'd.paket_id', null])
             ->orderBy('id', 'desc')
             ->asArray()->count();
     }
-    public function getPaketreject() {
+    public function getPaketreject()
+    {
         return self::where(['IS NOT', 'tanggal_reject', null])
             ->andWhere(['!=', 'tanggal_reject', ''])
             ->andWhere(['IS NOT', 'alasan_reject', null])
@@ -192,7 +221,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     //     }
     //     return $query->asArray()->all();
     // }
-    public function getRawDataReject($params = null) {
+    public function getRawDataReject($params = null)
+    {
         $rawSettingkategori = collect(Setting::where(['type' => 'kategori_pengadaan'])->all())
             ->pluck('id', 'value')
             ->toArray();
@@ -260,9 +290,11 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             return $e;
         });
     }
-    public function groupedData($field, $collection) { // part of dashboard
+    public function groupedData($field, $collection)
+    { // part of dashboard
         return $collection->groupBy(function ($item) use ($field) {
-            return $item['year'] . '#' . $item[$field];
+            $val = !empty($item[$field]) ? $item[$field] : 'Belum Ditugaskan';
+            return $item['year'] . '#' . $val;
         })
             ->map(function ($group, $key) use ($field) {
                 list($year, $value) = explode('#', $key);
@@ -276,7 +308,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             ->values()
             ->toArray();
     }
-    public function groupedDataBymonth($field, $collection) { // part of dashboard
+    public function groupedDataBymonth($field, $collection)
+    { // part of dashboard
         return $collection->groupBy(function ($item) use ($field) {
             //filter grab year and month
             // return $item['year'] . '#' . $item[$field];
@@ -297,7 +330,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
     //     $this->oldrecord = clone $this;
     //     parent::afterFind();
     // }
-    public function beforeSave($insert) {
+    public function beforeSave($insert)
+    {
         if ($insert) {
             $this->tanggal_paket = date('Y-m-d H:i:s', time());
             // $exist = self::where(['nama_paket' => $this->nama_paket])->exists();
@@ -330,7 +364,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         Dpp::invalidatecache('tag_' . Dpp::getModelname());
         return parent::beforeSave($insert);
     }
-    public function getrawData($tahun = null) {
+    public function getrawData($tahun = null)
+    {
         $rawSettingkategori = collect(Setting::where(['type' => 'kategori_pengadaan'])->all())->pluck('id', 'value')->toArray();
         $rawSettingmetode = collect(Setting::where(['type' => 'metode_pengadaan'])->all())->pluck('id', 'value')->toArray();
         $query = self::where(['not', ['pp.id' => null]])
@@ -394,7 +429,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             return $e;
         });
     }
-    private function createPivotTable($data, $params, $groupKey, $bln) { //($data, $params['groupby'], $params['type'], $params['bln']);
+    private function createPivotTable($data, $params, $groupKey, $bln)
+    { //($data, $params['groupby'], $params['type'], $params['bln']);
         if (isset($bln) && !empty($bln)) {
             $data = $data->where('month', $bln);
             $months = [$bln];
@@ -402,14 +438,14 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             $months = $data->pluck('month')->unique()->sort()->values();
         }
         // Yii::error('months: ' . $months);
-        if ((int)$groupKey) {
+        if ((int) $groupKey) {
             $data = $data->groupBy('kategori_pengadaan');
             $types = $data->get($groupKey);
         } else {
             $types = $data->pluck($groupKey)->unique()->sort()->values();
         }
         // Yii::error('types: ' . $types);
-        if ((int)$params) {
+        if ((int) $params) {
             // Yii::error('integer' . $params);
             $group = $data->groupBy('pejabat_pengadaan_id');
             $groupedData = $group->get($params);
@@ -446,14 +482,16 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         $pivotTable->put('Total', $totalRow);
         return ['months' => $months, 'types' => $types, 'pivotTable' => $pivotTable];
     }
-    public function byKategori($params) { //[groupby,type,bln]
+    public function byKategori($params)
+    { //[groupby,type,bln]
         $data = $this->getrawData();
         return $data;
         die;
         // Yii::error('kategori called # raw data: ' . $data);
         return $this->createPivotTable($data, $params['groupby'], $params['type'], $params['bln']);
     }
-    public function metodebulan($params) { // collection sudah diterima dpp / complete
+    public function metodebulan($params)
+    { // collection sudah diterima dpp / complete
         $data = $this->getrawData()->values();
         $data = $data->filter(function ($item) {
             return !empty($item['pejabat_pengadaan_id']) || !empty($item['admin_pengadaan_id']);
@@ -489,7 +527,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
         })
             ->values();
     }
-    public function kategoribulan($params) { // collection sudah assign / diterima
+    public function kategoribulan($params)
+    { // collection sudah assign / diterima
         $data = $this->getrawData();
         $data = $data->filter(function ($item) {
             return !empty($item['pejabat_pengadaan_id']) || !empty($item['admin_pengadaan_id']);
@@ -518,7 +557,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             ->sortBy('bulan')
             ->values();
     }
-    public function getExistingYears() {
+    public function getExistingYears()
+    {
         $query = PaketPengadaan::find()->cache(10)
             ->select([
                 new Expression("strftime('%Y', paket_pengadaan.tanggal_paket) as year"),
@@ -528,7 +568,8 @@ class PaketPengadaan extends \yii\db\ActiveRecord {
             ->all();
         return collect($query);
     }
-    public function getFilteredData($filters = null) { //collection all rekap
+    public function getFilteredData($filters = null)
+    { //collection all rekap
         $filters = $filters ?? collect([]);
         $data = $this->getrawData($filters->get('year'));
         if ($filters && $filters->isNotEmpty()) {
