@@ -37,12 +37,12 @@ AppAsset::register($this);
                     Html::a(
                         '<i class="fa fa-plus"></i>',
                         ['paketpengadaan/create'],
-                        ['role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Paket Pengadaans', 'class' => 'btn btn-outline-primary']
+                        ['role' => 'modal-remote', 'data-pjax' => '0', 'data-target' => '#' . $idmodal, 'title' => Yii::t('yii2-ajaxcrud', 'Create New') . ' Paket Pengadaans', 'class' => 'btn btn-outline-primary']
                     ) .
                         Html::a(
                             '<i class="fa fa-redo"></i>',
                             [''],
-                            ['data-pjax' => 1, 'data-target' => '#' . $idmodal, 'class' => 'btn btn-outline-success', 'title' => Yii::t('yii2-ajaxcrud', 'Reset Grid')]
+                            ['data-pjax' => '0', 'data-target' => '#' . $idmodal, 'class' => 'btn btn-outline-success', 'title' => Yii::t('yii2-ajaxcrud', 'Reset Grid')]
                         ) .
                         '{toggleData}' .
                         '{export}'
@@ -87,6 +87,7 @@ AppAsset::register($this);
                         [
                             'class' => 'btn btn-danger btn-xs',
                             'role' => 'modal-remote-bulk',
+                            'data-pjax' => '0',
                             'data-target' => '#' . $idmodal,
                             'data-confirm' => false,
                             'data-method' => false,
@@ -130,13 +131,12 @@ AppAsset::register($this);
     "footer" => "",
     "size" => "modal-xl",
     "clientOptions" => [
-        "tabindex" => false,
         "backdrop" => "static",
         "keyboard" => true,
-        "focus" => true,
     ],
     "options" => [
-        "tabindex" => true
+        "tabindex" => false,
+        "role" => "dialog",
     ]
 ]) ?>
 <?php Modal::end(); ?>

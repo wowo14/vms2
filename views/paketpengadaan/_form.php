@@ -30,7 +30,7 @@ function rabid(){
     }
 }
 JS;
-$this->registerJs($js, \yii\web\View::POS_HEAD);
+$this->registerJs($js, \yii\web\View::POS_END);
 $datakodeprogram = $model->isNewRecord ? \app\models\ProgramKegiatan::optionprogram() : \app\models\ProgramKegiatan::optionprogram($model->kode_program, $model->tahun_anggaran);
 $adminppkom = [];
 if ($model::isAdmin() || $model::isStaffpp() || $model::isPPK() || $model::isPP()) {
