@@ -165,6 +165,8 @@ $config = [
             'site/*',
             'site/login',
             'site/error',
+            'dasarhukum/gallery',
+            'dasarhukum/detail',
         ]
     ],
     'as beforeRequest' => [

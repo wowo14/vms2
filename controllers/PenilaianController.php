@@ -147,6 +147,119 @@ class PenilaianController extends Controller
             return $this->redirect(['index']);
         }
     }
+    public function actionEvaluasi()
+    {
+        $request = Yii::$app->request;
+        $tahun = $request->get('tahun');
+        $bulan = $request->get('bulan');
+        $vendor_id = $request->get('vendor_id');
+
+        $query = PenilaianPenyedia::find();
+        
+        if ($tahun && $tahun != 'all') {
+            $query->andWhere(['strftime("%Y", tanggal_kontrak)' => (string)$tahun]);
+        }
+        if ($bulan && $bulan != 'all') {
+            $query->andWhere(['strftime("%m", tanggal_kontrak)' => str_pad($bulan, 2, '0', STR_PAD_LEFT)]);
+        }
+        if ($vendor_id && $vendor_id != 'all') {
+            $p = \app\models\Penyedia::findOne($vendor_id);
+            if ($p) {
+                $query->andWhere(['nama_perusahaan' => $p->nama_perusahaan]);
+            }
+        }
+
+        $data = $query->all();
+        
+        $summary = [];
+        foreach ($data as $item) {
+            $details = json_decode($item->details, true);
+            if (!$details) continue;
+            
+            $provider = $item->nama_perusahaan;
+            
+            if (!isset($summary[$provider])) {
+                $summary[$provider] = [
+                    'nama' => $provider,
+                    'count' => 0,
+                    'total_score' => 0,
+                    'avg_score' => 0,
+                    'total_nilai' => 0
+                ];
+            }
+            
+            $nilaiakhir_str = $details['nilaiakhir'] ?? 0;
+            $nilaiakhir_num = 0;
+            if (is_string($nilaiakhir_str) && strpos($nilaiakhir_str, '=') !== false) {
+                $parts = explode('=', $nilaiakhir_str);
+                $nilaiakhir_num = (float) trim(end($parts));
+            } else {
+                $nilaiakhir_num = (float) $nilaiakhir_str;
+            }
+            
+            $summary[$provider]['count']++;
+            $summary[$provider]['total_score'] += $nilaiakhir_num;
+            $summary[$provider]['total_nilai'] += $item->nilai_kontrak;
+        }
+        
+        $sort = $request->get('sort', 'rating_desc');
+        
+        foreach ($summary as &$s) {
+            $s['avg_score'] = $s['count'] > 0 ? round($s['total_score'] / $s['count'], 2) : 0;
+        }
+
+        // Sorting logic
+        uasort($summary, function($a, $b) use ($sort) {
+            switch ($sort) {
+                case 'rating_asc':
+                    return $a['avg_score'] <=> $b['avg_score'];
+                case 'rating_desc':
+                    return $b['avg_score'] <=> $a['avg_score'];
+                case 'count_asc':
+                    return $a['count'] <=> $b['count'];
+                case 'count_desc':
+                    return $b['count'] <=> $a['count'];
+                case 'nilai_asc':
+                    return $a['total_nilai'] <=> $b['total_nilai'];
+                case 'nilai_desc':
+                    return $b['total_nilai'] <=> $a['total_nilai'];
+                default:
+                    return $b['avg_score'] <=> $a['avg_score'];
+            }
+        });
+
+        return $this->render('evaluasi', [
+            'summary' => $summary,
+            'tahun' => $tahun,
+            'bulan' => $bulan,
+            'vendor_id' => $vendor_id,
+            'sort' => $sort
+        ]);
+    }
+
+    public function actionDrillDown($vendor_nama)
+    {
+        $request = Yii::$app->request;
+        $tahun = $request->get('tahun');
+        $bulan = $request->get('bulan');
+
+        $query = PenilaianPenyedia::find()->where(['nama_perusahaan' => $vendor_nama]);
+        
+        if ($tahun && $tahun != 'all') {
+            $query->andWhere(['strftime("%Y", tanggal_kontrak)' => (string)$tahun]);
+        }
+        if ($bulan && $bulan != 'all') {
+            $query->andWhere(['strftime("%m", tanggal_kontrak)' => str_pad($bulan, 2, '0', STR_PAD_LEFT)]);
+        }
+
+        $data = $query->all();
+        
+        return $this->renderAjax('drill_down', [
+            'data' => $data,
+            'vendor_nama' => $vendor_nama
+        ]);
+    }
+
     protected function findModel($id)
     {
         if (($model = PenilaianPenyedia::findOne($id)) !== null)

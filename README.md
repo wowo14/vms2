@@ -49,3 +49,8 @@ run yii migrate after install to auto generate RBAC module and admin module user
 **NOTES:**
 - Yii won't create the database for you, this has to be done manually before you can access it.
 - Check and edit the other files in the `config/` directory to customize your application as required.
+
+===
+task Report Penilaian Penyedia bisa di agreegate per periode
+
+modul dokumen dasar hukum

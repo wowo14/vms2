@@ -1,7 +1,7 @@
 <?php
 namespace app\controllers;
 use Yii;
-use yii\helpers\Html;
+use yii\helpers\{Html, FileHelper};
 use yii\web\Controller;
 use app\models\Attachment;
 use yii\filters\VerbFilter;
@@ -19,6 +19,44 @@ class DasarhukumController extends Controller {
                 ],
             ],
         ];
+    }
+    public function actionGallery() {
+        $this->layout = 'main-public';
+        $query = GaleryDasarhukum::find()->where(['is_active' => 1]);
+        
+        $kategori = Yii::$app->request->get('kategori');
+        if ($kategori) {
+            $query->andWhere(['kategori' => $kategori]);
+        }
+        
+        $search = Yii::$app->request->get('search');
+        if ($search) {
+            $query->andWhere(['like', 'judul', $search]);
+        }
+        $dataProvider = new \yii\data\ActiveDataProvider([
+            'query' => $query,
+            'pagination' => [
+                'pageSize' => 12,
+            ],
+            'sort' => [
+                'defaultOrder' => ['tanggal_ditetapkan' => SORT_DESC],
+            ]
+        ]);
+        $categories = GaleryDasarhukum::find()->select('kategori')->distinct()->where(['is_active' => 1])->column();
+        return $this->render('gallery', [
+            'dataProvider' => $dataProvider,
+            'categories' => $categories,
+        ]);
+    }
+    public function actionDetail($id) {
+        $this->layout = 'main-public';
+        $model = $this->findModel($id);
+        if (!$model->is_active) {
+            throw new NotFoundHttpException('Halaman tidak ditemukan.');
+        }
+        return $this->render('detail', [
+            'model' => $model,
+        ]);
     }
     public function actionIndex() {
         $searchModel = new GaleryDasarhukumSearch();
@@ -53,6 +91,8 @@ class DasarhukumController extends Controller {
             Yii::$app->response->format = Response::FORMAT_JSON;
             if ($model->load($request->post()) && $model->save()) {
                 if (!empty($_FILES['GaleryDasarhukum']['name']['foto']) || !empty($_FILES['GaleryDasarhukum']['name']['file_pdf'])) {
+                    $uploadPath = Yii::getAlias('@uploads');
+                    FileHelper::createDirectory($uploadPath);
                     foreach ($_FILES['GaleryDasarhukum']['name'] as $index => $fileName) {
                         $fileType = $_FILES['GaleryDasarhukum']['type'][$index];
                         $fileTmpName = $_FILES['GaleryDasarhukum']['tmp_name'][$index];
@@ -64,9 +104,9 @@ class DasarhukumController extends Controller {
                         if ($fileError === 0) {
                             $extension = pathinfo($fileName, PATHINFO_EXTENSION);
                             $newFilename = uniqid() . '.' . $extension;
-                            $destination = Yii::getAlias('@uploads/' . $newFilename);
+                            $destination = rtrim($uploadPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $newFilename;
                             // Hapus attachment lama jika ada
-                            $att = Attachment::where(['type' => $index, 'jenis_dokumen' => 0, 'user_id' => $model->id])->one();
+                            $att = Attachment::find()->where(['type' => $index, 'jenis_dokumen' => 0, 'user_id' => $model->id])->one();
                             if ($att) {
                                 $att->delete();
                             }
@@ -126,6 +166,8 @@ class DasarhukumController extends Controller {
         } else {
             if ($model->load($request->post()) && $model->save()) {
                 if (!empty($_FILES['GaleryDasarhukum']['name']['foto']) || !empty($_FILES['GaleryDasarhukum']['name']['file_pdf'])) {
+                    $uploadPath = Yii::getAlias('@uploads');
+                    FileHelper::createDirectory($uploadPath);
                     foreach ($_FILES['GaleryDasarhukum']['name'] as $index => $fileName) {
                         $fileType = $_FILES['GaleryDasarhukum']['type'][$index];
                         $fileTmpName = $_FILES['GaleryDasarhukum']['tmp_name'][$index];
@@ -137,9 +179,9 @@ class DasarhukumController extends Controller {
                         if ($fileError === 0) {
                             $extension = pathinfo($fileName, PATHINFO_EXTENSION);
                             $newFilename = uniqid() . '.' . $extension;
-                            $destination = Yii::getAlias('@uploads/' . $newFilename);
+                            $destination = rtrim($uploadPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $newFilename;
                             // Hapus attachment lama jika ada
-                            $att = Attachment::where(['type' => $index, 'jenis_dokumen' => 0, 'user_id' => $model->id])->one();
+                            $att = Attachment::find()->where(['type' => $index, 'jenis_dokumen' => 0, 'user_id' => $model->id])->one();
                             if ($att) {
                                 $att->delete();
                             }
@@ -189,6 +231,8 @@ class DasarhukumController extends Controller {
             Yii::$app->response->format = Response::FORMAT_JSON;
             if ($model->load($request->post()) && $model->save()) {
                 if (!empty($_FILES['GaleryDasarhukum']['name']['foto']) || !empty($_FILES['GaleryDasarhukum']['name']['file_pdf'])) {
+                    $uploadPath = Yii::getAlias('@uploads');
+                    FileHelper::createDirectory($uploadPath);
                     foreach ($_FILES['GaleryDasarhukum']['name'] as $index => $fileName) {
                         $fileType = $_FILES['GaleryDasarhukum']['type'][$index];
                         $fileTmpName = $_FILES['GaleryDasarhukum']['tmp_name'][$index];
@@ -200,9 +244,9 @@ class DasarhukumController extends Controller {
                         if ($fileError === 0) {
                             $extension = pathinfo($fileName, PATHINFO_EXTENSION);
                             $newFilename = uniqid() . '.' . $extension;
-                            $destination = Yii::getAlias('@uploads/' . $newFilename);
+                            $destination = rtrim($uploadPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $newFilename;
                             // Hapus attachment lama jika ada
-                            $att = Attachment::where(['type' => $index, 'jenis_dokumen' => 0, 'user_id' => $model->id])->one();
+                            $att = Attachment::find()->where(['type' => $index, 'jenis_dokumen' => 0, 'user_id' => $model->id])->one();
                             if ($att) {
                                 $att->delete();
                             }
@@ -262,6 +306,8 @@ class DasarhukumController extends Controller {
         } else {
             if ($model->load($request->post()) && $model->save()) {
                 if (!empty($_FILES['GaleryDasarhukum']['name']['foto']) || !empty($_FILES['GaleryDasarhukum']['name']['file_pdf'])) {
+                    $uploadPath = Yii::getAlias('@uploads');
+                    FileHelper::createDirectory($uploadPath);
                     foreach ($_FILES['GaleryDasarhukum']['name'] as $index => $fileName) {
                         $fileType = $_FILES['GaleryDasarhukum']['type'][$index];
                         $fileTmpName = $_FILES['GaleryDasarhukum']['tmp_name'][$index];
@@ -273,9 +319,9 @@ class DasarhukumController extends Controller {
                         if ($fileError === 0) {
                             $extension = pathinfo($fileName, PATHINFO_EXTENSION);
                             $newFilename = uniqid() . '.' . $extension;
-                            $destination = Yii::getAlias('@uploads/' . $newFilename);
+                            $destination = rtrim($uploadPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $newFilename;
                             // Hapus attachment lama jika ada
-                            $att = Attachment::where(['type' => $index, 'jenis_dokumen' => 0, 'user_id' => $model->id])->one();
+                            $att = Attachment::find()->where(['type' => $index, 'jenis_dokumen' => 0, 'user_id' => $model->id])->one();
                             if ($att) {
                                 $att->delete();
                             }
