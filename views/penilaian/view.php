@@ -24,8 +24,8 @@ $viewdetail=DetailView::widget([
             'attribute' => 'nilai_kontrak',
             'value' => fn($d) => \Yii::$app->formatter->asCurrency($d->nilai_kontrak)
         ],
-        ['attribute' => 'created_by', 'value' => $model->usercreated->username ?? ''],
-        ['attribute' => 'updated_by', 'value' => $model->userupdated->username ?? ''],
+        ['attribute' => 'created_by', 'value' => $model->usercreated?->userpegawai?->nama ?? '-',],
+        ['attribute' => 'updated_by', 'value' => $model->userupdated?->userpegawai?->nama ?? '-',],
         'created_at',
         'updated_at',
     ],

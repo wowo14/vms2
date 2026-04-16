@@ -25,7 +25,7 @@ use yii\widgets\DetailView;
                     'pagu:currency',
                     'metode_pengadaan:ntext',
                     'kategori_pengadaan:ntext',
-                    ['attribute' => 'created_by', 'value' => $model->usercreated->username ?? ''],
+                    ['attribute' => 'created_by', 'value' => $model->usercreated?->userpegawai?->nama ?? '-',],
                     'tahun_anggaran',
                     'approval_by',
                     'unitnya.unit',

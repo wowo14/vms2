@@ -25,9 +25,9 @@ CrudAsset::register($this);
                 'lampiran_penawaran:ntext',
                 'lampiran_penawaran_harga:ntext',
                 'penilaian',
-                ['attribute' => 'created_by', 'value' => $model->usercreated->username ?? ''],
+                ['attribute' => 'created_by', 'value' => $model->usercreated?->userpegawai?->nama ?? '-',],
                 'created_at',
-                ['attribute' => 'updated_by', 'value' => $model->usercreated->username ?? ''],
+                ['attribute' => 'updated_by', 'value' => $model->userupdated?->userpegawai?->nama ?? '-',],
                 'updated_at',
             ],
         ]) ?>

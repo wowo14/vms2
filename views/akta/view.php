@@ -12,11 +12,11 @@ use yii\widgets\DetailView;
             'nomor_akta:ntext',
             'tanggal_akta:ntext',
             'notaris:ntext',
-            ['attribute'=>'file_akta','format'=>'raw','value'=>fn($model)=>"<a href='".Url::to('@web/uploads/').$model->file_akta."' target='_blank'>$model->file_akta</a>"],
+            ['attribute'=>'file_akta','format'=>'raw','value'=>fn($model)=Tg"<a href='".Url::to('@web/uploads/').$model->file_akta."' target='_blank'>$model->file_akta</a>"],
             'created_at:ntext',
             'updated_at:ntext',
-            ['attribute' => 'created_by', 'value' => $model->usercreated->username??''],
-            ['attribute' => 'updated_by', 'value' => $model->userupdated->username??''],
+            ['attribute' => 'created_by', 'value' => $model->usercreated?->userpegawai?->nama ?? '-',],
+            ['attribute' => 'updated_by', 'value' => $model->userupdated?->userpegawai?->nama ?? '-',],
         ],
     ]) ?>
 </div>
