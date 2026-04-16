@@ -93,10 +93,18 @@ $sortOptions = [
 
                     <div class="col-md-2">
                         <div class="form-group mb-0">
-                            <label class="d-block invisible">Search</label>
-                            <button type="submit" class="btn btn-primary btn-block">
-                                <i class="fas fa-search"></i>
-                            </button>
+                            <label class="d-block invisible">Action</label>
+                            <div class="d-flex h-100">
+                                <button type="submit" class="btn btn-primary flex-fill mr-1" title="Cari">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <button type="submit" name="export" value="excel" class="btn btn-success flex-fill mr-1" title="Export Excel">
+                                    <i class="fas fa-file-excel"></i>
+                                </button>
+                                <button type="submit" name="export" value="pdf" class="btn btn-danger flex-fill" title="Export PDF">
+                                    <i class="fas fa-file-pdf"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
