@@ -15,14 +15,23 @@ AppAsset::register($this);
 
 $months = [
     'all' => 'Semua Bulan',
-    '01' => 'Januari', '02' => 'Februari', '03' => 'Maret',
-    '04' => 'April', '05' => 'Mei', '06' => 'Juni',
-    '07' => 'Juli', '08' => 'Agustus', '09' => 'September',
-    '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
+    '01' => 'Januari',
+    '02' => 'Februari',
+    '03' => 'Maret',
+    '04' => 'April',
+    '05' => 'Mei',
+    '06' => 'Juni',
+    '07' => 'Juli',
+    '08' => 'Agustus',
+    '09' => 'September',
+    '10' => 'Oktober',
+    '11' => 'November',
+    '12' => 'Desember'
 ];
 
 $years = ['all' => 'Semua Tahun', '2024' => '2024', '2025' => '2025', '2026' => '2026'];
-if (!$tahun) $tahun = 'all';
+if (!$tahun)
+    $tahun = 'all';
 $vendors = Penyedia::find()->select(['nama_perusahaan', 'id'])->indexBy('id')->column();
 $vendors = ['all' => 'Semua Penyedia'] + $vendors;
 
@@ -44,38 +53,53 @@ $sortOptions = [
         </div>
         <div class="card-body">
             <form method="get" action="<?= Url::to(['penilaian/evaluasi']) ?>">
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="form-group">
+                <div class="row align-items-end">
+
+                    <div class="col-md-2">
+                        <div class="form-group mb-0">
                             <label>Tahun</label>
-                            <?= Html::dropDownList('tahun', $tahun, $years, ['class' => 'form-control select2']) ?>
+                            <?= Html::dropDownList('tahun', $tahun, $years, [
+                                'class' => 'form-control select2 w-100'
+                            ]) ?>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
+
+                    <div class="col-md-2">
+                        <div class="form-group mb-0">
                             <label>Bulan</label>
-                            <?= Html::dropDownList('bulan', $bulan, $months, ['class' => 'form-control select2']) ?>
+                            <?= Html::dropDownList('bulan', $bulan, $months, [
+                                'class' => 'form-control select2 w-100'
+                            ]) ?>
                         </div>
                     </div>
+
                     <div class="col-md-3">
-                        <div class="form-group">
+                        <div class="form-group mb-0">
                             <label>Penyedia</label>
-                            <?= Html::dropDownList('vendor_id', $vendor_id, $vendors, ['class' => 'form-control select2']) ?>
+                            <?= Html::dropDownList('vendor_id', $vendor_id, $vendors, [
+                                'class' => 'form-control select2 w-100'
+                            ]) ?>
                         </div>
                     </div>
+
                     <div class="col-md-3">
-                        <div class="form-group">
+                        <div class="form-group mb-0">
                             <label>Urutan</label>
-                            <?= Html::dropDownList('sort', $sort, $sortOptions, ['class' => 'form-control select2']) ?>
+                            <?= Html::dropDownList('sort', $sort, $sortOptions, [
+                                'class' => 'form-control select2 w-100'
+                            ]) ?>
                         </div>
                     </div>
-                    <div class="col-md-1 d-flex align-items-end">
-                        <div class="form-group w-100">
+
+                    <div class="col-md-2">
+                        <div class="form-group mb-0">
+                            <label class="d-block invisible">Search</label>
                             <button type="submit" class="btn btn-primary btn-block">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
                     </div>
+
                 </div>
             </form>
         </div>
@@ -83,29 +107,27 @@ $sortOptions = [
 
     <?php if (!empty($summary)): ?>
         <div class="row">
-            <?php foreach ($summary as $vendor_nama => $s): 
+            <?php foreach ($summary as $vendor_nama => $s):
                 $percentage = ($s['avg_score'] / 5) * 100;
                 $color = $s['avg_score'] >= 4 ? 'success' : ($s['avg_score'] >= 3 ? 'warning' : 'danger');
-            ?>
+                ?>
                 <div class="col-md-4 mb-4">
-                    <div class="card card-outline card-<?= $color ?> h-100 shadow-sm provider-card" 
-                         style="cursor:pointer;"
-                         data-vendor="<?= Html::encode($vendor_nama) ?>"
-                         data-tahun="<?= $tahun ?>"
-                         data-bulan="<?= $bulan ?>">
+                    <div class="card card-outline card-<?= $color ?> h-100 shadow-sm provider-card" style="cursor:pointer;"
+                        data-vendor="<?= Html::encode($vendor_nama) ?>" data-tahun="<?= $tahun ?>" data-bulan="<?= $bulan ?>">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-3">
                                 <div class="bg-<?= $color ?> p-3 rounded mr-3 text-white">
                                     <i class="fas fa-chart-line fa-2x"></i>
                                 </div>
                                 <div style="flex-grow: 1; overflow: hidden;">
-                                    <h5 class="card-title text-truncate mb-0" style="width: 100%;" title="<?= Html::encode($vendor_nama) ?>">
+                                    <h5 class="card-title text-truncate mb-0" style="width: 100%;"
+                                        title="<?= Html::encode($vendor_nama) ?>">
                                         <?= Html::encode($vendor_nama) ?>
                                     </h5>
                                     <small class="text-muted"><?= $s['count'] ?> Paket</small>
                                 </div>
                             </div>
-                            
+
                             <div class="mb-2">
                                 <div class="d-flex justify-content-between mb-1">
                                     <strong><?= $s['avg_score'] ?> / 5.0</strong>
@@ -140,10 +162,10 @@ $sortOptions = [
                         </tr>
                     </thead>
                     <tbody>
-                        <?php 
+                        <?php
                         $i = 1;
-                        foreach ($summary as $s): 
-                        ?>
+                        foreach ($summary as $s):
+                            ?>
                             <tr>
                                 <td><?= $i++ ?></td>
                                 <td class="font-weight-bold text-primary"><?= Html::encode($s['nama']) ?></td>
@@ -151,12 +173,16 @@ $sortOptions = [
                                 <td class="text-center">Rp. <?= number_format($s['total_nilai'], 0, ',', '.') ?></td>
                                 <td class="text-right font-weight-bold"><?= $s['avg_score'] ?></td>
                                 <td class="text-center">
-                                    <?php 
+                                    <?php
                                     $p = ($s['avg_score'] / 5) * 100;
-                                    if ($p >= 90) echo '<span class="badge badge-success">SANGAT MEMUASKAN</span>';
-                                    elseif ($p >= 80) echo '<span class="badge badge-primary">BAIK</span>';
-                                    elseif ($p >= 60) echo '<span class="badge badge-warning">CUKUP</span>';
-                                    else echo '<span class="badge badge-danger">BURUK</span>';
+                                    if ($p >= 90)
+                                        echo '<span class="badge badge-success">SANGAT MEMUASKAN</span>';
+                                    elseif ($p >= 80)
+                                        echo '<span class="badge badge-primary">BAIK</span>';
+                                    elseif ($p >= 60)
+                                        echo '<span class="badge badge-warning">CUKUP</span>';
+                                    else
+                                        echo '<span class="badge badge-danger">BURUK</span>';
                                     ?>
                                 </td>
                             </tr>
@@ -168,18 +194,18 @@ $sortOptions = [
     <?php endif; ?>
 </div>
 
-<?php 
+<?php
 yii\bootstrap4\Modal::begin([
     "id" => "ajaxCrudModal",
     "size" => "modal-xl",
-    "footer" => "", 
+    "footer" => "",
 ]);
 yii\bootstrap4\Modal::end();
 
 yii\bootstrap4\Modal::begin([
     "id" => "ajaxCrudModal2",
     "size" => "modal-xl",
-    "footer" => "", 
+    "footer" => "",
 ]);
 yii\bootstrap4\Modal::end();
 
@@ -210,10 +236,14 @@ $this->registerJs($js);
 ?>
 
 <style>
-.provider-card:hover {
-    transform: translateY(-5px);
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-}
-.progress { height: 4px; margin-top: 5px; }
+    .provider-card:hover {
+        transform: translateY(-5px);
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .progress {
+        height: 4px;
+        margin-top: 5px;
+    }
 </style>
