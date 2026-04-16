@@ -749,14 +749,15 @@ class DppController extends Controller
         $penilaian = PenilaianPenyedia::last(['dpp_id' => $dpp->id, 'created_by' => Yii::$app->user->id]) ?? new PenilaianPenyedia();
         $request = Yii::$app->request;
         $template = collect(json_decode(Setting::where(['type' => 'evaluasi_suplier_ppk', 'active' => 1])->one()->value, true)['kriteria'])
-            ->map(function ($e) use ($penilaian) {
+            ->map(function ($e, $index) use ($penilaian) {
+                $saved = $penilaian->dpp ? json_decode($penilaian->details, true) : null;
                 return [
-                    'uraian' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['uraian'] : $e['name'],
-                    'skor' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['skor'] : 0,
-                    'nilaiakhir' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['nilaiakhir'] : 0,
-                    'hasil_evaluasi' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['hasil_evaluasi'] : '',
-                    'ulasan_pejabat_pengadaan' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['ulasan_pejabat_pengadaan'] : '',
-                    'total' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['total'] : 0,
+                    'uraian' => $saved['uraian'][$index] ?? $e['name'],
+                    'skor' => $saved['skor'][$index] ?? 0,
+                    'nilaiakhir' => $saved['nilaiakhir'] ?? 0,
+                    'hasil_evaluasi' => $saved['hasil_evaluasi'] ?? '',
+                    'ulasan_pejabat_pengadaan' => $saved['ulasan_pejabat_pengadaan'] ?? '',
+                    'total' => $saved['total'] ?? 0,
                     'desc' => collect($e['description'])->map(function ($d, $i) {
                         return $i . '. ' . $d;
                     })->sortKeys(),
@@ -822,14 +823,15 @@ class DppController extends Controller
         $penilaian = PenilaianPenyedia::last(['dpp_id' => $dpp->id, 'created_by' => Yii::$app->user->id]) ?? new PenilaianPenyedia();
         $request = Yii::$app->request;
         $template = collect(json_decode(Setting::where(['type' => 'evaluasi_suplier_pejabat', 'active' => 1])->one()->value, true)['kriteria'])
-            ->map(function ($e) use ($penilaian) {
+            ->map(function ($e, $index) use ($penilaian) {
+                $saved = $penilaian->dpp ? json_decode($penilaian->details, true) : null;
                 return [
-                    'uraian' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['uraian'] : $e['name'],
-                    'skor' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['skor'] : 0,
-                    'nilaiakhir' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['nilaiakhir'] : 0,
-                    'hasil_evaluasi' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['hasil_evaluasi'] : '',
-                    'ulasan_pejabat_pengadaan' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['ulasan_pejabat_pengadaan'] : '',
-                    'total' => ($penilaian->dpp) ? json_decode($penilaian->details, true)['total'] : 0,
+                    'uraian' => $saved['uraian'][$index] ?? $e['name'],
+                    'skor' => $saved['skor'][$index] ?? 0,
+                    'nilaiakhir' => $saved['nilaiakhir'] ?? 0,
+                    'hasil_evaluasi' => $saved['hasil_evaluasi'] ?? '',
+                    'ulasan_pejabat_pengadaan' => $saved['ulasan_pejabat_pengadaan'] ?? '',
+                    'total' => $saved['total'] ?? 0,
                     'desc' => collect($e['description'])->map(function ($d, $i) {
                         return $i . '. ' . $d;
                     })->sortKeys(),
@@ -894,5 +896,18 @@ class DppController extends Controller
                 'template' => $template,
             ]);
         }
+    }
+
+    public function actionResetpenilaian($id)
+    {
+        $penilaian = PenilaianPenyedia::where(['dpp_id' => $id, 'created_by' => Yii::$app->user->id])->one();
+        if ($penilaian) {
+            if ($penilaian->delete()) {
+                Yii::$app->session->setFlash('success', 'Penilaian berhasil direset.');
+            } else {
+                Yii::$app->session->setFlash('error', 'Gagal mereset penilaian.');
+            }
+        }
+        return $this->redirect(['index']);
     }
 }

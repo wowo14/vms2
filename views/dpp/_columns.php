@@ -13,22 +13,29 @@ return [
         'width' => '30px',
     ],
     'ExpandRowColumn' =>
-    [
-        'class' => '\kartik\grid\ExpandRowColumn',
-        'value' => function ($model, $key, $index, $column) {
-            return GridView::ROW_COLLAPSED;
-        },
-        'detailUrl' => Url::to(['/dpp/detailpaket']),
-        'hiddenFromExport' => true
-    ],
+        [
+            'class' => '\kartik\grid\ExpandRowColumn',
+            'value' => function ($model, $key, $index, $column) {
+                return GridView::ROW_COLLAPSED;
+            },
+            'detailUrl' => Url::to(['/dpp/detailpaket']),
+            'hiddenFromExport' => true
+        ],
     [
         'class' => '\kartik\grid\DataColumn',
         'attribute' => 'nomor_dpp',
         'format' => 'raw',
         'contentOptions' => ['class' => 'text-center'],
         'value' => fn($d) =>
-        Html::a($d->nomor_dpp, ['/dpp/tab', 'id' => $d->id], ['class' => 'bg-white'])
+            Html::a($d->nomor_dpp, ['/dpp/tab', 'id' => $d->id], ['class' => 'bg-white'])
             ?? ''
+    ],
+    [
+        'class' => '\kartik\grid\DataColumn',
+        'attribute' => 'year',
+        'label' => 'Tahun',
+        'value' => fn($d) => date('Y', strtotime($d->tanggal_dpp)),
+        'filter' => \app\models\PaketPengadaan::optiontahunpaket(),
     ],
     [
         'class' => '\kartik\grid\DataColumn',
@@ -58,20 +65,41 @@ return [
         'format' => 'raw',
         'value' => fn($d) => $d->paketpengadaan->nomornamapaket ?? ''
     ],
-    [
-        'class' => '\kartik\grid\DataColumn',
-        'attribute' => 'status_review',
-        'label'=>'Review'
-    ],
+    // [
+    //     'class' => '\kartik\grid\DataColumn',
+    //     'attribute' => 'status_review',
+    //     'label'=>'Review'
+    // ],
     [
         'class' => '\kartik\grid\DataColumn',
         'attribute' => 'pejabat_pengadaan',
-        'value' => fn($d) => isset($d->pejabat) ? $d->pejabat->nama . $d->countPejabatWithNullPemenang($d->pejabat_pengadaan) : ''
+        'filter' => \app\models\Dpp::getAllpetugas(),
+        'value' => fn($d) => isset($d->pejabat) ? $d->pejabat->nama . $d->countPejabatWithNullPemenang($d->pejabat_pengadaan) : '',
+        'contentOptions' => function ($model, $key, $index, $column) {
+            if ($model->isEvaluatedByPejabat()) {
+                return ['style' => 'background-color: #3182ce; color: white; font-weight: bold;'];
+            }
+            return [];
+        },
     ],
     [
         'class' => '\kartik\grid\DataColumn',
         'attribute' => 'admin_pengadaan',
+        'filter' => \app\models\Dpp::getAlladmin(),
         'value' => fn($d) => isset($d->staffadmin)?$d->staffadmin->nama .$d->countAdminWithNullPemenang($d->admin_pengadaan) :''
+    ],
+    [
+        'class' => '\kartik\grid\DataColumn',
+        'attribute' => 'ppk',
+        'label' => 'PPK',
+        'filter' => \app\models\Dpp::optionppkom(),
+        'value' => fn($d) => $d->paketpengadaan->pejabatppkom->nama ?? '',
+        'contentOptions' => function ($model, $key, $index, $column) {
+            if ($model->isEvaluatedByPPK()) {
+                return ['style' => 'background-color: #3182ce; color: white; font-weight: bold;'];
+            }
+            return [];
+        },
     ],
     // [
     //     'class' => '\kartik\grid\DataColumn',

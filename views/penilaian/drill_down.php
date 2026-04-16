@@ -25,7 +25,7 @@ use yii\helpers\Html;
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($data as $i => $item): 
+                <?php foreach ($data as $i => $item):
                     $details = json_decode($item->details, true);
                     $score_raw = 0;
                     if (is_string($details['nilaiakhir']) && strpos($details['nilaiakhir'], '=') !== false) {
@@ -34,27 +34,47 @@ use yii\helpers\Html;
                     } else {
                         $score_raw = (float) $details['nilaiakhir'];
                     }
-                ?>
-                <tr>
-                    <td class="text-center"><?= $i + 1 ?></td>
-                    <td><?= Html::encode($item->paket_pekerjaan) ?></td>
-                    <td class="text-center text-muted small"><?= Html::encode($item->nomor_kontrak) ?></td>
-                    <td class="text-center small"><?= date('d/m/Y', strtotime($item->tanggal_kontrak)) ?></td>
-                    <td class="text-right">Rp. <?= number_format($item->nilai_kontrak, 0, ',', '.') ?></td>
-                    <td class="text-center">
-                        <span class="badge badge-<?= $score_raw >= 4 ? 'success' : ($score_raw >= 3 ? 'warning' : 'danger') ?>">
-                            <?= Html::encode($details['nilaiakhir']) ?>
-                        </span>
-                    </td>
-                    <td class="text-center">
-                        <?= Html::a('<i class="fas fa-eye"></i>', ['view', 'id' => $item->id], [
-                            'class' => 'btn btn-xs btn-info',
-                            'role' => 'modal-remote',
-                            'data-target' => '#ajaxCrudModal2',
-                            'title' => 'Detail Penilaian'
-                        ]) ?>
-                    </td>
-                </tr>
+                    ?>
+                    <tr>
+                        <td class="text-center"><?= $i + 1 ?></td>
+                        <td><?= Html::encode($item->paket_pekerjaan) ?></td>
+                        <td class="text-center small">
+                            <?= Html::a(Html::encode($item->nomor_kontrak), ['/dpp/tab', 'id' => $item->dpp_id], [
+                                'data-pjax' => 0,
+                                'class' => 'text-primary font-weight-bold',
+                                'title' => 'Buka Detail DPP'
+                            ]) ?>
+                        </td>
+                        <td class="text-center small"><?= date('d/m/Y', strtotime($item->tanggal_kontrak)) ?></td>
+                        <td class="text-right">Rp. <?= number_format($item->nilai_kontrak, 0, ',', '.') ?></td>
+                        <td class="text-center">
+                            <span
+                                class="badge badge-<?= $score_raw >= 4 ? 'success' : ($score_raw >= 3 ? 'warning' : 'danger') ?>">
+                                <?= Html::encode($details['nilaiakhir']) ?>
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <?= Html::a(' <i class="fas fa-eye"></i> ', ['/penilaian/view', 'id' => $item->id], [
+                                    'class' => 'btn btn-xs btn-info',
+                                    'role' => 'modal-remote',
+                                    'data-target' => '#ajaxCrudModal2',
+                                    'title' => 'Detail Penilaian'
+                                ]) ?>
+                                &nbsp;
+                                <?php if ($item->created_by == Yii::$app->user->id): ?>
+                                    <?= Html::a(' <i class="fas fa-undo"></i> ', ['/dpp/resetpenilaian', 'id' => $item->dpp_id], [
+                                        'class' => 'btn btn-xs btn-danger',
+                                        'title' => 'Reset Penilaian',
+                                        'data' => [
+                                            'confirm' => 'Apakah Anda yakin ingin mereset penilaian ini?',
+                                            'method' => 'post',
+                                        ],
+                                    ]) ?>
+                                <?php endif; ?>
+                            </div>
+                        </td>
+                    </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>

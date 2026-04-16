@@ -104,4 +104,12 @@ class Dpp extends \yii\db\ActiveRecord {
             return ' (' . $countpp[$idadmin] . ')';
         }
     }
+    public function isEvaluatedByPejabat() {
+        if (!isset($this->pejabat->id_user)) return false;
+        return PenilaianPenyedia::where(['dpp_id' => $this->id, 'created_by' => $this->pejabat->id_user])->exists();
+    }
+    public function isEvaluatedByPPK() {
+        if (!isset($this->paketpengadaan->pejabatppkom->id_user)) return false;
+        return PenilaianPenyedia::where(['dpp_id' => $this->id, 'created_by' => $this->paketpengadaan->pejabatppkom->id_user])->exists();
+    }
 }

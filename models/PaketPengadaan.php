@@ -170,7 +170,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord
 
         // ->orWhere(['n.penyedia_accept' => 1,'n.pp_accept'=>1])
         return $query->groupBy(['year', 'month', 'paket_pengadaan.id'])
-            ->orderBy('year', 'id')
+            ->orderBy(['year' => SORT_ASC, 'paket_pengadaan.id' => SORT_DESC])
             ->asArray()
             ->all();
     }
@@ -179,7 +179,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord
         return self::where(['not', ['paket_pengadaan.id' => null]])
             ->joinWith('dpp d')
             ->andWhere(['is', 'd.paket_id', null])
-            ->orderBy('id', 'desc')
+            ->orderBy(['id' => SORT_DESC])
             ->asArray()->count();
     }
     public function getPaketreject()
@@ -567,6 +567,17 @@ class PaketPengadaan extends \yii\db\ActiveRecord
             ->asArray()
             ->all();
         return collect($query);
+    }
+    public static function optiontahunpaket()
+    {
+        $query = self::find()->cache(10)
+            ->select([
+                new Expression("strftime('%Y', paket_pengadaan.tanggal_paket) as year"),
+            ])
+            ->distinct()
+            ->asArray()
+            ->all();
+        return collect($query)->pluck('year', 'year')->toArray();
     }
     public function getFilteredData($filters = null)
     { //collection all rekap

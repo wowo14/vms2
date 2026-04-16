@@ -103,6 +103,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'Legend:
                     <span class="bg-warning p-1 m-0 text-white">On Process</span>
                     <span class="bg-light p-1 m-0 text-white">Selesai</span>
+                    <span class="bg-blue p-1 m-0 text-white">Sudah Dinilai</span>
                     <div class="clearfix"></div>',
             ]
         ]) ?>

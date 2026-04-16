@@ -80,7 +80,7 @@ $this->registerJs($js);
             ]) ?>
             <?= $form->field($penilaian, 'jangka_waktu')->textInput(['maxlength' => true]) ?>
             <?= $form->field($penilaian, 'metode_pemilihan')->textInput(['readonly' => true]) ?>
-            <?= $form->field($penilaian, 'pengguna_anggaran')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($penilaian, 'pengguna_anggaran')->dropDownList(\app\models\Dpp::getAllkpa(), ['prompt' => 'Pilih KPA...']) ?>
             <?= $form->field($penilaian, 'pejabat_pembuat_komitmen')->textInput(['readonly' => true]) ?>
         </div>
     </div>
@@ -106,12 +106,12 @@ $this->registerJs($js);
                 echo "<tr>";
                 echo "<td>{$no}</td>";
                 echo "<td class='text-center align-middle  p-1'>
-                    <input name='uraian[$v]' class='form-control' readonly  value='" . (is_array($item['uraian']) ? $item['uraian'][$v] : $item['uraian']) . "'/></td>";
+                    <input name='uraian[$v]' class='form-control' readonly  value='" . Html::encode($item['uraian']) . "'/></td>";
                 echo "<td class='text-center align-middle  p-1'>";
                 echo "<select name='skor[$v]' class='select2 form-control'>";
                 echo "<option></option>";
                 foreach ($item['desc'] as $i => $d) {
-                    echo "<option value=$i" . (is_array($item['skor']) ? (($item['skor'][$v] == $i) ? ' selected' : '') : '') . ">" . $d . "</option>";
+                    echo "<option value=$i" . (($item['skor'] == $i) ? ' selected' : '') . ">" . $d . "</option>";
                 }
                 echo "</select>";
                 echo "</td>";
@@ -148,6 +148,15 @@ $this->registerJs($js);
     <?php if (!Yii::$app->request->isAjax) { ?>
         <div class="form-group">
             <?= Html::submitButton($penilaian->isNewRecord ? 'Create' : 'Update', ['class' => $penilaian->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+            <?php if (!$penilaian->isNewRecord): ?>
+                <?= Html::a('Reset Penilaian', ['resetpenilaian', 'id' => $penilaian->dpp_id], [
+                    'class' => 'btn btn-danger',
+                    'data' => [
+                        'confirm' => 'Apakah Anda yakin ingin mereset penilaian ini? Data yang sudah diisi akan dihapus.',
+                        'method' => 'post',
+                    ],
+                ]) ?>
+            <?php endif; ?>
         </div>
     <?php } ?>
     <?php ActiveForm::end(); ?>

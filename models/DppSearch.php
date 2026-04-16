@@ -2,14 +2,17 @@
 namespace app\models;
 use Yii;
 use yii\base\Model;
+use yii\db\Expression;
 use yii\data\ActiveDataProvider;
 use app\models\Dpp;
 class DppSearch extends Dpp{
+    public $year;
+    public $ppk;
     public function rules()
     {
         return [
             [['id', 'created_by', 'updated_by'], 'integer'],
-            [['nomor_dpp','tanggal_terima', 'paket_id', 'kode','pejabat_pengadaan', 'admin_pengadaan', 'tanggal_dpp', 'bidang_bagian', 'status_review', 'is_approved', 'nomor_persetujuan', 'created_at', 'updated_at'], 'safe'],
+            [['nomor_dpp','tanggal_terima', 'paket_id', 'kode','pejabat_pengadaan', 'admin_pengadaan', 'tanggal_dpp', 'bidang_bagian', 'status_review', 'is_approved', 'nomor_persetujuan', 'created_at', 'updated_at', 'year', 'ppk'], 'safe'],
         ];
     }
     public function scenarios()
@@ -59,14 +62,20 @@ class DppSearch extends Dpp{
             'updated_at' => $this->updated_at,
             'created_by' => $this->created_by,
             'updated_by' => $this->updated_by,
+            'dpp.pejabat_pengadaan' => $this->pejabat_pengadaan,
+            'dpp.admin_pengadaan' => $this->admin_pengadaan,
+            'p.ppkom' => $this->ppk,
         ]);
+        if ($this->year) {
+            $query->andFilterWhere(['=', new Expression("strftime('%Y', dpp.tanggal_dpp)"), $this->year]);
+        }
         $query->andFilterWhere(['like', 'dpp.nomor_dpp', $this->nomor_dpp])
             ->andFilterWhere(['like', 'u.unit', $this->bidang_bagian])
             ->andFilterWhere(['like', 'p.nama_paket', $this->paket_id])
-            ->andFilterWhere(['like', 'p2.nama', $this->pejabat_pengadaan])
+            // ->andFilterWhere(['like', 'p2.nama', $this->pejabat_pengadaan])
             ->andFilterWhere(['between', 'datetime(dpp.tanggal_dpp)', ($this->range($this->tanggal_dpp, 's')), ($this->range($this->tanggal_dpp, 'e'))])
             ->andFilterWhere(['between', 'datetime(dpp.tanggal_terima)', ($this->range($this->tanggal_terima, 's')), ($this->range($this->tanggal_terima, 'e'))])
-            ->andFilterWhere(['like', 's.nama', $this->admin_pengadaan])
+            // ->andFilterWhere(['like', 's.nama', $this->admin_pengadaan])
             ->andFilterWhere(['like', 'dpp.kode', $this->kode])
             ->andFilterWhere(['like', 'dpp.status_review', $this->status_review])
             ->andFilterWhere(['like', 'dpp.is_approved', $this->is_approved])
