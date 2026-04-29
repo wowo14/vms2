@@ -1,5 +1,5 @@
 <?php
-use yii\helpers\Url;
+use yii\helpers\{Html,Url};
 use yii\widgets\DetailView;
 ?>
 <div class="akta-penyedia-view">
@@ -12,7 +12,15 @@ use yii\widgets\DetailView;
             'nomor_akta:ntext',
             'tanggal_akta:ntext',
             'notaris:ntext',
-            ['attribute'=>'file_akta','format'=>'raw','value'=>fn($model)=Tg"<a href='".Url::to('@web/uploads/').$model->file_akta."' target='_blank'>$model->file_akta</a>"],
+            ['attribute'=>'file_akta','format'=>'raw',
+             'value' => fn($model) => $model->file_akta
+                ? Html::a(
+                    $model->file_akta,
+                    Url::to('@web/uploads/' . $model->file_akta),
+                    ['target' => '_blank']
+                )
+                : '-',
+            ],
             'created_at:ntext',
             'updated_at:ntext',
             ['attribute' => 'created_by', 'value' => $model->usercreated?->userpegawai?->nama ?? '-',],
