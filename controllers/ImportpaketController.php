@@ -19,8 +19,26 @@ class ImportpaketController extends Controller {
             if ($file) {
                 try {
                     $spreadsheet = IOFactory::load($file->tempName);
-                    $worksheet = $spreadsheet->getActiveSheet();
-                    $rows = $worksheet->toArray();
+                    // Coba ambil sheet berdasarkan nama, atau default ke indeks 0
+                    $worksheetPaket = $spreadsheet->getSheetByName('Form Import Paket');
+                    if (!$worksheetPaket) $worksheetPaket = $spreadsheet->getSheet(0);
+                    $rows = $worksheetPaket->toArray();
+                    
+                    // Coba ambil sheet detail
+                    $worksheetDetail = $spreadsheet->getSheetByName('Form Detail Paket');
+                    $rowsDetail = $worksheetDetail ? $worksheetDetail->toArray() : [];
+                    
+                    $detailMap = []; // Grouping by Nomor Paket
+                    if (!empty($rowsDetail)) {
+                        for ($j = 1; $j < count($rowsDetail); $j++) {
+                            $rowD = $rowsDetail[$j];
+                            // Skip jika Nomor Paket atau Nama Produk kosong
+                            if (empty($rowD[0]) || empty($rowD[1])) continue; 
+                            
+                            $nomorPaket = trim((string)$rowD[0]);
+                            $detailMap[$nomorPaket][] = $rowD;
+                        }
+                    }
                     
                     $successCount = 0;
                     $errorCount = 0;
@@ -29,50 +47,70 @@ class ImportpaketController extends Controller {
                     for ($i = 1; $i < count($rows); $i++) {
                         $row = $rows[$i];
                         
-                        if (empty($row[1])) continue; // Skip jika Nama Paket kosong
+                        if (empty($row[4])) continue; // Skip jika Nama Paket kosong
                         
                         $transaction = Yii::$app->db->beginTransaction();
                         try {
                             $paket = new PaketPengadaan();
-                            $paket->nomor = !empty($row[0]) ? (string)$row[0] : 'IMP-'.time().'-'.$i;
-                            $paket->nama_paket = (string)$row[1];
-                            $paket->tanggal_paket = !empty($row[2]) ? (string)$row[2] : date('Y-m-d H:i:s');
-                            $paket->pagu = (float)($row[3] ?? 0);
-                            $paket->pemenang = !empty($row[4]) ? $row[4] : null;
-                            $paket->ppkom = !empty($row[6]) ? $row[6] : null;
-                            $paket->tahun_anggaran = !empty($row[7]) ? (int)$row[7] : date('Y');
+                            $nomorPaketImport = !empty($row[0]) ? trim((string)$row[0]) : 'IMP-'.time().'-'.$i; // Nomor DPP
+                            $paket->nomor = $nomorPaketImport;
+                            $paket->tanggal_dpp = !empty($row[1]) ? (string)$row[1] : date('Y-m-d H:i:s');
+                            $paket->nomor_persetujuan = !empty($row[2]) ? (string)$row[2] : 'IMP-' . time() . '-' . $i;
+                            $paket->tanggal_persetujuan = !empty($row[3]) ? (string)$row[3] : date('Y-m-d H:i:s');
+                            $paket->nama_paket = (string)$row[4];
+                            $paket->tanggal_paket = !empty($row[5]) ? (string)$row[5] : date('Y-m-d H:i:s');
+                            $paket->kode_program = !empty($row[6]) ? (string)$row[6] : '-';
+                            $paket->kode_kegiatan = !empty($row[7]) ? (string)$row[7] : '-';
+                            $paket->kode_rekening = !empty($row[8]) ? (string)$row[8] : '-';
+                            $paket->ppkom = !empty($row[9]) ? $row[9] : null;
+                            $paket->pagu = (float)($row[10] ?? 0);
+                            $paket->metode_pengadaan = !empty($row[11]) ? (string)$row[11] : 'PL'; 
+                            $paket->kategori_pengadaan = !empty($row[12]) ? (string)$row[12] : 'barang/jasa';
+                            $paket->tahun_anggaran = !empty($row[13]) ? (int)$row[13] : date('Y');
+                            $paket->unit = !empty($row[14]) ? $row[14] : 1; 
+                            $paket->pemenang = !empty($row[15]) ? $row[15] : null;
                             
-                            // Field Dummy
-                            $paket->tanggal_dpp = $paket->tanggal_paket;
-                            $paket->tanggal_persetujuan = $paket->tanggal_paket;
-                            $paket->nomor_persetujuan = 'IMP-' . time();
-                            $paket->kode_program = '-';
-                            $paket->kode_kegiatan = '-';
-                            $paket->kode_rekening = '-';
-                            $paket->unit = 1; 
-                            $paket->metode_pengadaan = 'PL'; 
-                            $paket->kategori_pengadaan = 'barang/jasa';
                             $paket->is_import = 1; // FLAG IMPORT
                             
                             if ($paket->save(false)) {
                                 $dpp = new Dpp();
-                                $dpp->nomor_dpp = 'DPP-IMP-' . $paket->id;
+                                $dpp->nomor_dpp = $paket->nomor;
+                                $dpp->tanggal_dpp = $paket->tanggal_dpp;
+                                $dpp->nomor_persetujuan = $paket->nomor_persetujuan;
+                                $dpp->bidang_bagian = $paket->unit;
                                 $dpp->paket_id = $paket->id;
-                                $dpp->pejabat_pengadaan = !empty($row[5]) ? $row[5] : null;
-                                $dpp->tanggal_dpp = $paket->tanggal_paket;
+                                $dpp->pejabat_pengadaan = !empty($row[16]) ? $row[16] : null;
+                                $dpp->admin_pengadaan = !empty($row[17]) ? $row[17] : null;
+                                $dpp->kode = !empty($row[18]) ? (string)$row[18] : null;
                                 $dpp->save(false);
                                 
-                                // Insert Dummy Detail
-                                $detail = new \app\models\PaketPengadaanDetails();
-                                $detail->paket_id = $paket->id;
-                                $detail->nama_produk = $paket->nama_paket;
-                                $detail->qty = 1;
-                                $detail->volume = 1;
-                                $detail->satuan = 'ls';
-                                $detail->hps_satuan = $paket->pagu;
-                                $detail->penawaran = $paket->pagu;
-                                $detail->negosiasi = $paket->pagu;
-                                $detail->save(false);
+                                // Insert Detail (Multi-produk support)
+                                if (isset($detailMap[$nomorPaketImport])) {
+                                    foreach ($detailMap[$nomorPaketImport] as $rowD) {
+                                        $detail = new \app\models\PaketPengadaanDetails();
+                                        $detail->paket_id = $paket->id;
+                                        $detail->nama_produk = (string)$rowD[1];
+                                        $detail->qty = !empty($rowD[2]) ? (float)$rowD[2] : 1;
+                                        $detail->volume = !empty($rowD[3]) ? (float)$rowD[3] : 1;
+                                        $detail->satuan = !empty($rowD[4]) ? (string)$rowD[4] : 'ls';
+                                        $detail->hps_satuan = !empty($rowD[5]) ? (float)$rowD[5] : 0;
+                                        $detail->penawaran = !empty($rowD[6]) ? (float)$rowD[6] : $detail->hps_satuan;
+                                        $detail->negosiasi = !empty($rowD[7]) ? (float)$rowD[7] : $detail->penawaran;
+                                        $detail->save(false);
+                                    }
+                                } else {
+                                    // Fallback: Jika tidak mengisi sheet detail, coba baca dari kolom T-Z (Sheet 1) atau buat dummy
+                                    $detail = new \app\models\PaketPengadaanDetails();
+                                    $detail->paket_id = $paket->id;
+                                    $detail->nama_produk = !empty($row[19]) ? (string)$row[19] : $paket->nama_paket;
+                                    $detail->qty = !empty($row[20]) ? (float)$row[20] : 1;
+                                    $detail->volume = !empty($row[21]) ? (float)$row[21] : 1;
+                                    $detail->satuan = !empty($row[22]) ? (string)$row[22] : 'ls';
+                                    $detail->hps_satuan = !empty($row[23]) ? (float)$row[23] : $paket->pagu;
+                                    $detail->penawaran = !empty($row[24]) ? (float)$row[24] : $detail->hps_satuan;
+                                    $detail->negosiasi = !empty($row[25]) ? (float)$row[25] : $detail->penawaran;
+                                    $detail->save(false);
+                                }
                                 
                                 $successCount++;
                                 $transaction->commit();
@@ -106,14 +144,25 @@ class ImportpaketController extends Controller {
         $sheet->setTitle('Form Import');
         
         $headers = [
-            'A1' => 'Nomor Paket',
-            'B1' => 'Nama Paket',
-            'C1' => 'Tanggal Paket (YYYY-MM-DD)',
-            'D1' => 'Pagu (Angka)',
-            'E1' => 'ID Vendor (Penyedia)',
-            'F1' => 'ID Pejabat Pengadaan',
-            'G1' => 'ID PPK (Pejabat Pembuat Komitmen)',
-            'H1' => 'Tahun Anggaran'
+            'A1' => 'Nomor DPP / Paket (Wajib sbg Relasi Detail)',
+            'B1' => 'Tanggal DPP (YYYY-MM-DD)',
+            'C1' => 'Nomor Persetujuan',
+            'D1' => 'Tanggal Persetujuan (YYYY-MM-DD)',
+            'E1' => 'Nama Paket',
+            'F1' => 'Tanggal Paket (YYYY-MM-DD)',
+            'G1' => 'Kode Program',
+            'H1' => 'Kode Kegiatan',
+            'I1' => 'Kode Rekening',
+            'J1' => 'ID PPK',
+            'K1' => 'Pagu Paket',
+            'L1' => 'Metode Pengadaan (PL/EPL/E-Purchasing/dll)',
+            'M1' => 'Kategori Pengadaan (barang/jasa/konstruksi/konsultansi)',
+            'N1' => 'Tahun Anggaran',
+            'O1' => 'ID Unit / Bidang Bagian',
+            'P1' => 'ID Vendor (Pemenang)',
+            'Q1' => 'ID Pejabat Pengadaan',
+            'R1' => 'ID Admin Pengadaan',
+            'S1' => 'Kode Paket / Kode Pemesanan',
         ];
         foreach ($headers as $cell => $val) {
             $sheet->setCellValue($cell, $val);
@@ -121,42 +170,66 @@ class ImportpaketController extends Controller {
         }
         
         // Buat kolom agak lebar
-        foreach(range('A','H') as $columnID) {
+        foreach(range('A','S') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
         
-        // Sheet 2: Data Master
-        $sheet2 = $spreadsheet->createSheet();
-        $sheet2->setTitle('Data Master');
+        // Sheet 2: Form Detail Paket
+        $sheetDetail = $spreadsheet->createSheet();
+        $sheetDetail->setTitle('Form Detail Paket');
         
-        $sheet2->setCellValue('A1', 'DATA VENDOR (PENYEDIA)');
-        $sheet2->setCellValue('A2', 'ID');
-        $sheet2->setCellValue('B2', 'Nama Vendor');
-        $sheet2->getStyle('A1:B2')->getFont()->setBold(true);
+        $headersDetail = [
+            'A1' => 'Nomor DPP / Paket (Sama dengan Sheet 1)',
+            'B1' => 'Nama Produk / Jasa',
+            'C1' => 'Qty',
+            'D1' => 'Volume',
+            'E1' => 'Satuan',
+            'F1' => 'HPS Satuan',
+            'G1' => 'Penawaran',
+            'H1' => 'Negosiasi',
+        ];
+        
+        foreach ($headersDetail as $cell => $val) {
+            $sheetDetail->setCellValue($cell, $val);
+            $sheetDetail->getStyle($cell)->getFont()->setBold(true);
+        }
+        
+        foreach(range('A','H') as $columnID) {
+            $sheetDetail->getColumnDimension($columnID)->setAutoSize(true);
+        }
+        
+        // Sheet 3: Data Master
+        $sheetMaster = $spreadsheet->createSheet();
+        $sheetMaster->setTitle('Data Master');
+        
+        $sheetMaster->setCellValue('A1', 'DATA VENDOR (PENYEDIA)');
+        $sheetMaster->setCellValue('A2', 'ID');
+        $sheetMaster->setCellValue('B2', 'Nama Vendor');
+        $sheetMaster->getStyle('A1:B2')->getFont()->setBold(true);
         
         $vendors = Penyedia::find()->where(['active' => 1])->all();
         $row = 3;
         foreach ($vendors as $v) {
-            $sheet2->setCellValue('A'.$row, $v->id);
-            $sheet2->setCellValue('B'.$row, $v->nama_perusahaan);
+            $sheetMaster->setCellValue('A'.$row, $v->id);
+            $sheetMaster->setCellValue('B'.$row, $v->nama_perusahaan);
             $row++;
         }
         
-        $sheet2->setCellValue('D1', 'DATA PEGAWAI (PEJABAT/PPK)');
-        $sheet2->setCellValue('D2', 'ID');
-        $sheet2->setCellValue('E2', 'Nama Pegawai');
-        $sheet2->getStyle('D1:E2')->getFont()->setBold(true);
+        $sheetMaster->setCellValue('D1', 'DATA PEGAWAI (PEJABAT/PPK)');
+        $sheetMaster->setCellValue('D2', 'ID');
+        $sheetMaster->setCellValue('E2', 'Nama Pegawai');
+        $sheetMaster->getStyle('D1:E2')->getFont()->setBold(true);
         
         $pegawai = Pegawai::find()->where(['status' => '1'])->all();
         $row = 3;
         foreach ($pegawai as $p) {
-            $sheet2->setCellValue('D'.$row, $p->id);
-            $sheet2->setCellValue('E'.$row, $p->nama);
+            $sheetMaster->setCellValue('D'.$row, $p->id);
+            $sheetMaster->setCellValue('E'.$row, $p->nama);
             $row++;
         }
         
         foreach(range('A','E') as $columnID) {
-            $sheet2->getColumnDimension($columnID)->setAutoSize(true);
+            $sheetMaster->getColumnDimension($columnID)->setAutoSize(true);
         }
         
         $spreadsheet->setActiveSheetIndex(0);
