@@ -336,7 +336,9 @@ class ReportController extends Controller {
                 ->alias('p')
                 ->joinWith(['dpp d' => function($q) {
                     $q->joinWith(['paketpengadaan pp']);
-                }]);
+                }])
+                ->innerJoin('tbl_pegawai peg_creator', 'peg_creator.id_user = p.created_by')
+                ->andWhere('peg_creator.id = d.pejabat_pengadaan'); // Filter only evaluations by assigned Pejabat Pengadaan
 
             // Apply Filters
             if ($model->tahun) {
@@ -392,11 +394,6 @@ class ReportController extends Controller {
                 
                 $scores = $details['skor'] ?? [];
                 
-                // Filter: Only include if it has 5 scores (PP Assessment)
-                if (count($scores) !== 5) {
-                    continue;
-                }
-
                 $total = $details['total'] ?? 0;
                 $rata = $details['nilaiakhir'] ?? 0;
                 $eval = $details['hasil_evaluasi'] ?? '-';
@@ -456,7 +453,9 @@ class ReportController extends Controller {
                 ->alias('p')
                 ->joinWith(['dpp d' => function($q) {
                     $q->joinWith(['paketpengadaan pp']);
-                }]);
+                }])
+                ->innerJoin('tbl_pegawai peg_creator', 'peg_creator.id_user = p.created_by')
+                ->andWhere('peg_creator.id = pp.ppkom'); // Filter only evaluations by assigned PPK
 
             // Apply Filters
             if ($model->tahun) {

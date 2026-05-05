@@ -141,7 +141,7 @@ class ImportpaketController extends Controller {
         
         // Sheet 1: Form Import
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Form Import');
+        $sheet->setTitle('Form Import Paket');
         
         $headers = [
             'A1' => 'Nomor DPP / Paket (Wajib sbg Relasi Detail)',
@@ -219,7 +219,7 @@ class ImportpaketController extends Controller {
         $sheetMaster->setCellValue('D2', 'ID');
         $sheetMaster->setCellValue('E2', 'Nama Pegawai');
         $sheetMaster->getStyle('D1:E2')->getFont()->setBold(true);
-        
+
         $pegawai = Pegawai::find()->where(['status' => '1'])->all();
         $row = 3;
         foreach ($pegawai as $p) {
@@ -227,8 +227,83 @@ class ImportpaketController extends Controller {
             $sheetMaster->setCellValue('E'.$row, $p->nama);
             $row++;
         }
-        
-        foreach(range('A','E') as $columnID) {
+
+        $sheetMaster->setCellValue('G1', 'DATA PROGRAM');
+        $sheetMaster->setCellValue('G2', 'Kode');
+        $sheetMaster->setCellValue('H2', 'Nama Program');
+        $sheetMaster->getStyle('G1:H2')->getFont()->setBold(true);
+
+        $programs = \app\models\ProgramKegiatan::find()->where(['type' => 'program', 'is_active' => 1])->all();
+        $row = 3;
+        foreach ($programs as $p) {
+            $sheetMaster->setCellValue('G'.$row, $p->code);
+            $sheetMaster->setCellValue('H'.$row, $p->desc);
+            $row++;
+        }
+
+        $sheetMaster->setCellValue('J1', 'DATA KEGIATAN');
+        $sheetMaster->setCellValue('J2', 'Kode');
+        $sheetMaster->setCellValue('K2', 'Nama Kegiatan');
+        $sheetMaster->getStyle('J1:K2')->getFont()->setBold(true);
+
+        $kegiatans = \app\models\ProgramKegiatan::find()->where(['type' => 'kegiatan', 'is_active' => 1])->all();
+        $row = 3;
+        foreach ($kegiatans as $k) {
+            $sheetMaster->setCellValue('J'.$row, $k->code);
+            $sheetMaster->setCellValue('K'.$row, $k->desc);
+            $row++;
+        }
+
+        $sheetMaster->setCellValue('M1', 'DATA KODE REKENING');
+        $sheetMaster->setCellValue('M2', 'Kode');
+        $sheetMaster->setCellValue('N2', 'Uraian Rekening');
+        $sheetMaster->getStyle('M1:N2')->getFont()->setBold(true);
+
+        $rekenings = \app\models\KodeRekening::find()->where(['is_active' => 1])->all();
+        $row = 3;
+        foreach ($rekenings as $r) {
+            $sheetMaster->setCellValue('M'.$row, $r->kode);
+            $sheetMaster->setCellValue('N'.$row, $r->rekening);
+            $row++;
+        }
+
+        $sheetMaster->setCellValue('P1', 'DATA RAB (ANGGARAN)');
+        $sheetMaster->setCellValue('P2', 'Program');
+        $sheetMaster->setCellValue('Q2', 'Kegiatan');
+        $sheetMaster->setCellValue('R2', 'Rekening');
+        $sheetMaster->setCellValue('S2', 'Uraian Anggaran');
+        $sheetMaster->setCellValue('T2', 'Pagu');
+        $sheetMaster->getStyle('P1:T2')->getFont()->setBold(true);
+
+        $rabs = \app\models\Rab::find()->all();
+        $row = 3;
+        foreach ($rabs as $rab) {
+            $sheetMaster->setCellValue('P'.$row, $rab->kode_program);
+            $sheetMaster->setCellValue('Q'.$row, $rab->kode_kegiatan);
+            $sheetMaster->setCellValue('R'.$row, $rab->kode_rekening);
+            $sheetMaster->setCellValue('S'.$row, $rab->uraian_anggaran);
+            $sheetMaster->setCellValue('T'.$row, $rab->jumlah_anggaran);
+            $row++;
+        }
+
+        foreach(range('A','T') as $columnID) {
+            $sheetMaster->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $sheetMaster->setCellValue('V1', 'DATA UNIT (BIDANG/BAGIAN)');
+        $sheetMaster->setCellValue('V2', 'ID');
+        $sheetMaster->setCellValue('W2', 'Nama Unit');
+        $sheetMaster->getStyle('V1:W2')->getFont()->setBold(true);
+
+        $units = \app\models\Unit::find()->where(['aktif' => 1])->all();
+        $row = 3;
+        foreach ($units as $u) {
+            $sheetMaster->setCellValue('V'.$row, $u->id);
+            $sheetMaster->setCellValue('W'.$row, $u->unit);
+            $row++;
+        }
+
+        foreach(range('V','W') as $columnID) {
             $sheetMaster->getColumnDimension($columnID)->setAutoSize(true);
         }
         
