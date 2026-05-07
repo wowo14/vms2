@@ -97,10 +97,10 @@ class PricingDatasetService
         $agg = (new \yii\db\Query())
             ->select([
                 'COUNT(*) AS sample_count',
-                'COUNT(DISTINCT vendor_id) AS vendor_count',
+                new \yii\db\Expression('COUNT(DISTINCT vendor_id) AS vendor_count'),
                 'MIN(unit_price) AS min_price',
                 'MAX(unit_price) AS max_price',
-                'ROUND(AVG(unit_price), 2) AS avg_price',
+                new \yii\db\Expression('ROUND(AVG(unit_price), 2) AS avg_price'),
                 'MAX(procurement_date) AS last_seen_at',
                 'MIN(product_catalog_id) AS product_catalog_id',
                 'MIN(product_category) AS product_category',
@@ -173,8 +173,8 @@ class PricingDatasetService
             ->select([
                 'COUNT(*) AS total_bids',
                 'SUM(is_winner) AS total_wins',
-                'ROUND(AVG(price_ratio_vs_hps), 4) AS avg_price_vs_hps',
-                'ROUND(AVG(unit_price), 2) AS avg_price',
+                new \yii\db\Expression('ROUND(AVG(price_ratio_vs_hps), 4) AS avg_price_vs_hps'),
+                new \yii\db\Expression('ROUND(AVG(unit_price), 2) AS avg_price'),
             ])
             ->from('pricing_dataset')
             ->where(['company_id' => $companyId, 'vendor_id' => $vendorId, 'is_latest_version' => 1])

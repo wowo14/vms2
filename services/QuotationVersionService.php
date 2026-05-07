@@ -106,6 +106,7 @@ class QuotationVersionService
             $qi->unit_price = $unitPrice;
             $qi->skor_kualitas = (float) ($row['skor_kualitas'] ?? 0);
             $qi->keterangan = $row['keterangan'] ?? '';
+            $qi->link_katalog = $row['link_katalog'] ?? null;
             // total_price auto-computed in beforeSave()
 
             $qi->save(false); // skip validation for bulk speed

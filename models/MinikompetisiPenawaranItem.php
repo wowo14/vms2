@@ -13,6 +13,7 @@ use Yii;
  * @property float|null $harga_penawaran
  * @property float|null $skor_kualitas
  * @property string|null $keterangan
+ * @property string|null $link_katalog
  *
  * @property MinikompetisiItem $item
  * @property MinikompetisiPenawaran $penawaran
@@ -36,7 +37,7 @@ class MinikompetisiPenawaranItem extends \yii\db\ActiveRecord
             [['penawaran_id', 'item_id'], 'required'],
             [['penawaran_id', 'item_id'], 'integer'],
             [['harga_penawaran', 'skor_kualitas'], 'number'],
-            [['keterangan'], 'string'],
+            [['keterangan', 'link_katalog'], 'string'],
         ];
     }
 
@@ -52,6 +53,7 @@ class MinikompetisiPenawaranItem extends \yii\db\ActiveRecord
             'harga_penawaran' => 'Harga Penawaran',
             'skor_kualitas' => 'Skor Kualitas (0-100)',
             'keterangan' => 'Keterangan Kualitas',
+            'link_katalog' => 'Link Katalog',
         ];
     }
 

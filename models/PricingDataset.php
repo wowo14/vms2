@@ -125,8 +125,8 @@ class PricingDataset extends \yii\db\ActiveRecord
             ->select([
                 'v.nama_vendor',
                 'pd.vendor_id',
-                'MIN(pd.unit_price) AS min_price',
-                'ROUND(AVG(pd.unit_price), 2) AS avg_price',
+                new \yii\db\Expression('MIN(pd.unit_price) AS min_price'),
+                new \yii\db\Expression('ROUND(AVG(pd.unit_price), 2) AS avg_price'),
                 'COUNT(*) AS bid_count',
             ])
             ->from(['pd' => 'pricing_dataset'])
@@ -146,11 +146,11 @@ class PricingDataset extends \yii\db\ActiveRecord
         return (new \yii\db\Query())
             ->select([
                 'product_norm_name',
-                'MIN(unit_price) AS min_price',
-                'ROUND(AVG(unit_price), 2) AS avg_price',
-                'MAX(unit_price) AS max_price',
+                new \yii\db\Expression('MIN(unit_price) AS min_price'),
+                new \yii\db\Expression('ROUND(AVG(unit_price), 2) AS avg_price'),
+                new \yii\db\Expression('MAX(unit_price) AS max_price'),
                 'COUNT(*) AS total_samples',
-                'COUNT(DISTINCT vendor_id) AS vendor_count',
+                new \yii\db\Expression('COUNT(DISTINCT vendor_id) AS vendor_count'),
                 'MIN(procurement_date) AS first_seen',
                 'MAX(procurement_date) AS last_seen',
             ])
@@ -167,15 +167,15 @@ class PricingDataset extends \yii\db\ActiveRecord
     {
         return (new \yii\db\Query())
             ->select([
-                "SUBSTR(procurement_date, 1, 7) AS year_month",
-                'ROUND(AVG(unit_price), 2) AS avg_price',
+                new \yii\db\Expression("SUBSTR(procurement_date, 1, 7) AS year_month"),
+                new \yii\db\Expression('ROUND(AVG(unit_price), 2) AS avg_price'),
                 'MIN(unit_price) AS min_price',
                 'COUNT(*) AS sample_count',
             ])
             ->from('pricing_dataset')
             ->where(['company_id' => $companyId])
             ->andWhere(['like', 'product_norm_name', $productTerm])
-            ->groupBy("SUBSTR(procurement_date, 1, 7)")
+            ->groupBy(new \yii\db\Expression("SUBSTR(procurement_date, 1, 7)"))
             ->orderBy("year_month ASC")
             ->all();
     }

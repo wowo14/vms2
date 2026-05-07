@@ -288,7 +288,13 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
 
                     <div class="form-group">
                         <label>Pilih Vendor</label>
-                        <select name="vendor_id" id="upload-vendor-select" class="form-control" required>
+                        <?php if (empty($vendors)): ?>
+                            <div class="alert alert-warning p-2" style="font-size: 13px;">
+                                <i class="fas fa-exclamation-triangle mr-1"></i> Belum ada vendor diundang.
+                                <?= Html::a('<strong>Kelola Vendor &raquo;</strong>', ['update', 'id' => $model->id, '#' => 'daftar-vendor'], ['class' => 'alert-link']) ?>
+                            </div>
+                        <?php endif; ?>
+                        <select name="vendor_id" id="upload-vendor-select" class="form-control" required <?= empty($vendors) ? 'disabled' : '' ?>>
                             <option value="">- Pilih Vendor -</option>
                             <?php foreach ($vendors as $v): ?>
                                 <option value="<?= $v->id ?>"><?= Html::encode($v->nama_vendor) ?></option>
@@ -794,9 +800,12 @@ $(function () {
 
                 tbodyHtml += '<td class="harga-cell ' + cellClass + '">';
                 if (price !== null) {
-                    tbodyHtml += fmt(price) + '/sat<br>';
-                    tbodyHtml += '<small>' + fmt(total) + ' total</small><br>';
-                    tbodyHtml += itemRankBadge;
+                    tbodyHtml += '<strong>' + fmt(price) + '</strong>/sat<br>';
+                    tbodyHtml += '<small class="text-muted">' + fmt(total) + ' total</small><br>';
+                    if (pi.link_katalog) {
+                        tbodyHtml += '<div class="mt-1"><a href="' + pi.link_katalog + '" target="_blank" class="btn btn-xs btn-outline-primary" style="font-size:9px;padding:0 3px;"><i class="fas fa-external-link-alt"></i> Katalog</a></div>';
+                    }
+                    tbodyHtml += '<div class="mt-1">' + itemRankBadge + '</div>';
                 } else {
                     tbodyHtml += '<span class="text-muted">–</span>';
                 }
@@ -960,12 +969,28 @@ $(function () {
 
         // Item rows
         items.forEach(function(item) {
+            // Price row
             var row = [item.nama_produk, item.qty, item.satuan || '', item.harga_hps, item.harga_existing];
             vendors.forEach(function(v) {
                 var pi = v.items.find(function(i) { return i.item_id === item.id; });
                 row.push(pi ? pi.harga_penawaran : '');
             });
             wsData.push(row);
+
+            // Link row (optional, only if at least one vendor has a link for this item)
+            var hasAnyLink = vendors.some(function(v) {
+                var pi = v.items.find(function(i) { return i.item_id === item.id; });
+                return pi && pi.link_katalog;
+            });
+
+            if (hasAnyLink) {
+                var linkRow = ['   (Link Katalog)', '', '', '', ''];
+                vendors.forEach(function(v) {
+                    var pi = v.items.find(function(i) { return i.item_id === item.id; });
+                    linkRow.push(pi ? (pi.link_katalog || '') : '');
+                });
+                wsData.push(linkRow);
+            }
         });
 
         // Blank separator

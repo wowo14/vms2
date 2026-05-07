@@ -95,7 +95,7 @@ use yii\web\JsExpression;
         ]) ?>
 
         <hr>
-        <h4>Daftar Vendor Diundang</h4>
+        <h4 id="daftar-vendor">Daftar Vendor Diundang</h4>
         <?= MultipleInput::widget([
             'name' => 'MinikompetisiVendor',
             'addButtonOptions' => [
@@ -105,6 +105,7 @@ use yii\web\JsExpression;
             'removeButtonOptions' => [
                 'label' => 'x'
             ],
+            'min' => 1,
             'data' => $model->minikompetisiVendors,
             'columns' => [
                 [

@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use app\services\ProductNormalizerService;
 
 /**
  * Model for table "product_catalog" — master normalized product names.

@@ -21,6 +21,7 @@ use Yii;
  * @property float|null $total_price
  * @property float|null $skor_kualitas
  * @property string|null $keterangan
+ * @property string|null $link_katalog
  *
  * @property QuotationVersion $quotationVersion
  * @property MinikompetisiItem $minikompetisiItem
@@ -41,7 +42,7 @@ class QuotationItem extends \yii\db\ActiveRecord
             [['quantity', 'unit_price', 'total_price', 'skor_kualitas'], 'number'],
             [['product_name', 'product_name_norm'], 'string', 'max' => 255],
             [['product_category', 'unit'], 'string', 'max' => 100],
-            [['specification', 'keterangan'], 'string'],
+            [['specification', 'keterangan', 'link_katalog'], 'string'],
         ];
     }
 
@@ -61,6 +62,7 @@ class QuotationItem extends \yii\db\ActiveRecord
             'total_price' => 'Total Harga',
             'skor_kualitas' => 'Skor Kualitas',
             'keterangan' => 'Keterangan',
+            'link_katalog' => 'Link Katalog',
         ];
     }
 

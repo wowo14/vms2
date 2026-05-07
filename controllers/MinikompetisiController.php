@@ -95,6 +95,7 @@ class MinikompetisiController extends Controller
                         $item->satuan = $itemData['satuan'];
                         $item->harga_hps = str_replace(',', '', $itemData['harga_hps']);
                         $item->harga_existing = str_replace(',', '', $itemData['harga_existing']);
+                        $item->link_katalog = $itemData['link_katalog'] ?? null;
                         $item->save();
                     }
                 }
@@ -142,6 +143,7 @@ class MinikompetisiController extends Controller
                         $item->satuan = $itemData['satuan'];
                         $item->harga_hps = str_replace(',', '', $itemData['harga_hps'] ?? 0);
                         $item->harga_existing = str_replace(',', '', $itemData['harga_existing'] ?? 0);
+                        $item->link_katalog = $itemData['link_katalog'] ?? null;
                         $item->save();
                     }
                 }
@@ -204,13 +206,14 @@ class MinikompetisiController extends Controller
         $sheet->setCellValue('C3', 'Satuan');
         $sheet->setCellValue('D3', 'Harga HPS (Satuan)');
         $sheet->setCellValue('E3', 'Harga Beli Existing');
+        $sheet->setCellValue('F3', 'Link Katalog');
 
         // Style header row
         $headerStyle = [
             'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']],
             'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF1F6FEB']],
         ];
-        $sheet->getStyle('A3:E3')->applyFromArray($headerStyle);
+        $sheet->getStyle('A3:F3')->applyFromArray($headerStyle);
 
         // Column widths
         $sheet->getColumnDimension('A')->setWidth(35);
@@ -218,6 +221,7 @@ class MinikompetisiController extends Controller
         $sheet->getColumnDimension('C')->setWidth(15);
         $sheet->getColumnDimension('D')->setWidth(22);
         $sheet->getColumnDimension('E')->setWidth(22);
+        $sheet->getColumnDimension('F')->setWidth(22);
 
         // Contoh baris
         $sheet->setCellValue('A4', 'Contoh: Pipa PVC 4 inch');
@@ -225,8 +229,9 @@ class MinikompetisiController extends Controller
         $sheet->setCellValue('C4', 'batang');
         $sheet->setCellValue('D4', 150000);
         $sheet->setCellValue('E4', 140000);
-        $sheet->getStyle('A4:E4')->getFont()->setItalic(true);
-        $sheet->getStyle('A4:E4')->getFont()->getColor()->setARGB('FF888888');
+        $sheet->setCellValue('F4', 'https://example.com');
+        $sheet->getStyle('A4:F4')->getFont()->setItalic(true);
+        $sheet->getStyle('A4:F4')->getFont()->getColor()->setARGB('FF888888');
 
         $writer = new Xlsx($spreadsheet);
         $filename = 'Template_Import_Item_Minikompetisi.xlsx';
@@ -276,6 +281,7 @@ class MinikompetisiController extends Controller
                     $satuan = trim((string) $sheet->getCell('C' . $row)->getValue());
                     $hargaHps = (float) $sheet->getCell('D' . $row)->getValue();
                     $hargaExisting = (float) $sheet->getCell('E' . $row)->getValue();
+                    $linkKatalog = trim((string) $sheet->getCell('F' . $row)->getValue());
 
                     if ($qty <= 0) {
                         $errors[] = 'Baris ' . $row . ': Qty harus lebih dari 0.';
@@ -289,6 +295,7 @@ class MinikompetisiController extends Controller
                     $item->satuan = $satuan;
                     $item->harga_hps = $hargaHps;
                     $item->harga_existing = $hargaExisting;
+                    $item->link_katalog = $linkKatalog;
 
                     if ($item->save()) {
                         $imported++;
@@ -331,6 +338,9 @@ class MinikompetisiController extends Controller
         if ($model->metode == 2) {
             $sheet->setCellValue('F5', 'Skor Kualitas (1-100)');
             $sheet->setCellValue('G5', 'Keterangan Kualitas');
+            $sheet->setCellValue('H5', 'Link Katalog');
+        } else {
+            $sheet->setCellValue('F5', 'Link Katalog');
         }
 
         $row = 6;
@@ -399,10 +409,14 @@ class MinikompetisiController extends Controller
                         $harga = (float) $sheet->getCell('E' . $row)->getValue();
                         $skor_kualitas = 0;
                         $keterangan = '';
-
+                        $link_katalog = '';
+                        
                         if ($model->metode == 2) {
                             $skor_kualitas = (float) $sheet->getCell('F' . $row)->getValue();
                             $keterangan = (string) $sheet->getCell('G' . $row)->getValue();
+                            $link_katalog = (string) $sheet->getCell('H' . $row)->getValue();
+                        } else {
+                            $link_katalog = (string) $sheet->getCell('F' . $row)->getValue();
                         }
 
                         $mItem = MinikompetisiItem::findOne($item_id);
@@ -412,6 +426,7 @@ class MinikompetisiController extends Controller
                                 'harga_penawaran' => $harga,
                                 'skor_kualitas' => $skor_kualitas,
                                 'keterangan' => $keterangan,
+                                'link_katalog' => $link_katalog,
                             ];
                             $total_harga += $harga * $mItem->qty;
                             $total_skor_kualitas += $skor_kualitas;
@@ -425,6 +440,7 @@ class MinikompetisiController extends Controller
                             $pItem->harga_penawaran = $harga;
                             $pItem->skor_kualitas = $skor_kualitas;
                             $pItem->keterangan = $keterangan;
+                            $pItem->link_katalog = $link_katalog;
                             // NOT saved here — handled through legacy penawaran below
                         }
                     }
@@ -461,6 +477,7 @@ class MinikompetisiController extends Controller
                             $pItem->harga_penawaran = $r['harga_penawaran'];
                             $pItem->skor_kualitas = $r['skor_kualitas'];
                             $pItem->keterangan = $r['keterangan'];
+                            $pItem->link_katalog = $r['link_katalog'];
                             $pItem->save(false);
                         }
                     }
@@ -591,7 +608,8 @@ class MinikompetisiController extends Controller
 
         // Available years
         $years = (new \yii\db\Query())
-            ->select('DISTINCT fiscal_year')
+            ->select('fiscal_year')
+            ->distinct()
             ->from('pricing_dataset')
             ->where(['company_id' => $companyId])
             ->andWhere(['IS NOT', 'fiscal_year', null])
@@ -731,6 +749,7 @@ class MinikompetisiController extends Controller
                 'satuan' => $item->satuan,
                 'harga_hps' => (float) $item->harga_hps,
                 'harga_existing' => (float) $item->harga_existing,
+                'link_katalog' => $item->link_katalog,
             ];
         }
 
@@ -744,6 +763,7 @@ class MinikompetisiController extends Controller
                     'harga_penawaran' => (float) $pi->harga_penawaran,
                     'skor_kualitas' => (float) $pi->skor_kualitas,
                     'keterangan' => $pi->keterangan,
+                    'link_katalog' => $pi->link_katalog,
                 ];
             }
             $penawaranRows[] = [
