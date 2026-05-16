@@ -3,6 +3,7 @@
 use kartik\grid\GridView;
 use yii\helpers\{Html, Url};
 
+$idmodal = isset($idmodal)?$idmodal:'modal-remote';
 return [
     // [
     //     'class' => 'kartik\grid\CheckboxColumn',
@@ -183,11 +184,11 @@ return [
                     'class' => 'btn btn-sm btn-outline-primary'
                 ]);
             },
-            'reject' => function ($url, $model, $key) {
+            'reject' => function ($url, $model, $key) use ($idmodal) {
                 return Html::a(
                     '<span class="fa fa-ban"></span>',
                     $url,
-                    ['class' => 'btn btn-sm btn-outline-danger', 'data-pjax' => 0, 'title' => 'Reject', 'data-toggle' => 'tooltip']
+                    ['class' => 'btn btn-sm btn-outline-danger', 'role' => 'modal-remote', 'data-target' => '#' . $idmodal, 'title' => 'Reject', 'data-toggle' => 'tooltip']
                 );
             },
             'formreview' => function ($url, $model, $key) {

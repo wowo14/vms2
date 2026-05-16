@@ -33,40 +33,59 @@ use yii\widgets\DetailView;
                         'attribute' => 'linksirup',
                         'format' => 'raw',
                         'value' => function ($model) {
-                            if (empty($model->linksirup)) {
-                                return null; // atau bisa return '-' kalau mau ditampilkan tanda strip
-                            }
-                            $links = explode(',', (string) $model->linksirup);
-                            $html = '';
-                            foreach ($links as $link) {
-                                $link = trim($link); // biar rapi kalau ada spasi
-                                if ($link !== '') {
-                                    $html .= Html::a($link, $link, ['target' => '_blank', 'data-pjax' => 0]) . ', ';
-                                }
-                            }
-                            return rtrim($html, ', ');
-                        },
+                                        if (empty($model->linksirup)) {
+                                            return null; // atau bisa return '-' kalau mau ditampilkan tanda strip
+                                        }
+                                        $links = explode(',', (string) $model->linksirup);
+                                        $html = '';
+                                        foreach ($links as $link) {
+                                            $link = trim($link); // biar rapi kalau ada spasi
+                                            if ($link !== '') {
+                                                $html .= Html::a($link, $link, ['target' => '_blank', 'data-pjax' => 0]) . ', ';
+                                            }
+                                        }
+                                        return rtrim($html, ', ');
+                                    },
                     ],
                     // ['attribute'=>'linksirup','format' => 'raw','value'=>Html::a($model->linksirup, $model->linksirup, ['target' => '_blank','data-pjax' => 0])],
                     'alasan_reject:ntext',
                     'tanggal_reject:ntext',
+                    // link file reject
+                    [
+                        'attribute' => 'file_reject',
+                        'format' => 'raw',
+                        'value' => function ($model) {
+                                        if (empty($model->file_reject)) {
+                                            return null; // atau bisa return '-' kalau mau ditampilkan tanda strip
+                                        }
+                                        $links = explode(',', (string) $model->file_reject);
+                                        $html = '';
+                                        foreach ($links as $link) {
+                                            $link = trim($link); // biar rapi kalau ada spasi
+                                            if ($link !== '') {
+                                                $html .= Html::a($link,'@web/uploads/'.$link, ['target' => '_blank', 'data-pjax' => 0]) . ', ';
+                                            }
+                                        }
+                                        return rtrim($html, ', ');
+                                    },
+                    ]
                 ],
             ]) ?>
             <?php
-            if(!empty($model->details)){
+            if (!empty($model->details)) {
                 $dataProviderdetails = new ActiveDataProvider([
                     'query' => PaketPengadaanDetails::find()->where(['paket_id' => $model->id]),
                     'pagination' => false
                 ]);
                 echo GridView::widget([
-                'dataProvider' => $dataProviderdetails,
-                'responsiveWrap' => false,
-                'pjax' => true,
-                'showPageSummary' => true,
-                'tableOptions' => ['class' => 'new_expand'],
-                'id' => 'details1',
-                'columns' => require('_col_views.php'),
-            ]);
+                    'dataProvider' => $dataProviderdetails,
+                    'responsiveWrap' => false,
+                    'pjax' => true,
+                    'showPageSummary' => true,
+                    'tableOptions' => ['class' => 'new_expand'],
+                    'id' => 'details1',
+                    'columns' => require('_col_views.php'),
+                ]);
             }
             ?>
         </div>
@@ -81,13 +100,14 @@ use yii\widgets\DetailView;
                     'model' => $el,
                     'attributes' => [
                         [
-                            'attribute' => 'name', 'format' => 'raw',
-                            'value' => fn ($d) => Html::a($d->name, Yii::getAlias('@web/uploads/') . $d->uri, ['target' => '_blank'])
+                            'attribute' => 'name',
+                            'format' => 'raw',
+                            'value' => fn($d) => Html::a($d->name, Yii::getAlias('@web/uploads/') . $d->uri, ['target' => '_blank'])
                         ],
                         [
                             'attribute' => 'jenis_dokumen',
                             'value' => function ($d) {
-                                return $d->jenisdokumen->value??'';
+                                return $d->jenisdokumen->value ?? '';
                             }
                         ],
                         [

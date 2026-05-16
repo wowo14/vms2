@@ -10,14 +10,15 @@ use yii\widgets\ActiveForm;
 use app\widgets\FilePreview;
 use kartik\switchinput\SwitchInput;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
-use unclead\multipleinput\{MultipleInput,MultipleInputColumn};
-$idmodal='modal-reviewdpp';
+use unclead\multipleinput\{MultipleInput, MultipleInputColumn};
+$idmodal = 'modal-reviewdpp';
 CrudAsset::register($this);
 AppAsset::register($this);
 $this->registerJs('
 jQuery(function ($) {
     $(".list-cell__button").hide();
     setupImagePreview($("#imageInput"), $("#imagePreview"), $("#file_tanggapan"));
+    setupImagePreview($("#imageInputReject"), $("#imagePreviewReject"), $("#file_reject"));
 });', View::POS_END);
 ?>
 <?php
@@ -34,7 +35,7 @@ echo Tabs::widget([
         //     'options' => ['id' => 'evaluasi' . $model->hash],
         // ],
     ]
-]);?>
+]); ?>
 
 <div id="form-reviewdpp">
     <?php $form = ActiveForm::begin([
@@ -92,7 +93,7 @@ echo Tabs::widget([
     ?>
     <?= $form->field($reviews, 'uraian')->widget(MultipleInput::class, [
         'id' => 'doklampiran',
-        'enableGuessTitle'  => true,
+        'enableGuessTitle' => true,
         'cloneButton' => false,
         'max' => count($template) - 1,
         'addButtonOptions' => [
@@ -108,7 +109,7 @@ echo Tabs::widget([
             [
                 'name' => 'uraian',
                 'title' => 'Uraian',
-                'type'=>'textarea',
+                'type' => 'textarea',
             ],
             [
                 'name' => 'sesuai',
@@ -131,22 +132,49 @@ echo Tabs::widget([
     Review Oleh Pejabat Pengadaan:<br>
     <?= $form->field($reviews, 'keterangan')->textarea(['rows' => 2]) ?>
     <div class="form-group row">
-    <div class="col-sm-3">&nbsp;</div>
-    <div class="col-sm-9">
-        <?php
-        if($model->paketpengadaan->historireject){
-            echo Html::a('History Reject', [
-                '/historireject/showbypaket',
-                'id' => $model->paketpengadaan->id], [
+        <div class="col-sm-3">&nbsp;</div>
+        <div class="col-sm-9">
+            <?php
+            if ($model->paketpengadaan->historireject) {
+                echo Html::a('History Reject', [
+                    '/historireject/showbypaket',
+                    'id' => $model->paketpengadaan->id
+                ], [
                     'role' => 'modal-remote',
                     'data-target' => '#' . $idmodal,
-                    'data-pjax'=>1,'data-toggle' => 'tooltip',
-                    'class' => 'btn btn-danger']);
-        }
+                    'data-pjax' => 1,
+                    'data-toggle' => 'tooltip',
+                    'class' => 'btn btn-danger'
+                ]);
+            }
+            ?>
+        </div>
+    </div>
+    <?= $form->field($reviews, 'file_reject')->hiddenInput(['id' => 'file_reject'])->label(false) ?>
+
+    <div class="form-group ">
+        <div class="row">
+            <label class="control-label right col-sm-3" for="reviewdpp-file_reject">File Reject
+                (images/pdf)</label>
+            <div class="col-sm-9">
+                <input type="file" accept=".pdf, .png, .jpg, .jpeg, .gif" id="imageInputReject">
+                <div id="imagePreviewReject"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <?php echo $reviews->file_reject ? Html::a(
+            FilePreview::widget([
+                'model' => $reviews,
+                'attribute' => 'file_reject',
+            ]),
+            Yii::getAlias('@web/uploads/') . $reviews->file_reject,
+            ['target' => '_blank']
+        ) : '';
         ?>
-    </div></div>
+    </div>
     Kesimpulan :<br>
-    <?= $form->field($reviews, 'kesimpulan')->widget(Select2::class,[
+    <?= $form->field($reviews, 'kesimpulan')->widget(Select2::class, [
         'data' => [
             'lanjutkan' => 'Lanjutkan',
             'ditolak' => 'Ditolak'
@@ -166,7 +194,8 @@ echo Tabs::widget([
     <?= $form->field($reviews, 'file_tanggapan')->hiddenInput(['id' => 'file_tanggapan'])->label(false) ?>
     <div class="form-group ">
         <div class="row">
-            <label class="control-label right col-sm-3" for="reviewdpp-file_tanggapan">File Tanggapan PPK (images/pdf)</label>
+            <label class="control-label right col-sm-3" for="reviewdpp-file_tanggapan">File Tanggapan PPK
+                (images/pdf)</label>
             <div class="col-sm-9">
                 <input type="file" accept=".pdf, .png, .jpg, .jpeg, .gif" id="imageInput">
                 <div id="imagePreview"></div>
@@ -174,16 +203,17 @@ echo Tabs::widget([
         </div>
     </div>
     <div class="col-md-4">
-    <?php echo $reviews->file_tanggapan ? Html::a(
-        FilePreview::widget([
-            'model' => $reviews,
-            'attribute' => 'file_tanggapan',
-        ]),
-        Yii::getAlias('@web/uploads/') . $reviews->file_tanggapan,
-        ['target' => '_blank']
-    ) : '';
-    ?>
+        <?php echo $reviews->file_tanggapan ? Html::a(
+            FilePreview::widget([
+                'model' => $reviews,
+                'attribute' => 'file_tanggapan',
+            ]),
+            Yii::getAlias('@web/uploads/') . $reviews->file_tanggapan,
+            ['target' => '_blank']
+        ) : '';
+        ?>
     </div>
+    
     <?php if (!Yii::$app->request->isAjax) { ?>
         <div class="form-group">
             <?= Html::submitButton('Submit', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
@@ -196,7 +226,8 @@ echo Tabs::widget([
 
 </div>
 <?php Modal::begin([
-    "id" => $idmodal, "size" => "modal-xl",
+    "id" => $idmodal,
+    "size" => "modal-xl",
     "footer" => "",
     "clientOptions" => [
         "tabindex" => false,

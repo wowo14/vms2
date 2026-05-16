@@ -9,7 +9,7 @@ class ReviewDpp extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['dpp_id', 'pejabat', 'kesesuaian', 'created_by', 'updated_by'], 'integer'],
-            [['tanggal_review', 'file_tanggapan', 'created_at', 'updated_at', 'tgl_dikembalikan'], 'safe'],
+            [['tanggal_review', 'file_tanggapan', 'file_reject', 'created_at', 'updated_at', 'tgl_dikembalikan'], 'safe'],
             [['uraian', 'keterangan', 'kesimpulan', 'tanggapan_ppk'], 'string'],
         ];
     }
@@ -26,6 +26,7 @@ class ReviewDpp extends \yii\db\ActiveRecord {
             'tanggapan_ppk' => 'Tanggapan PPK',
             'tgl_dikembalikan' => 'Tanggal Dikembalikan',
             'file_tanggapan' => 'File upload lampiran tanggapan',
+            'file_reject' => 'File upload lampiran reject',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'created_by' => 'Created By',
@@ -37,17 +38,19 @@ class ReviewDpp extends \yii\db\ActiveRecord {
         if (file_exists($filePath) && !empty($this->file_tanggapan)) {
             unlink($filePath);
         }
+        //file reject
+        $filePathReject = Yii::getAlias('@uploads') . $this->file_reject;
+        if (file_exists($filePathReject) && !empty($this->file_reject)) {
+            unlink($filePathReject);
+        }
     }
     public function init() {
         parent::init();
         $this->on(self::EVENT_AFTER_DELETE, [$this, 'autoDeleteFile']);
     }
     public function beforeSave($insert) {
-        if ($insert) {
-            $this->file_tanggapan = !empty($this->file_tanggapan) && self::isBase64Encoded($this->file_tanggapan) ? $this->upload($this->file_tanggapan, 'file_tanggapan' . '_' . time()) : '';
-        } else {
-            $this->file_tanggapan = !empty($this->file_tanggapan) && self::isBase64Encoded($this->file_tanggapan) ? $this->upload($this->file_tanggapan, 'file_tanggapan' . '_' . time()) : $this->file_tanggapan;
-        }
+        $this->file_tanggapan = !empty($this->file_tanggapan) && self::isBase64Encoded($this->file_tanggapan) ? $this->upload($this->file_tanggapan, 'file_tanggapan' . '_' . time()) : $this->file_tanggapan;
+        $this->file_reject = !empty($this->file_reject) && self::isBase64Encoded($this->file_reject) ? $this->upload($this->file_reject, 'file_reject' . '_' . time()) : $this->file_reject;
         $this->tanggal_review = date('Y-m-d H:i:s');
         return parent::beforeSave($insert);
     }

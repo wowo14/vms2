@@ -16,7 +16,7 @@ class PaketPengadaan extends \yii\db\ActiveRecord
     {
         return [
             [['nomor', 'tanggal_paket', 'tanggal_dpp', 'tanggal_persetujuan', 'nomor_persetujuan', 'nama_paket', 'tahun_anggaran', 'kode_program', 'kode_kegiatan', 'kode_rekening', 'ppkom', 'unit', 'pagu', 'metode_pengadaan', 'kategori_pengadaan'], 'required'],
-            [['tanggal_paket', 'created_at', 'updated_at', 'tanggal_reject', 'alasan_reject', 'addition'], 'string'],
+            [['tanggal_paket', 'created_at', 'updated_at', 'tanggal_reject', 'alasan_reject', 'addition', 'file_reject'], 'string'],
             [['pagu'], 'number'],
             [['linksirup'], 'safe'],
             [['created_by', 'admin_ppkom', 'tahun_anggaran', 'approval_by', 'unit'], 'integer'],
@@ -56,7 +56,20 @@ class PaketPengadaan extends \yii\db\ActiveRecord
             'alasan_dibatalkan' => 'Alasan Dibatalkan',
             'berita_acara_pembatalan' => 'Berita Acara Pembatalan',
             'tanggal_dibatalkan' => 'Tanggal Pembatalan',
+            'file_reject' => 'File Lampiran Reject',
         ];
+    }
+    public function autoDeleteFile()
+    {
+        $filePathReject = Yii::getAlias('@uploads') . $this->file_reject;
+        if (file_exists($filePathReject) && !empty($this->file_reject)) {
+            unlink($filePathReject);
+        }
+    }
+    public function init()
+    {
+        parent::init();
+        $this->on(self::EVENT_AFTER_DELETE, [$this, 'autoDeleteFile']);
     }
     public function getListpaketoutstanding()
     {
@@ -359,6 +372,11 @@ class PaketPengadaan extends \yii\db\ActiveRecord
                 $this->addition = json_encode($hasil);
             }
         } else { //update
+        }
+        Yii::error("PaketPengadaan beforeSave: file_reject=" . (is_string($this->file_reject) ? substr($this->file_reject, 0, 100) : gettype($this->file_reject)));
+        if (!empty($this->file_reject) && self::isBase64Encoded($this->file_reject)) {
+            $this->file_reject = $this->upload($this->file_reject, 'file_reject' . '_' . time());
+            Yii::error("PaketPengadaan uploaded: " . $this->file_reject);
         }
         self::invalidatecache('tag_' . self::getModelname());
         Dpp::invalidatecache('tag_' . Dpp::getModelname());

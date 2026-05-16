@@ -17,6 +17,7 @@ use yii\widgets\DetailView;
             'tanggapan_ppk:ntext',
             'created_at',
             'file_tanggapan',
+            'file_reject'
         ],
     ]) ?>
 </div>
@@ -28,6 +29,15 @@ use yii\widgets\DetailView;
             'attribute' => 'file_tanggapan',
         ]),
         \Yii::getAlias('@web/uploads/') . $model->file_tanggapan,
+        ['target' => '_blank']
+    ) : '';
+    ?>
+    <?php echo $model->file_reject ? Html::a(
+        FilePreview::widget([
+            'model' => $model,
+            'attribute' => 'file_reject',
+        ]),
+        \Yii::getAlias('@web/uploads/') . $model->file_reject,
         ['target' => '_blank']
     ) : '';
     ?>

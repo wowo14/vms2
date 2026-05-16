@@ -309,32 +309,60 @@ class DppController extends Controller
         $request = Yii::$app->request;
         $paket = $this->findModel($id)->paketpengadaan;
         if ($request->isGet) {
+            if ($request->isAjax) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return [
+                    'title' => "Reject DPP -> Paket Pengadaan",
+                    'content' => $this->renderAjax('_frm_reject', ['model' => $paket]),
+                    'footer' => Html::button('Close', ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
+                        Html::button('Reject', ['class' => 'btn btn-danger', 'type' => 'submit'])
+                ];
+            }
             return $this->render('_frm_reject', ['model' => $paket]);
         } elseif ($request->isPost) {
+            Yii::error('Reject POST: ' . json_encode($request->post()));
             $transaction = Yii::$app->db->beginTransaction();
             try {
-                if ($paket->load($request->post()) && $paket->save()) {
-                    Dpp::invalidatecache('tag_' . Dpp::getModelname());
-                    $paket::invalidatecache('tag_' . $paket::getModelname());
+                if ($paket->load($request->post())) {
+                    if (!$paket->save(false)) {
+                         Yii::error("Failed to save PaketPengadaan: " . json_encode($paket->getErrors()));
+                         throw new \yii\web\BadRequestHttpException('Gagal menyimpan PaketPengadaan.');
+                    }
                 } else {
-                    throw new \yii\web\BadRequestHttpException('Gagal menyimpan PaketPengadaan.');
+                    throw new \yii\web\BadRequestHttpException('Gagal memuat data PaketPengadaan.');
                 }
-                $data = $_POST['PaketPengadaan'];
-                $data['paket_id'] = $data['id'];
-                unset($data['id']);
+
+                $data = $request->post('PaketPengadaan');
+                Yii::error('PaketPengadaan data: ' . (isset($data['file_reject']) ? substr($data['file_reject'], 0, 100) : 'MISSING'));
+                if (!$data) {
+                     throw new \yii\web\BadRequestHttpException('Data POST PaketPengadaan tidak ditemukan.');
+                }
+                
+                $data['paket_id'] = $paket->id;
+                $data['file_reject'] = $paket->file_reject; // Ensure we pass the uploaded filename, not the base64 string
+                // unset($data['id']); // not needed if we use attributes assignment carefully
+
                 $historyreject = new HistoriReject();
                 $historyreject->attributes = $data;
-                if ($historyreject->tanggal_reject && $historyreject->alasan_reject && $historyreject->save()) {
+                $historyreject->paket_id = $paket->id; // Ensure paket_id is set
+                
+                if ($historyreject->save()) {
                     Dpp::invalidatecache('tag_' . Dpp::getModelname());
                     $historyreject::invalidatecache('tag_' . $historyreject::getModelname());
                 } else {
+                    Yii::error("Failed to save HistoriReject: " . json_encode($historyreject->getErrors()));
                     throw new \yii\web\BadRequestHttpException('Gagal menyimpan histori reject.');
                 }
                 $transaction->commit();
+                if ($request->isAjax) {
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    return ['forceClose' => true, 'forceReload' => '#crud-datatable-pjax'];
+                }
                 return $this->redirect(['index']);
             } catch (\Exception $e) {
                 $transaction->rollBack();
-                throw $e; // akan dilempar ke error handler Yii
+                Yii::error("Exception in actionReject: " . $e->getMessage());
+                throw $e;
             }
         }
     }
@@ -592,11 +620,16 @@ class DppController extends Controller
                 if (file_exists(Yii::getAlias('@uploads') . $oldfile) && !empty($oldfile) && ($rr->isBase64Encoded($_POST['ReviewDpp']['file_tanggapan']))) {
                     unlink(Yii::getAlias('@uploads') . $oldfile);
                 }
+                $oldfilereject = $rr->file_reject;
+                if (file_exists(Yii::getAlias('@uploads') . $oldfilereject) && !empty($oldfilereject) && ($rr->isBase64Encoded($_POST['ReviewDpp']['file_reject']))) {
+                    unlink(Yii::getAlias('@uploads') . $oldfilereject);
+                }
                 $rr->uraian = json_encode($_POST['ReviewDpp']['uraian'], JSON_UNESCAPED_SLASHES);
                 $rr->keterangan = $_POST['ReviewDpp']['keterangan'];
                 $rr->kesimpulan = $_POST['ReviewDpp']['kesimpulan'];
                 $rr->tanggapan_ppk = $_POST['ReviewDpp']['tanggapan_ppk'];
                 $rr->file_tanggapan = $_POST['ReviewDpp']['file_tanggapan'];
+                $rr->file_reject = $_POST['ReviewDpp']['file_reject'];
                 $rr->dpp_id = $model->id;
                 $rr->pejabat = Yii::$app->user->id;
                 $rr->save();
@@ -607,6 +640,7 @@ class DppController extends Controller
                 $rr->kesimpulan = $_POST['ReviewDpp']['kesimpulan'];
                 $rr->tanggapan_ppk = $_POST['ReviewDpp']['tanggapan_ppk'];
                 $rr->file_tanggapan = $_POST['ReviewDpp']['file_tanggapan'];
+                $rr->file_reject = $_POST['ReviewDpp']['file_reject'];
                 $rr->dpp_id = $model->id;
                 $rr->pejabat = Yii::$app->user->id;
                 $rr->save();

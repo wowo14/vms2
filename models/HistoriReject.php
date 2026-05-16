@@ -13,7 +13,7 @@ class HistoriReject extends \yii\db\ActiveRecord
         return [
             [['paket_id'], 'required'],
             [['paket_id', 'user_id', 'created_at'], 'integer'],
-            [['alasan_reject', 'kesimpulan', 'tanggapan_ppk','file_tanggapan'], 'string'],
+            [['alasan_reject', 'kesimpulan', 'tanggapan_ppk','file_tanggapan', 'file_reject'], 'string'],
             [['tanggal_reject', 'tanggal_dikembalikan'], 'safe'],
             [['nomor', 'nama_paket'], 'string', 'max' => 255],
         ];
@@ -32,6 +32,7 @@ class HistoriReject extends \yii\db\ActiveRecord
             'tanggal_dikembalikan' => 'Tanggal Dikembalikan',
             'tanggapan_ppk' => 'Tanggapan Ppk',
             'file_tanggapan' => 'File Tanggapan',
+            'file_reject' => 'File Lampiran Reject',
             'created_at' => 'Created At',
         ];
     }
@@ -39,6 +40,10 @@ class HistoriReject extends \yii\db\ActiveRecord
         $filePath = Yii::getAlias('@uploads') . $this->file_tanggapan;
         if (file_exists($filePath) && !empty($this->file_tanggapan)) {
             unlink($filePath);
+        }
+        $filePathReject = Yii::getAlias('@uploads') . $this->file_reject;
+        if (file_exists($filePathReject) && !empty($this->file_reject)) {
+            unlink($filePathReject);
         }
     }
     public function init() {
@@ -52,10 +57,10 @@ class HistoriReject extends \yii\db\ActiveRecord
         if ($insert) {
             $this->created_at = date('Y-m-d H:i:s');
             $this->user_id= \Yii::$app->user->identity->id;
-            $this->file_tanggapan = !empty($this->file_tanggapan) && self::isBase64Encoded($this->file_tanggapan) ? $this->upload($this->file_tanggapan, 'file_tanggapan' . '_' . time()) : '';
-        } else {
-            $this->file_tanggapan = !empty($this->file_tanggapan) && self::isBase64Encoded($this->file_tanggapan) ? $this->upload($this->file_tanggapan, 'file_tanggapan' . '_' . time()) : $this->file_tanggapan;
         }
+        $this->file_tanggapan = !empty($this->file_tanggapan) && self::isBase64Encoded($this->file_tanggapan) ? $this->upload($this->file_tanggapan, 'file_tanggapan' . '_' . time()) : $this->file_tanggapan;
+        $this->file_reject = !empty($this->file_reject) && self::isBase64Encoded($this->file_reject) ? $this->upload($this->file_reject, 'file_reject' . '_' . time()) : $this->file_reject;
+        
         return parent::beforeSave($insert);
     }
 }

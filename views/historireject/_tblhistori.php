@@ -19,6 +19,13 @@ echo GridView::widget([
                 'kesimpulan:ntext',
                 'tanggal_dikembalikan',
                 'tanggapan_ppk:ntext',
+                ['attribute'=>'file_reject','format'=>'html',
+                'value'=>function($model){
+                    if($model['file_reject']){
+                        return Html::a($model['file_reject'], \Yii::getAlias('@web/uploads/') . $model['file_reject'], ['target' => '_blank','data-pjax'=>0]);
+                    }
+                }
+                ],
                 ['attribute'=>'file_tanggapan','format'=>'html',
                 'value'=>function($model){
                     if($model['file_tanggapan']){

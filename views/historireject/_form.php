@@ -13,16 +13,60 @@ if (strpos($referrer, 'paketpengadaan') !== false) { //disable edit from paketpe
 } else {
     $isactive=false;
 }
-$js=<<<JS
-jQuery(function ($) {
-    setupImagePreview($("#imageInput"), $("#imagePreview"), $("#file_tanggapan"));
-});
-function autogenerates(el){
-    console.log(el);
-    $('#historireject-nomor').val();
-}
+?>
+<?php
+$js = <<<JS
+    $("#imageInputHst").on("change", function(e) {
+        const input = e.target;
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = $("#imagePreviewHst");
+                preview.empty();
+                const file = input.files[0];
+                const extension = file.name.split(".").pop().toLowerCase();
+                if (extension === "pdf") {
+                    const pdfEmbed = $("<embed style='width:60%;height:400px;' src='" + e.target.result + "' type='application/pdf'>");
+                    $("#file_tanggapan_hst").val(e.target.result);
+                    preview.append(pdfEmbed);
+                } else if (extension.match(/(jpg|jpeg|png|gif)$/)) {
+                    const image = $("<img style='width:60%;' src='" + e.target.result + "'>");
+                    $("#file_tanggapan_hst").val(e.target.result);
+                    preview.append(image);
+                } else {
+                    preview.text("Unsupported file type");
+                }
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    });
+
+    $("#imageInputRejectHst").on("change", function(e) {
+        const input = e.target;
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = $("#imagePreviewRejectHst");
+                preview.empty();
+                const file = input.files[0];
+                const extension = file.name.split(".").pop().toLowerCase();
+                if (extension === "pdf") {
+                    const pdfEmbed = $("<embed style='width:60%;height:400px;' src='" + e.target.result + "' type='application/pdf'>");
+                    $("#file_reject_hst").val(e.target.result);
+                    preview.append(pdfEmbed);
+                } else if (extension.match(/(jpg|jpeg|png|gif)$/)) {
+                    const image = $("<img style='width:60%;' src='" + e.target.result + "'>");
+                    $("#file_reject_hst").val(e.target.result);
+                    preview.append(image);
+                } else {
+                    preview.text("Unsupported file type");
+                }
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    });
 JS;
-$this->registerJs($js, \yii\web\View::POS_END);
+$this->registerJs($js, \yii\web\View::POS_READY);
 ?>
 <div class="histori-reject-form">
     <?php $form = ActiveForm::begin([
@@ -67,13 +111,13 @@ $this->registerJs($js, \yii\web\View::POS_END);
         // 'disabled'=>$isactive
     ]) ?>
       <?= $form->field($model, 'tanggapan_ppk')->textarea(['rows' => 2]) ?>
-      <?= $form->field($model, 'file_tanggapan')->hiddenInput(['id' => 'file_tanggapan'])->label(false) ?>
+      <?= $form->field($model, 'file_tanggapan')->hiddenInput(['id' => 'file_tanggapan_hst'])->label(false) ?>
         <div class="form-group ">
             <div class="row">
                 <label class="control-label right col-sm-3" for="reviewdpp-file_tanggapan">File Tanggapan PPK (images/pdf)</label>
                 <div class="col-sm-9">
-                    <input type="file" accept=".pdf, .png, .jpg, .jpeg, .gif" id="imageInput">
-                    <div id="imagePreview"></div>
+                    <input type="file" accept=".pdf, .png, .jpg, .jpeg, .gif" id="imageInputHst">
+                    <div id="imagePreviewHst"></div>
                 </div>
             </div>
         </div>
@@ -88,6 +132,7 @@ $this->registerJs($js, \yii\web\View::POS_END);
         ) : '';
         ?>
         </div>
+      
     <?php if (!Yii::$app->request->isAjax){ ?>
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

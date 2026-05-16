@@ -164,27 +164,42 @@ class Tools extends Widget {
       'image/bmp' => 'bmp',
       'image/png' => 'png',
       'image/jpeg' => 'jpg',
+      'image/jpg' => 'jpg',
       'image/gif' => 'gif',
-      'application/pdf' => 'pdf', // Added support for PDF
+      'application/pdf' => 'pdf',
+      'application/x-pdf' => 'pdf',
     ];
-    list($imageType, $base64Data) = explode(';', $base64Data);
-    list(, $base64Data) = explode(',', $base64Data);
-    $imageType = str_replace('data:', '', $imageType);
-    if (isset($extensions[$imageType])) {
-      $extension = $extensions[$imageType];
-      $binaryData = base64_decode($base64Data);
-      $filename .= '.' . $extension;
-      $filePath = Yii::getAlias('@uploads') . $filename;
-      file_put_contents($filePath, $binaryData);
-      if (in_array($extension, ['png', 'jpg', 'jpeg', 'gif'])) {
-        $this->resizeImageToMaxSize($filePath, 512 * 1024);
-        // $filename=$this->convertavif($filePath);
-      }
-      return $filename;
-    } else {
-      echo "Unsupported file format: $imageType";
-      die;
+
+    if (strpos($base64Data, ';') === false || strpos($base64Data, ',') === false) {
+        return $base64Data;
     }
+
+    try {
+        list($imageType, $rest) = explode(';', $base64Data);
+        $imageType = str_replace('data:', '', $imageType);
+        list(, $base64) = explode(',', $rest);
+
+        if (isset($extensions[$imageType])) {
+          $extension = $extensions[$imageType];
+          $binaryData = base64_decode($base64);
+          if ($binaryData === false) return $base64Data;
+
+          $filename .= '.' . $extension;
+          $filePath = Yii::getAlias('@uploads') . $filename;
+          
+          if (file_put_contents($filePath, $binaryData)) {
+              if (in_array($extension, ['png', 'jpg', 'jpeg', 'gif'])) {
+                $this->resizeImageToMaxSize($filePath, 512 * 1024);
+              }
+              return $filename;
+          } else {
+              Yii::error("Failed to write file to: " . $filePath);
+          }
+        }
+    } catch (\Exception $e) {
+        Yii::error("Upload failed: " . $e->getMessage());
+    }
+    return $base64Data;
   }
   public function resizeImageToMaxSize($filePath, $maxSize) {
     $supportedExtensions = ['png', 'jpg', 'jpeg', 'gif'];

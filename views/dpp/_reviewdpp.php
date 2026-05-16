@@ -40,7 +40,7 @@ use yii\helpers\Html;
         <td class="center border1solid">Tidak</td>
     </tr>
     <?php $i = 1;
-    $uraian = json_decode($template->uraian, true);
+    $uraian = json_decode((is_object($template) ? $template->uraian : ($template['uraian'] ?? '[]')), true);
     foreach ($uraian as $v) {
         echo "<tr>
         <td width=\"1%\" class=\"center border1solid\">$i</td>
@@ -55,11 +55,14 @@ use yii\helpers\Html;
 </table>
 Review Oleh Pejabat Pengadaan:<br>
 <ol>
-    <li><?= $historyreject->alasan_reject ?? ($template->keterangan ?? '') ?></li>
+    <li><?= $historyreject->alasan_reject ?? (is_object($template) ? ($template->keterangan ?? '') : ($template['keterangan'] ?? '')) ?></li>
 </ol>
+<?php if (($historyreject->file_reject ?? null) || (is_object($template) ? ($template->file_reject ?? null) : ($template['file_reject'] ?? null))): ?>
+    Lampiran Reject: <?= Html::a('Lihat File', Yii::getAlias('@web/uploads/') . (($historyreject->file_reject ?? (is_object($template) ? $template->file_reject : $template['file_reject']))), ['target' => '_blank']) ?><br>
+<?php endif; ?>
 Kesimpulan:<br>
 <ol>
-    <li><?= $historyreject->kesimpulan ?? ($template->kesimpulan ?? '') ?></li>
+    <li><?= $historyreject->kesimpulan ?? (is_object($template) ? ($template->kesimpulan ?? '') : ($template['kesimpulan'] ?? '')) ?></li>
 </ol>
 <table width="100%">
     <tr>
@@ -78,8 +81,11 @@ Kesimpulan:<br>
 </table>
 Tanggapan PPK atas dikembalikan DPP :<br>
 <ol>
-    <li><?= $historyreject->tanggapan_ppk ?? ($template->tanggapan_ppk ?? '') ?></li>
+    <li><?= $historyreject->tanggapan_ppk ?? (is_object($template) ? ($template->tanggapan_ppk ?? '') : ($template['tanggapan_ppk'] ?? '')) ?></li>
 </ol>
+<?php if (($historyreject->file_tanggapan ?? null) || (is_object($template) ? ($template->file_tanggapan ?? null) : ($template['file_tanggapan'] ?? null))): ?>
+    Lampiran Tanggapan: <?= Html::a('Lihat File', Yii::getAlias('@web/uploads/') . (($historyreject->file_tanggapan ?? (is_object($template) ? $template->file_tanggapan : $template['file_tanggapan']))), ['target' => '_blank']) ?><br>
+<?php endif; ?>
 <table width="100%">
     <tr>
         <td width="50%" style="text-align:center">Yang Menerima,<br>

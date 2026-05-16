@@ -13,6 +13,7 @@ AppAsset::register($this);
 $this->registerJs('
 jQuery(function ($) {
     setupImagePreview($("#imageInput"), $("#imagePreview"), $("#file_tanggapan"));
+    setupImagePreview($("#imageInputReject"), $("#imagePreviewReject"), $("#file_reject"));
 });', View::POS_END);
 $js = <<< JS
 function rabid(){
@@ -247,6 +248,25 @@ if ($model::isStaff()) {
                     'attribute' => 'file_tanggapan',
                 ]),
                 Yii::getAlias('@web/uploads/') . $reviews->file_tanggapan,
+                ['target' => '_blank']
+            ) : '';
+            ?>
+            <?= $form->field($reviews, 'file_reject')->hiddenInput(['id' => 'file_reject'])->label(false) ?>
+            <div class="form-group ">
+                <div class="row">
+                    <label class="control-label right col-sm-3" for="reviewdpp-file_reject">File Reject (images/pdf)</label>
+                    <div class="col-sm-9">
+                        <input type="file" accept=".pdf, .png, .jpg, .jpeg, .gif" id="imageInputReject">
+                        <div id="imagePreviewReject"></div>
+                    </div>
+                </div>
+            </div>
+            <?php echo $reviews->file_reject ? Html::a(
+                FilePreview::widget([
+                    'model' => $reviews,
+                    'attribute' => 'file_reject',
+                ]),
+                Yii::getAlias('@web/uploads/') . $reviews->file_reject,
                 ['target' => '_blank']
             ) : '';
             ?>

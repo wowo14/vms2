@@ -94,8 +94,13 @@ trait GeneralModelsTrait {
         return self::isBase64Encoded($str);
     }
     public static function isBase64Encoded($str) { //boolean
-        $data = preg_replace('#^data:(image/[^;]+|application/pdf);base64,#', '', $str);
-        return base64_encode(base64_decode($data, true)) === $data;
+        if (empty($str)) return false;
+        if (preg_match('#^data:([^;]+);base64,#', $str)) {
+            $data = preg_replace('#^data:([^;]+);base64,#', '', $str);
+            $data = str_replace([' ', "\n", "\r", "\t"], '', $data);
+            return base64_decode($data, true) !== false;
+        }
+        return false;
     }
     public function getVendor() {
         if ($this->hasAttribute('penyedia_id')) {
@@ -185,8 +190,12 @@ trait GeneralModelsTrait {
     }
     //==model commons ===//
     public function beforeValidate() {
-        // HTML escape all attributes
+        // HTML escape all attributes, except for potential file/binary fields
+        $exclude = ['file_reject', 'file_tanggapan', 'bast', 'lampiran_penawaran', 'lampiran_penawaran_harga', 'file_ijinusaha', 'file_akta', 'file'];
         foreach ($this->attributes as $key => $value) {
+            if (in_array($key, $exclude)) {
+                continue;
+            }
             $processedValue = HtmlPurifier::process($value);
             $this->$key = $processedValue;
         }
