@@ -33,8 +33,13 @@ class Dpp extends \yii\db\ActiveRecord {
             'updated_at' => 'Updated At',
             'created_by' => 'Created By',
             'updated_by' => 'Updated By',
-            'kode' => 'Kode Paket/kode pemesanan'
+            'kode' => 'Kode Paket/kode pemesanan',
+            'jenis_dpp' => 'Jenis DPP'// DPP PPK / DPP Farmasi
         ];
+    }
+    public function getJenisdppconstant(){
+        // return [1=>'DPP PPK',2=>'DPP KHUSUS'];
+        return Setting::where(['type'=>'jenis_dpp'])->all();
     }
     public function getBelumditugaskan(){
         return self::where(['pejabat_pengadaan'=>null,'admin_pengadaan'=>null])->count();

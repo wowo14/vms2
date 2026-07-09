@@ -15,16 +15,20 @@ $this->params['breadcrumbs'][] = $this->title;
             <h3 class="card-title"><i class="fas fa-file-excel"></i> Form Import Paket dari Excel</h3>
         </div>
         <div class="card-body">
-            
-            <div class="alert alert-info">
+
+            <div class="alert alert-info"></div>
+            <div class="">
                 <h5><i class="icon fas fa-info"></i> Panduan Import</h5>
-                Fitur ini digunakan untuk memasukkan (import) paket pengadaan yang tidak sempat dientry di project VMS agar dapat dinilai pada modul evaluasi penyedia.<br>
+                Fitur ini digunakan untuk memasukkan (import) paket pengadaan yang tidak sempat dientry di project VMS
+                agar dapat dinilai pada modul evaluasi penyedia.<br>
                 <b>Langkah-langkah:</b>
                 <ol>
                     <li>Download template excel melalui tombol dibawah.</li>
-                    <li>Isi data paket pengadaan pada sheet <strong>Form Import</strong>. Anda bisa merujuk ke sheet <strong>Data Master</strong> untuk melihat ID Vendor dan ID Pegawai.</li>
+                    <li>Isi data paket pengadaan pada sheet <strong>Form Import</strong>. Anda bisa merujuk ke sheet
+                        <strong>Data Master</strong> untuk melihat ID Vendor dan ID Pegawai.</li>
                     <li>Pastikan tidak ada baris yang terlewat, lalu simpan file Excel.</li>
-                    <li>Upload file Excel yang sudah diisi melalui form di bawah ini lalu klik tombol "Mulai Import".</li>
+                    <li>Upload file Excel yang sudah diisi melalui form di bawah ini lalu klik tombol "Mulai Import".
+                    </li>
                 </ol>
                 <?= Html::a('<i class="fas fa-download"></i> Download Template', ['template'], ['class' => 'btn btn-sm btn-success', 'data-pjax' => 0]) ?>
             </div>
@@ -61,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?php ActiveForm::end(); ?>
                 </div>
             </div>
-            
+
         </div>
     </div>
 </div>

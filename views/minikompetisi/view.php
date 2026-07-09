@@ -238,6 +238,14 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
     .winner-badge {
         font-size: 11px;
     }
+
+    /* Select2 fixes for bootstrap 4 */
+    .select2-container--default .select2-selection--multiple {
+        border-color: #ced4da;
+    }
+    .select2-container--default.select2-container--focus .select2-selection--multiple {
+        border-color: #80bdff;
+    }
 </style>
 
 <div class="minikompetisi-view">
@@ -502,16 +510,39 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
                     </button>
                 </div>
                 <div class="card-body p-2">
-                    <!-- FILTER PER ITEM -->
+                    <!-- FILTER PER ITEM, RANKING, & VENDOR -->
                     <div id="item-filter-bar"
                         class="d-none mb-2 p-2 bg-light rounded border d-flex align-items-center flex-wrap"
                         style="gap:10px;">
-                        <i class="fas fa-filter text-primary"></i>
-                        <strong style="font-size:13px;">Filter Item:</strong>
-                        <select id="item-filter-select" class="form-control form-control-sm" style="max-width:280px;">
-                            <option value="">-- Tampilkan Semua Item --</option>
-                        </select>
-                        <small class="text-muted">Pilih item untuk melihat ranking harga antar penyedia</small>
+                        
+                        <div class="d-flex align-items-center" style="gap:5px; flex:1; min-width:200px;">
+                            <i class="fas fa-filter text-primary"></i>
+                            <strong style="font-size:13px; white-space:nowrap;">Filter Item:</strong>
+                            <div style="flex:1;">
+                                <select id="item-filter-select" class="form-control form-control-sm" multiple="multiple">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center" style="gap:5px; flex:1; min-width:200px;">
+                            <i class="fas fa-medal text-warning"></i>
+                            <strong style="font-size:13px; white-space:nowrap;">Filter Rank:</strong>
+                            <div style="flex:1;">
+                                <select id="rank-filter-select" class="form-control form-control-sm" multiple="multiple">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center" style="gap:5px; flex:1; min-width:200px;">
+                            <i class="fas fa-building text-success"></i>
+                            <strong style="font-size:13px; white-space:nowrap;">Filter Penyedia:</strong>
+                            <div style="flex:1;">
+                                <select id="vendor-filter-select" class="form-control form-control-sm" multiple="multiple">
+                                </select>
+                            </div>
+                        </div>
+
+                        <small class="text-muted w-100 mt-1" style="font-size:12px;">Pilih filter untuk melihat ranking spesifik (kolom penyedia & kalkulasi akan disesuaikan otomatis secara live)</small>
                     </div>
 
                     <!-- ITEM RANKING DETAIL (muncul saat item dipilih) -->
@@ -530,8 +561,10 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
 
 </div><!-- /minikompetisi-view -->
 
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <?php
 // Static chart (PHP-rendered, no hot-reload needed here)
 $hps_total = 0;
@@ -607,29 +640,55 @@ $(function () {
 
         // Populate item filter dropdown
         var sel = $('#item-filter-select');
+        sel.empty();
         data.items.forEach(function(item) {
             sel.append('<option value="' + item.id + '">' + $('<div>').text(item.nama_produk).html() + ' (' + item.qty + ' ' + (item.satuan || '') + ')</option>');
         });
+        
+        // Populate rank filter dropdown
+        var selRank = $('#rank-filter-select');
+        selRank.empty();
+        for(var r=1; r<=data.penawarans.length; r++) {
+            selRank.append('<option value="' + r + '">Rank ' + r + '</option>');
+        }
+
+        // Populate vendor filter dropdown
+        var selVendor = $('#vendor-filter-select');
+        selVendor.empty();
+        data.penawarans.forEach(function(p) {
+            selVendor.append('<option value="' + p.vendor_id + '">' + $('<div>').text(p.nama_vendor).html() + '</option>');
+        });
+
+        if ($.fn.select2) {
+            sel.select2({
+                placeholder: "-- Semua Item --",
+                allowClear: true,
+                width: '100%'
+            });
+            selRank.select2({
+                placeholder: "-- Semua Rank --",
+                allowClear: true,
+                width: '100%'
+            });
+            selVendor.select2({
+                placeholder: "-- Semua Penyedia --",
+                allowClear: true,
+                width: '100%'
+            });
+        }
         $('#item-filter-bar').removeClass('d-none');
     });
 
     // Filter change handler
-    $('#item-filter-select').on('change', function() {
-        var itemId = parseInt($(this).val());
-        if (!itemId || !_lastVendors.length) {
+    $('#item-filter-select, #rank-filter-select, #vendor-filter-select').on('change', function() {
+        triggerRecalc();
+        
+        var selectedItems = $('#item-filter-select').val() || [];
+        if (selectedItems.length === 1) {
+            renderItemRanking(parseInt(selectedItems[0]), _lastVendors);
+        } else {
             $('#item-rank-panel').addClass('d-none').empty();
-            $('#matrix-wrap').show();
-            return;
         }
-        renderItemRanking(itemId, _lastVendors);
-        // Highlight row in matrix
-        $('#matrix-table tbody tr').css('opacity', '0.4');
-        $('#matrix-table tbody tr').filter(function() {
-            return $(this).find('td.item-name-col').length > 0;
-        }).each(function() {
-            // we can't easily match by item name reliably; just show the panel
-        });
-        $('#matrix-table tbody tr').css('opacity', '');
     });
 
     /* ─────────────── SIMULASI CONTROLS ─────────────── */
@@ -675,10 +734,12 @@ $(function () {
         var bk = parseFloat($('#sim-kualitas').val());
         var bh = parseFloat($('#sim-harga').val());
         var vendors = calcRanking(metode, bk, bh);
+        
         renderMatrix(vendors);
+        
         // Refresh item panel if item is selected
-        var selectedItem = parseInt($('#item-filter-select').val());
-        if (selectedItem) renderItemRanking(selectedItem, vendors);
+        var selectedItems = $('#item-filter-select').val() || [];
+        if (selectedItems.length === 1) renderItemRanking(parseInt(selectedItems[0]), vendors);
     }
 
     /* ─────────────── CALCULATION ENGINE ─────────────── */
@@ -687,6 +748,56 @@ $(function () {
         if (!_raw || !_raw.penawarans.length) return [];
 
         var vendors = JSON.parse(JSON.stringify(_raw.penawarans)); // deep clone
+        
+        var selectedVendors = $('#vendor-filter-select').val() || [];
+        if (selectedVendors.length > 0) {
+            vendors = vendors.filter(function(v) {
+                return selectedVendors.indexOf(v.vendor_id.toString()) !== -1;
+            });
+        }
+
+        var selectedItems = $('#item-filter-select').val() || [];
+        var selectedRanks = $('#rank-filter-select').val() || [];
+
+        // Pre-calculate item ranks for all items so we can filter by it
+        var itemRanks = {};
+        _raw.items.forEach(function(item) {
+            var prices = [];
+            vendors.forEach(function(v) {
+                var pi = v.items.find(function(i) { return i.item_id === item.id; });
+                if (pi && pi.harga_penawaran > 0) prices.push(pi.harga_penawaran);
+            });
+            prices.sort(function(a, b) { return a - b; });
+            
+            itemRanks[item.id] = {};
+            vendors.forEach(function(v) {
+                var pi = v.items.find(function(i) { return i.item_id === item.id; });
+                if (pi && pi.harga_penawaran > 0) {
+                    itemRanks[item.id][v.id] = prices.indexOf(pi.harga_penawaran) + 1;
+                } else {
+                    itemRanks[item.id][v.id] = null;
+                }
+            });
+        });
+
+        if (selectedItems.length > 0 || selectedRanks.length > 0) {
+            vendors.forEach(function(v) {
+                var newTotal = 0;
+                v.items.forEach(function(pi) {
+                    var isItemSelected = selectedItems.length === 0 || selectedItems.indexOf(pi.item_id.toString()) !== -1;
+                    var iRank = itemRanks[pi.item_id] ? itemRanks[pi.item_id][v.id] : null;
+                    var isRankSelected = selectedRanks.length === 0 || (iRank !== null && selectedRanks.indexOf(iRank.toString()) !== -1);
+                    
+                    if (isItemSelected && isRankSelected) {
+                        var it = _raw.items.find(function(x) { return x.id == pi.item_id; });
+                        if (it && pi.harga_penawaran) {
+                            newTotal += parseFloat(pi.harga_penawaran) * parseFloat(it.qty);
+                        }
+                    }
+                });
+                v.total_harga = newTotal;
+            });
+        }
 
         // Find lowest total harga
         var lowestPrice = null;
@@ -767,7 +878,14 @@ $(function () {
         /* ── TBODY: item rows ── */
         var tbodyHtml = '<tbody>';
 
+        var selectedItems = $('#item-filter-select').val() || [];
+        var selectedRanks = $('#rank-filter-select').val() || [];
+
         items.forEach(function (item) {
+            if (selectedItems.length > 0 && selectedItems.indexOf(item.id.toString()) === -1) {
+                return; // skip if filtered
+            }
+
             // Collect prices from all vendors for this item, to determine best/worst
             var prices = vendors.map(function (v) {
                 var pi = v.items.find(function (i) { return i.item_id === item.id; });
@@ -797,9 +915,10 @@ $(function () {
 
                 var itemRank = price !== null && price > 0 ? (sortedPrices.indexOf(price) + 1) : null;
                 var itemRankBadge = itemRank ? rankBadge(itemRank) : '';
+                var isRankSelected = selectedRanks.length === 0 || (itemRank !== null && selectedRanks.indexOf(itemRank.toString()) !== -1);
 
                 tbodyHtml += '<td class="harga-cell ' + cellClass + '">';
-                if (price !== null) {
+                if (isRankSelected && price !== null) {
                     tbodyHtml += '<strong>' + fmt(price) + '</strong>/sat<br>';
                     tbodyHtml += '<small class="text-muted">' + fmt(total) + ' total</small><br>';
                     if (pi.link_katalog) {
@@ -967,13 +1086,32 @@ $(function () {
         });
         wsData.push(headerRow);
 
+        var selectedItems = $('#item-filter-select').val() || [];
+        var selectedRanks = $('#rank-filter-select').val() || [];
+
         // Item rows
         items.forEach(function(item) {
+            if (selectedItems.length > 0 && selectedItems.indexOf(item.id.toString()) === -1) {
+                return; // skip if filtered
+            }
+            
+            // pre-calculate valid prices
+            var validPrices = [];
+            vendors.forEach(function(v) {
+                var pi = v.items.find(function(i) { return i.item_id === item.id; });
+                if (pi && pi.harga_penawaran > 0) validPrices.push(pi.harga_penawaran);
+            });
+            validPrices.sort(function(a, b) { return a - b; });
+
             // Price row
             var row = [item.nama_produk, item.qty, item.satuan || '', item.harga_hps, item.harga_existing];
             vendors.forEach(function(v) {
                 var pi = v.items.find(function(i) { return i.item_id === item.id; });
-                row.push(pi ? pi.harga_penawaran : '');
+                var price = pi ? pi.harga_penawaran : null;
+                var itemRank = price !== null && price > 0 ? (validPrices.indexOf(price) + 1) : null;
+                var isRankSelected = selectedRanks.length === 0 || (itemRank !== null && selectedRanks.indexOf(itemRank.toString()) !== -1);
+                
+                row.push(isRankSelected && price ? price : '');
             });
             wsData.push(row);
 
@@ -987,7 +1125,11 @@ $(function () {
                 var linkRow = ['   (Link Katalog)', '', '', '', ''];
                 vendors.forEach(function(v) {
                     var pi = v.items.find(function(i) { return i.item_id === item.id; });
-                    linkRow.push(pi ? (pi.link_katalog || '') : '');
+                    var price = pi ? pi.harga_penawaran : null;
+                    var itemRank = price !== null && price > 0 ? (validPrices.indexOf(price) + 1) : null;
+                    var isRankSelected = selectedRanks.length === 0 || (itemRank !== null && selectedRanks.indexOf(itemRank.toString()) !== -1);
+                    
+                    linkRow.push(isRankSelected && pi && pi.link_katalog ? pi.link_katalog : '');
                 });
                 wsData.push(linkRow);
             }

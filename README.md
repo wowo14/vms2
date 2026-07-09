@@ -54,3 +54,14 @@ run yii migrate after install to auto generate RBAC module and admin module user
 task Report Penilaian Penyedia bisa di agreegate per periode
 
 modul dokumen dasar hukum
+
+
+modul dpp baru untuk ppk
+
+Matriks Konsolidasi Penawaran
+Kolom diurutkan dari terbaik (kiri) ke terburuk (kanan) secara live
+tambahkan filter per produk bisa lebih dari 1 produk
+
+tambahkan filter baru per rangking
+
+tambahkan link kuisioner per penyedia

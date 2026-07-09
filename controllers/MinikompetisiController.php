@@ -769,7 +769,7 @@ class MinikompetisiController extends Controller
             $penawaranRows[] = [
                 'id' => (int) $p->id,
                 'vendor_id' => (int) $p->vendor_id,
-                'nama_vendor' => $p->vendor->nama_vendor,
+                'nama_vendor' => $p->vendor ? $p->vendor->nama_vendor : '',
                 'total_harga' => (float) $p->total_harga,
                 'total_skor_kualitas' => (float) $p->total_skor_kualitas,
                 'total_skor_harga' => (float) $p->total_skor_harga,
