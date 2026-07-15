@@ -1,7 +1,7 @@
 <?php
 namespace app\controllers;
 use app\models\PenilaianPenyedia;
-use app\models\{Setting, Negosiasi, PenugasanPemilihanpenyedia, Unit, HistoriReject, ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails, PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia};
+use app\models\{Setting, AuthAssignment, Pegawai, Negosiasi, PenugasanPemilihanpenyedia, Unit, HistoriReject, ReviewDpp, Dpp, DppSearch, PaketPengadaanDetails, PenawaranPengadaan, TemplateChecklistEvaluasi, ValidasiKualifikasiPenyedia};
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
@@ -67,11 +67,59 @@ class DppController extends Controller
     public function actionIndex()
     {
         $searchModel = new DppSearch();
+        $searchModel->setJenisDppScope(DppSearch::SCOPE_REGULER);
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'title' => 'DPP Reguler',
         ]);
+    }
+    public function actionFarmasi()
+    {
+        $searchModel = new DppSearch();
+        $setting = Setting::findOne(['type' => 'jenis_dpp', 'param' => 'dpp_farmasi']);
+        if ($setting) {
+            $searchModel->setJenisDppScope($setting->id);
+        } else {
+            $searchModel->setJenisDppScope(0);
+        }
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'title' => 'DPP Farmasi',
+        ]);
+    }
+    public function actionPpk()
+    {
+        $searchModel = new DppSearch();
+        $setting = Setting::findOne(['type' => 'jenis_dpp', 'param' => 'dpp_ppk']);
+        if ($setting) {
+            $searchModel->setJenisDppScope($setting->id);
+        } else {
+            $searchModel->setJenisDppScope(0);
+        }
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'title' => 'DPP PPK',
+        ]);
+    }
+    protected function redirectByJenisDpp($dpp)
+    {
+        if ($dpp && $dpp->jenis_dpp) {
+            $setting = Setting::findOne($dpp->jenis_dpp);
+            if ($setting) {
+                if ($setting->param === 'dpp_farmasi') {
+                    return $this->redirect(['farmasi']);
+                } elseif ($setting->param === 'dpp_ppk') {
+                    return $this->redirect(['ppk']);
+                }
+            }
+        }
+        return $this->redirect(['index']);
     }
     public function actionTab($id)
     {
@@ -84,7 +132,7 @@ class DppController extends Controller
             ]);
         } else {
             Yii::$app->session->setFlash('warning', 'Tidak ada penawaran yang tersedia');
-            return $this->redirect('index');
+            return $this->redirectByJenisDpp($model);
         }
     }
     public function actionListpemenang($params)
@@ -143,9 +191,13 @@ class DppController extends Controller
     {
         $request = Yii::$app->request;
         $pks = explode(',', $request->post('pks'));
+        $firstModel = null;
         foreach ($pks as $pk) {
             $model = $this->findModel($pk);
             if ($model) {
+                if (!$firstModel) {
+                    $firstModel = $model;
+                }
                 $model->pejabat_pengadaan = $request->post('pejabat_pengadaan');
                 $model->save(false);
             } else {
@@ -156,7 +208,7 @@ class DppController extends Controller
             Yii::$app->response->format = Response::FORMAT_JSON;
             return ['forceClose' => true, 'forceReload' => '#crud-datatable-pjax'];
         } else {
-            return $this->redirect(['index']);
+            return $this->redirectByJenisDpp($firstModel);
         }
     }
     public function actionPenugasan($id)
@@ -288,9 +340,13 @@ class DppController extends Controller
     {
         $request = Yii::$app->request;
         $pks = explode(',', $request->post('pks'));
+        $firstModel = null;
         foreach ($pks as $pk) {
             $model = $this->findModel($pk);
             if ($model) {
+                if (!$firstModel) {
+                    $firstModel = $model;
+                }
                 $model->admin_pengadaan = $request->post('admin_pengadaan');
                 $model->save(false);
             } else {
@@ -301,7 +357,7 @@ class DppController extends Controller
             Yii::$app->response->format = Response::FORMAT_JSON;
             return ['forceClose' => true, 'forceReload' => '#crud-datatable-pjax'];
         } else {
-            return $this->redirect(['index']);
+            return $this->redirectByJenisDpp($firstModel);
         }
     }
     public function actionReject($id)
@@ -358,7 +414,7 @@ class DppController extends Controller
                     Yii::$app->response->format = Response::FORMAT_JSON;
                     return ['forceClose' => true, 'forceReload' => '#crud-datatable-pjax'];
                 }
-                return $this->redirect(['index']);
+                return $this->redirectByJenisDpp($paket->dpp);
             } catch (\Exception $e) {
                 $transaction->rollBack();
                 Yii::error("Exception in actionReject: " . $e->getMessage());
@@ -424,7 +480,7 @@ class DppController extends Controller
             return $pdf->render();
         } else {
             Yii::$app->session->setFlash('warning', 'Belum ada review dpp');
-            return $this->redirect(['index']);
+            return $this->redirectByJenisDpp($model);
         }
     }
     // PERBAIKAN FUNGSI UPDATE NAMES
@@ -451,6 +507,95 @@ class DppController extends Controller
         }
         return $names;
     }
+
+    /**
+     * Ambil daftar pejabat pengadaan berdasarkan jenis_dpp.
+     * - reguler (null/0)  : semua pegawai dengan hak_akses PP
+     * - dpp_farmasi       : pegawai yang ada di setting pp_farmasi
+     * - dpp_ppk           : pegawai dengan role PPK di auth_assignment
+     */
+    private function getPejabatByJenisDpp(?int $jenisDpp): array
+    {
+        if (!$jenisDpp) {
+            // Reguler — gunakan semua PP
+            return Dpp::getAllpetugas();
+        }
+
+        $setting = Setting::findOne($jenisDpp);
+        if (!$setting) {
+            return Dpp::getAllpetugas();
+        }
+
+        if ($setting->param === 'dpp_farmasi') {
+            $farmasiSetting = Setting::find()->where(['type' => 'pp_farmasi'])->one();
+            $farmasiIds = $farmasiSetting
+                ? ArrayHelper::getColumn(json_decode($farmasiSetting->value, true) ?? [], 'id')
+                : [];
+            if (empty($farmasiIds)) {
+                return [];
+            }
+            return ArrayHelper::map(
+                Pegawai::find()->where(['in', 'id_user', $farmasiIds])->all(),
+                'id',
+                'nama'
+            );
+        }
+
+        if ($setting->param === 'dpp_ppk') {
+            $ppkUserIds = AuthAssignment::find()
+                ->select('user_id')
+                ->where(['item_name' => 'PPK'])
+                ->column();
+            if (empty($ppkUserIds)) {
+                return [];
+            }
+            return ArrayHelper::map(
+                Pegawai::find()->where(['in', 'id_user', $ppkUserIds])->all(),
+                'id',
+                'nama'
+            );
+        }
+
+        // Fallback ke semua PP jika param tidak dikenali
+        return Dpp::getAllpetugas();
+    }
+
+    /**
+     * Ambil daftar admin pengadaan berdasarkan jenis_dpp.
+     * - reguler (null/0)  : semua pegawai dengan hak_akses staffpp
+     * - dpp_farmasi/ppk  : pegawai dengan role staffAdmin di auth_assignment
+     */
+    private function getAdminByJenisDpp(?int $jenisDpp): array
+    {
+        if (!$jenisDpp) {
+            // Reguler — gunakan semua staffpp
+            return Dpp::getAlladmin();
+        }
+
+        $setting = Setting::findOne($jenisDpp);
+        if (!$setting) {
+            return Dpp::getAlladmin();
+        }
+
+        if (in_array($setting->param, ['dpp_farmasi', 'dpp_ppk'], true)) {
+            $staffAdminUserIds = AuthAssignment::find()
+                ->select('user_id')
+                ->where(['item_name' => 'staffAdmin'])
+                ->column();
+            if (empty($staffAdminUserIds)) {
+                return [];
+            }
+            return ArrayHelper::map(
+                Pegawai::find()->where(['in', 'id_user', $staffAdminUserIds])->all(),
+                'id',
+                'nama'
+            );
+        }
+
+        // Fallback ke semua staffpp jika param tidak dikenali
+        return Dpp::getAlladmin();
+    }
+
     public function actionCeklistadmin($id)
     {
         $request = Yii::$app->request;
@@ -497,12 +642,13 @@ class DppController extends Controller
                 $query->andWhere(['dpp.id' => $id]);
             }
 
-            $pejabatNames = $model::getAllpetugas();
-            $adminnames = $model::getAlladmin();
-           
-            // PERBAIKAN: Gunakan fungsi update yang benar
+            // Ambil daftar pejabat dan admin sesuai jenis_dpp DPP ini
+            $pejabatNames = $this->getPejabatByJenisDpp($dpp->jenis_dpp);
+            $adminnames   = $this->getAdminByJenisDpp($dpp->jenis_dpp);
+
+            // PERBAIKAN: Tambahkan workload count ke nama
             $pejabatNames = $this->updateNamesWithCounts($dt, $pejabatNames, 'pejabat_pengadaan', $id);
-            $adminnames = $this->updateNamesWithCounts($dt, $adminnames, 'admin_pengadaan', $id);
+            $adminnames   = $this->updateNamesWithCounts($dt, $adminnames, 'admin_pengadaan', $id);
             $datapenugasan = [
                 'dpp' => ArrayHelper::map($query->all(), 'id', 'nomordpp'),
                 'pejabat' => $pejabatNames,
@@ -556,7 +702,7 @@ class DppController extends Controller
             $set->value = $_POST['CeklistModel']['nomor_tugas'];
             $set->save();
             Yii::$app->session->setFlash('success', 'Kelengkapan DPP Berhasil Ditambahkan');
-            return $this->redirect(['/dpp/index']);
+            return $this->redirectByJenisDpp($dpp);
         }
     }
     public function actionPrintceklistadmin($id)
@@ -648,7 +794,7 @@ class DppController extends Controller
             $model->status_review = 1;
             $model->save();
             Yii::$app->session->setFlash('success', 'Review DPP Berhasil');
-            return $this->redirect(['index']);
+            return $this->redirectByJenisDpp($model);
         }
     }
     public function actionCreate()
@@ -731,8 +877,9 @@ class DppController extends Controller
         $model = $this->findModel($id);
         if ($model->paketpengadaan->pemenang) {
             Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
-            return $this->redirect('index');
+            return $this->redirectByJenisDpp($model);
         }
+        $jenisDpp = $model->jenis_dpp;
         $model->paketpengadaan->addition = null;
         $model->paketpengadaan->save();
         $model->unlinkAll('reviews', true);
@@ -742,6 +889,16 @@ class DppController extends Controller
             Yii::$app->response->format = Response::FORMAT_JSON;
             return ['forceClose' => true, 'forceReload' => '#crud-datatable-pjax'];
         } else {
+            if ($jenisDpp) {
+                $setting = Setting::findOne($jenisDpp);
+                if ($setting) {
+                    if ($setting->param === 'dpp_farmasi') {
+                        return $this->redirect(['farmasi']);
+                    } elseif ($setting->param === 'dpp_ppk') {
+                        return $this->redirect(['ppk']);
+                    }
+                }
+            }
             return $this->redirect(['index']);
         }
     }
@@ -749,12 +906,14 @@ class DppController extends Controller
     {
         $request = Yii::$app->request;
         $pks = explode(',', $request->post('pks'));
+        $jenisDpp = null;
         foreach ($pks as $pk) {
             $model = $this->findModel($pk);
             if ($model->paketpengadaan->pemenang) {
                 Yii::$app->session->setFlash('warning', 'PaketPengadaan Sudah ada Pemenang');
-                return $this->redirect('index');
+                return $this->redirectByJenisDpp($model);
             }
+            $jenisDpp = $model->jenis_dpp;
             $model->paketpengadaan->addition = null;
             $model->paketpengadaan->save();
             $model->unlinkAll('reviews', true);
@@ -765,6 +924,16 @@ class DppController extends Controller
             Yii::$app->response->format = Response::FORMAT_JSON;
             return ['forceClose' => true, 'forceReload' => '#crud-datatable-pjax'];
         } else {
+            if ($jenisDpp) {
+                $setting = Setting::findOne($jenisDpp);
+                if ($setting) {
+                    if ($setting->param === 'dpp_farmasi') {
+                        return $this->redirect(['farmasi']);
+                    } elseif ($setting->param === 'dpp_ppk') {
+                        return $this->redirect(['ppk']);
+                    }
+                }
+            }
             return $this->redirect(['index']);
         }
     }
@@ -819,7 +988,7 @@ class DppController extends Controller
                 Yii::error(json_encode($penilaian->getErrors()));
             } else {
                 Yii::$app->session->setFlash('success', 'Penilaian Berhasil');
-                return $this->redirect('index');
+                return $this->redirectByJenisDpp($dpp);
             }
         } else {
             if ($penilaian->dpp) {

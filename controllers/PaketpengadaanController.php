@@ -119,7 +119,58 @@ class PaketpengadaanController extends Controller {
     }
     public function actionDpp() { // kirim dpp
         $request = Yii::$app->request;
-        $pks = explode(',', $request->post('pks'));
+        $pks = $request->post('pks');
+        
+        if (!$pks) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ['forceClose' => true, 'forceReload' => '#crud-datatable-pjax'];
+        }
+
+        if (!$request->post('confirm_kirim')) {
+            $jenis_dpp_list = ArrayHelper::map(\app\models\Setting::find()->where(['type' => 'jenis_dpp'])->all(), 'id', 'value');
+            
+            $ppk_user_ids = \app\models\AuthAssignment::find()->select('user_id')->where(['item_name' => 'PPK'])->column();
+            $ppk_users = ArrayHelper::map(\app\models\Pegawai::find()->where(['in', 'id_user', $ppk_user_ids])->all(), 'id', 'nama');
+            
+            $khusus_setting = \app\models\Setting::find()->where(['type' => 'pp_khusus'])->one();
+            $khusus_ids = $khusus_setting ? ArrayHelper::getColumn(json_decode($khusus_setting->value, true) ?? [], 'id') : [];
+            $khusus_users = ArrayHelper::map(\app\models\Pegawai::find()->where(['in', 'id_user', $khusus_ids])->all(), 'id', 'nama');
+            
+            $farmasi_setting = \app\models\Setting::find()->where(['type' => 'pp_farmasi'])->one();
+            $farmasi_ids = $farmasi_setting ? ArrayHelper::getColumn(json_decode($farmasi_setting->value, true) ?? [], 'id') : [];
+            $farmasi_users = ArrayHelper::map(\app\models\Pegawai::find()->where(['in', 'id_user', $farmasi_ids])->all(), 'id', 'nama');
+
+            $staffadmin_user_ids = \app\models\AuthAssignment::find()->select('user_id')->where(['item_name' => 'staffAdmin'])->column();
+            $staffadmin_users = ArrayHelper::map(\app\models\Pegawai::find()->where(['in', 'id_user', $staffadmin_user_ids])->all(), 'id', 'nama');
+
+            $lists = [
+                'dpp_ppk' => $ppk_users,
+                'dpp_khusus' => $khusus_users,
+                'dpp_farmasi' => $farmasi_users,
+            ];
+            
+            $jenis_mapping = ArrayHelper::map(\app\models\Setting::find()->where(['type' => 'jenis_dpp'])->all(), 'id', 'param');
+
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return [
+                'title' => "Konfirmasi Kirim DPP",
+                'content' => $this->renderAjax('_form_kirim_dpp', [
+                    'pks' => $pks,
+                    'jenis_dpp_list' => $jenis_dpp_list,
+                    'lists' => $lists,
+                    'jenis_mapping' => $jenis_mapping,
+                    'admin_pengadaan_list' => $staffadmin_users
+                ]),
+                'footer' => Html::button('Batal', ['class' => 'btn btn-default pull-left', 'data-dismiss' => 'modal']) .
+                            Html::button('Kirim', ['class' => 'btn btn-primary', 'type' => 'submit'])
+            ];
+        }
+
+        $jenis_dpp = $request->post('jenis_dpp');
+        $pejabat_pengadaan = $request->post('pejabat_pengadaan');
+        $admin_pengadaan = $request->post('admin_pengadaan');
+
+        $pks = explode(',', $pks);
         foreach ($pks as $pk) {
             $pk=Yii::$app->hashids->encode($pk);
             $model = $this->findModel($pk);
@@ -142,6 +193,17 @@ class PaketpengadaanController extends Controller {
             $dpp->nomor_dpp = $model->nomor ?? '';
             $dpp->tanggal_dpp = $model->tanggal_dpp ?? '';
             $dpp->nomor_persetujuan = $model->nomor_persetujuan ?? '';
+            
+            if (!empty($jenis_dpp)) {
+                $dpp->jenis_dpp = $jenis_dpp;
+            }
+            if (!empty($pejabat_pengadaan)) {
+                $dpp->pejabat_pengadaan = $pejabat_pengadaan;
+            }
+            if (!empty($admin_pengadaan)) {
+                $dpp->admin_pengadaan = $admin_pengadaan;
+            }
+
             if ($dpp->save()) {
                 Yii::$app->session->setFlash('success', 'Paket Pengadaan ' . $model->nama_paket . ' Berhasil ajukan DPP');
             } else {

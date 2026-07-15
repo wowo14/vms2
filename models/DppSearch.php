@@ -5,23 +5,56 @@ use yii\base\Model;
 use yii\db\Expression;
 use yii\data\ActiveDataProvider;
 use app\models\Dpp;
-class DppSearch extends Dpp{
+use yii\db\ActiveQuery;
+class DppSearch extends Dpp
+{
+    public const SCOPE_ALL = 'all';
+    public const SCOPE_REGULER = 'reguler';
+
+    /**
+     * Nilai yang diperbolehkan:
+     *
+     * - all       : tidak membatasi jenis DPP
+     * - reguler   : jenis_dpp IS NULL
+     * - integer   : jenis_dpp = ID setting
+     *
+     * @var string|int
+     */
+    private $jenisDppScope = self::SCOPE_ALL;
     public $year;
     public $ppk;
     public function rules()
     {
         return [
             [['id', 'created_by', 'updated_by'], 'integer'],
-            [['nomor_dpp','tanggal_terima', 'paket_id', 'kode','pejabat_pengadaan', 'admin_pengadaan', 'tanggal_dpp', 'bidang_bagian', 'status_review', 'is_approved', 'nomor_persetujuan', 'created_at', 'updated_at', 'year', 'ppk'], 'safe'],
+            [['nomor_dpp', 'tanggal_terima', 'paket_id', 'kode', 'pejabat_pengadaan', 'admin_pengadaan', 'tanggal_dpp', 'bidang_bagian', 'status_review', 'is_approved', 'nomor_persetujuan', 'created_at', 'updated_at', 'year', 'ppk'], 'safe'],
         ];
     }
     public function scenarios()
     {
         return Model::scenarios();
     }
+    /**
+     * Mengatur scope jenis DPP dari controller.
+     *
+     * @param string|int $scope
+     */
+    public function setJenisDppScope($scope)
+    {
+        $this->jenisDppScope = $scope;
+
+        return $this;
+    }
     public function search($params)
     {
         $query = Dpp::find()->cache(self::cachetime(), self::settagdep('tag_dpp'));
+        /*
+         * Filter utama berdasarkan halaman.
+         *
+         * Filter ini diterapkan sebelum filter pencarian biasa supaya
+         * pengguna tidak dapat berpindah jenis DPP melalui query string.
+         */
+        $this->applyJenisDppScope($query);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
@@ -34,25 +67,28 @@ class DppSearch extends Dpp{
             return $dataProvider;
         }
         $query->joinWith(['paketpengadaan p']);
-        $query->where(['p.tanggal_reject' => NULL, 'p.alasan_reject' => NULL])->orWhere(['p.tanggal_reject' => '', 'p.alasan_reject' => '']);
+        $query->andWhere(['or',
+            ['and', ['p.tanggal_reject' => NULL], ['p.alasan_reject' => NULL]],
+            ['and', ['p.tanggal_reject' => ''], ['p.alasan_reject' => '']],
+        ]);
         $query->joinWith(['unit u']);
         $query->joinWith(['reviews r']);
         $query->joinWith(['pejabat p2']);
         $query->joinWith(['staffadmin s']);
-        if(self::isStaffpp()){
+        if (self::isStaffpp()) {
             $query->andWhere(['s.id_user' => Yii::$app->user->identity->id]);
         }
-        if(self::isPP()){
-            $chief=\app\models\Pegawai::findOne(self::profile('kepalapengadaan'));
-            if($chief->id_user<>Yii::$app->user->identity->id){
+        if (self::isPP()) {
+            $chief = \app\models\Pegawai::findOne(self::profile('kepalapengadaan'));
+            if ($chief->id_user <> Yii::$app->user->identity->id) {
                 // Yii::error(($chief->id_user));
                 $query->andWhere(['p2.id_user' => Yii::$app->user->identity->id]);
             }
         }
-        if(self::isStaff()){
+        if (self::isStaff()) {
             $query->andWhere(['p.created_by' => Yii::$app->user->identity->id]);
         }
-        if(self::isPPK()){
+        if (self::isPPK()) {
             $query->joinWith(['paketpengadaan.pejabatppkom ppkom']);
             $query->andWhere(['ppkom.id_user' => Yii::$app->user->identity->id]);
         }
@@ -66,6 +102,15 @@ class DppSearch extends Dpp{
             'dpp.admin_pengadaan' => $this->admin_pengadaan,
             'p.ppkom' => $this->ppk,
         ]);
+        /*
+         * Filter jenis_dpp dari form hanya dipakai pada halaman seluruh DPP.
+         * Pada halaman reguler atau halaman per jenis, filter ini diabaikan.
+         */
+        if ($this->jenisDppScope === self::SCOPE_ALL) {
+            $query->andFilterWhere([
+                'dpp.jenis_dpp' => $this->jenis_dpp,
+            ]);
+        }
         if ($this->year) {
             $query->andFilterWhere(['=', new Expression("strftime('%Y', dpp.tanggal_dpp)"), $this->year]);
         }
@@ -81,5 +126,26 @@ class DppSearch extends Dpp{
             ->andFilterWhere(['like', 'dpp.is_approved', $this->is_approved])
             ->andFilterWhere(['like', 'dpp.nomor_persetujuan', $this->nomor_persetujuan]);
         return $dataProvider;
+    }
+    private function applyJenisDppScope(ActiveQuery $query)
+    {
+        if ($this->jenisDppScope === self::SCOPE_REGULER) {
+            $query->andWhere(['or',
+                ['dpp.jenis_dpp' => null],
+                ['dpp.jenis_dpp' => 0],
+                ['dpp.jenis_dpp' => '']
+            ]);
+
+            return;
+        }
+
+        if (
+            is_int($this->jenisDppScope)
+            || ctype_digit((string) $this->jenisDppScope)
+        ) {
+            $query->andWhere([
+                'dpp.jenis_dpp' => (int) $this->jenisDppScope,
+            ]);
+        }
     }
 }

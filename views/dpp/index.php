@@ -11,7 +11,7 @@ use yii\helpers\Url;
 $idmodal = $searchModel->hash;
 AppAsset::register($this);
 CrudAsset::register($this);
-$this->title = 'Dpp';
+$this->title = isset($title) ? $title : 'Dpp';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="dpp-index">

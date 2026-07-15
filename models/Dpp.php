@@ -11,7 +11,7 @@ class Dpp extends \yii\db\ActiveRecord {
         return [
             [['tanggal_dpp','tanggal_terima', 'created_at', 'updated_at'], 'safe'],
             ['paket_id', 'unique'],
-            [['paket_id', 'pejabat_pengadaan', 'admin_pengadaan', 'created_by', 'updated_by'], 'integer'],
+            [['paket_id', 'pejabat_pengadaan', 'admin_pengadaan', 'created_by', 'updated_by', 'jenis_dpp'], 'integer'],
             [['status_review', 'is_approved'], 'integer', 'max' => 1],
             [['nomor_dpp', 'bidang_bagian', 'nomor_persetujuan', 'kode'], 'string', 'max' => 255],
         ];

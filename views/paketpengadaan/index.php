@@ -83,21 +83,16 @@ AppAsset::register($this);
                 'before' => (Helper::checkRoute($this->context->uniqueId . '/dpp') ? BulkButtonWidget::widget([
                     'buttons' => Html::a(
                         '<i class="fa fa-flag"></i>&nbsp; ' . Yii::t('yii2-ajaxcrud', 'Kirim DPP'),
-                        ["/paketpengadaan/dpp"],
+                        Url::to(["/paketpengadaan/dpp"]),
                         [
                             'class' => 'btn btn-danger btn-xs',
-                            'role' => 'modal-remote-bulk',
+                            'id' => 'btn-kirim-dpp',
                             'data-pjax' => '0',
                             'data-target' => '#' . $idmodal,
-                            'data-confirm' => false,
-                            'data-method' => false,
-                            'data-request-method' => 'post',
-                            'data-confirm-title' => Yii::t('yii2-ajaxcrud', 'Kirim DPP'),
-                            'data-confirm-message' => 'Ajukan Paket Pengadaan Ke Menu DPP',
                             'data-toggle' => 'tooltip',
                             'data-original-title' => Yii::t('yii2-ajaxcrud', 'Kirim DPP'),
                         ]
-                        ).' '.
+                    ).' '.
                     Html::a('<i class="fa fa-file"></i>&nbsp; ' . Yii::t('yii2-ajaxcrud', 'File Template Pengadaan Terbaru'), ['site/downloads'], ['class' => 'btn btn-primary btn-xs'])
                     
                 ]) : '' ),
@@ -155,3 +150,24 @@ AppAsset::register($this);
     ]
 ]) ?>
 <?php Modal::end(); ?>
+<?php $this->registerJs(<<<JS
+$(document).on('click', '#btn-kirim-dpp', function(e) {
+    e.preventDefault();
+    var btn = $(this);
+    var idmodal = btn.data('target'); // has # prefix e.g. "#ajaxCrudModal"
+    var pks = [];
+    $('input:checkbox[name="selection[]"]:checked').each(function() {
+        pks.push($(this).val());
+    });
+    if (pks.length === 0) {
+        alert('Pilih paket pengadaan terlebih dahulu.');
+        return false;
+    }
+    // Build FormData (doRemote uses processData:false so plain objects won't work)
+    var fd = new FormData();
+    fd.append('pks', pks.join(','));
+    fd.append('_csrf', yii.getCsrfToken());
+    var modalRemote = new ModalRemote(idmodal);
+    modalRemote.doRemote(btn.attr('href'), 'POST', fd);
+});
+JS); ?>
