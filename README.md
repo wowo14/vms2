@@ -65,3 +65,9 @@ tambahkan filter per produk bisa lebih dari 1 produk
 tambahkan filter baru per rangking
 
 tambahkan link kuisioner per penyedia
+===done===
+
+
+tambah penawaran penyedia dari vendor bisa langsng submit
+tambah breakdown dari nilai kontrak lihat detail per barang (kolom namabarang,hps, penawaean,negosiasi, selisi)
+    filter per barang, per kegiatan, per jenis barang,

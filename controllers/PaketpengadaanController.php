@@ -127,21 +127,21 @@ class PaketpengadaanController extends Controller {
         }
 
         if (!$request->post('confirm_kirim')) {
-            $jenis_dpp_list = ArrayHelper::map(\app\models\Setting::find()->where(['type' => 'jenis_dpp'])->all(), 'id', 'value');
+            $jenis_dpp_list = ArrayHelper::map(\app\models\Setting::where(['type' => 'jenis_dpp'])->all(), 'id', 'value');
             
             $ppk_user_ids = \app\models\AuthAssignment::find()->select('user_id')->where(['item_name' => 'PPK'])->column();
             $ppk_users = ArrayHelper::map(\app\models\Pegawai::find()->where(['in', 'id_user', $ppk_user_ids])->all(), 'id', 'nama');
             
-            $khusus_setting = \app\models\Setting::find()->where(['type' => 'pp_khusus'])->one();
+            $khusus_setting = \app\models\Setting::where(['type' => 'pp_khusus'])->one();
             $khusus_ids = $khusus_setting ? ArrayHelper::getColumn(json_decode($khusus_setting->value, true) ?? [], 'id') : [];
             $khusus_users = ArrayHelper::map(\app\models\Pegawai::find()->where(['in', 'id_user', $khusus_ids])->all(), 'id', 'nama');
             
-            $farmasi_setting = \app\models\Setting::find()->where(['type' => 'pp_farmasi'])->one();
+            $farmasi_setting = \app\models\Setting::where(['type' => 'pp_farmasi'])->one();
             $farmasi_ids = $farmasi_setting ? ArrayHelper::getColumn(json_decode($farmasi_setting->value, true) ?? [], 'id') : [];
-            $farmasi_users = ArrayHelper::map(\app\models\Pegawai::find()->where(['in', 'id_user', $farmasi_ids])->all(), 'id', 'nama');
+            $farmasi_users = ArrayHelper::map(\app\models\Pegawai::where(['in', 'id_user', $farmasi_ids])->all(), 'id', 'nama');
 
             $staffadmin_user_ids = \app\models\AuthAssignment::find()->select('user_id')->where(['item_name' => 'staffAdmin'])->column();
-            $staffadmin_users = ArrayHelper::map(\app\models\Pegawai::find()->where(['in', 'id_user', $staffadmin_user_ids])->all(), 'id', 'nama');
+            $staffadmin_users = ArrayHelper::map(\app\models\Pegawai::where(['in', 'id_user', $staffadmin_user_ids])->all(), 'id', 'nama');
 
             $lists = [
                 'dpp_ppk' => $ppk_users,

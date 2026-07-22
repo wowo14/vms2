@@ -64,12 +64,17 @@ $this->registerJs(<<<JS
             var user_list = lists[param] || {};
 
             if (Object.keys(user_list).length > 0) {
-                $('#pejabat_pengadaan_group').show();
-                pejabat_dropdown.append($('<option></option>').attr('value', '').text('Pilih Pejabat Pengadaan'));
-                $.each(user_list, function(id, nama) {
-                    pejabat_dropdown.append($('<option></option>').attr('value', id).text(nama));
-                });
-                $('#admin_pengadaan_group').show();
+                if (param === 'dpp_farmasi') {
+                    $('#pejabat_pengadaan_group').hide();
+                    $('#admin_pengadaan_group').hide();
+                } else {
+                    $('#pejabat_pengadaan_group').show();
+                    pejabat_dropdown.append($('<option></option>').attr('value', '').text('Pilih Pejabat Pengadaan'));
+                    $.each(user_list, function(id, nama) {
+                        pejabat_dropdown.append($('<option></option>').attr('value', id).text(nama));
+                    });
+                    $('#admin_pengadaan_group').show();
+                }
 
             } else {
                 $('#pejabat_pengadaan_group').hide();
