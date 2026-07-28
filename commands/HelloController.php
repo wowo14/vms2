@@ -8,6 +8,11 @@ use Yii;
 use yii\console\Controller;
 use yii\db\Expression;
 class HelloController extends Controller {
+    public function actionUpdateadmindpp(){
+        $sql="UPDATE dpp SET admin_pengadaan =20 WHERE jenis_dpp=304";
+        Yii::$app->db->createCommand($sql)->execute();
+        print_r('sukses update admin pengadaan');
+    }
     public function actionIndex() {
        print_r('hello world');
        $query=PaketPengadaan::find()->cache(10)
