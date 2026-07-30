@@ -11,6 +11,8 @@ class HelloController extends Controller {
     public function actionUpdateadmindpp(){
         $sql="UPDATE dpp SET admin_pengadaan =20 WHERE jenis_dpp=304";
         Yii::$app->db->createCommand($sql)->execute();
+        $sql="UPDATE dpp SET jenis_dpp=NULL WHERE jenis_dpp=303";
+        Yii::$app->db->createCommand($sql)->execute();
         print_r('sukses update admin pengadaan');
     }
     public function actionIndex() {
