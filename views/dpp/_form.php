@@ -29,6 +29,13 @@ use kartik\select2\Select2;
             'placeholder' => 'Pilih Bidang/Bagian...',
         ]
     ]) ?>
+    <?= $form->field($model, 'jenis_dpp')->widget(Select2::class, [
+            'data' => $model::optionsSettingtype('jenis_dpp', ['value','id']),
+            'options' => ['placeholder' => 'Select Jenis DPP'],
+            'pluginOptions' => [
+                'allowClear' => true
+            ]
+        ]) ?>
     <?= $form->field($model, 'paket_id')->widget(Select2::class, [
         'data' => PaketPengadaan::collectAll(['approval_by' => null])->pluck('nomornamapaket', 'id')->toArray(),
         'options' => [

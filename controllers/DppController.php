@@ -652,7 +652,7 @@ class DppController extends Controller
             $datapenugasan = [
                 'dpp' => ArrayHelper::map($query->all(), 'id', 'nomordpp'),
                 'pejabat' => $pejabatNames,
-                'admin' => array_merge( $adminnames,$pejabatNames),
+                'admin' => $adminnames+$pejabatNames
             ];
             Yii::error(json_encode($datapenugasan));
             //endpenugasan
