@@ -107,6 +107,22 @@ class DppController extends Controller
             'title' => 'DPP PPK',
         ]);
     }
+    public function actionBmhp()
+    {
+        $searchModel = new DppSearch();
+        $setting = Setting::findOne(['type' => 'jenis_dpp', 'param' => 'dpp_bmhp']);
+        if ($setting) {
+            $searchModel->setJenisDppScope($setting->id);
+        } else {
+            $searchModel->setJenisDppScope(0);
+        }
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'title' => 'DPP BMHP',
+        ]);
+    }
     protected function redirectByJenisDpp($dpp)
     {
         if ($dpp && $dpp->jenis_dpp) {
