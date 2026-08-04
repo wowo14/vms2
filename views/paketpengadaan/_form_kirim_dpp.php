@@ -9,7 +9,7 @@ use yii\helpers\Json;
         <?= Html::hiddenInput('confirm_kirim', '1') ?>
         <?= Html::hiddenInput(Yii::$app->request->csrfParam, Yii::$app->request->getCsrfToken()) ?>
         <p class="badge badge-warning">
-            <b>Untuk Dpp Reguler abaikan form isian dibawah ini</b>
+            <b>Untuk Dpp Reguler (Umum) abaikan form isian dibawah ini</b>
         </p>
         <div class="form-group">
             <label class="control-label">Jenis DPP</label>
