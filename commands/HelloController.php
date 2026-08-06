@@ -7,14 +7,183 @@ use app\models\PaketPengadaanDetails;
 use Yii;
 use yii\console\Controller;
 use yii\db\Expression;
+use yii\console\ExitCode;
+use yii\helpers\Json;
 class HelloController extends Controller {
-    public function actionUpdateadmindpp(){
-        $sql="UPDATE dpp SET admin_pengadaan =20 WHERE jenis_dpp=304";
-        Yii::$app->db->createCommand($sql)->execute();
-        $sql="UPDATE dpp SET jenis_dpp=NULL WHERE jenis_dpp=303";
-        Yii::$app->db->createCommand($sql)->execute();
-        print_r('sukses update admin pengadaan');
+    /**
+     * Update qty paket_pengadaan_details berdasarkan nomor DPP.
+     *
+     * Contoh:
+     * php yii hello/update-paket-pengadaan-details \
+     * "DPP/2439/2026" \
+     * '{"12042":6,"12046":2}'
+     *
+     * Tanpa konfirmasi:
+     * php yii hello/update-paket-pengadaan-details \
+     * "DPP/2439/2026" \
+     * '{"12042":6,"12046":2}' \
+     * 1
+     */
+    public function actionUpdatePaketPengadaanDetails(
+        string $nomorDpp,
+        string $updatesInput,
+        int $yes = 0
+    ): int {
+        $updates = [];
+
+        foreach (explode(',', $updatesInput) as $item) {
+            $item = trim($item);
+
+            if (!preg_match('/^(\d+)=(\d+)$/', $item, $matches)) {
+                $this->stderr(
+                    "Format update tidak valid: {$item}\n" .
+                    "Gunakan format: detail_id=qty,detail_id=qty\n"
+                );
+
+                return ExitCode::DATAERR;
+            }
+
+            $detailId = (int) $matches[1];
+            $qty      = (int) $matches[2];
+
+            if ($detailId <= 0) {
+                $this->stderr("Detail ID harus lebih besar dari 0.\n");
+
+                return ExitCode::DATAERR;
+            }
+
+            $updates[$detailId] = $qty;
+        }
+
+        if (empty($updates)) {
+            $this->stderr("Data update tidak boleh kosong.\n");
+
+            return ExitCode::DATAERR;
+        }
+
+        /*
+         * Cari DPP menggunakan nomor lengkap agar tidak terjadi salah paket.
+         */
+        $details = (new \yii\db\Query())
+            ->select([
+                'dpp_id'          => 'd.id',
+                'nomor_dpp'       => 'd.nomor_dpp',
+                'paket_id'        => 'pp.id',
+                'detail_id'       => 'pd.id',
+                'qty_lama'        => 'pd.qty',
+            ])
+            ->from(['d' => 'dpp'])
+            ->innerJoin(
+                ['pp' => 'paket_pengadaan'],
+                'pp.id = d.paket_id'
+            )
+            ->innerJoin(
+                ['pd' => 'paket_pengadaan_details'],
+                'pd.paket_id = pp.id'
+            )
+            ->where(['d.nomor_dpp' => $nomorDpp])
+            ->andWhere(['pd.id' => array_keys($updates)])
+            ->orderBy(['pd.id' => SORT_ASC])
+            ->all();
+
+        if (empty($details)) {
+            $this->stderr(
+                "Detail paket tidak ditemukan untuk nomor DPP: {$nomorDpp}\n"
+            );
+
+            return ExitCode::UNSPECIFIED_ERROR;
+        }
+
+        $foundIds     = array_map('strval', array_column($details, 'detail_id'));
+        $requestedIds = array_map('strval', array_keys($updates));
+        $invalidIds   = array_diff($requestedIds, $foundIds);
+
+        /*
+         * Jangan lanjut jika ada detail ID yang bukan milik paket tersebut.
+         */
+        if (!empty($invalidIds)) {
+            $this->stderr(
+                "Update dibatalkan. Detail ID berikut bukan milik DPP " .
+                "{$nomorDpp}: " . implode(', ', $invalidIds) . "\n"
+            );
+
+            return ExitCode::DATAERR;
+        }
+
+        $this->stdout("Rencana perubahan:\n");
+
+        foreach ($details as $detail) {
+            $detailId = (string) $detail['detail_id'];
+            $qtyBaru  = $updates[$detailId] ?? $updates[(int) $detailId];
+
+            $this->stdout(
+                "Detail ID {$detailId}: " .
+                "{$detail['qty_lama']} -> {$qtyBaru}\n"
+            );
+        }
+
+        if (!$yes && !$this->confirm('Lanjutkan proses update?')) {
+            $this->stdout("Update dibatalkan.\n");
+
+            return ExitCode::OK;
+        }
+
+        $transaction = Yii::$app->db->beginTransaction();
+
+        try {
+            $totalUpdated = 0;
+
+            foreach ($details as $detail) {
+                $detailId = (string) $detail['detail_id'];
+                $qtyBaru  = $updates[$detailId] ?? $updates[(int) $detailId];
+
+                if (
+                    filter_var($qtyBaru, FILTER_VALIDATE_INT) === false ||
+                    (int) $qtyBaru < 0
+                ) {
+                    throw new \InvalidArgumentException(
+                        "Qty detail ID {$detailId} harus berupa angka bulat " .
+                        "dan tidak boleh negatif."
+                    );
+                }
+
+                $totalUpdated += Yii::$app->db
+                    ->createCommand()
+                    ->update(
+                        'paket_pengadaan_details',
+                        [
+                            'qty' => (int) $qtyBaru,
+                        ],
+                        [
+                            'id'       => (int) $detailId,
+                            'paket_id' => (int) $detail['paket_id'],
+                        ]
+                    )
+                    ->execute();
+            }
+
+            $transaction->commit();
+
+            $this->stdout(
+                "Sukses. {$totalUpdated} detail paket berhasil diperbarui.\n"
+            );
+
+            return ExitCode::OK;
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+
+            $this->stderr("Update gagal: {$e->getMessage()}\n");
+
+            return ExitCode::UNSPECIFIED_ERROR;
+        }
     }
+    // public function actionUpdateadmindpp(){
+    //     $sql="UPDATE dpp SET admin_pengadaan =20 WHERE jenis_dpp=304";
+    //     Yii::$app->db->createCommand($sql)->execute();
+    //     $sql="UPDATE dpp SET jenis_dpp=NULL WHERE jenis_dpp=303";
+    //     Yii::$app->db->createCommand($sql)->execute();
+    //     print_r('sukses update admin pengadaan');
+    // }
     public function actionIndex() {
        print_r('hello world');
        $query=PaketPengadaan::find()->cache(10)
