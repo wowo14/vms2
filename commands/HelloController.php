@@ -163,6 +163,8 @@ class HelloController extends Controller {
             }
 
             $transaction->commit();
+            Yii::$app->cache->flush();
+            Yii::$app->db->schema->refresh();
 
             $this->stdout(
                 "Sukses. {$totalUpdated} detail paket berhasil diperbarui.\n"
