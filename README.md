@@ -71,3 +71,12 @@ tambahkan link kuisioner per penyedia
 tambah penawaran penyedia dari vendor bisa langsng submit
 tambah breakdown dari nilai kontrak lihat detail per barang (kolom namabarang,hps, penawaean,negosiasi, selisi)
     filter per barang, per kegiatan, per jenis barang,
+
+pengembangan 2026 yang sudah diterapkan :
+- tambahkan menu untuk File Template Pengadaan Terbaru
+- revisi perhitungan total beban kerja penugasan pejabat pengadaan dan admin pengadaan
+- tambahkan menu report penyedia berdasarkan hasil penilaian oleh pejabat maupun ppk
+- menambah menu minikompetisi untuk membandingkan secara harga maupun kualitas secara real time
+- menambah menu untuk mengelola dokumen dasar hukum seperti PP, UU, Instruksi Menteri, dll
+- menambah fitur import excel untuk paket pengadaan yang dilakukan diluar unit pengadaan misal obat-obatan supaya bisa terintegrasi dengan aplikasi dan data di agregate 
+- 

@@ -799,7 +799,7 @@ $(function () {
             });
         }
 
-        // Find lowest total harga
+        // Find lowest total harga (exclude vendors with total_harga = 0)
         var lowestPrice = null;
         vendors.forEach(function (v) {
             if (v.total_harga > 0 && (lowestPrice === null || v.total_harga < lowestPrice)) {
@@ -823,10 +823,29 @@ $(function () {
         });
 
         // Sort vendors by skor_akhir DESC (best first = leftmost column)
-        vendors.sort(function (a, b) { return b._skor_akhir - a._skor_akhir; });
+        // Vendors with total_harga = 0 are ranked last
+        vendors.sort(function (a, b) {
+            // If both have 0 total harga, maintain original order
+            if (a.total_harga === 0 && b.total_harga === 0) return 0;
+            // If a has 0 total harga, put it last
+            if (a.total_harga === 0) return 1;
+            // If b has 0 total harga, put it last
+            if (b.total_harga === 0) return -1;
+            // Otherwise sort by skor_akhir DESC
+            return b._skor_akhir - a._skor_akhir;
+        });
 
-        // Assign ranking
-        vendors.forEach(function (v, i) { v._ranking = i + 1; v._is_winner = (i === 0); });
+        // Assign ranking (vendors with total_harga = 0 get rank null)
+        var currentRank = 1;
+        vendors.forEach(function (v) {
+            if (v.total_harga === 0) {
+                v._ranking = null;
+                v._is_winner = false;
+            } else {
+                v._ranking = currentRank++;
+                v._is_winner = (v._ranking === 1);
+            }
+        });
 
         return vendors;
     }
@@ -839,6 +858,7 @@ $(function () {
     function fmtNum(n) { return parseFloat(n).toFixed(2); }
 
     function rankBadge(rank) {
+        if (rank === null) return '<span class="badge-rank rank-n">–</span>';
         if (rank === 1) return '<span class="badge-rank rank-1">🥇&nbsp;1</span>';
         if (rank === 2) return '<span class="badge-rank rank-2">🥈&nbsp;2</span>';
         if (rank === 3) return '<span class="badge-rank rank-3">🥉&nbsp;3</span>';
@@ -904,7 +924,7 @@ $(function () {
 
             vendors.forEach(function (v, vi) {
                 var pi = v.items.find(function (i) { return i.item_id === item.id; });
-                var price = pi ? pi.harga_penawaran : null;
+                var price = (pi && pi.harga_penawaran > 0) ? pi.harga_penawaran : null;
                 var total = (price && item.qty) ? price * item.qty : null;
 
                 var cellClass = v._ranking === 1 ? 'cell-winner-vendor' : '';
@@ -984,10 +1004,11 @@ $(function () {
         var rows = [];
         vendors.forEach(function(v) {
             var pi = v.items.find(function(i) { return i.item_id === itemId; });
+            var harga = (pi && pi.harga_penawaran > 0) ? pi.harga_penawaran : null;
             rows.push({
                 nama_vendor : v.nama_vendor,
-                harga       : pi ? pi.harga_penawaran : null,
-                total       : (pi && pi.harga_penawaran) ? pi.harga_penawaran * item.qty : null,
+                harga       : harga,
+                total       : harga ? harga * item.qty : null,
                 is_winner   : v._is_winner,
                 vendor_rank : v._ranking,
             });
@@ -1082,7 +1103,8 @@ $(function () {
         // Column headers: Item, then vendor names + rank
         var headerRow = ['Item Produk', 'Qty', 'Satuan', 'HPS/Satuan', 'Existing/Satuan'];
         vendors.forEach(function(v) {
-            headerRow.push('[Rank #' + v._ranking + '] ' + v.nama_vendor);
+            var rankLabel = v._ranking !== null ? '[Rank #' + v._ranking + '] ' : '[–] ';
+            headerRow.push(rankLabel + v.nama_vendor);
         });
         wsData.push(headerRow);
 
@@ -1107,11 +1129,11 @@ $(function () {
             var row = [item.nama_produk, item.qty, item.satuan || '', item.harga_hps, item.harga_existing];
             vendors.forEach(function(v) {
                 var pi = v.items.find(function(i) { return i.item_id === item.id; });
-                var price = pi ? pi.harga_penawaran : null;
+                var price = (pi && pi.harga_penawaran > 0) ? pi.harga_penawaran : null;
                 var itemRank = price !== null && price > 0 ? (validPrices.indexOf(price) + 1) : null;
                 var isRankSelected = selectedRanks.length === 0 || (itemRank !== null && selectedRanks.indexOf(itemRank.toString()) !== -1);
                 
-                row.push(isRankSelected && price ? price : '');
+                row.push(isRankSelected && price !== null && price > 0 ? price : '');
             });
             wsData.push(row);
 
@@ -1125,7 +1147,7 @@ $(function () {
                 var linkRow = ['   (Link Katalog)', '', '', '', ''];
                 vendors.forEach(function(v) {
                     var pi = v.items.find(function(i) { return i.item_id === item.id; });
-                    var price = pi ? pi.harga_penawaran : null;
+                    var price = (pi && pi.harga_penawaran > 0) ? pi.harga_penawaran : null;
                     var itemRank = price !== null && price > 0 ? (validPrices.indexOf(price) + 1) : null;
                     var isRankSelected = selectedRanks.length === 0 || (itemRank !== null && selectedRanks.indexOf(itemRank.toString()) !== -1);
                     

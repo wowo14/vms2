@@ -11,12 +11,92 @@ use yii\console\ExitCode;
 use yii\helpers\Json;
 class HelloController extends Controller {
     /**
+     * Menampilkan paket_pengadaan_details berdasarkan nomor DPP.
+     *
+     * Contoh:
+     * php yii hello/list-paket-pengadaan-details "000.3.3/5700/437.52.35.13/2026"
+     */
+    public function actionListPaketPengadaanDetails(string $nomorDpp): int
+    {
+        $details = (new \yii\db\Query())
+            ->select([
+                'dpp_id'    => 'd.id',
+                'nomor_dpp' => 'd.nomor_dpp',
+                'paket_id'  => 'pp.id',
+                'detail_id' => 'pd.id',
+                'nama_produk' => 'pd.nama_produk',
+                'qty'       => 'pd.qty',
+
+                // Tambahkan kolom identitas barang sesuai struktur tabel Anda.
+                // 'barang_id'   => 'pd.barang_id',
+                // 'nama_barang' => 'pd.nama_barang',
+                // 'satuan'      => 'pd.satuan',
+            ])
+            ->from(['d' => 'dpp'])
+            ->innerJoin(
+                ['pp' => 'paket_pengadaan'],
+                'pp.id = d.paket_id'
+            )
+            ->innerJoin(
+                ['pd' => 'paket_pengadaan_details'],
+                'pd.paket_id = pp.id'
+            )
+            ->where([
+                'd.nomor_dpp' => $nomorDpp,
+            ])
+            ->orderBy([
+                'pd.id' => SORT_ASC,
+            ])
+            ->all();
+
+        if (empty($details)) {
+            $this->stderr(
+                "Detail paket tidak ditemukan untuk DPP: {$nomorDpp}\n"
+            );
+
+            return ExitCode::UNSPECIFIED_ERROR;
+        }
+
+        $this->stdout("Nomor DPP : {$nomorDpp}\n");
+        $this->stdout("Jumlah     : " . count($details) . " detail\n\n");
+
+        $this->stdout(
+            str_pad('DETAIL ID', 15) .
+            str_pad('PAKET ID', 15) .
+            str_pad('NAMA PRODUK', 20) .
+            str_pad('QTY', 10) .
+            "\n"
+        );
+
+        $this->stdout(str_repeat('-', 55) . "\n");
+
+        foreach ($details as $detail) {
+            $this->stdout(
+                str_pad((string) $detail['detail_id'], 15) .
+                str_pad((string) $detail['paket_id'], 15) .
+                str_pad('(' . (string) $detail['nama_produk'] . ')', 20) .
+                str_pad('#'.(string) $detail['qty'], 10) .
+                "\n"
+            );
+        }
+
+        $this->stdout("\nFormat update:\n");
+        $this->stdout(
+            'php yii hello/update-paket-pengadaan-details ' .
+            '"' . $nomorDpp . '" ' .
+            '"DETAIL_ID=QTY,DETAIL_ID=QTY"' .
+            "\n"
+        );
+
+        return ExitCode::OK;
+    }
+    /**
      * Update qty paket_pengadaan_details berdasarkan nomor DPP.
      *
      * Contoh:
      * php yii hello/update-paket-pengadaan-details \
      * "DPP/2439/2026" \
-     * '{"12042":6,"12046":2}'
+     * '12042:6,12046=2'
      *
      * Tanpa konfirmasi:
      * php yii hello/update-paket-pengadaan-details \
@@ -271,6 +351,7 @@ class HelloController extends Controller {
     //         }
     //     });
     // }
+    /*
     public function actionDropAllTables() {
         $db = \Yii::$app->db;
         $schema = $db->schema;
@@ -283,6 +364,8 @@ class HelloController extends Controller {
         // $db->createCommand('SET FOREIGN_KEY_CHECKS = 1;')->execute();
         echo "All tables dropped successfully.\n";
     }
+    */
+    /*
     public function actionTruncateTransaksi() {
         $db = \Yii::$app->db;
         $schema = $db->schema;
@@ -339,6 +422,7 @@ class HelloController extends Controller {
         // cache flush
         Yii::$app->cache->flush();
     }
+    */
     public function actionJenisakta() {
         $jenisAkta = [
             'PENDIRIAN PT',

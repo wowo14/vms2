@@ -20,6 +20,14 @@ $config = [
             'class' => '\kartik\grid\Module',
             // 'bsVersion' => '4.x',
         ],
+        'api' => [
+            'class' => app\modules\api\v1\Module::class,
+            'modules' => [
+                'v1' => [
+                    'class' => app\modules\api\v1\Module::class,
+                ],
+            ],
+        ],
         'admin' => [
             'class' => 'mdm\admin\Module',
             'layout' => '@app/views/layouts/left-menu-admin',

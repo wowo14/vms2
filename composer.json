@@ -41,7 +41,9 @@
     "intervention/image": "^2.6",
     "kartik-v/yii2-money": "1.2.x-dev",
     "kartik-v/yii2-editable": "1.8.x-dev",
-    "hashids/hashids": "5.0.x-dev"
+    "hashids/hashids": "5.0.x-dev",
+    "firebase/php-jwt": "dev-main",
+    "zircote/swagger-php": "5.0"
   },
   "require-dev": {
     "yiisoft/yii2-gii": ">=2.2.2",

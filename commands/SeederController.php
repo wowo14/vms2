@@ -15,6 +15,7 @@ use app\models\User;
 
 class SeederController extends Controller
 {
+    /*
     public function actionDebug()
     {
         $ppk = Setting::find()->where(['type' => 'evaluasi_suplier_ppk', 'active' => 1])->one();
@@ -202,4 +203,5 @@ class SeederController extends Controller
         echo "Seeding completed successfully!\n";
         return ExitCode::OK;
     }
+         */
 }

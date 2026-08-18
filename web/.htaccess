@@ -1,4 +1,12 @@
 RewriteEngine on
-RewriteCond %{REQUEST_FILENAME} !-d
+
+# API routes - use index-api.php
+RewriteCond %{REQUEST_URI} ^/api
 RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index-api.php [L]
+
+# Web routes - use index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . index.php [L]
