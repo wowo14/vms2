@@ -339,6 +339,9 @@ class PenilaianController extends Controller
 
         $rowNum = 5;
         $no = 1;
+        $total_nilai_kontrak = 0;
+        $total_nilai_kinerja = 0;
+        $total_items = 0;
 
         foreach ($summary as $providerName => $s) {
             foreach ($data as $item) {
@@ -399,9 +402,26 @@ class PenilaianController extends Controller
                 // align numbers
                 $sheet->getStyle('J'.$rowNum.':R'.$rowNum)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
+                $total_nilai_kontrak += $item->nilai_kontrak;
+                $total_nilai_kinerja += $nilai_kinerja;
+                $total_items++;
+
                 $rowNum++;
             }
         }
+
+        // Add total row
+        $sheet->mergeCells('A'.$rowNum.':H'.$rowNum);
+        $sheet->setCellValue('A'.$rowNum, 'Total / Rata-rata:');
+        $sheet->setCellValue('I'.$rowNum, $total_nilai_kontrak);
+        $sheet->getStyle('I'.$rowNum)->getNumberFormat()->setFormatCode('#,##0');
+        $avg_score = $total_items > 0 ? $total_nilai_kinerja / $total_items : 0;
+        $sheet->setCellValue('R'.$rowNum, round($avg_score, 2));
+
+        $sheet->getStyle('A'.$rowNum.':T'.$rowNum)->getFont()->setBold(true);
+        $sheet->getStyle('A'.$rowNum.':T'.$rowNum)->applyFromArray($styleArray);
+        $sheet->getStyle('A'.$rowNum)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('R'.$rowNum)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
         $writer = new Xlsx($spreadsheet);
         $filename = 'Rekapitulasi_Penilaian_Penyedia_PPK_' . date('YmdHis') . '.xlsx';
@@ -459,6 +479,9 @@ class PenilaianController extends Controller
         $html .= '</thead><tbody>';
 
         $no = 1;
+        $total_nilai_kontrak = 0;
+        $total_nilai_kinerja = 0;
+        $total_items = 0;
         foreach ($summary as $providerName => $s) {
             foreach ($data as $item) {
                 if ($item->nama_perusahaan !== $providerName) continue;
@@ -510,8 +533,22 @@ class PenilaianController extends Controller
                 $html .= '<td align="center">'.Html::encode($details['hasil_evaluasi'] ?? '').'</td>';
                 $html .= '<td>'.Html::encode($details['ulasan_pejabat_pengadaan'] ?? '').'</td>';
                 $html .= '</tr>';
+
+                $total_nilai_kontrak += $item->nilai_kontrak;
+                $total_nilai_kinerja += $nilai_kinerja;
+                $total_items++;
             }
         }
+
+        $avg_score = $total_items > 0 ? $total_nilai_kinerja / $total_items : 0;
+        $html .= '<tr style="font-weight:bold; background-color:#f2f2f2;">';
+        $html .= '<td colspan="8" align="right">Total / Rata-rata:</td>';
+        $html .= '<td align="right">'.number_format($total_nilai_kontrak, 0, ',', '.').'</td>';
+        $html .= '<td colspan="8"></td>';
+        $html .= '<td align="center">'.number_format($avg_score, 2).'</td>';
+        $html .= '<td colspan="2"></td>';
+        $html .= '</tr>';
+
         $html .= '</tbody></table>';
 
         $pdf = new Pdf([
