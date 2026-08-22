@@ -80,3 +80,7 @@ pengembangan 2026 yang sudah diterapkan :
 - menambah menu untuk mengelola dokumen dasar hukum seperti PP, UU, Instruksi Menteri, dll
 - menambah fitur import excel untuk paket pengadaan yang dilakukan diluar unit pengadaan misal obat-obatan supaya bisa terintegrasi dengan aplikasi dan data di agregate 
 - 
+
+ref minikompetisi per vendor urut terlengkap termurah rangk 1 - n
+
+revisi penilaian penyedia kolom filter dan rata-rata

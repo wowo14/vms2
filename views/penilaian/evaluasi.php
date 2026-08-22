@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
+use kartik\select2\Select2;
 use app\models\Penyedia;
 use yii2ajaxcrud\ajaxcrud\CrudAsset;
 use app\assets\AppAsset;
@@ -12,22 +13,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 CrudAsset::register($this);
 AppAsset::register($this);
-
-$months = [
-    'all' => 'Semua Bulan',
-    '01' => 'Januari',
-    '02' => 'Februari',
-    '03' => 'Maret',
-    '04' => 'April',
-    '05' => 'Mei',
-    '06' => 'Juni',
-    '07' => 'Juli',
-    '08' => 'Agustus',
-    '09' => 'September',
-    '10' => 'Oktober',
-    '11' => 'November',
-    '12' => 'Desember'
-];
+$month = (new Penyedia())->months;
+$months = array_merge(['0' => 'Semua Bulan'], $month);
 
 $years = ['all' => 'Semua Tahun', '2024' => '2024', '2025' => '2025', '2026' => '2026'];
 if (!$tahun)
@@ -58,8 +45,14 @@ $sortOptions = [
                     <div class="col-md-2">
                         <div class="form-group mb-0">
                             <label>Tahun</label>
-                            <?= Html::dropDownList('tahun', $tahun, $years, [
-                                'class' => 'form-control select2 w-100'
+                            <?= Select2::widget([
+                                'name' => 'tahun',
+                                'value' => $tahun,
+                                'data' => $years,
+                                'options' => ['placeholder' => 'Pilih Tahun...'],
+                                'pluginOptions' => [
+                                    'allowClear' => true
+                                ],
                             ]) ?>
                         </div>
                     </div>
@@ -67,8 +60,14 @@ $sortOptions = [
                     <div class="col-md-2">
                         <div class="form-group mb-0">
                             <label>Bulan</label>
-                            <?= Html::dropDownList('bulan', $bulan, $months, [
-                                'class' => 'form-control select2 w-100'
+                            <?= Select2::widget([
+                                'name' => 'bulan',
+                                'value' => $bulan,
+                                'data' => $months,
+                                'options' => ['placeholder' => 'Pilih Bulan...'],
+                                'pluginOptions' => [
+                                    'allowClear' => true
+                                ],
                             ]) ?>
                         </div>
                     </div>
@@ -76,8 +75,14 @@ $sortOptions = [
                     <div class="col-md-3">
                         <div class="form-group mb-0">
                             <label>Penyedia</label>
-                            <?= Html::dropDownList('vendor_id', $vendor_id, $vendors, [
-                                'class' => 'form-control select2 w-100'
+                            <?= Select2::widget([
+                                'name' => 'vendor_id',
+                                'value' => $vendor_id,
+                                'data' => $vendors,
+                                'options' => ['placeholder' => 'Pilih Penyedia...'],
+                                'pluginOptions' => [
+                                    'allowClear' => true
+                                ],
                             ]) ?>
                         </div>
                     </div>
@@ -85,8 +90,14 @@ $sortOptions = [
                     <div class="col-md-3">
                         <div class="form-group mb-0">
                             <label>Urutan</label>
-                            <?= Html::dropDownList('sort', $sort, $sortOptions, [
-                                'class' => 'form-control select2 w-100'
+                            <?= Select2::widget([
+                                'name' => 'sort',
+                                'value' => $sort,
+                                'data' => $sortOptions,
+                                'options' => ['placeholder' => 'Pilih Urutan...'],
+                                'pluginOptions' => [
+                                    'allowClear' => true
+                                ],
                             ]) ?>
                         </div>
                     </div>

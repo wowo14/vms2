@@ -25,7 +25,10 @@ use yii\helpers\Html;
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($data as $i => $item):
+                <?php
+                $total_nilai_kontrak = 0;
+                $total_score_raw = 0;
+                foreach ($data as $i => $item):
                     $details = json_decode($item->details, true);
                     $score_raw = 0;
                     if (is_string($details['nilaiakhir']) && strpos($details['nilaiakhir'], '=') !== false) {
@@ -34,6 +37,8 @@ use yii\helpers\Html;
                     } else {
                         $score_raw = (float) $details['nilaiakhir'];
                     }
+                    $total_nilai_kontrak += $item->nilai_kontrak;
+                    $total_score_raw += $score_raw;
                     ?>
                     <tr>
                         <td class="text-center"><?= $i + 1 ?></td>
@@ -76,6 +81,20 @@ use yii\helpers\Html;
                         </td>
                     </tr>
                 <?php endforeach; ?>
+                <?php
+                $count = count($data);
+                $avg_score = $count > 0 ? $total_score_raw / $count : 0;
+                ?>
+                <tr class="bg-light font-weight-bold">
+                    <td colspan="4" class="text-right text-dark">Total / Rata-rata:</td>
+                    <td class="text-right text-primary">Rp. <?= number_format($total_nilai_kontrak, 0, ',', '.') ?></td>
+                    <td class="text-center">
+                        <span class="badge badge-<?= $avg_score >= 4 ? 'success' : ($avg_score >= 3 ? 'warning' : 'danger') ?>">
+                            <?= number_format($avg_score, 2) ?>
+                        </span>
+                    </td>
+                    <td></td>
+                </tr>
             </tbody>
         </table>
     </div>
