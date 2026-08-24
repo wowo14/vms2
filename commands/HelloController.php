@@ -424,13 +424,20 @@ class HelloController extends Controller {
     }
     */
     public function actionUpdateppbmhp(){
-        $q="UPDATE dpp d
-        JOIN paket_pengadaan p ON d.paket_id = p.id
-        JOIN unit u ON p.unit = u.id
-        SET d.jenis_dpp = 306
-        WHERE u.unit LIKE '%KEPERAWATAN%'
-        AND d.jenis_dpp = 304";
-        Yii::$app->db->createCommand($q)->execute();
+        $sql = "
+            UPDATE dpp
+            SET jenis_dpp = 306
+            WHERE jenis_dpp = 304
+            AND paket_id IN (
+                SELECT p.id
+                FROM paket_pengadaan p
+                JOIN unit u ON p.unit = u.id
+                WHERE u.unit LIKE '%KEPERAWATAN%'
+            )
+        ";
+
+        Yii::$app->db->createCommand($sql)->execute();
+       
         echo "Update successfully.\n";
         Yii::$app->cache->flush();
         Yii::$app->db->schema->refresh();
