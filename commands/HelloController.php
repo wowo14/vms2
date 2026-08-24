@@ -423,6 +423,18 @@ class HelloController extends Controller {
         Yii::$app->cache->flush();
     }
     */
+    public function actionUpdateppbmhp(){
+        $q="UPDATE dpp d
+        JOIN paket_pengadaan p ON d.paket_id = p.id
+        JOIN unit u ON p.unit = u.id
+        SET d.jenis_dpp = 306
+        WHERE u.unit LIKE '%KEPERAWATAN%'
+        AND d.jenis_dpp = 304";
+        Yii::$app->db->createCommand($q)->execute();
+        echo "Update successfully.\n";
+        Yii::$app->cache->flush();
+        Yii::$app->db->schema->refresh();
+    }
     public function actionJenisakta() {
         $jenisAkta = [
             'PENDIRIAN PT',
