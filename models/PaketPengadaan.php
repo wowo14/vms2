@@ -6,7 +6,7 @@ use yii\db\Expression;
 class PaketPengadaan extends \yii\db\ActiveRecord
 {
     use GeneralModelsTrait;
-    // public $oldrecord;
+    public $historyreject;
     // public $statusPengadaan;
     public static function tableName()
     {

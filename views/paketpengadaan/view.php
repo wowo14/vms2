@@ -68,7 +68,23 @@ use yii\widgets\DetailView;
                                         }
                                         return rtrim($html, ', ');
                                     },
-                    ]
+                    ],
+                    ['attribute'=>'historyreject','format'=>'raw','value'
+                    =>function($model){
+                    if ($model->historirejects) {
+                        return Html::a('History Reject', [
+                            '/historireject/showbypaket',
+                            'id' => $model->id
+                        ], [
+                            'role' => 'modal-remote',
+                            'data-target' => '#' . $model->hash,
+                            'data-pjax' => 1,
+                            'data-toggle' => 'tooltip',
+                            'class' => 'btn btn-danger'
+                        ]);
+                    }
+            
+                    }]
                 ],
             ]) ?>
             <?php
