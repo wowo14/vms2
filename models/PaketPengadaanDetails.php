@@ -207,10 +207,14 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
 
         $results = Yii::$app->db->createCommand($sql, $paramsSql)->queryAll();
 
-        // Ambil paket_ids dan paket_names untuk setiap kombinasi produk-tahun
+        // Ambil paket data untuk setiap kombinasi produk-tahun
         foreach ($results as &$row) {
             $paketSql = "
-                SELECT GROUP_CONCAT(pp.id) AS paket_ids, GROUP_CONCAT(pp.nama_paket) AS paket_names
+                SELECT 
+                    pp.id AS paket_id,
+                    pp.nama_paket AS paket_name,
+                    pd.nama_produk AS nama_produk,
+                    pd.negosiasi AS harga_negosiasi
                 FROM paket_pengadaan_details pd
                 INNER JOIN paket_pengadaan pp ON pp.id = pd.paket_id
                 WHERE pp.kategori_pengadaan = :kategori
@@ -233,21 +237,22 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
                 $paketParams[':nama_filter'] = '%' . $cleanName . '%';
             }
 
-            $paketResult = Yii::$app->db->createCommand($paketSql, $paketParams)->queryOne();
+            $paketResults = Yii::$app->db->createCommand($paketSql, $paketParams)->queryAll();
             
-            // Encode paket_ids using hashids
-            $rawPaketIds = $paketResult['paket_ids'] ?? '';
-            if (!empty($rawPaketIds)) {
-                $paketIdArray = explode(',', $rawPaketIds);
-                $encodedIds = array_map(function($id) {
-                    return Yii::$app->hashids->encode($id);
-                }, $paketIdArray);
-                $row['paket_ids'] = implode(',', $encodedIds);
-            } else {
-                $row['paket_ids'] = '';
+            // Encode paket_ids and structure the data
+            $paketData = [];
+            foreach ($paketResults as $paket) {
+                $paketData[] = [
+                    'id' => Yii::$app->hashids->encode($paket['paket_id']),
+                    'nama_paket' => $paket['paket_name'],
+                    'nama_produk' => $paket['nama_produk'],
+                    'harga_negosiasi' => $paket['harga_negosiasi'],
+                ];
             }
             
-            $row['paket_names'] = $paketResult['paket_names'] ?? '';
+            $row['paket_data'] = $paketData;
+            $row['paket_ids'] = implode(',', array_column($paketData, 'id'));
+            $row['paket_names'] = implode(',', array_column($paketData, 'nama_paket'));
         }
 
         return $results;

@@ -117,10 +117,10 @@ sort($allYears);
                                                     <td class="text-center">
                                                         <?php 
                                                         $jumlahTrx = $data['jumlah_trx'];
+                                                        $paketData = $data['paket_data'] ?? [];
                                                         $paketIds = $data['paket_ids'] ?? '';
                                                         $paketNames = $data['paket_names'] ?? '';
                                                         $paketIdArray = !empty($paketIds) ? explode(',', $paketIds) : [];
-                                                        $paketNameArray = !empty($paketNames) ? explode(',', $paketNames) : [];
                                                         
                                                         if ($jumlahTrx == 1 && !empty($paketIdArray)): ?>
                                                             <a href="<?= \yii\helpers\Url::to(['paketpengadaan/view', 'id' => $paketIdArray[0]]) ?>" 
@@ -129,15 +129,13 @@ sort($allYears);
                                                                title="Lihat detail paket">
                                                                 <?= $jumlahTrx ?>
                                                             </a>
-                                                        <?php elseif ($jumlahTrx > 1 && !empty($paketIdArray)): ?>
+                                                        <?php elseif ($jumlahTrx > 1 && !empty($paketData)): ?>
                                                             <?= Html::button(
                                                                 $jumlahTrx,
                                                                 [
                                                                     'class' => 'btn btn-sm btn-primary btn-view-paket',
-                                                                    'data-paket-ids' => json_encode($paketIdArray),
-                                                                    'data-paket-names' => json_encode($paketNameArray),
+                                                                    'data-paket-data' => json_encode($paketData),
                                                                     'data-target' => '#' . $idmodal,
-                                                                    'data-role' => 'modal-remote',
                                                                     'title' => 'Lihat daftar paket',
                                                                 ]
                                                             ) ?>
@@ -219,23 +217,29 @@ $(document).ready(function() {
         
         var btn = $(this);
         var idmodal = btn.data('target');
-        var paketIds = btn.data('paket-ids');
-        var paketNames = btn.data('paket-names');
+        var paketData = btn.data('paket-data');
         
-        var paketListHtml = '<div class="list-group">';
+        var paketListHtml = '<table class="table table-striped table-hover">';
+        paketListHtml += '<thead><tr>';
+        paketListHtml += '<th>Nama Produk</th>';
+        paketListHtml += '<th>Harga Negosiasi</th>';
+        paketListHtml += '<th>ID Paket</th>';
+        paketListHtml += '</tr></thead><tbody>';
+        
         var baseUrl = '$baseUrl';
         
-        for (var i = 0; i < paketIds.length; i++) {
-            var url = baseUrl + '?id=' + paketIds[i];
-            paketListHtml += '<a href="' + url + '" class="list-group-item list-group-item-action" target="_blank">';
-            paketListHtml += '<div class="d-flex w-100 justify-content-between">';
-            paketListHtml += '<h6 class="mb-1">' + paketNames[i] + '</h6>';
-            paketListHtml += '<small>ID: ' + paketIds[i] + '</small>';
-            paketListHtml += '</div>';
-            paketListHtml += '</a>';
+        for (var i = 0; i < paketData.length; i++) {
+            var url = baseUrl + '?id=' + paketData[i].id;
+            var hargaNegosiasi = paketData[i].harga_negosiasi ? new Intl.NumberFormat('id-ID').format(paketData[i].harga_negosiasi) : '-';
+            
+            paketListHtml += '<tr>';
+            paketListHtml += '<td>' + paketData[i].nama_produk + '</td>';
+            paketListHtml += '<td>' + hargaNegosiasi + '</td>';
+            paketListHtml += '<td><a href="' + url + '" target="_blank" class="btn btn-sm btn-info">' + paketData[i].id + '</a></td>';
+            paketListHtml += '</tr>';
         }
         
-        paketListHtml += '</div>';
+        paketListHtml += '</tbody></table>';
         
         $(idmodal).find('#paketListContent').html(paketListHtml);
         $(idmodal).modal('show');

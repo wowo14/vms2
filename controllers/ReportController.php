@@ -735,12 +735,11 @@ class ReportController extends Controller {
                             'hps' => $row['avg_hps_satuan'],
                             'penawaran' => $row['avg_penawaran'],
                             'nego' => $row['avg_negosiasi'],
-                            'satuan' => $row['satuan'],
-                            'jumlah_trx' => $row['jumlah_transaksi'],
                             'persentase_fluktuasi' => $row['persentase_fluktuasi'],
-                            'harga_tahun_lalu' => $row['harga_tahun_lalu'],
-                            'paket_ids' => $row['paket_ids'],
-                            'paket_names' => $row['paket_names'],
+                            'jumlah_trx' => $row['jumlah_transaksi'],
+                            'paket_ids' => $row['paket_ids'] ?? '',
+                            'paket_names' => $row['paket_names'] ?? '',
+                            'paket_data' => $row['paket_data'] ?? [],
                         ];
                     }
                     return [
