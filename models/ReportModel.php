@@ -15,10 +15,12 @@ class ReportModel extends DynamicModel
     public $admin;
     public $bidang;
     public $ppkom;
+    public $kategori_pengadaan;
+    public $nama_produk;
     public function rules()
     {
         return [
-            [['tahun','bulan', 'bulan_awal', 'bulan_akhir', 'metode', 'kategori','pejabat','admin','bidang','ppkom'], 'safe'],
+            [['tahun','bulan', 'bulan_awal', 'bulan_akhir', 'metode', 'kategori','pejabat','admin','bidang','ppkom','kategori_pengadaan','nama_produk'], 'safe'],
         ];
     }
      public function attributeLabels() {

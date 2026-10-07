@@ -4,6 +4,7 @@ use kartik\mpdf\Pdf;
 use yii\base\DynamicModel;
 use app\models\ReportModel;
 use app\models\PaketPengadaan;
+use app\models\PaketPengadaanDetails;
 class ReportController extends Controller {
     public function actionMetode() {
         $model = new ReportModel();
@@ -700,6 +701,82 @@ class ReportController extends Controller {
                 'dataProvider' => $dataProvider,
                 'title' => $title,
                 'rows' => $rows
+            ]);
+        }
+    }
+
+    public function actionPerbandinganHargaYoy()
+    {
+        $model = new ReportModel();
+        $request = \Yii::$app->request;
+
+        if ($request->isGet) {
+            return $this->render('_frm_perbandingan_harga_yoy', [
+                'model' => $model,
+                'kategoriList' => PaketPengadaanDetails::getKategoriList(),
+                'tahunList' => PaketPengadaanDetails::getTahunList(),
+            ]);
+        } else if ($model->load($request->post())) {
+            $params = [
+                'kategori_pengadaan' => $model->kategori_pengadaan ?? null,
+                'nama_produk' => $model->nama_produk ?? null,
+                'tahun' => $model->tahun ?? null,
+            ];
+
+            $rawData = PaketPengadaanDetails::getReportPerbandinganHarga($params);
+
+            // Grouping berdasarkan Kategori dan Nama Produk agar tersaji rapi per grup
+            $groupedReport = collect($rawData)->groupBy(['kategori_pengadaan', 'nama_produk'])->map(function ($products) {
+                return collect($products)->map(function ($years, $productName) {
+                    // Ubah array tahun menjadi format key-value [ '2024' => harga, '2025' => harga ]
+                    $arrTahun = [];
+                    foreach ($years as $row) {
+                        $arrTahun[$row['tahun']] = [
+                            'hps' => $row['avg_hps_satuan'],
+                            'penawaran' => $row['avg_penawaran'],
+                            'nego' => $row['avg_negosiasi'],
+                            'satuan' => $row['satuan'],
+                            'jumlah_trx' => $row['jumlah_transaksi'],
+                            'persentase_fluktuasi' => $row['persentase_fluktuasi'],
+                            'harga_tahun_lalu' => $row['harga_tahun_lalu'],
+                            'paket_ids' => $row['paket_ids'],
+                            'paket_names' => $row['paket_names'],
+                        ];
+                    }
+                    return [
+                        'nama_produk' => $productName,
+                        'satuan' => $years[0]['satuan'],
+                        'riwayat_tahun' => $arrTahun
+                    ];
+                })->values();
+            });
+
+            // Handle PDF export
+            if ($request->post('type') === 'pdf') {
+                $pdf = new Pdf([
+                    'mode' => Pdf::MODE_UTF8,
+                    'format' => Pdf::FORMAT_A4,
+                    'orientation' => Pdf::ORIENT_LANDSCAPE,
+                    'destination' => Pdf::DEST_BROWSER,
+                    'content' => $this->renderPartial('_pdf_perbandingan_harga_yoy', [
+                        'reportData' => $groupedReport,
+                        'params' => $params
+                    ]),
+                    'options' => [
+                        'title' => 'Perbandingan Harga YoY',
+                        'subject' => 'Perbandingan Harga Year-over-Year',
+                    ],
+                    'methods' => [
+                        'SetHeader' => ['Perbandingan Harga Year-over-Year'],
+                        'SetFooter' => ['{PAGENO}'],
+                    ]
+                ]);
+                return $pdf->render();
+            }
+
+            return $this->render('_perbandingan_harga_yoy', [
+                'reportData' => $groupedReport,
+                'params' => $params
             ]);
         }
     }
