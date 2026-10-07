@@ -9,7 +9,7 @@ use yii\web\UnauthorizedHttpException;
 
 class AuthController extends ApiController
 {
-    public function behaviors()
+    public function behaviors(): array
     {
         $behaviors = parent::behaviors();
         // Auth tidak butuh authentication untuk login, refresh, dan me
