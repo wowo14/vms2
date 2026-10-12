@@ -1,5 +1,6 @@
 <?php
 namespace app\controllers;
+use Yii;
 use kartik\mpdf\Pdf;
 use yii\base\DynamicModel;
 use app\models\ReportModel;
@@ -709,18 +710,22 @@ class ReportController extends Controller {
     {
         $model = new ReportModel();
         $request = \Yii::$app->request;
+        $title = "Detail Perbandingan Harga Year Over Year";
 
         if ($request->isGet) {
             return $this->render('_frm_perbandingan_harga_yoy', [
                 'model' => $model,
                 'kategoriList' => PaketPengadaanDetails::getKategoriList(),
                 'tahunList' => PaketPengadaanDetails::getTahunList(),
+                'title' => $title,
             ]);
         } else if ($model->load($request->post())) {
             $params = [
                 'kategori_pengadaan' => $model->kategori_pengadaan ?? null,
                 'nama_produk' => $model->nama_produk ?? null,
                 'tahun' => $model->tahun ?? null,
+                'bidang' => $model->bidang ?? null,
+                'paket_id' => $model->paket_id ?? null,
             ];
 
             $rawData = PaketPengadaanDetails::getReportPerbandinganHarga($params);
@@ -775,7 +780,98 @@ class ReportController extends Controller {
 
             return $this->render('_perbandingan_harga_yoy', [
                 'reportData' => $groupedReport,
+                'title' => $title,
                 'params' => $params
+            ]);
+        }
+    }
+
+    public function actionRekapHarga()
+    {
+        $model = new ReportModel();
+        $request = \Yii::$app->request;
+        $title = "Rekap Perbandingan Harga Year Over Year";
+
+        if ($request->isGet) {
+            return $this->render('_frm_perbandingan_harga_yoy', [
+                'model' => $model,
+                'kategoriList' => PaketPengadaanDetails::getKategoriList(),
+                'tahunList' => PaketPengadaanDetails::getTahunList(),
+                'action' => 'rekap-harga',
+                'title' => $title,
+            ]);
+        } else {
+            // Handle POST - either from form submission or PDF export
+            // Try to load model first (for form submission)
+            if ($model->load($request->post())) {
+                $params = [
+                    'kategori_pengadaan' => $model->kategori_pengadaan ?? null,
+                    'nama_produk' => $model->nama_produk ?? null,
+                    'tahun' => $model->tahun ?? null,
+                    'bidang' => $model->bidang ?? null,
+                    'paket_id' => $model->paket_id ?? null,
+                ];
+            } else {
+                // Fallback to direct POST (for PDF export form)
+                $params = [
+                    'kategori_pengadaan' => $request->post('kategori_pengadaan') ?? null,
+                    'nama_produk' => $request->post('nama_produk') ?? null,
+                    'tahun' => $request->post('tahun') ?? null,
+                    'bidang' => $request->post('bidang') ?? null,
+                    'paket_id' => $request->post('paket_id') ?? null,
+                ];
+            }
+
+            $rawData = PaketPengadaanDetails::getReportRekapHarga($params);
+
+            // Grouping berdasarkan Kategori dan Nama Produk
+            $groupedReport = collect($rawData)->groupBy(['kategori_pengadaan', 'nama_produk'])->map(function ($products) {
+                return collect($products)->map(function ($years, $productName) {
+                    // Ubah array tahun menjadi format key-value
+                    $arrTahun = [];
+                    foreach ($years as $row) {
+                        $arrTahun[$row['tahun']] = [
+                            'harga_negosiasi' => $row['harga_negosiasi_terakhir'],
+                            'persentase_fluktuasi' => $row['persentase_fluktuasi'],
+                        ];
+                    }
+                    return [
+                        'nama_produk' => $productName,
+                        'satuan' => $years[0]['satuan'],
+                        'riwayat_tahun' => $arrTahun
+                    ];
+                })->values();
+            });
+
+            $reportData = $groupedReport->toArray();
+
+            // Handle PDF export
+            if ($request->post('type') === 'pdf') {
+                $pdf = new Pdf([
+                    'mode' => Pdf::MODE_UTF8,
+                    'format' => Pdf::FORMAT_A4,
+                    'orientation' => Pdf::ORIENT_LANDSCAPE,
+                    'destination' => Pdf::DEST_BROWSER,
+                    'content' => $this->renderPartial('_pdf_rekap_harga', [
+                        'reportData' => $reportData,
+                        'params' => $params,
+                    ]),
+                    'options' => [
+                        'title' => 'Rekap Perbandingan Harga',
+                        'subject' => 'Rekap Perbandingan Harga',
+                    ],
+                    'methods' => [
+                        'SetHeader' => ['Rekap Perbandingan Harga||Generated On: ' . date('d/m/Y H:i')],
+                        'SetFooter' => ['|Page {PAGENO}|'],
+                    ],
+                ]);
+                return $pdf->render();
+            }
+
+            return $this->render('_rekap_harga', [
+                'reportData' => $reportData,
+                'params' => $params,
+                'title' => $title
             ]);
         }
     }

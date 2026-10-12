@@ -149,6 +149,8 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
         $tahunDipilih = $params['tahun'] ?? null;
         $kategori     = $params['kategori_pengadaan'] ?? null;
         $namaProduk   = $params['nama_produk'] ?? null;
+        $bidang       = $params['bidang'] ?? null;
+        $paketId      = $params['paket_id'] ?? null;
 
         // Subquery untuk mendapatkan agregasi data
         $sql = "
@@ -179,6 +181,8 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
                 FROM paket_pengadaan_details pd
                 INNER JOIN paket_pengadaan pp ON pp.id = pd.paket_id
                 WHERE pp.id IS NOT NULL
+                    AND pp.pemenang IS NOT NULL
+                    AND pp.pemenang != ''
         ";
 
         $paramsSql = [];
@@ -186,6 +190,16 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
         if (!empty($kategori)) {
             $sql .= " AND pp.kategori_pengadaan = :kategori";
             $paramsSql[':kategori'] = $kategori;
+        }
+
+        if (!empty($bidang)) {
+            $sql .= " AND pp.unit = :bidang";
+            $paramsSql[':bidang'] = $bidang;
+        }
+
+        if (!empty($paketId)) {
+            $sql .= " AND pp.nama_paket LIKE :paket_id";
+            $paramsSql[':paket_id'] = '%' . $paketId . '%';
         }
 
         if (!empty($namaProduk)) {
@@ -221,6 +235,8 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
                     AND pd.nama_produk = :nama_produk
                     AND pd.satuan = :satuan
                     AND strftime('%Y', pp.tanggal_paket) = :tahun
+                    AND pp.pemenang IS NOT NULL
+                    AND pp.pemenang != ''
             ";
 
             $paketParams = [
@@ -229,6 +245,17 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
                 ':satuan' => $row['satuan'],
                 ':tahun' => $row['tahun'],
             ];
+
+            // Apply same filters for bidang and paket_id if exists
+            if (!empty($bidang)) {
+                $paketSql .= " AND pp.unit = :bidang";
+                $paketParams[':bidang'] = $bidang;
+            }
+
+            if (!empty($paketId)) {
+                $paketSql .= " AND pp.nama_paket LIKE :paket_id";
+                $paketParams[':paket_id'] = '%' . $paketId . '%';
+            }
 
             // Apply same filters for product name if exists
             if (!empty($namaProduk)) {
@@ -256,6 +283,79 @@ class PaketPengadaanDetails extends \yii\db\ActiveRecord
         }
 
         return $results;
+    }
+
+    public static function getReportRekapHarga($params = [])
+    {
+        $tahunDipilih = $params['tahun'] ?? null;
+        $kategori     = $params['kategori_pengadaan'] ?? null;
+        $namaProduk   = $params['nama_produk'] ?? null;
+        $bidang       = $params['bidang'] ?? null;
+        $paketId      = $params['paket_id'] ?? null;
+
+        // Subquery untuk mendapatkan harga negosiasi terakhir per tahun
+        $sql = "
+            SELECT 
+                kategori_pengadaan,
+                nama_produk,
+                satuan,
+                tahun,
+                harga_negosiasi_terakhir,
+                LAG(harga_negosiasi_terakhir) OVER (PARTITION BY nama_produk, satuan ORDER BY tahun) AS harga_tahun_lalu,
+                CASE 
+                    WHEN LAG(harga_negosiasi_terakhir) OVER (PARTITION BY nama_produk, satuan ORDER BY tahun) IS NULL OR LAG(harga_negosiasi_terakhir) OVER (PARTITION BY nama_produk, satuan ORDER BY tahun) = 0 THEN NULL
+                    ELSE ROUND(((harga_negosiasi_terakhir - LAG(harga_negosiasi_terakhir) OVER (PARTITION BY nama_produk, satuan ORDER BY tahun)) / LAG(harga_negosiasi_terakhir) OVER (PARTITION BY nama_produk, satuan ORDER BY tahun)) * 100, 2)
+                END AS persentase_fluktuasi
+            FROM (
+                SELECT 
+                    pp.kategori_pengadaan,
+                    pd.nama_produk,
+                    pd.satuan,
+                    strftime('%Y', pp.tanggal_paket) AS tahun,
+                    pd.negosiasi AS harga_negosiasi_terakhir,
+                    ROW_NUMBER() OVER (PARTITION BY pp.kategori_pengadaan, pd.nama_produk, pd.satuan, strftime('%Y', pp.tanggal_paket) ORDER BY pp.tanggal_paket DESC) AS rn
+                FROM paket_pengadaan_details pd
+                INNER JOIN paket_pengadaan pp ON pp.id = pd.paket_id
+                WHERE pp.id IS NOT NULL
+                    AND pp.pemenang IS NOT NULL
+                    AND pp.pemenang != ''
+        ";
+
+        $paramsSql = [];
+
+        if (!empty($kategori)) {
+            $sql .= " AND pp.kategori_pengadaan = :kategori";
+            $paramsSql[':kategori'] = $kategori;
+        }
+
+        if (!empty($bidang)) {
+            $sql .= " AND pp.unit = :bidang";
+            $paramsSql[':bidang'] = $bidang;
+        }
+
+        if (!empty($paketId)) {
+            $sql .= " AND pp.nama_paket LIKE :paket_id";
+            $paramsSql[':paket_id'] = '%' . $paketId . '%';
+        }
+
+        if (!empty($namaProduk)) {
+            $cleanName = preg_replace('/\s+/', ' ', trim($namaProduk));
+            $sql .= " AND pd.nama_produk LIKE :nama";
+            $paramsSql[':nama'] = '%' . $cleanName . '%';
+        }
+
+        if (!empty($tahunDipilih)) {
+            $sql .= " AND strftime('%Y', pp.tanggal_paket) = :tahun";
+            $paramsSql[':tahun'] = $tahunDipilih;
+        }
+
+        $sql .= "
+            ) ranked
+            WHERE rn = 1
+            ORDER BY kategori_pengadaan ASC, nama_produk ASC, tahun ASC
+        ";
+
+        return Yii::$app->db->createCommand($sql, $paramsSql)->queryAll();
     }
 
     public static function getKategoriList()

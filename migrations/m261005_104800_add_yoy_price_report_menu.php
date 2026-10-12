@@ -10,7 +10,7 @@ class m261005_104800_add_yoy_price_report_menu extends Migration
     public function safeUp()
     {
         // Find the Report menu parent ID
-        $reportMenu = $this->db->createCommand("SELECT id FROM menu WHERE route LIKE '%laporan%' AND parent IS NULL LIMIT 1")->queryOne();
+        $reportMenu = $this->db->createCommand("SELECT id FROM menu WHERE name LIKE '%laporan%' AND parent IS NULL LIMIT 1")->queryOne();
         
         $parentId = $reportMenu ? $reportMenu['id'] : null;
         

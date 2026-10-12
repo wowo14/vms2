@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\bootstrap4\Modal;
 
-$this->title = 'Laporan Perbandingan Harga Year-over-Year';
+$this->title = $title??'Laporan Perbandingan Harga Year-over-Year';
 $this->params['breadcrumbs'][] = ['label' => 'Report', 'url' => ['report/index']];
 $this->params['breadcrumbs'][] = $this->title;
 

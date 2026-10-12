@@ -621,4 +621,19 @@ class PaketPengadaan extends \yii\db\ActiveRecord
         });
         return $data->values(); // reset index
     }
+    public static function getPaketList(){
+        $query = (new \yii\db\Query())
+            ->select(['id', 'nama_paket'])
+            ->from(PaketPengadaan::tableName())
+            ->where(['not', ['nama_paket' => null]])
+            ->andWhere(['<>', 'nama_paket', ''])
+            ->orderBy(['nama_paket' => SORT_ASC])
+            ->all();
+        
+        $result = [];
+        foreach ($query as $item) {
+            $result[$item['id']] = $item['nama_paket'];
+        }
+        return $result;
+    }
 }

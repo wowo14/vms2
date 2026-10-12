@@ -17,10 +17,11 @@ class ReportModel extends DynamicModel
     public $ppkom;
     public $kategori_pengadaan;
     public $nama_produk;
+    public $paket_id;
     public function rules()
     {
         return [
-            [['tahun','bulan', 'bulan_awal', 'bulan_akhir', 'metode', 'kategori','pejabat','admin','bidang','ppkom','kategori_pengadaan','nama_produk'], 'safe'],
+            [['tahun','bulan', 'bulan_awal', 'bulan_akhir', 'metode', 'kategori','pejabat','admin','bidang','ppkom','kategori_pengadaan','nama_produk','paket_id'], 'safe'],
         ];
     }
      public function attributeLabels() {
@@ -30,6 +31,7 @@ class ReportModel extends DynamicModel
             'ppkom'=>'Pejabat Pembuat Komitmen',
             'bulan_awal' => 'Periode Awal',
             'bulan_akhir' => 'Periode Akhir',
+            'paket_id' => 'Nama Paket',
         ];
     }
 }
