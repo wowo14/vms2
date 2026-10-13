@@ -505,9 +505,14 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
                     <h3 class="card-title mb-0"><i class="fas fa-table mr-1"></i> Matriks Konsolidasi Penawaran</h3>
                     <span class="badge badge-light ml-2" style="font-size:11px;">Kolom diurutkan dari terbaik (kiri) ke
                         terburuk (kanan) secara live</span>
-                    <button id="btn-export-excel" class="btn btn-success btn-sm ml-auto" disabled>
-                        <i class="fas fa-file-excel mr-1"></i> Export Excel
-                    </button>
+                    <div class="ml-auto">
+                        <button id="btn-view-rangking" class="btn btn-danger btn-sm ml-auto" disabled>
+                            <a href="<?=URL::to('/minikompetisi/rangkingterpilih?id='.$model->id)?>" class="text-white"><i class="fas fa-user mr-1"></i> Ranking Terpilih</a>
+                        </button>
+                        <button id="btn-export-excel" class="btn btn-success btn-sm ml-auto" disabled>
+                            <i class="fas fa-file-excel mr-1"></i> Export Excel
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body p-2">
                     <!-- FILTER PER ITEM, RANKING, & VENDOR -->

@@ -84,3 +84,12 @@ pengembangan 2026 yang sudah diterapkan :
 ref minikompetisi per vendor urut terlengkap termurah rangk 1 - n
 
 revisi penilaian penyedia kolom filter dan rata-rata
+
+====
+laporan pengadaan:
+ada kolom filter perusahaan,
+ada kolom nama produk,
+ada kolom harga,
+ada kolom tanggal
+
+=== mini kompetisi baru format 
