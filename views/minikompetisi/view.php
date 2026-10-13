@@ -764,18 +764,19 @@ $(function () {
         var selectedItems = $('#item-filter-select').val() || [];
         var selectedRanks = $('#rank-filter-select').val() || [];
 
-        // Pre-calculate item ranks for all items so we can filter by it
+        // Pre-calculate item ranks for all items using ALL vendors (not filtered)
+        // This is important for correct ranking calculation
         var itemRanks = {};
         _raw.items.forEach(function(item) {
             var prices = [];
-            vendors.forEach(function(v) {
+            _raw.penawarans.forEach(function(v) { // Use ALL vendors from _raw
                 var pi = v.items.find(function(i) { return i.item_id === item.id; });
                 if (pi && pi.harga_penawaran > 0) prices.push(pi.harga_penawaran);
             });
             prices.sort(function(a, b) { return a - b; });
             
             itemRanks[item.id] = {};
-            vendors.forEach(function(v) {
+            _raw.penawarans.forEach(function(v) { // Use ALL vendors from _raw
                 var pi = v.items.find(function(i) { return i.item_id === item.id; });
                 if (pi && pi.harga_penawaran > 0) {
                     itemRanks[item.id][v.id] = prices.indexOf(pi.harga_penawaran) + 1;
@@ -905,10 +906,36 @@ $(function () {
 
         var selectedItems = $('#item-filter-select').val() || [];
         var selectedRanks = $('#rank-filter-select').val() || [];
+        var selectedVendors = $('#vendor-filter-select').val() || [];
 
         items.forEach(function (item) {
             if (selectedItems.length > 0 && selectedItems.indexOf(item.id.toString()) === -1) {
-                return; // skip if filtered
+                return; // skip if filtered by item
+            }
+
+            // If both vendor and rank filters are selected, check if this item has the selected rank in the selected vendor
+            if (selectedVendors.length > 0 && selectedRanks.length > 0) {
+                var hasMatchingRank = false;
+                _raw.penawarans.forEach(function (v) {
+                    if (selectedVendors.indexOf(v.vendor_id.toString()) !== -1) {
+                        var pi = v.items.find(function (i) { return i.item_id === item.id; });
+                        var price = (pi && pi.harga_penawaran > 0) ? pi.harga_penawaran : null;
+                        var validPrices = _raw.penawarans.map(function (v2) {
+                            var pi2 = v2.items.find(function (i) { return i.item_id === item.id; });
+                            return pi2 ? pi2.harga_penawaran : null;
+                        }).filter(function (p) { return p !== null && p > 0; });
+                        var sortedPrices = validPrices.slice().sort(function (a, b) { return a - b; });
+                        var itemRank = price !== null && price > 0 ? (sortedPrices.indexOf(price) + 1) : null;
+                        
+                        if (itemRank !== null && selectedRanks.indexOf(itemRank.toString()) !== -1) {
+                            hasMatchingRank = true;
+                        }
+                    }
+                });
+                
+                if (!hasMatchingRank) {
+                    return; // skip item if it doesn't have the selected rank in the selected vendor
+                }
             }
 
             // Collect prices from all vendors for this item, to determine best/worst
@@ -1115,11 +1142,37 @@ $(function () {
 
         var selectedItems = $('#item-filter-select').val() || [];
         var selectedRanks = $('#rank-filter-select').val() || [];
+        var selectedVendors = $('#vendor-filter-select').val() || [];
 
         // Item rows
         items.forEach(function(item) {
             if (selectedItems.length > 0 && selectedItems.indexOf(item.id.toString()) === -1) {
                 return; // skip if filtered
+            }
+
+            // If both vendor and rank filters are selected, check if this item has the selected rank in the selected vendor
+            if (selectedVendors.length > 0 && selectedRanks.length > 0) {
+                var hasMatchingRank = false;
+                vendors.forEach(function (v) {
+                    if (selectedVendors.indexOf(v.vendor_id.toString()) !== -1) {
+                        var pi = v.items.find(function (i) { return i.item_id === item.id; });
+                        var price = (pi && pi.harga_penawaran > 0) ? pi.harga_penawaran : null;
+                        var validPrices = vendors.map(function (v2) {
+                            var pi2 = v2.items.find(function (i) { return i.item_id === item.id; });
+                            return pi2 ? pi2.harga_penawaran : null;
+                        }).filter(function (p) { return p !== null && p > 0; });
+                        var sortedPrices = validPrices.slice().sort(function (a, b) { return a - b; });
+                        var itemRank = price !== null && price > 0 ? (sortedPrices.indexOf(price) + 1) : null;
+                        
+                        if (itemRank !== null && selectedRanks.indexOf(itemRank.toString()) !== -1) {
+                            hasMatchingRank = true;
+                        }
+                    }
+                });
+                
+                if (!hasMatchingRank) {
+                    return; // skip item if it doesn't have the selected rank in the selected vendor
+                }
             }
             
             // pre-calculate valid prices

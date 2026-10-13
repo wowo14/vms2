@@ -49,10 +49,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             <th>Metode</th>
                             <td><?= Html::encode($model->getMetodeText()) ?></td>
                         </tr>
-                        <tr>
-                            <th>Status</th>
-                            <td><?= Html::encode($model->getStatusText()) ?></td>
-                        </tr>
                     </table>
                 </div>
                 <div class="col-md-6">
@@ -87,7 +83,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <!-- <th rowspan="2" width="10%">Satuan</th> -->
                             <?php for ($i = 1; $i <= $maxRank; $i++): ?>
                                 <?php $colorClass = "rank-" . ($i > 10 ? 10 : $i); ?>
-                                <th colspan="2" class="text-center <?= $colorClass ?>">Terpilih <?= $i ?></th>
+                                <th colspan="2" class="text-center <?= $colorClass ?>">Harga Terbaik <?= $i ?></th>
                             <?php endfor; ?>
                         </tr>
                         <tr>
