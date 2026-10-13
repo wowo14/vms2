@@ -938,8 +938,8 @@ $(function () {
                 }
             }
 
-            // Collect prices from all vendors for this item, to determine best/worst
-            var prices = vendors.map(function (v) {
+            // Collect prices from ALL vendors for this item to determine correct ranking
+            var prices = _raw.penawarans.map(function (v) {
                 var pi = v.items.find(function (i) { return i.item_id === item.id; });
                 return pi ? pi.harga_penawaran : null;
             });
@@ -947,7 +947,7 @@ $(function () {
             var minPrice = validPrices.length ? Math.min.apply(null, validPrices) : null;
             var maxPrice = validPrices.length ? Math.max.apply(null, validPrices) : null;
 
-            // Rank prices per item (ascending = better)
+            // Rank prices per item using ALL vendors (ascending = better)
             var sortedPrices = validPrices.slice().sort(function (a, b) { return a - b; });
 
             tbodyHtml += '<tr>';
@@ -965,6 +965,7 @@ $(function () {
                     else if (price === maxPrice) cellClass += ' cell-worst';
                 }
 
+                // Calculate item rank using ALL vendors for correct ranking
                 var itemRank = price !== null && price > 0 ? (sortedPrices.indexOf(price) + 1) : null;
                 var itemRankBadge = itemRank ? rankBadge(itemRank) : '';
                 var isRankSelected = selectedRanks.length === 0 || (itemRank !== null && selectedRanks.indexOf(itemRank.toString()) !== -1);
@@ -1153,11 +1154,11 @@ $(function () {
             // If both vendor and rank filters are selected, check if this item has the selected rank in the selected vendor
             if (selectedVendors.length > 0 && selectedRanks.length > 0) {
                 var hasMatchingRank = false;
-                vendors.forEach(function (v) {
+                _raw.penawarans.forEach(function (v) {
                     if (selectedVendors.indexOf(v.vendor_id.toString()) !== -1) {
                         var pi = v.items.find(function (i) { return i.item_id === item.id; });
                         var price = (pi && pi.harga_penawaran > 0) ? pi.harga_penawaran : null;
-                        var validPrices = vendors.map(function (v2) {
+                        var validPrices = _raw.penawarans.map(function (v2) {
                             var pi2 = v2.items.find(function (i) { return i.item_id === item.id; });
                             return pi2 ? pi2.harga_penawaran : null;
                         }).filter(function (p) { return p !== null && p > 0; });
@@ -1175,9 +1176,9 @@ $(function () {
                 }
             }
             
-            // pre-calculate valid prices
+            // pre-calculate valid prices using ALL vendors for correct ranking
             var validPrices = [];
-            vendors.forEach(function(v) {
+            _raw.penawarans.forEach(function(v) {
                 var pi = v.items.find(function(i) { return i.item_id === item.id; });
                 if (pi && pi.harga_penawaran > 0) validPrices.push(pi.harga_penawaran);
             });
