@@ -80,4 +80,14 @@ class MinikompetisiItem extends \yii\db\ActiveRecord
     {
         return $this->hasMany(MinikompetisiPenawaranItem::class, ['item_id' => 'id']);
     }
+
+    /**
+     * Gets query for [[MinikompetisiTrialQuestions]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMinikompetisiTrialQuestions()
+    {
+        return $this->hasMany(MinikompetisiTrialQuestion::class, ['item_id' => 'id']);
+    }
 }

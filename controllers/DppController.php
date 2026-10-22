@@ -19,6 +19,7 @@ class DppController extends Controller
                 'actions' => [
                     'delete' => ['post'],
                     'bulkdelete' => ['post'],
+                    'bulk-magic-autofill' => ['post'],
                 ],
             ],
         ];
@@ -953,6 +954,163 @@ class DppController extends Controller
             return $this->redirect(['index']);
         }
     }
+
+    public function actionBulkMagicAutofill()
+    {
+        $request = Yii::$app->request;
+        $pks = explode(',', $request->post('pks'));
+        $jenisDpp = null;
+        $successCount = 0;
+        $errorCount = 0;
+
+        // Default values for auto-fill
+        $defaultPejabatId = 20;
+        $defaultAdminId = 20;
+        $today = date('Y-m-d');
+
+        foreach ($pks as $pk) {
+            $model = $this->findModel($pk);
+            $jenisDpp = $model->jenis_dpp;
+
+            try {
+                // Update atau buat penugasan
+                if ($model->penugasan) {
+                    $result = $model->penugasan->updateAttributes([
+                        'tanggal_tugas' => $model->tanggal_dpp,
+                        'pejabat' => $defaultPejabatId,
+                        'admin' => $defaultAdminId,
+                    ]);
+                } else {
+                    $penugasan = new PenugasanPemilihanpenyedia();
+                    $penugasan->dpp_id = $model->id;
+                    $penugasan->tanggal_tugas = $model->tanggal_dpp;
+                    $penugasan->pejabat = $defaultPejabatId;
+                    $penugasan->admin = $defaultAdminId;
+                    if ($penugasan->save()) {
+                        // Yii::warning("Penugasan created successfully for DPP ID {$pk}");
+                    } else {
+                        // Yii::warning("Failed to create penugasan for DPP ID {$pk}: " . json_encode($penugasan->errors));
+                    }
+                }
+
+                // Update paketpengadaan addition for checklist
+                if ($model->paketpengadaan) {
+                    // Buat struktur addition jika belum ada (sama seperti actionCeklistadmin)
+                    if (!$model->paketpengadaan->addition) {
+                        $temp = TemplateChecklistEvaluasi::where(['like', 'template', 'Ceklist_Kelengkapan_DPP'])->one();
+                        if ($temp) {
+                            $ar_element = $temp->element ? explode(',', $temp->element) : [];
+                            $details = json_decode($temp->detail->uraian, true);
+                            $hasil = [];
+                            foreach ($details as $v) {
+                                $c = ['uraian' => $v['uraian']];
+                                foreach ($ar_element as $element) {
+                                    if ($element) {
+                                        // Jika element adalah sesuai, langsung isi dengan '1'
+                                        if ($element === 'sesuai') {
+                                            $c[$element] = '1';
+                                        } else {
+                                            $c[$element] = '';
+                                        }
+                                    }
+                                }
+                                $hasil[] = $c;
+                            }
+                            $data = [
+                                'unit' => $model->bidang_bagian,
+                                'id' => $model->paketpengadaan->id,
+                                'template' => $hasil
+                            ];
+                            $newAddition = json_encode($data, JSON_UNESCAPED_SLASHES);
+                            // Gunakan updateAll langsung ke database
+                            $result = \Yii::$app->db->createCommand()
+                                ->update('paket_pengadaan', 
+                                    ['addition' => $newAddition], 
+                                    ['id' => $model->paketpengadaan->id])
+                                ->execute();
+                        }
+                    }
+                    
+                    if ($model->paketpengadaan->addition) {
+                        $additions = json_decode($model->paketpengadaan->addition, true);
+                        
+                        $hasChanges = false;
+                        
+                        // Pastikan unit dan id ada
+                        if (!isset($additions['unit']) || $additions['unit'] === '') {
+                            $additions['unit'] = $model->bidang_bagian;
+                            $hasChanges = true;
+                        }
+                        if (!isset($additions['id']) || $additions['id'] === '') {
+                            $additions['id'] = $model->paketpengadaan->id;
+                            $hasChanges = true;
+                        }
+                        
+                        if (isset($additions['template'])) {
+                            $count = 0;
+                            foreach ($additions['template'] as &$templateItem) {
+                                if (isset($templateItem['sesuai'])) {
+                                    // Centang jika kosong atau bukan '1'
+                                    if ($templateItem['sesuai'] != '1') {
+                                        $templateItem['sesuai'] = '1'; // Centang checklist
+                                        $hasChanges = true;
+                                    }
+                                    $count++;
+                                }
+                            }
+                            
+                            // Gunakan updateAll langsung ke database untuk menghindari masalah model validation
+                            if ($hasChanges) {
+                                $newAddition = json_encode($additions);
+                                $result = \Yii::$app->db->createCommand()
+                                    ->update('paket_pengadaan', 
+                                        ['addition' => $newAddition, 'updated_at' => date('Y-m-d H:i:s')], 
+                                        ['id' => $model->paketpengadaan->id])
+                                    ->execute();
+                            } else {
+                                Yii::warning("No changes needed, skipping update");
+                            }
+                        } else {
+                            Yii::warning("No template found in additions");
+                        }
+                    } else {
+                        Yii::warning("Paketpengadaan addition is null");
+                    }
+                } else {
+                    Yii::warning("No paketpengadaan found for DPP ID {$pk}");
+                }
+
+                $successCount++;
+            } catch (\Exception $e) {
+                $errorCount++;
+                Yii::error("Bulk Magic Auto Fill error for DPP ID {$pk}: " . $e->getMessage() . "\nTrace: " . $e->getTraceAsString());
+            }
+        }
+
+        if ($request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            $message = "Berhasil: {$successCount} paket";
+            if ($errorCount > 0) {
+                $message .= ", Gagal: {$errorCount} paket";
+            }
+            Yii::$app->session->setFlash('success', $message);
+            return ['forceClose' => true, 'forceReload' => '#crud-datatable-pjax'];
+        } else {
+            Yii::$app->session->setFlash('success', "Bulk Magic Auto Fill selesai. Berhasil: {$successCount} paket, Gagal: {$errorCount} paket");
+            if ($jenisDpp) {
+                $setting = Setting::findOne($jenisDpp);
+                if ($setting) {
+                    if ($setting->param === 'dpp_farmasi') {
+                        return $this->redirect(['farmasi']);
+                    } elseif ($setting->param === 'dpp_ppk') {
+                        return $this->redirect(['ppk']);
+                    }
+                }
+            }
+            return $this->redirect(['index']);
+        }
+    }
+
     protected function findModel($id)
     {
         if (($model = Dpp::findOne($id)) !== null) {

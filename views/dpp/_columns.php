@@ -5,10 +5,13 @@ use yii\helpers\{Html, Url};
 
 $idmodal = isset($idmodal)?$idmodal:'modal-remote';
 return [
-    // [
-    //     'class' => 'kartik\grid\CheckboxColumn',
-    //     'width' => '20px',
-    // ],
+    [
+        'class' => 'kartik\grid\CheckboxColumn',
+        'width' => '20px',
+        'checkboxOptions' => function ($model, $key, $index, $column) {
+            return ['value' => $model->id];
+        }
+    ],
     [
         'class' => 'kartik\grid\SerialColumn',
         'width' => '30px',

@@ -93,4 +93,14 @@ class MinikompetisiPenawaran extends \yii\db\ActiveRecord
     {
         return $this->hasMany(MinikompetisiPenawaranItem::class, ['penawaran_id' => 'id']);
     }
+
+    /**
+     * Gets query for [[MinikompetisiTrialAnswers]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMinikompetisiTrialAnswers()
+    {
+        return $this->hasMany(MinikompetisiTrialAnswer::class, ['penawaran_id' => 'id']);
+    }
 }

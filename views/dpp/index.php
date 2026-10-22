@@ -13,6 +13,65 @@ AppAsset::register($this);
 CrudAsset::register($this);
 $this->title = isset($title) ? $title : 'Dpp';
 $this->params['breadcrumbs'][] = $this->title;
+$currentController = Yii::$app->controller->id;
+$currentAction = Yii::$app->controller->action->id;
+
+$isDppBmhpEndpoint = (
+    $currentController === 'dpp' &&
+    $currentAction === 'bmhp'
+);
+
+$buttons = '';
+
+if ($isDppBmhpEndpoint) {
+    $buttons .= Html::a(
+        '<i class="fas fa-magic"></i>&nbsp; ' .
+        Yii::t('yii2-ajaxcrud', 'Bulk Magic Auto Fill'),
+        ['bulk-magic-autofill'],
+        [
+            'class' => 'btn btn-warning btn-xs',
+            'role' => 'modal-remote-bulk',
+            'data-target' => '#' . $idmodal,
+            'data-confirm' => false,
+            'data-method' => false,
+            'data-request-method' => 'post',
+            'data-confirm-title' => Yii::t(
+                'yii2-ajaxcrud',
+                'Bulk Magic Auto Fill'
+            ),
+            'data-confirm-message' =>
+                'Apakah Anda yakin ingin melakukan Magic Auto Fill ' .
+                'untuk paket yang dipilih?<br><br>' .
+                'Tanggal tugas akan diisi dengan tgl dpp.<br>' .
+                'Pejabat dan Admin akan diisi sesuai default.<br>' .
+                'Checklist akan dicentang.',
+            'data-toggle' => 'tooltip',
+            'data-original-title' => Yii::t(
+                'yii2-ajaxcrud',
+                'Bulk Magic Auto Fill'
+            ),
+        ]
+    ) . ' ';
+}
+
+$buttons .= Html::a(
+    '<i class="fa fa-trash"></i>&nbsp; ' .
+    Yii::t('yii2-ajaxcrud', 'Delete All'),
+    ['bulkdelete'],
+    [
+        'class' => 'btn btn-danger btn-xs',
+        'role' => 'modal-remote-bulk',
+        'data-target' => '#' . $idmodal,
+        'data-confirm' => false,
+        'data-method' => false,
+        'data-request-method' => 'post',
+        'data-confirm-title' => Yii::t('yii2-ajaxcrud', 'Delete'),
+        'data-confirm-message' => Yii::t(
+            'yii2-ajaxcrud',
+            'Delete Confirm'
+        ),
+    ]
+);
 ?>
 <div class="dpp-index">
     <div id="ajaxCrudDatatable">
@@ -85,20 +144,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 //     ) : '')
                 // ])),
                 'after' => BulkButtonWidget::widget([
-                    'buttons' => Html::a(
-                        '<i class="fa fa-trash"></i>&nbsp; ' . Yii::t('yii2-ajaxcrud', 'Delete All'),
-                        ["bulkdelete"],
-                        [
-                            'class' => 'btn btn-danger btn-xs',
-                            'role' => 'modal-remote-bulk',
-                            'data-target' => '#' . $idmodal,
-                            'data-confirm' => false,
-                            'data-method' => false,
-                            'data-request-method' => 'post',
-                            'data-confirm-title' => Yii::t('yii2-ajaxcrud', 'Delete'),
-                            'data-confirm-message' => Yii::t('yii2-ajaxcrud', 'Delete Confirm')
-                        ]
-                    ),
+                    'buttons' => $buttons,
                 ]) .
                     'Legend:
                     <span class="bg-warning p-1 m-0 text-white">On Process</span>

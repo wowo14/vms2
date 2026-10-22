@@ -38,8 +38,57 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                     'filter' => [0 => 'Draft', 1 => 'Dipublikasikan / Berjalan', 2 => 'Selesai'],
                 ],
+                [
+                    'label' => 'Form Trial',
+                    'format' => 'raw',
+                    'value' => function ($model) {
+                        if ($model->metode == 2) {
+                            return Html::a('<i class="fas fa-clipboard-check"></i> Kelola Quiz', ['trial-questions', 'id' => $model->id], [
+                                'class' => 'btn btn-info btn-sm',
+                                'title' => 'Kelola Pertanyaan Trial'
+                            ]);
+                        }
+                        return '<span class="text-muted text-small">-</span>';
+                    },
+                    'filter' => false,
+                ],
 
-                ['class' => 'yii\grid\ActionColumn'],
+                [
+                    'class' => 'yii\grid\ActionColumn',
+                    'template' => '{view} {update} {delete}',
+                    'buttons' => [
+                        'view' => function ($url, $model, $key) {
+                            return Html::a('<i class="fas fa-eye"></i>', ['view', 'id' => $model->id], [
+                                'class' => 'btn btn-primary btn-sm',
+                                'title' => 'Lihat Detail',
+                                'data-toggle' => 'tooltip'
+                            ]);
+                        },
+                        'update' => function ($url, $model, $key) {
+                            return Html::a('<i class="fas fa-edit"></i>', ['update', 'id' => $model->id], [
+                                'class' => 'btn btn-warning btn-sm',
+                                'title' => 'Edit',
+                                'data-toggle' => 'tooltip'
+                            ]);
+                        },
+                        'delete' => function ($url, $model, $key) {
+                            return Html::a('<i class="fas fa-trash"></i>', ['delete', 'id' => $model->id], [
+                                'class' => 'btn btn-danger btn-sm',
+                                'title' => 'Hapus',
+                                'data-toggle' => 'tooltip',
+                                'data' => [
+                                    'confirm' => 'Apakah Anda yakin ingin menghapus minikompetisi ini?',
+                                    'method' => 'post',
+                                ]
+                            ]);
+                        },
+                    ],
+                    'visibleButtons' => [
+                        'view' => true,
+                        'update' => true,
+                        'delete' => true,
+                    ],
+                ],
             ],
             'responsive' => true,
             'hover' => true,

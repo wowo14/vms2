@@ -2,6 +2,7 @@
 use yii\web\View;
 use yii\helpers\Html;
 use kartik\date\DatePicker;
+use yii\helpers\Json;
 use kartik\select2\Select2;
 use yii\bootstrap4\ActiveForm;
 use app\models\{Unit, CeklistModel};
@@ -112,6 +113,117 @@ echo $form->field($mdl, 'template')->widget(MultipleInput::class, [
     'columns' => $col
 ])->label(false);
 echo '<div class="form-group">';
+echo Html::button('<i class="fas fa-magic"></i> Magic Auto Fill', [
+    'id' => 'btn-magic-autofill',
+    'class' => 'btn btn-warning mr-2',
+    'title' => 'Auto-fill tanggal, pejabat, admin, dan checklist'
+]);
 echo Html::submitButton('Submit', ['class' => 'btn btn-primary']);
 echo '</div>';
 ActiveForm::end();
+
+$tanggalDpp = Json::encode($dpp->tanggal_dpp ?? '');
+$this->registerJs("
+jQuery(function ($) {
+    $('#btn-magic-autofill').on('click', function () {
+        const \$button = \$(this);
+
+        if (!confirm(
+            'Jalankan Magic Auto Fill?\\n\\n' +
+            'Tanggal tugas akan diisi dengan tgl dpp. ' +
+            'Checklist akan dicentang. ' +
+            'Periksa seluruh hasil sebelum menyimpan.'
+        )) {
+            return;
+        }
+
+        // 1. Isi tanggal tugas menggunakan tanggal DPP
+        const tanggalDpp = {$tanggalDpp};
+        \$('#ceklistmodel-tanggal_tugas')
+            .val(tanggalDpp)
+            .trigger('change');
+
+        // 2. Pilih pejabat/admin.
+        // Isi ID berikut setelah menentukan aturan bisnis.
+        const defaultPejabatId = '20';
+        const defaultAdminId = '20';
+
+        function selectIfUnambiguous(selector, preferredId) {
+            const \$select = \$(selector);
+
+            if (!\$select.length) {
+                return false;
+            }
+
+            // Prioritaskan ID yang dikonfigurasi.
+            if (
+                preferredId !== '' &&
+                \$select.find('option').filter(function () {
+                    return this.value === String(preferredId);
+                }).length
+            ) {
+                \$select.val(String(preferredId))
+                    .trigger('change');
+
+                return true;
+            }
+
+            // Jika hanya ada satu pilihan nyata, pilih otomatis.
+            const \$options = \$select.find('option').filter(function () {
+                return this.value !== '' && !this.disabled;
+            });
+
+            if (\$options.length === 1) {
+                \$select.val(\$options.first().val())
+                    .trigger('change');
+
+                return true;
+            }
+
+            // Jangan menebak jika ada beberapa pilihan.
+            return false;
+        }
+
+        const pejabatTerpilih = selectIfUnambiguous(
+            '#ceklistmodel-pejabat',
+            defaultPejabatId
+        );
+
+        const adminTerpilih = selectIfUnambiguous(
+            '#ceklistmodel-admin',
+            defaultAdminId
+        );
+
+        // 3. Centang kolom \"sesuai\" pada MultipleInput.
+        // Gunakan hanya jika seluruh item memang sudah diverifikasi.
+        const bolehCentangSemua = true;
+
+        if (bolehCentangSemua) {
+            const \$checkboxes = \$(
+                '#dok-template input[type=\"checkbox\"]'
+            ).filter(function () {
+                const name = \$(this).attr('name') || '';
+
+                return /\\[sesuai\\]\$/.test(name);
+            });
+
+            \$checkboxes
+                .prop('checked', true)
+                .trigger('change');
+        }
+
+        // 4. Beri informasi jika pemilihan belum dapat dilakukan.
+        const pesan = [
+            'Magic Auto Fill selesai.',
+            'Tanggal tugas: ' + tanggalDpp,
+            'Pejabat: ' +
+                (pejabatTerpilih ? 'terisi' : 'perlu dipilih'),
+            'Admin: ' +
+                (adminTerpilih ? 'terisi' : 'perlu dipilih'),
+            'Checklist: periksa kembali seluruh item.',
+        ];
+
+        alert(pesan.join('\\n'));
+    });
+});
+", View::POS_END);

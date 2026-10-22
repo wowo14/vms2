@@ -9,6 +9,8 @@ use app\models\MinikompetisiItem;
 use app\models\MinikompetisiVendor;
 use app\models\MinikompetisiPenawaran;
 use app\models\MinikompetisiPenawaranItem;
+use app\models\MinikompetisiTrialQuestion;
+use app\models\MinikompetisiTrialAnswer;
 use app\models\QuotationVersion;
 use app\models\QuotationItem;
 use app\models\PricingDataset;
@@ -1150,15 +1152,202 @@ class MinikompetisiController extends Controller
                 .text-center { text-align: center; }
             ',
             'options' => [
-                'title' => 'Ranking Minikompetisi - ' . $model->judul,
-                'subject' => 'Ranking Minikompetisi',
+                'title' => 'Ranking Report - ' . $model->judul,
+                'subject' => 'Ranking Report',
             ],
             'methods' => [
-                'SetHeader' => ['Ranking Minikompetisi - ' . $model->judul . '||Generated: ' . date('Y-m-d H:i')],
-                'SetFooter' => ['|Page {PAGENO}|'],
+                'SetHeader' => ['{TITLE}'],
+                'SetFooter' => ['{PAGENO}'],
             ]
         ]);
 
         return $pdf->render();
+    }
+
+    /* ─────────────── TRIAL FORM MANAGEMENT (ADMIN) ─────────────── */
+
+    /**
+     * Manage trial questions for a minikompetisi
+     */
+    public function actionTrialQuestions($id)
+    {
+        $model = $this->findModel($id);
+        
+        // Only allow for Kualitas & Harga method
+        if ($model->metode != 2) {
+            Yii::$app->session->setFlash('error', 'Form trial hanya tersedia untuk metode Kualitas & Harga.');
+            return $this->redirect(['view', 'id' => $id]);
+        }
+
+        $questions = MinikompetisiTrialQuestion::find()
+            ->where(['minikompetisi_id' => $id])
+            ->orderBy(['urutan' => SORT_ASC, 'id' => SORT_ASC])
+            ->all();
+
+        $newQuestion = new MinikompetisiTrialQuestion();
+        $newQuestion->minikompetisi_id = $id;
+        $newQuestion->tipe_jawaban = MinikompetisiTrialQuestion::TIPE_SKALA;
+
+        if ($newQuestion->load(Yii::$app->request->post()) && $newQuestion->save()) {
+            Yii::$app->session->setFlash('success', 'Pertanyaan berhasil ditambahkan.');
+            return $this->redirect(['trial-questions', 'id' => $id]);
+        }
+
+        return $this->render('trial_questions', [
+            'model' => $model,
+            'questions' => $questions,
+            'newQuestion' => $newQuestion,
+        ]);
+    }
+
+    /**
+     * Update trial question
+     */
+    public function actionUpdateTrialQuestion($id)
+    {
+        $question = MinikompetisiTrialQuestion::findOne($id);
+        if (!$question) {
+            throw new NotFoundHttpException('Pertanyaan tidak ditemukan.');
+        }
+
+        if ($question->load(Yii::$app->request->post()) && $question->save()) {
+            Yii::$app->session->setFlash('success', 'Pertanyaan berhasil diperbarui.');
+            return $this->redirect(['trial-questions', 'id' => $question->minikompetisi_id]);
+        }
+
+        return $this->render('update_trial_question', [
+            'question' => $question,
+        ]);
+    }
+
+    /**
+     * Delete trial question
+     */
+    public function actionDeleteTrialQuestion($id)
+    {
+        $question = MinikompetisiTrialQuestion::findOne($id);
+        if ($question) {
+            $minikompetisiId = $question->minikompetisi_id;
+            $question->delete();
+            Yii::$app->session->setFlash('success', 'Pertanyaan berhasil dihapus.');
+            return $this->redirect(['trial-questions', 'id' => $minikompetisiId]);
+        }
+        return $this->goBack();
+    }
+
+    /* ─────────────── TRIAL ANSWER SUBMISSION (OPERATOR) ─────────────── */
+
+    /**
+     * Submit trial answers for a vendor's products
+     */
+    public function actionTrialAnswer($penawaran_id)
+    {
+        $penawaran = MinikompetisiPenawaran::findOne($penawaran_id);
+        if (!$penawaran) {
+            throw new NotFoundHttpException('Penawaran tidak ditemukan.');
+        }
+
+        $minikompetisi = $penawaran->minikompetisi;
+        
+        // Only allow for Kualitas & Harga method
+        if ($minikompetisi->metode != 2) {
+            Yii::$app->session->setFlash('error', 'Form trial hanya tersedia untuk metode Kualitas & Harga.');
+            return $this->redirect(['view', 'id' => $minikompetisi->id]);
+        }
+
+        // Get all questions for this minikompetisi
+        $questions = MinikompetisiTrialQuestion::find()
+            ->where(['minikompetisi_id' => $minikompetisi->id])
+            ->orderBy(['urutan' => SORT_ASC, 'id' => SORT_ASC])
+            ->all();
+
+        if (empty($questions)) {
+            Yii::$app->session->setFlash('warning', 'Belum ada pertanyaan trial yang dibuat untuk minikompetisi ini.');
+            return $this->redirect(['view', 'id' => $minikompetisi->id]);
+        }
+
+        // Load existing answers or create new ones
+        $answers = [];
+        foreach ($questions as $question) {
+            $answer = MinikompetisiTrialAnswer::find()
+                ->where(['question_id' => $question->id, 'penawaran_id' => $penawaran_id])
+                ->one();
+            if (!$answer) {
+                $answer = new MinikompetisiTrialAnswer();
+                $answer->question_id = $question->id;
+                $answer->penawaran_id = $penawaran_id;
+                $answer->tanggal_isi = date('Y-m-d');
+            }
+            $answers[$question->id] = $answer;
+        }
+
+        if (Yii::$app->request->isPost) {
+            $allSaved = true;
+            foreach ($answers as $answer) {
+                if ($answer->load(Yii::$app->request->post(), 'MinikompetisiTrialAnswer_' . $answer->question_id)) {
+                    if (!$answer->save()) {
+                        $allSaved = false;
+                    }
+                }
+            }
+
+            if ($allSaved) {
+                Yii::$app->session->setFlash('success', 'Jawaban trial berhasil disimpan.');
+                return $this->redirect(['trial-result', 'penawaran_id' => $penawaran_id]);
+            }
+        }
+
+        return $this->render('trial_answer', [
+            'penawaran' => $penawaran,
+            'minikompetisi' => $minikompetisi,
+            'questions' => $questions,
+            'answers' => $answers,
+        ]);
+    }
+
+    /* ─────────────── TRIAL RESULTS VIEW (VENDOR/PUBLIC) ─────────────── */
+
+    /**
+     * View trial results for a vendor
+     */
+    public function actionTrialResult($penawaran_id)
+    {
+        $penawaran = MinikompetisiPenawaran::findOne($penawaran_id);
+        if (!$penawaran) {
+            throw new NotFoundHttpException('Penawaran tidak ditemukan.');
+        }
+
+        $minikompetisi = $penawaran->minikompetisi;
+        
+        // Get all questions with answers
+        $questions = MinikompetisiTrialQuestion::find()
+            ->where(['minikompetisi_id' => $minikompetisi->id])
+            ->orderBy(['urutan' => SORT_ASC, 'id' => SORT_ASC])
+            ->all();
+
+        $answers = [];
+        foreach ($questions as $question) {
+            $answer = MinikompetisiTrialAnswer::find()
+                ->where(['question_id' => $question->id, 'penawaran_id' => $penawaran_id])
+                ->one();
+            $answers[$question->id] = $answer;
+        }
+
+        return $this->render('trial_result', [
+            'penawaran' => $penawaran,
+            'minikompetisi' => $minikompetisi,
+            'questions' => $questions,
+            'answers' => $answers,
+        ]);
+    }
+
+    /**
+     * Public view for trial results (accessible by vendors)
+     */
+    public function actionPublicTrialResult($token)
+    {
+        // Find penawaran by token (you may need to add a token field to penawaran table)
+        // For now, use penawaran_id directly
+        return $this->redirect(['trial-result', 'penawaran_id' => $token]);
     }
 }

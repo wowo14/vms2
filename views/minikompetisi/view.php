@@ -263,6 +263,9 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
                             'class' => 'btn btn-danger btn-sm',
                             'data' => ['confirm' => 'Hapus paket ini beserta semua penawarannya?', 'method' => 'post'],
                         ]) ?>
+                        <?php if ($model->metode == 2): ?>
+                            <?= Html::a('<i class="fas fa-clipboard-check"></i> Form Trial', ['trial-questions', 'id' => $model->id], ['class' => 'btn btn-info btn-sm']) ?>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -424,6 +427,13 @@ $konsolidasiUrl = Url::to(['konsolidasi', 'id' => $model->id]);
                                                     data-mk="<?= $model->id ?>" data-vendor="<?= $p->vendor_id ?>">
                                                 <i class="fas fa-history"></i> Riwayat
                                             </button>
+                                            <?php if ($model->metode == 2): ?>
+                                                <?= Html::a('<i class="fas fa-clipboard-check"></i> Trial', ['trial-answer', 'penawaran_id' => $p->id], [
+                                                    'class' => 'btn btn-xs btn-outline-info',
+                                                    'style' => 'font-size:11px;padding:2px 6px;',
+                                                    'title' => 'Isi Form Trial'
+                                                ]) ?>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

@@ -93,3 +93,5 @@ ada kolom harga,
 ada kolom tanggal
 
 === mini kompetisi baru format 
+
+revisi rekap harga, bisa trace transaksi mana penyedia siapa
