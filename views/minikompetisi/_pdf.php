@@ -34,7 +34,7 @@ use yii\helpers\Html;
                 <th style="border: 1px solid #000; padding: 8px; background-color: #f2f2f2; font-weight: bold;">Nama Produk</th>
                 <?php for ($i = 1; $i <= $maxRank; $i++): ?>
                     <?php $colorClass = "rank-" . ($i > 5 ? 5 : $i); ?>
-                    <th colspan="2" style="border: 1px solid #000; padding: 8px; background-color: #f2f2f2; font-weight: bold; text-align: center;">Terpilih <?= $i ?></th>
+                    <th colspan="2" style="border: 1px solid #000; padding: 8px; background-color: #f2f2f2; font-weight: bold; text-align: center;">Terbaik <?= $i ?></th>
                 <?php endfor; ?>
             </tr>
             <tr>
